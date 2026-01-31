@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Minus, Plus, RotateCcw, Cloud, CloudOff, Loader2 } from 'lucide-react';
+import { Minus, Plus, RotateCcw, Cloud, CloudOff, Loader2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,8 +10,13 @@ import { MethodSelector } from './MethodSelector';
 import { calculateShinyStats, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON } from '@/lib/pokemon-data';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
+import { FinishHuntDialog } from './FinishHuntDialog';
 
-export function ShinyCounter() {
+interface ShinyCounterProps {
+  huntId?: string;
+}
+
+export function ShinyCounter({ huntId }: ShinyCounterProps) {
   const { user } = useAuth();
   const [counter, setCounter] = useState(0);
   const [incrementAmount, setIncrementAmount] = useState(1);
@@ -25,6 +30,7 @@ export function ShinyCounter() {
   const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'error'>('saved');
   const [isEditingCounter, setIsEditingCounter] = useState(false);
   const [tempCounterValue, setTempCounterValue] = useState('');
+  const [isFinishDialogOpen, setIsFinishDialogOpen] = useState(false);
 
   // Load active hunt from Supabase when user is logged in
   useEffect(() => {
@@ -34,14 +40,32 @@ export function ShinyCounter() {
     }
 
     const loadHunt = async () => {
+      // If creating a new hunt, ensure we start fresh
+      if (huntId === 'new') {
+        setCounter(0);
+        setIncrementAmount(1);
+        setSelectedPokemonId(null);
+        setSelectedPokemonName('');
+        activeHuntIdRef.current = null;
+        setLoading(false);
+        return;
+      }
+
       try {
-        const { data, error } = await supabase
+        let query = supabase
           .from('active_hunts')
           .select('*')
-          .eq('user_id', user.id)
-          .order('updated_at', { ascending: false })
-          .limit(1)
-          .maybeSingle();
+          .eq('user_id', user.id);
+
+        // If huntId is provided, load that specific hunt
+        if (huntId) {
+          query = query.eq('id', huntId).maybeSingle();
+        } else {
+          // Otherwise load the most recent hunt
+          query = query.order('updated_at', { ascending: false }).limit(1).maybeSingle();
+        }
+
+        const { data, error } = await query;
 
         if (error) throw error;
 
@@ -62,7 +86,7 @@ export function ShinyCounter() {
     };
 
     loadHunt();
-  }, [user?.id]);
+  }, [user?.id, huntId]);
 
   // Save to Supabase when state changes (debounced)
   useEffect(() => {
@@ -359,6 +383,18 @@ export function ShinyCounter() {
             </div>
           )}
 
+          {/* Finish Hunt Button - only show if user is logged in and hunt exists */}
+          {user && activeHuntIdRef.current && selectedPokemonId && (
+            <Button
+              variant="default"
+              onClick={() => setIsFinishDialogOpen(true)}
+              className="w-full shiny-glow"
+            >
+              <Check className="mr-2 h-4 w-4" />
+              Termina caccia e salva
+            </Button>
+          )}
+
           {/* Reset Button */}
           <Button
             variant="destructive"
@@ -370,6 +406,17 @@ export function ShinyCounter() {
           </Button>
         </CardContent>
       </Card>
+
+      <FinishHuntDialog
+        open={isFinishDialogOpen}
+        onOpenChange={setIsFinishDialogOpen}
+        huntId={activeHuntIdRef.current || ''}
+        pokemonId={selectedPokemonId || 0}
+        pokemonName={selectedPokemonName}
+        counter={counter}
+        method={selectedMethod.id}
+        hasShinyCharm={hasShinyCharm}
+      />
     </div>
   );
 }

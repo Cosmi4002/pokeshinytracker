@@ -15,7 +15,8 @@ export function Navbar() {
   const { user, signOut } = useAuth();
 
   const navLinks = [
-    { to: '/counter', label: 'Counter', icon: Calculator },
+    { to: '/hunts', label: 'Hunts', icon: Calculator },
+    { to: '/counter', label: 'Counter', icon: Sparkles }, // Changed Icon to distinguish
     { to: '/pokedex', label: 'Pokédex', icon: BookOpen },
     { to: '/collection', label: 'Collection', icon: Archive },
   ];
