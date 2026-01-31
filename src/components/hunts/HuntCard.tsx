@@ -17,8 +17,7 @@ interface HuntCardProps {
 
 export function HuntCard({ hunt, onDelete }: HuntCardProps) {
     const method = HUNTING_METHODS.find((m) => m.id === hunt.method);
-    const odds = method?.baseOdds || 4096;
-    const stats = calculateShinyStats(hunt.counter || 0, odds);
+    const stats = calculateShinyStats(hunt.counter || 0, hunt.method || 'gen9-random', hunt.has_shiny_charm || false);
 
     const getPokemonAnimatedSpriteUrl = (pokemonId: number | null): string | null => {
         if (!pokemonId) return null;

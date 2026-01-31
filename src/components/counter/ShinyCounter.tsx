@@ -124,18 +124,8 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
     return () => clearTimeout(timer);
   }, [user?.id, loading, counter, incrementAmount, selectedPokemonId, selectedPokemonName, selectedMethod, hasShinyCharm]);
 
-  // Calculate current odds based on method and shiny charm
-  const getCurrentOdds = useCallback(() => {
-    if (selectedMethod.id === 'custom') {
-      return customOdds;
-    }
-    if (hasShinyCharm && selectedMethod.supportsShinyCharm && selectedMethod.shinyCharmOdds) {
-      return selectedMethod.shinyCharmOdds;
-    }
-    return selectedMethod.baseOdds;
-  }, [selectedMethod, hasShinyCharm, customOdds]);
-
-  const stats = calculateShinyStats(counter, getCurrentOdds());
+  // Calculate stats based on current counter and method
+  const stats = calculateShinyStats(counter, selectedMethod.id, hasShinyCharm, selectedMethod.id === 'custom' ? customOdds : undefined);
 
   const increment = () => setCounter((prev) => prev + incrementAmount);
   const decrement = () => setCounter((prev) => Math.max(0, prev - incrementAmount));
@@ -169,11 +159,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
   const reset = async () => {
     setCounter(0);
     if (user && activeHuntIdRef.current) {
-      try {
-        await supabase.from('active_hunts').update({ counter: 0, updated_at: new Date().toISOString() }).eq('id', activeHuntIdRef.current);
-      } catch {
-        // Silently fail
-      }
+      await supabase.from('active_hunts').update({ counter: 0 }).eq('id', activeHuntIdRef.current);
     }
   };
 
@@ -197,14 +183,14 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
 
   if (loading) {
     return (
-      <div className="w-full max-w-lg mx-auto flex justify-center py-12">
-        <p className="text-muted-foreground">Caricamento...</p>
+      <div className="w-full h-full flex items-center justify-center p-12">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div className="w-full max-w-lg mx-auto space-y-6">
+    <div className="w-full h-full space-y-4">
       {/* Counter Display */}
       <div className="text-center space-y-4">
         {/* Pokemon Sprite */}
@@ -232,13 +218,13 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
             onBlur={handleCounterBlur}
             onKeyDown={handleCounterKeyDown}
             autoFocus
-            className="text-8xl font-bold tabular-nums text-center h-32 border-2 border-primary"
-            style={{ fontSize: '6rem' }}
+            className="text-6xl font-bold tabular-nums text-center h-24 border-2 border-primary"
+            style={{ fontSize: '4rem' }}
           />
         ) : (
           <div
             onClick={handleCounterClick}
-            className="text-8xl font-bold tabular-nums shiny-text cursor-pointer hover:scale-105 transition-transform duration-200"
+            className="text-6xl font-bold tabular-nums shiny-text cursor-pointer hover:scale-105 transition-transform duration-200"
             title="Click to edit counter"
           >
             {counter.toLocaleString()}
@@ -251,23 +237,23 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
             size="lg"
             variant="outline"
             onClick={decrement}
-            className="h-14 px-8 text-2xl"
+            className="h-12 px-6 text-xl"
           >
-            <Minus className="h-6 w-6" />
+            <Minus className="h-5 w-5" />
           </Button>
           <Button
             size="lg"
             onClick={increment}
-            className="h-14 px-8 text-2xl shiny-glow"
+            className="h-12 px-6 text-xl shiny-glow"
           >
-            <Plus className="h-6 w-6" />
+            <Plus className="h-5 w-5" />
           </Button>
         </div>
 
         {/* Increment Amount */}
         <div className="flex items-center justify-center gap-2">
-          <Label htmlFor="increment" className="text-sm text-muted-foreground">
-            Amount to increase/decrease by:
+          <Label htmlFor="increment" className="text-xs text-muted-foreground">
+            Step:
           </Label>
           <Input
             id="increment"
@@ -275,52 +261,47 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
             min={1}
             value={incrementAmount}
             onChange={(e) => setIncrementAmount(Math.max(1, parseInt(e.target.value) || 1))}
-            className="w-20 h-8 text-center"
+            className="w-16 h-8 text-center"
           />
         </div>
 
         {user && (
-          <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground animate-in fade-in h-6">
-            {saveStatus === 'saving' && (
+          <div className="flex justify-center items-center gap-2 text-sm text-muted-foreground h-6">
+            {saveStatus === 'saving' ? (
               <>
                 <Loader2 className="h-3 w-3 animate-spin" />
-                Saving...
+                <span>Salvataggio...</span>
               </>
-            )}
-            {saveStatus === 'saved' && (
+            ) : saveStatus === 'saved' ? (
               <>
                 <Cloud className="h-3 w-3" />
-                Saved to cloud
+                <span>Salvato</span>
               </>
-            )}
-            {saveStatus === 'error' && (
+            ) : (
               <>
                 <CloudOff className="h-3 w-3 text-destructive" />
-                <span className="text-destructive">Sync error</span>
+                <span className="text-destructive">Errore</span>
               </>
             )}
           </div>
         )}
       </div>
 
-      {/* Statistics */}
+      {/* Stats Card */}
       <Card>
-        <CardContent className="pt-6 space-y-3">
-          <div className="flex justify-between items-center">
-            <span className="text-muted-foreground">Probability:</span>
-            <span className="font-mono font-semibold text-lg">{stats.probability}</span>
+        <CardContent className="pt-6 grid grid-cols-2 gap-4 text-center">
+          <div>
+            <div className="text-sm text-muted-foreground mb-1">Odds Correnti</div>
+            <div className="font-mono font-bold text-lg text-primary">
+              1 / {stats.currentOdds.toLocaleString()}
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {stats.percentage}%
+            </div>
           </div>
-          <div className="flex justify-between items-center">
-            <span className="text-muted-foreground">Binomial Probability:</span>
-            <span className="font-mono font-semibold text-lg">{stats.binomialProbability}%</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-muted-foreground">Until 50%:</span>
-            <span className="font-mono font-semibold text-lg">{stats.until50.toLocaleString()}</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-muted-foreground">Until 90%:</span>
-            <span className="font-mono font-semibold text-lg">{stats.until90.toLocaleString()}</span>
+          <div>
+            <div className="text-sm text-muted-foreground mb-1">Prob. Totale</div>
+            <span className="font-mono font-bold text-lg text-primary">{stats.binomialProbability}%</span>
           </div>
         </CardContent>
       </Card>
