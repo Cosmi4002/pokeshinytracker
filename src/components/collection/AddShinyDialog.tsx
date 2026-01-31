@@ -93,7 +93,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
         pokemon_name: pokemonName,
         sprite_url: getPokemonSpriteUrl(pokemonId, { shiny: true }),
         attempts,
-        method: method.name,
+        method: method.id,
         gender: gender || null,
         pokeball,
         caught_date: caughtDate,

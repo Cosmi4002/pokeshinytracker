@@ -2,16 +2,45 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL ?? '';
+// Support both common env var names (docs/tools vary).
+const SUPABASE_ANON_KEY =
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ??
+  import.meta.env.VITE_SUPABASE_ANON_KEY ??
+  '';
+
+export const isSupabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
+
+export function getSupabaseConfigErrorMessage() {
+  if (isSupabaseConfigured) return null;
+  return [
+    "Supabase non è configurato.",
+    "Imposta le variabili d'ambiente:",
+    "- VITE_SUPABASE_URL",
+    "- VITE_SUPABASE_PUBLISHABLE_KEY (oppure VITE_SUPABASE_ANON_KEY)",
+  ].join('\n');
+}
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-  auth: {
-    storage: localStorage,
-    persistSession: true,
-    autoRefreshToken: true,
+function createSupabaseClient() {
+  if (!isSupabaseConfigured) {
+    return createClient<Database>('https://placeholder.supabase.co', 'placeholder-anon-key', {
+      auth: { persistSession: false, autoRefreshToken: false }
+    });
   }
-});
+  return createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      storage: localStorage,
+      persistSession: true,
+      autoRefreshToken: true,
+    }
+  });
+}
+
+export const supabase = createSupabaseClient();
+
+export const supabaseProjectRef = SUPABASE_URL
+  ? new URL(SUPABASE_URL).hostname.split('.')[0]
+  : 'local';

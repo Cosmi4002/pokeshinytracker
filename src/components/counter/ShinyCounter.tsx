@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Minus, Plus, RotateCcw } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { Minus, Plus, RotateCcw, Cloud, CloudOff, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,9 +8,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { PokemonSelector } from './PokemonSelector';
 import { MethodSelector } from './MethodSelector';
 import { calculateShinyStats, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON } from '@/lib/pokemon-data';
-import { getPokemonSpriteUrl } from '@/hooks/use-pokemon';
+import { useAuth } from '@/lib/auth-context';
+import { supabase } from '@/integrations/supabase/client';
 
 export function ShinyCounter() {
+  const { user } = useAuth();
   const [counter, setCounter] = useState(0);
   const [incrementAmount, setIncrementAmount] = useState(1);
   const [selectedPokemonId, setSelectedPokemonId] = useState<number | null>(null);
@@ -18,6 +20,83 @@ export function ShinyCounter() {
   const [selectedMethod, setSelectedMethod] = useState<HuntingMethod>(HUNTING_METHODS[0]);
   const [hasShinyCharm, setHasShinyCharm] = useState(false);
   const [customOdds, setCustomOdds] = useState(4096);
+  const [loading, setLoading] = useState(!!user);
+  const activeHuntIdRef = useRef<string | null>(null);
+  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'error'>('saved');
+
+  // Load active hunt from Supabase when user is logged in
+  useEffect(() => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    const loadHunt = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('active_hunts')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('updated_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        if (data) {
+          activeHuntIdRef.current = data.id;
+          setCounter(data.counter ?? 0);
+          setIncrementAmount(data.increment_amount ?? 1);
+          setSelectedPokemonId(data.pokemon_id ?? null);
+          setSelectedPokemonName(data.pokemon_name ?? '');
+          setSelectedMethod(HUNTING_METHODS.find((m) => m.id === data.method) ?? HUNTING_METHODS[0]);
+          setHasShinyCharm(data.has_shiny_charm ?? false);
+        }
+      } catch {
+        // Silently fail - use default state
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadHunt();
+  }, [user?.id]);
+
+  // Save to Supabase when state changes (debounced)
+  useEffect(() => {
+    if (!user) return;
+
+    const timer = setTimeout(async () => {
+      setSaveStatus('saving');
+      try {
+        const payload = {
+          user_id: user.id,
+          pokemon_id: selectedPokemonId,
+          pokemon_name: selectedPokemonName ?? '',
+          method: selectedMethod.id,
+          counter,
+          has_shiny_charm: hasShinyCharm,
+          increment_amount: incrementAmount,
+          updated_at: new Date().toISOString(),
+        };
+
+        if (activeHuntIdRef.current) {
+          await supabase
+            .from('active_hunts')
+            .update(payload)
+            .eq('id', activeHuntIdRef.current);
+        } else {
+          const { data, error } = await supabase.from('active_hunts').insert(payload).select('id').single();
+          if (!error && data) activeHuntIdRef.current = data.id;
+        }
+        setSaveStatus('saved');
+      } catch {
+        setSaveStatus('error');
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [user?.id, loading, counter, incrementAmount, selectedPokemonId, selectedPokemonName, selectedMethod, hasShinyCharm]);
 
   // Calculate current odds based on method and shiny charm
   const getCurrentOdds = useCallback(() => {
@@ -32,15 +111,24 @@ export function ShinyCounter() {
 
   const stats = calculateShinyStats(counter, getCurrentOdds());
 
-  const increment = () => setCounter(prev => prev + incrementAmount);
-  const decrement = () => setCounter(prev => Math.max(0, prev - incrementAmount));
-  const reset = () => setCounter(0);
+  const increment = () => setCounter((prev) => prev + incrementAmount);
+  const decrement = () => setCounter((prev) => Math.max(0, prev - incrementAmount));
+  const reset = async () => {
+    setCounter(0);
+    if (user && activeHuntIdRef.current) {
+      try {
+        await supabase.from('active_hunts').update({ counter: 0, updated_at: new Date().toISOString() }).eq('id', activeHuntIdRef.current);
+      } catch {
+        // Silently fail
+      }
+    }
+  };
 
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement) return;
-      
+
       if (e.key === '+' || e.key === '=') {
         e.preventDefault();
         increment();
@@ -53,6 +141,14 @@ export function ShinyCounter() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [incrementAmount]);
+
+  if (loading) {
+    return (
+      <div className="w-full max-w-lg mx-auto flex justify-center py-12">
+        <p className="text-muted-foreground">Caricamento...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-lg mx-auto space-y-6">
@@ -95,6 +191,29 @@ export function ShinyCounter() {
             className="w-20 h-8 text-center"
           />
         </div>
+
+        {user && (
+          <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground animate-in fade-in h-6">
+            {saveStatus === 'saving' && (
+              <>
+                <Loader2 className="h-3 w-3 animate-spin" />
+                Saving...
+              </>
+            )}
+            {saveStatus === 'saved' && (
+              <>
+                <Cloud className="h-3 w-3" />
+                Saved to cloud
+              </>
+            )}
+            {saveStatus === 'error' && (
+              <>
+                <CloudOff className="h-3 w-3 text-destructive" />
+                <span className="text-destructive">Sync error</span>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Statistics */}

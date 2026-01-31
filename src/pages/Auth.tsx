@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/auth-context';
+import { getSupabaseConfigErrorMessage, isSupabaseConfigured } from '@/integrations/supabase/client';
 
 const authSchema = z.object({
   email: z.string().email('Please enter a valid email'),
@@ -23,6 +24,7 @@ export default function Auth() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const supabaseConfigError = getSupabaseConfigErrorMessage();
 
   // Redirect if already logged in
   useEffect(() => {
@@ -51,6 +53,14 @@ export default function Auth() {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isSupabaseConfigured) {
+      toast({
+        variant: 'destructive',
+        title: 'Supabase non configurato',
+        description: supabaseConfigError ?? 'Configura Supabase per usare login e registrazione.',
+      });
+      return;
+    }
     if (!validateForm()) return;
 
     setLoading(true);
@@ -76,6 +86,14 @@ export default function Auth() {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isSupabaseConfigured) {
+      toast({
+        variant: 'destructive',
+        title: 'Supabase non configurato',
+        description: supabaseConfigError ?? 'Configura Supabase per usare login e registrazione.',
+      });
+      return;
+    }
     if (!validateForm()) return;
 
     setLoading(true);
@@ -113,6 +131,15 @@ export default function Auth() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {!isSupabaseConfigured && (
+            <div className="mb-4 rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-sm">
+              <p className="font-semibold text-destructive">Login/Registrazione disabilitati</p>
+              <p className="mt-1 text-muted-foreground whitespace-pre-line">
+                {supabaseConfigError}
+              </p>
+            </div>
+          )}
+
           <Tabs defaultValue="signin" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="signin">Sign In</TabsTrigger>
@@ -157,7 +184,7 @@ export default function Auth() {
                   )}
                 </div>
 
-                <Button type="submit" className="w-full" disabled={loading}>
+                <Button type="submit" className="w-full" disabled={loading || !isSupabaseConfigured}>
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Sign In
                 </Button>
@@ -202,7 +229,7 @@ export default function Auth() {
                   )}
                 </div>
 
-                <Button type="submit" className="w-full" disabled={loading}>
+                <Button type="submit" className="w-full" disabled={loading || !isSupabaseConfigured}>
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Create Account
                 </Button>

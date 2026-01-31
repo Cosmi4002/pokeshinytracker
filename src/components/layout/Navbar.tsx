@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Calculator, BookOpen, Archive, LogOut, User, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { supabaseProjectRef } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth-context';
 import {
   DropdownMenu,
@@ -31,7 +32,7 @@ export function Navbar() {
           {navLinks.map((link) => {
             const Icon = link.icon;
             const isActive = location.pathname === link.to;
-            
+
             return (
               <Link key={link.to} to={link.to}>
                 <Button
@@ -56,8 +57,10 @@ export function Navbar() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem className="text-muted-foreground text-sm">
-                  {user.email}
+                <DropdownMenuItem className="text-muted-foreground text-xs flex flex-col items-start gap-1">
+                  <span className="font-semibold text-foreground">{user.email}</span>
+                  <span>ID: {user.id.slice(0, 8)}...</span>
+                  <span>Project: {supabaseProjectRef}</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={signOut} className="text-destructive">
                   <LogOut className="mr-2 h-4 w-4" />
