@@ -23,6 +23,8 @@ export function ShinyCounter() {
   const [loading, setLoading] = useState(!!user);
   const activeHuntIdRef = useRef<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'error'>('saved');
+  const [isEditingCounter, setIsEditingCounter] = useState(false);
+  const [tempCounterValue, setTempCounterValue] = useState('');
 
   // Load active hunt from Supabase when user is logged in
   useEffect(() => {
@@ -113,6 +115,33 @@ export function ShinyCounter() {
 
   const increment = () => setCounter((prev) => prev + incrementAmount);
   const decrement = () => setCounter((prev) => Math.max(0, prev - incrementAmount));
+
+  const handleCounterClick = () => {
+    setTempCounterValue(counter.toString());
+    setIsEditingCounter(true);
+  };
+
+  const handleCounterBlur = () => {
+    const newValue = parseInt(tempCounterValue);
+    if (!isNaN(newValue) && newValue >= 0) {
+      setCounter(newValue);
+    }
+    setIsEditingCounter(false);
+  };
+
+  const handleCounterKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleCounterBlur();
+    } else if (e.key === 'Escape') {
+      setIsEditingCounter(false);
+    }
+  };
+
+  const getPokemonAnimatedSpriteUrl = (pokemonId: number | null): string | null => {
+    if (!pokemonId) return null;
+    // Try animated shiny sprite from Pokemon Showdown (Gen 5 B/W style)
+    return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/shiny/${pokemonId}.gif`;
+  };
   const reset = async () => {
     setCounter(0);
     if (user && activeHuntIdRef.current) {
@@ -154,9 +183,43 @@ export function ShinyCounter() {
     <div className="w-full max-w-lg mx-auto space-y-6">
       {/* Counter Display */}
       <div className="text-center space-y-4">
-        <div className="text-8xl font-bold tabular-nums shiny-text">
-          {counter.toLocaleString()}
-        </div>
+        {/* Pokemon Sprite */}
+        {selectedPokemonId && (
+          <div className="flex justify-center mb-4">
+            <img
+              src={getPokemonAnimatedSpriteUrl(selectedPokemonId) || ''}
+              alt={selectedPokemonName}
+              className="w-32 h-32 object-contain pokemon-sprite animate-in fade-in zoom-in duration-500"
+              onError={(e) => {
+                // Fallback to static shiny sprite if animated fails
+                const target = e.target as HTMLImageElement;
+                target.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${selectedPokemonId}.png`;
+              }}
+            />
+          </div>
+        )}
+
+        {/* Counter Number - Editable */}
+        {isEditingCounter ? (
+          <Input
+            type="number"
+            value={tempCounterValue}
+            onChange={(e) => setTempCounterValue(e.target.value)}
+            onBlur={handleCounterBlur}
+            onKeyDown={handleCounterKeyDown}
+            autoFocus
+            className="text-8xl font-bold tabular-nums text-center h-32 border-2 border-primary"
+            style={{ fontSize: '6rem' }}
+          />
+        ) : (
+          <div
+            onClick={handleCounterClick}
+            className="text-8xl font-bold tabular-nums shiny-text cursor-pointer hover:scale-105 transition-transform duration-200"
+            title="Click to edit counter"
+          >
+            {counter.toLocaleString()}
+          </div>
+        )}
 
         {/* Counter Buttons */}
         <div className="flex justify-center gap-2">
