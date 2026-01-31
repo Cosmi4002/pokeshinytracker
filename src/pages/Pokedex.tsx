@@ -13,18 +13,22 @@ import {
 } from '@/components/ui/select';
 import { usePokemonList, getPokemonSpriteUrl, GENERATION_RANGES, POKEMON_WITH_GENDER_DIFF } from '@/hooks/use-pokemon';
 import { Skeleton } from '@/components/ui/skeleton';
+import { PokemonDetailDialog } from '@/components/pokedex/PokemonDetailDialog';
+import { PokemonBasic } from '@/hooks/use-pokemon';
 
 export default function Pokedex() {
   const { pokemon, loading } = usePokemonList();
   const [search, setSearch] = useState('');
   const [generation, setGeneration] = useState<string>('all');
+  const [selectedPokemon, setSelectedPokemon] = useState<PokemonBasic | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const filteredPokemon = useMemo(() => {
     return pokemon.filter((p) => {
       // Search filter
       const matchesSearch = p.displayName.toLowerCase().includes(search.toLowerCase()) ||
         p.id.toString().includes(search);
-      
+
       // Generation filter
       let matchesGen = true;
       if (generation !== 'all') {
@@ -32,7 +36,7 @@ export default function Pokedex() {
         const [start, end] = GENERATION_RANGES[genNum];
         matchesGen = p.id >= start && p.id <= end;
       }
-      
+
       return matchesSearch && matchesGen;
     });
   }, [pokemon, search, generation]);
@@ -45,7 +49,7 @@ export default function Pokedex() {
           {/* Header & Filters */}
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
             <h1 className="text-3xl font-bold shiny-text">Shiny Pokédex</h1>
-            
+
             <div className="flex gap-2 w-full sm:w-auto">
               <div className="relative flex-1 sm:w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -56,7 +60,7 @@ export default function Pokedex() {
                   className="pl-10"
                 />
               </div>
-              
+
               <Select value={generation} onValueChange={setGeneration}>
                 <SelectTrigger className="w-[140px]">
                   <SelectValue placeholder="Generation" />
@@ -89,11 +93,15 @@ export default function Pokedex() {
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3">
               {filteredPokemon.map((p) => {
                 const hasGenderDiff = POKEMON_WITH_GENDER_DIFF.includes(p.id);
-                
+
                 return (
                   <Card
                     key={p.id}
                     className="group cursor-pointer hover:border-primary transition-colors overflow-hidden"
+                    onClick={() => {
+                      setSelectedPokemon(p);
+                      setIsDialogOpen(true);
+                    }}
                   >
                     <CardContent className="p-2 text-center space-y-1">
                       <div className="flex justify-center gap-1">
@@ -107,7 +115,7 @@ export default function Pokedex() {
                             (e.target as HTMLImageElement).style.display = 'none';
                           }}
                         />
-                        
+
                         {/* Female shiny sprite if has gender difference */}
                         {hasGenderDiff && (
                           <img
@@ -121,7 +129,7 @@ export default function Pokedex() {
                           />
                         )}
                       </div>
-                      
+
                       <p className="text-xs text-muted-foreground">
                         #{p.id.toString().padStart(4, '0')}
                       </p>
@@ -136,6 +144,12 @@ export default function Pokedex() {
           )}
         </div>
       </main>
+
+      <PokemonDetailDialog
+        pokemon={selectedPokemon}
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+      />
     </div>
   );
 }

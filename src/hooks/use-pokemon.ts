@@ -23,6 +23,7 @@ export interface PokemonDetailed {
 }
 
 export interface PokemonFormDetailed {
+  id: number;
   formName: string;
   displayName: string;
   sprites: {
@@ -82,13 +83,13 @@ export function usePokemonList() {
       try {
         const response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${TOTAL_POKEMON}`);
         const data = await response.json();
-        
+
         const pokemonList: PokemonBasic[] = data.results.map((p: { name: string }, index: number) => ({
           id: index + 1,
           name: p.name,
           displayName: formatPokemonName(p.name),
         }));
-        
+
         setPokemon(pokemonList);
       } catch (err) {
         setError('Failed to fetch Pokemon list');
@@ -118,24 +119,24 @@ export function usePokemonDetails(pokemonId: number | null) {
     async function fetchPokemonDetails() {
       setLoading(true);
       setError(null);
-      
+
       try {
         const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`);
         const data = await response.json();
-        
+
         // Also fetch species data for forms
         const speciesResponse = await fetch(data.species.url);
         const speciesData = await speciesResponse.json();
-        
+
         const hasGenderDiff = POKEMON_WITH_GENDER_DIFF.includes(pokemonId);
-        
+
         const sprites = {
           default: data.sprites.front_default,
           shiny: data.sprites.front_shiny,
           femaleDefault: hasGenderDiff ? data.sprites.front_female : undefined,
           femaleShiny: hasGenderDiff ? data.sprites.front_shiny_female : undefined,
         };
-        
+
         // Fetch form data
         const forms: PokemonFormDetailed[] = [];
         if (speciesData.varieties && speciesData.varieties.length > 1) {
@@ -145,6 +146,7 @@ export function usePokemonDetails(pokemonId: number | null) {
                 const formResponse = await fetch(variety.pokemon.url);
                 const formData = await formResponse.json();
                 forms.push({
+                  id: formData.id,
                   formName: variety.pokemon.name,
                   displayName: formatPokemonName(variety.pokemon.name),
                   sprites: {
@@ -158,7 +160,7 @@ export function usePokemonDetails(pokemonId: number | null) {
             }
           }
         }
-        
+
         setPokemon({
           id: pokemonId,
           name: data.name,
@@ -192,17 +194,17 @@ export function getPokemonSpriteUrl(
   } = {}
 ): string {
   const { shiny = false, female = false, form } = options;
-  
+
   // Use PokeAPI sprites
   const baseUrl = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
-  
+
   let path = '';
   if (shiny) path += '/shiny';
   if (female) path += '/female';
-  
+
   // Handle form IDs (like -alola, -galar, etc.)
   const pokemonId = form ? form : id.toString();
-  
+
   return `${baseUrl}${path}/${pokemonId}.png`;
 }
 
