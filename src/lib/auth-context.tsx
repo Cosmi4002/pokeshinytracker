@@ -27,9 +27,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     let subscription: { unsubscribe: () => void } | null = null;
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
+    const stopLoading = () => setLoading(false);
 
     try {
-      // Set up auth state listener FIRST
       const { data } = supabase.auth.onAuthStateChange(
         (event, session) => {
           setSession(session);
@@ -39,7 +41,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       );
       subscription = data.subscription;
 
-      // THEN check for existing session
+      // Timeout: se getSession non risponde in 8 secondi, mostra comunque l'app (login form)
+      timeoutId = setTimeout(stopLoading, 8000);
+
       supabase.auth.getSession()
         .then(({ data: { session } }) => {
           setSession(session);
@@ -49,12 +53,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setSession(null);
           setUser(null);
         })
-        .finally(() => setLoading(false));
+        .finally(() => {
+          if (timeoutId) clearTimeout(timeoutId);
+          setLoading(false);
+        });
     } catch {
       setLoading(false);
     }
 
-    return () => subscription?.unsubscribe();
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      subscription?.unsubscribe();
+    };
   }, []);
 
   const signUp = async (email: string, password: string) => {

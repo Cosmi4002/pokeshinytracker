@@ -31,15 +31,16 @@ export function getSupabaseConfigErrorMessage() {
 
 function createSupabaseClient() {
   if (!isSupabaseConfigured) {
-    // Provide placeholder client if not configured to avoid crashes,
-    // but operations will fail gracefully and error will be displayed by ErrorBoundary
     return createClient<Database>('https://placeholder.supabase.co', 'placeholder-anon-key', {
       auth: { persistSession: false, autoRefreshToken: false }
     });
   }
-  console.log("Supabase client initialized with:", {
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY,
+  return createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      storage: localStorage,
+      persistSession: true,
+      autoRefreshToken: true,
+    }
   });
 }
 
