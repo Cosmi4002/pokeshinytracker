@@ -62,7 +62,9 @@ export type Database = {
           game: string
           gender: string | null
           has_shiny_charm: boolean | null
+          hunt_start_date: string | null
           id: string
+          is_fail: boolean
           method: string
           notes: string | null
           playlist_id: string | null
@@ -81,7 +83,9 @@ export type Database = {
           game: string
           gender?: string | null
           has_shiny_charm?: boolean | null
+          hunt_start_date?: string | null
           id?: string
+          is_fail?: boolean
           method: string
           notes?: string | null
           playlist_id?: string | null
@@ -100,7 +104,9 @@ export type Database = {
           game?: string
           gender?: string | null
           has_shiny_charm?: boolean | null
+          hunt_start_date?: string | null
           id?: string
+          is_fail?: boolean
           method?: string
           notes?: string | null
           playlist_id?: string | null

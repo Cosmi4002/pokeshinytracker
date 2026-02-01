@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Plus, Trash2, Filter, LogIn, List } from 'lucide-react';
+import { Plus, Trash2, Filter, LogIn, List, Pencil } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { AddShinyDialog } from '@/components/collection/AddShinyDialog';
 import { CreatePlaylistDialog } from '@/components/collection/CreatePlaylistDialog';
 import { ManagePlaylistsDialog } from '@/components/collection/ManagePlaylistsDialog';
+import { EditShinyDialog } from '@/components/collection/EditShinyDialog';
 import type { Tables } from '@/integrations/supabase/types';
 
 type CaughtShinyRow = Tables<'caught_shinies'>;
@@ -194,6 +195,13 @@ export default function Collection() {
                   playlists={playlists.map((p) => ({ id: p.id, name: p.name }))}
                   onSuccess={fetchData}
                 />
+                <EditShinyDialog
+                  open={isEditDialogOpen}
+                  onOpenChange={setIsEditDialogOpen}
+                  entry={editEntry}
+                  playlists={playlists.map((p) => ({ id: p.id, name: p.name }))}
+                  onSuccess={fetchData}
+                />
               </div>
             )}
           </div>
@@ -307,14 +315,27 @@ export default function Collection() {
                           </div>
                         </div>
                         {user && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDelete(entry.id)}
-                            className="opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
+                          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setEditEntry(entry);
+                                setIsEditDialogOpen(true);
+                              }}
+                              title="Modifica"
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDelete(entry.id)}
+                              title="Elimina"
+                            >
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </div>
                         )}
                       </div>
 
@@ -343,11 +364,19 @@ export default function Collection() {
                           </div>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-muted-foreground">Data:</span>
+                          <span className="text-muted-foreground">Data cattura:</span>
                           <span className="font-semibold">
                             {new Date(entry.caught_date).toLocaleDateString()}
                           </span>
                         </div>
+                        {entry.hunt_start_date && (
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Inizio caccia:</span>
+                            <span className="font-semibold text-xs">
+                              {new Date(entry.hunt_start_date).toLocaleDateString()}
+                            </span>
+                          </div>
+                        )}
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Gioco:</span>
                           <span className="font-semibold text-xs">{game?.name}</span>
@@ -358,11 +387,18 @@ export default function Collection() {
                             <span className="text-xs font-semibold">Shiny Charm</span>
                           </div>
                         )}
-                        {playlistName && (
-                          <div className="pt-2 border-t">
-                            <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary">
-                              {playlistName}
-                            </span>
+                        {(playlistName || entry.is_fail) && (
+                          <div className="pt-2 border-t flex flex-wrap gap-1 items-center">
+                            {entry.is_fail && (
+                              <span className="text-xs px-2 py-1 rounded-full bg-destructive/20 text-destructive font-semibold">
+                                FAIL
+                              </span>
+                            )}
+                            {playlistName && (
+                              <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary">
+                                {playlistName}
+                              </span>
+                            )}
                           </div>
                         )}
                       </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,6 +25,7 @@ import { PokemonSelector } from '@/components/counter/PokemonSelector';
 import { MethodSelector } from '@/components/counter/MethodSelector';
 import { POKEBALLS, GAMES, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON } from '@/lib/pokemon-data';
 import { getPokemonSpriteUrl } from '@/hooks/use-pokemon';
+import { usePokemonDetails } from '@/hooks/use-pokemon';
 
 interface AddShinyDialogProps {
   open: boolean;
@@ -38,67 +39,87 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
-  // Form state
   const [pokemonId, setPokemonId] = useState<number | null>(null);
   const [pokemonName, setPokemonName] = useState('');
-  const [method, setMethod] = useState<HuntingMethod>(HUNTING_METHODS[0]);
-  const [attempts, setAttempts] = useState(1);
+  const [form, setForm] = useState('');
   const [gender, setGender] = useState<string>('');
+  const [hasShinyCharm, setHasShinyCharm] = useState(false);
   const [pokeball, setPokeball] = useState('pokeball');
   const [game, setGame] = useState(GAMES[GAMES.length - 1].id);
+  const [method, setMethod] = useState<HuntingMethod>(HUNTING_METHODS[0]);
+  const [attempts, setAttempts] = useState(1);
+  const [huntStartDate, setHuntStartDate] = useState('');
   const [caughtDate, setCaughtDate] = useState(new Date().toISOString().split('T')[0]);
-  const [hasShinyCharm, setHasShinyCharm] = useState(false);
+  const [isFail, setIsFail] = useState(false);
   const [playlistId, setPlaylistId] = useState<string>('');
   const [notes, setNotes] = useState('');
 
-  const resetForm = () => {
+  const { pokemon: pokemonDetails } = usePokemonDetails(pokemonId);
+  const formOptions = useMemo(() => pokemonDetails?.forms ?? [], [pokemonDetails]);
+
+  const spriteUrl = useMemo(() => {
+    if (!pokemonId) return '';
+    const formSuffix = form ? `${pokemonId}-${form}` : undefined;
+    return getPokemonSpriteUrl(pokemonId, {
+      shiny: true,
+      female: gender === 'female',
+      form: formSuffix,
+    });
+  }, [pokemonId, gender, form]);
+
+  const resetFormState = () => {
     setPokemonId(null);
     setPokemonName('');
-    setMethod(HUNTING_METHODS[0]);
-    setAttempts(1);
+    setForm('');
     setGender('');
+    setHasShinyCharm(false);
     setPokeball('pokeball');
     setGame(GAMES[GAMES.length - 1].id);
+    setMethod(HUNTING_METHODS[0]);
+    setAttempts(1);
+    setHuntStartDate('');
     setCaughtDate(new Date().toISOString().split('T')[0]);
-    setHasShinyCharm(false);
+    setIsFail(false);
     setPlaylistId('');
     setNotes('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!pokemonId || !pokemonName) {
-      toast({
-        variant: 'destructive',
-        title: 'Please select a Pokémon',
-      });
+      toast({ variant: 'destructive', title: 'Seleziona un Pokémon' });
       return;
     }
-
     if (!user) {
-      toast({
-        variant: 'destructive',
-        title: 'You must be logged in',
-      });
+      toast({ variant: 'destructive', title: 'Devi essere loggato' });
       return;
     }
 
     setLoading(true);
-
     try {
+      const finalSpriteUrl =
+        spriteUrl ||
+        getPokemonSpriteUrl(pokemonId, {
+          shiny: true,
+          female: gender === 'female',
+          form: form ? `${pokemonId}-${form}` : undefined,
+        });
+
       const { error } = await supabase.from('caught_shinies').insert({
         user_id: user.id,
         pokemon_id: pokemonId,
         pokemon_name: pokemonName,
-        sprite_url: getPokemonSpriteUrl(pokemonId, { shiny: true }),
-        attempts,
-        method: method.id,
+        sprite_url: finalSpriteUrl,
+        form: form || null,
         gender: gender || null,
-        pokeball,
-        caught_date: caughtDate,
-        game,
         has_shiny_charm: hasShinyCharm,
+        pokeball,
+        game,
+        method: method.id,
+        attempts,
+        hunt_start_date: huntStartDate || null,
+        caught_date: caughtDate,
+        is_fail: isFail,
         playlist_id: playlistId || null,
         notes: notes || null,
       });
@@ -106,18 +127,17 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
       if (error) throw error;
 
       toast({
-        title: 'Shiny added!',
-        description: `${pokemonName} has been added to your collection.`,
+        title: 'Shiny aggiunto!',
+        description: `${pokemonName} è stato aggiunto alla collezione.`,
       });
-
-      resetForm();
+      resetFormState();
       onOpenChange(false);
       onSuccess();
     } catch (error: any) {
       toast({
         variant: 'destructive',
-        title: 'Error adding shiny',
-        description: error.message || 'Unknown error occurred',
+        title: 'Errore',
+        description: error.message || 'Impossibile aggiungere lo shiny.',
       });
     } finally {
       setLoading(false);
@@ -128,11 +148,25 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add Shiny to Collection</DialogTitle>
+          <DialogTitle>Aggiungi Shiny alla collezione</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Pokemon Selector */}
+          {/* 1. Sprite preview (cambia con sesso/form) */}
+          {pokemonId && (
+            <div className="flex justify-center p-4 bg-muted rounded-lg">
+              <img
+                src={spriteUrl}
+                alt={pokemonName}
+                className="h-24 w-24 pokemon-sprite object-contain"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = getPokemonSpriteUrl(pokemonId, { shiny: true });
+                }}
+              />
+            </div>
+          )}
+
+          {/* 2. Pokémon con nome */}
           <div className="space-y-2">
             <Label>Pokémon *</Label>
             <PokemonSelector
@@ -140,43 +174,56 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
               onChange={(id, name) => {
                 setPokemonId(id);
                 setPokemonName(name);
+                setForm('');
               }}
             />
           </div>
 
-          {/* Method */}
-          <div className="space-y-2">
-            <Label>Method *</Label>
-            <MethodSelector value={method.id} onChange={setMethod} />
-          </div>
+          {/* 3. Form (opzionale, per Deerling, Pikachu, ecc.) */}
+          {formOptions.length > 0 && (
+            <div className="space-y-2">
+              <Label>Forma / variante</Label>
+              <Select value={form || 'default'} onValueChange={(v) => setForm(v === 'default' ? '' : v)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Forma base" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="default">Forma base</SelectItem>
+                  {formOptions.map((f) => (
+                    <SelectItem key={f.id} value={f.formName.replace(/^[^-]+-/, '')}>
+                      {f.displayName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
-          {/* Attempts */}
+          {/* 4. Sesso */}
           <div className="space-y-2">
-            <Label>Number of Attempts</Label>
-            <Input
-              type="number"
-              min={1}
-              value={attempts}
-              onChange={(e) => setAttempts(Math.max(1, parseInt(e.target.value) || 1))}
-            />
-          </div>
-
-          {/* Gender */}
-          <div className="space-y-2">
-            <Label>Gender</Label>
+            <Label>Sesso</Label>
             <Select value={gender} onValueChange={setGender}>
               <SelectTrigger>
-                <SelectValue placeholder="Select gender (optional)" />
+                <SelectValue placeholder="Opzionale" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="male">♂ Male</SelectItem>
-                <SelectItem value="female">♀ Female</SelectItem>
-                <SelectItem value="genderless">⚪ Genderless</SelectItem>
+                <SelectItem value="male">♂ Maschio</SelectItem>
+                <SelectItem value="female">♀ Femmina</SelectItem>
+                <SelectItem value="genderless">⚪ Senza genere</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {/* Pokeball */}
+          {/* 5. Shiny Charm */}
+          <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
+            <div className="flex items-center gap-2">
+              <img src={SHINY_CHARM_ICON} alt="Shiny Charm" className="h-6 w-6 pokemon-sprite" />
+              <Label>Shiny Charm</Label>
+            </div>
+            <Switch checked={hasShinyCharm} onCheckedChange={setHasShinyCharm} />
+          </div>
+
+          {/* 6. Poké Ball */}
           <div className="space-y-2">
             <Label>Poké Ball</Label>
             <Select value={pokeball} onValueChange={setPokeball}>
@@ -196,9 +243,9 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
             </Select>
           </div>
 
-          {/* Game */}
+          {/* 7. Gioco */}
           <div className="space-y-2">
-            <Label>Game</Label>
+            <Label>Gioco</Label>
             <Select value={game} onValueChange={setGame}>
               <SelectTrigger>
                 <SelectValue />
@@ -213,39 +260,55 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
             </Select>
           </div>
 
-          {/* Date */}
+          {/* 8. Metodo */}
           <div className="space-y-2">
-            <Label>Date Caught</Label>
+            <Label>Metodo *</Label>
+            <MethodSelector value={method.id} onChange={setMethod} />
+          </div>
+
+          {/* 9. Counter */}
+          <div className="space-y-2">
+            <Label>Numero tentativi (counter)</Label>
             <Input
-              type="date"
-              value={caughtDate}
-              onChange={(e) => setCaughtDate(e.target.value)}
+              type="number"
+              min={1}
+              value={attempts}
+              onChange={(e) => setAttempts(Math.max(1, parseInt(e.target.value) || 1))}
             />
           </div>
 
-          {/* Shiny Charm */}
-          <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
-            <div className="flex items-center gap-2">
-              <img
-                src={SHINY_CHARM_ICON}
-                alt="Shiny Charm"
-                className="h-6 w-6 pokemon-sprite"
+          {/* 10. Data inizio e fine */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Data inizio caccia</Label>
+              <Input
+                type="date"
+                value={huntStartDate}
+                onChange={(e) => setHuntStartDate(e.target.value)}
               />
-              <Label>Shiny Charm</Label>
             </div>
-            <Switch checked={hasShinyCharm} onCheckedChange={setHasShinyCharm} />
+            <div className="space-y-2">
+              <Label>Data cattura *</Label>
+              <Input type="date" value={caughtDate} onChange={(e) => setCaughtDate(e.target.value)} />
+            </div>
           </div>
 
-          {/* Playlist */}
+          {/* 11. FAIL */}
+          <div className="flex items-center justify-between p-3 rounded-lg border border-destructive/30 bg-destructive/5">
+            <Label>FAIL (caccia fallita / phase)</Label>
+            <Switch checked={isFail} onCheckedChange={setIsFail} />
+          </div>
+
+          {/* 12. Playlist */}
           {playlists.length > 0 && (
             <div className="space-y-2">
-              <Label>Playlist (optional)</Label>
+              <Label>Playlist (opzionale)</Label>
               <Select value={playlistId || 'none'} onValueChange={(val) => setPlaylistId(val === 'none' ? '' : val)}>
                 <SelectTrigger>
-                  <SelectValue placeholder="No playlist" />
+                  <SelectValue placeholder="Nessuna playlist" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">No playlist</SelectItem>
+                  <SelectItem value="none">Nessuna playlist</SelectItem>
                   {playlists.map((playlist) => (
                     <SelectItem key={playlist.id} value={playlist.id}>
                       {playlist.name}
@@ -256,19 +319,19 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
             </div>
           )}
 
-          {/* Notes */}
+          {/* 13. Note */}
           <div className="space-y-2">
-            <Label>Notes (optional)</Label>
+            <Label>Note (opzionale)</Label>
             <Textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Any additional notes..."
+              placeholder="Note aggiuntive..."
             />
           </div>
 
           <Button type="submit" className="w-full" disabled={loading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Add Shiny
+            Aggiungi Shiny
           </Button>
         </form>
       </DialogContent>
