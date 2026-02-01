@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Plus, Trash2, Filter, LogIn } from 'lucide-react';
+import { Plus, Trash2, Filter, LogIn, List } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,7 @@ import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
 import { AddShinyDialog } from '@/components/collection/AddShinyDialog';
 import { CreatePlaylistDialog } from '@/components/collection/CreatePlaylistDialog';
+import { ManagePlaylistsDialog } from '@/components/collection/ManagePlaylistsDialog';
 import type { Tables } from '@/integrations/supabase/types';
 
 type CaughtShinyRow = Tables<'caught_shinies'>;
@@ -29,6 +30,7 @@ export default function Collection() {
   const [loading, setLoading] = useState(true);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isNewPlaylistDialogOpen, setIsNewPlaylistDialogOpen] = useState(false);
+  const [isManagePlaylistsDialogOpen, setIsManagePlaylistsDialogOpen] = useState(false);
 
   // Filters
   const [filterGen, setFilterGen] = useState<string>('all');
@@ -162,6 +164,12 @@ export default function Collection() {
 
             {user && (
               <div className="flex gap-2">
+                {playlists.length > 0 && (
+                  <Button variant="outline" onClick={() => setIsManagePlaylistsDialogOpen(true)}>
+                    <List className="mr-2 h-4 w-4" />
+                    Gestisci Playlist
+                  </Button>
+                )}
                 <Button variant="outline" onClick={() => setIsNewPlaylistDialogOpen(true)}>
                   <Plus className="mr-2 h-4 w-4" />
                   Nuova Playlist
@@ -170,6 +178,11 @@ export default function Collection() {
                   <Plus className="mr-2 h-4 w-4" />
                   Aggiungi Shiny
                 </Button>
+                <ManagePlaylistsDialog
+                  open={isManagePlaylistsDialogOpen}
+                  onOpenChange={setIsManagePlaylistsDialogOpen}
+                  onSuccess={fetchData}
+                />
                 <CreatePlaylistDialog
                   open={isNewPlaylistDialogOpen}
                   onOpenChange={setIsNewPlaylistDialogOpen}

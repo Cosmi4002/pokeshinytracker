@@ -52,11 +52,23 @@ export function CreatePlaylistDialog({ open, onOpenChange, onSuccess }: CreatePl
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!name.trim()) {
+
+    // Validate name
+    const trimmedName = name.trim();
+    if (!trimmedName) {
       toast({
         variant: 'destructive',
-        title: 'Please enter a playlist name',
+        title: 'Nome richiesto',
+        description: 'Inserisci un nome per la playlist',
+      });
+      return;
+    }
+
+    if (trimmedName.length > 100) {
+      toast({
+        variant: 'destructive',
+        title: 'Nome troppo lungo',
+        description: 'Il nome deve essere massimo 100 caratteri',
       });
       return;
     }
@@ -64,7 +76,8 @@ export function CreatePlaylistDialog({ open, onOpenChange, onSuccess }: CreatePl
     if (!user) {
       toast({
         variant: 'destructive',
-        title: 'You must be logged in',
+        title: 'Accesso richiesto',
+        description: 'Devi effettuare il login per creare una playlist',
       });
       return;
     }
@@ -74,16 +87,26 @@ export function CreatePlaylistDialog({ open, onOpenChange, onSuccess }: CreatePl
     try {
       const { error } = await supabase.from('shiny_playlists').insert({
         user_id: user.id,
-        name: name.trim(),
+        name: trimmedName,
         description: description.trim() || null,
         category_type: categoryType,
       });
 
-      if (error) throw error;
+      if (error) {
+        // Handle specific Supabase errors
+        if (error.message.includes('JWT')) {
+          throw new Error('Sessione scaduta. Effettua nuovamente il login.');
+        } else if (error.message.includes('unique')) {
+          throw new Error('Hai già una playlist con questo nome.');
+        } else if (error.message.includes('network') || error.message.includes('fetch')) {
+          throw new Error('Errore di connessione. Verifica la tua connessione internet.');
+        }
+        throw error;
+      }
 
       toast({
-        title: 'Playlist created!',
-        description: `"${name}" has been created.`,
+        title: 'Playlist creata!',
+        description: `"${trimmedName}" è stata creata con successo.`,
       });
 
       resetForm();
@@ -92,8 +115,8 @@ export function CreatePlaylistDialog({ open, onOpenChange, onSuccess }: CreatePl
     } catch (error: any) {
       toast({
         variant: 'destructive',
-        title: 'Error creating playlist',
-        description: error.message,
+        title: 'Errore nella creazione',
+        description: error.message || 'Impossibile creare la playlist. Riprova.',
       });
     } finally {
       setLoading(false);
