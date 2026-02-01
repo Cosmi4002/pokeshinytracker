@@ -68,7 +68,8 @@
     /* Dark theme specific sidebar colors - these don't change with data-theme */
     --sidebar-background: hsl(0 0% 12%);
     --sidebar-foreground: hsl(0 0% 95%);
-    --sidebar-primary: hsl(45 100% 50%); /* Keeping original shiny hue for sidebar primary */
+    --sidebar-primary: hsl(45 100% 50%);
+    /* Keeping original shiny hue for sidebar primary */
     --sidebar-primary-foreground: hsl(0 0% 10%);
     --sidebar-accent: hsl(0 0% 20%);
     --sidebar-accent-foreground: hsl(0 0% 95%);
@@ -98,19 +99,17 @@
 
 @layer utilities {
   .shiny-text {
-    background: linear-gradient(
-      90deg,
-      hsl(var(--shiny)) 0%,
-      hsl(var(--shiny-glow)) 50%,
-      hsl(var(--shiny)) 100%
-    );
+    background: linear-gradient(90deg,
+        var(--shiny) 0%,
+        var(--shiny-glow) 50%,
+        var(--shiny) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .shiny-glow {
-    box-shadow: 0 0 20px hsl(var(--shiny) / 0.3);
+    box-shadow: 0 0 20px color-mix(in srgb, var(--shiny), transparent 70%);
   }
 
   .pokemon-sprite {
