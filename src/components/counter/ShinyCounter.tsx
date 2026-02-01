@@ -31,45 +31,48 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
   const [isEditingCounter, setIsEditingCounter] = useState(false);
   const [tempCounterValue, setTempCounterValue] = useState('');
   const [isFinishDialogOpen, setIsFinishDialogOpen] = useState(false);
+  const [playlists, setPlaylists] = useState<{ id: string; name: string }[]>([]);
 
-  // Load active hunt from Supabase when user is logged in
+  // Load active hunt and playlists from Supabase when user is logged in
   useEffect(() => {
     if (!user) {
       setLoading(false);
       return;
     }
 
-    const loadHunt = async () => {
-      // If creating a new hunt, ensure we start fresh
+    const loadData = async () => {
+      // If creating a new hunt, ensure we start fresh (but still fetch playlists)
       if (huntId === 'new') {
         setCounter(0);
         setIncrementAmount(1);
         setSelectedPokemonId(null);
         setSelectedPokemonName('');
         activeHuntIdRef.current = null;
-        setLoading(false);
-        return;
       }
 
       try {
-        let query = supabase
-          .from('active_hunts')
-          .select('*')
-          .eq('user_id', user.id);
+        const promises: Promise<any>[] = [
+          supabase.from('shiny_playlists').select('id, name').eq('user_id', user.id)
+        ];
 
-        // If huntId is provided, load that specific hunt
-        if (huntId) {
-          query = query.eq('id', huntId).maybeSingle();
-        } else {
-          // Otherwise load the most recent hunt
-          query = query.order('updated_at', { ascending: false }).limit(1).maybeSingle();
+        if (huntId !== 'new') {
+          let query = supabase.from('active_hunts').select('*').eq('user_id', user.id);
+          if (huntId) {
+            query = query.eq('id', huntId).maybeSingle();
+          } else {
+            query = query.order('updated_at', { ascending: false }).limit(1).maybeSingle();
+          }
+          promises.push(query);
         }
 
-        const { data, error } = await query;
+        const [playlistsRes, huntRes] = await Promise.all(promises);
 
-        if (error) throw error;
+        if (playlistsRes.data) {
+          setPlaylists(playlistsRes.data);
+        }
 
-        if (data) {
+        if (huntId !== 'new' && huntRes && huntRes.data) {
+          const data = huntRes.data;
           activeHuntIdRef.current = data.id;
           setCounter(data.counter ?? 0);
           setIncrementAmount(data.increment_amount ?? 1);
@@ -85,7 +88,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
       }
     };
 
-    loadHunt();
+    loadData();
   }, [user?.id, huntId]);
 
   // Save to Supabase when state changes (debounced)
@@ -397,6 +400,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
         counter={counter}
         method={selectedMethod.id}
         hasShinyCharm={hasShinyCharm}
+        playlists={playlists}
       />
     </div>
   );

@@ -67,7 +67,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!pokemonId || !pokemonName) {
       toast({
         variant: 'destructive',
@@ -117,7 +117,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
       toast({
         variant: 'destructive',
         title: 'Error adding shiny',
-        description: error.message,
+        description: error.message || 'Unknown error occurred',
       });
     } finally {
       setLoading(false);

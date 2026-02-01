@@ -35,6 +35,7 @@ interface FinishHuntDialogProps {
     counter: number;
     method: string;
     hasShinyCharm: boolean;
+    playlists: { id: string; name: string }[];
 }
 
 export function FinishHuntDialog({
@@ -46,6 +47,7 @@ export function FinishHuntDialog({
     counter,
     method,
     hasShinyCharm: initialHasShinyCharm,
+    playlists,
 }: FinishHuntDialogProps) {
     const { user } = useAuth();
     const { toast } = useToast();
@@ -59,6 +61,7 @@ export function FinishHuntDialog({
     const [game, setGame] = useState('');
     const [caughtDate, setCaughtDate] = useState(new Date().toISOString().split('T')[0]);
     const [hasShinyCharm, setHasShinyCharm] = useState(initialHasShinyCharm);
+    const [playlistId, setPlaylistId] = useState<string>('');
     const [notes, setNotes] = useState('');
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -97,6 +100,7 @@ export function FinishHuntDialog({
                 caught_date: caughtDate,
                 game,
                 has_shiny_charm: hasShinyCharm,
+                playlist_id: playlistId || null,
                 notes: notes || null,
             });
 
@@ -240,6 +244,26 @@ export function FinishHuntDialog({
                         </div>
                         <Switch checked={hasShinyCharm} onCheckedChange={setHasShinyCharm} />
                     </div>
+
+                    {/* Playlist */}
+                    {playlists.length > 0 && (
+                        <div className="space-y-2">
+                            <Label>Playlist (opzionale)</Label>
+                            <Select value={playlistId} onValueChange={setPlaylistId}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Nessuna playlist" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="">Nessuna playlist</SelectItem>
+                                    {playlists.map((playlist) => (
+                                        <SelectItem key={playlist.id} value={playlist.id}>
+                                            {playlist.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
 
                     {/* Notes */}
                     <div className="space-y-2">
