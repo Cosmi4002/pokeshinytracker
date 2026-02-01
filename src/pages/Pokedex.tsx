@@ -74,12 +74,12 @@ export default function Pokedex() {
                   placeholder="Cerca Pokémon..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 bg-white text-black"
                 />
               </div>
 
               <Select value={generation} onValueChange={setGeneration}>
-                <SelectTrigger className="w-[140px]">
+                <SelectTrigger className="w-[140px] bg-white text-black">
                   <SelectValue placeholder="Generazione" />
                 </SelectTrigger>
                 <SelectContent>

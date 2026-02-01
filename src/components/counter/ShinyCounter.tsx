@@ -262,9 +262,9 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
         <div className="flex justify-center gap-2">
           <Button
             size="lg"
-            variant="outline"
+            variant="secondary"
             onClick={decrement}
-            className="h-12 px-6 text-xl"
+            className="h-12 px-6 text-xl border-2 border-border"
           >
             <Minus className="h-5 w-5" />
           </Button>
@@ -288,7 +288,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
             min={1}
             value={incrementAmount}
             onChange={(e) => setIncrementAmount(Math.max(1, parseInt(e.target.value) || 1))}
-            className="w-16 h-8 text-center"
+            className="w-16 h-8 text-center bg-white text-black border-2 border-input"
           />
         </div>
 
