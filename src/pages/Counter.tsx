@@ -114,7 +114,11 @@ export default function Counter() {
               <>
                 {/* Render Active Hunts */}
                 {activeHunts.map((hunt) => (
-                  <div key={hunt.id} className="border rounded-xl p-4 bg-card/50 shadow-sm relative hover:shadow-md transition-shadow">
+                  <div
+                    key={hunt.id}
+                    className="border rounded-xl p-4 shadow-sm relative hover:shadow-md transition-shadow"
+                    style={{ backgroundColor: 'color-mix(in srgb, var(--card), transparent 50%)' }}
+                  >
                     <div className="absolute top-2 right-2 z-10">
                       <Button variant="ghost" size="icon" onClick={() => navigate(`/counter/${hunt.id}`)} title="Focus mode">
                         <Maximize2 className="h-4 w-4 text-muted-foreground" />
@@ -130,10 +134,20 @@ export default function Counter() {
                 {/* Empty Slots */}
                 {activeHunts.length < 3 && (
                   Array.from({ length: 3 - activeHunts.length }).map((_, index) => (
-                    <Card key={`empty-${index}`} className="border-dashed border-2 flex items-center justify-center min-h-[500px] bg-muted/20 hover:bg-muted/40 transition-colors cursor-pointer" onClick={handleCreateNew}>
-                      <CardContent className="text-center pt-6">
+                    <Card
+                      key={`empty-${index}`}
+                      className="border-dashed border-2 flex items-center justify-center min-h-[500px] transition-colors cursor-pointer group"
+                      onClick={handleCreateNew}
+                      style={{
+                        backgroundColor: 'color-mix(in srgb, var(--muted), transparent 90%)',
+                      }}
+                    >
+                      <CardContent className="text-center pt-6 group-hover:bg-muted/10 transition-colors">
                         <div className="mb-4 flex justify-center">
-                          <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
+                          <div
+                            className="h-16 w-16 rounded-full flex items-center justify-center"
+                            style={{ backgroundColor: 'color-mix(in srgb, var(--primary), transparent 90%)' }}
+                          >
                             <Plus className="h-8 w-8 text-primary" />
                           </div>
                         </div>

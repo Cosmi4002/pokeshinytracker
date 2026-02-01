@@ -374,7 +374,10 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
 
           {/* Shiny Charm Toggle */}
           {selectedMethod.supportsShinyCharm && (
-            <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
+            <div
+              className="flex items-center justify-between p-3 rounded-lg"
+              style={{ backgroundColor: 'color-mix(in srgb, var(--muted), transparent 50%)' }}
+            >
               <div className="flex items-center gap-2">
                 <img
                   src={SHINY_CHARM_ICON}

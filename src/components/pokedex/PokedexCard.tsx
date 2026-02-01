@@ -38,13 +38,19 @@ export function PokedexCard({
                 "backdrop-blur-sm overflow-hidden cursor-pointer w-full",
                 "hover:scale-105 active:scale-95",
                 // Base state
-                !hasCaughtAny && "bg-muted/10 border-white/5 hover:border-primary/40 grayscale hover:grayscale-0",
+                !hasCaughtAny && "border-white/5 hover:border-primary grayscale hover:grayscale-0",
                 // Partial caught
-                isPartial && "bg-gradient-to-t from-primary/20 via-transparent to-transparent border-primary/30",
+                isPartial && "border-primary",
                 // Complete caught
-                isComplete && "bg-primary/15 border-primary/50 shadow-[0_0_25px_rgba(var(--primary),0.4)] ring-1 ring-primary/30"
+                isComplete && "border-primary shadow-[0_0_25px_rgba(var(--primary),0.4)] ring-1 ring-primary"
             )}
             style={{
+                // Fix for dynamic opacity with hex vars
+                backgroundColor: !hasCaughtAny
+                    ? 'color-mix(in srgb, var(--muted), transparent 90%)'
+                    : isPartial
+                        ? 'color-mix(in srgb, var(--primary), transparent 80%)'
+                        : 'color-mix(in srgb, var(--primary), transparent 85%)',
                 // Dynamic partial glow using CSS variable
                 '--glow-opacity': glowIntensity,
             } as React.CSSProperties}
@@ -52,8 +58,13 @@ export function PokedexCard({
             {/* Background gradient for partial completion */}
             {isPartial && (
                 <div
-                    className="absolute inset-0 bg-gradient-to-t from-primary/30 to-transparent"
-                    style={{ height: `${caughtPercentage}%`, bottom: 0, top: 'auto' }}
+                    className="absolute inset-0"
+                    style={{
+                        height: `${caughtPercentage}%`,
+                        bottom: 0,
+                        top: 'auto',
+                        background: 'linear-gradient(to top, color-mix(in srgb, var(--primary), transparent 70%), transparent)'
+                    }}
                 />
             )}
 
