@@ -249,12 +249,12 @@ export function FinishHuntDialog({
                     {playlists.length > 0 && (
                         <div className="space-y-2">
                             <Label>Playlist (opzionale)</Label>
-                            <Select value={playlistId} onValueChange={setPlaylistId}>
+                            <Select value={playlistId || 'none'} onValueChange={(val) => setPlaylistId(val === 'none' ? '' : val)}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Nessuna playlist" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="">Nessuna playlist</SelectItem>
+                                    <SelectItem value="none">Nessuna playlist</SelectItem>
                                     {playlists.map((playlist) => (
                                         <SelectItem key={playlist.id} value={playlist.id}>
                                             {playlist.name}

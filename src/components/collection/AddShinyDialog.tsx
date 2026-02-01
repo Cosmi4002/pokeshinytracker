@@ -240,12 +240,12 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
           {playlists.length > 0 && (
             <div className="space-y-2">
               <Label>Playlist (optional)</Label>
-              <Select value={playlistId} onValueChange={setPlaylistId}>
+              <Select value={playlistId || 'none'} onValueChange={(val) => setPlaylistId(val === 'none' ? '' : val)}>
                 <SelectTrigger>
                   <SelectValue placeholder="No playlist" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No playlist</SelectItem>
+                  <SelectItem value="none">No playlist</SelectItem>
                   {playlists.map((playlist) => (
                     <SelectItem key={playlist.id} value={playlist.id}>
                       {playlist.name}
