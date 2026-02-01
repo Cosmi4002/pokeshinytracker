@@ -32,6 +32,8 @@ export default function Collection() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isNewPlaylistDialogOpen, setIsNewPlaylistDialogOpen] = useState(false);
   const [isManagePlaylistsDialogOpen, setIsManagePlaylistsDialogOpen] = useState(false);
+  const [editEntry, setEditEntry] = useState<CaughtShinyRow | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   // Filters
   const [filterGen, setFilterGen] = useState<string>('all');
