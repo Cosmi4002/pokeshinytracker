@@ -32,6 +32,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
   const [tempCounterValue, setTempCounterValue] = useState('');
   const [isFinishDialogOpen, setIsFinishDialogOpen] = useState(false);
   const [playlists, setPlaylists] = useState<{ id: string; name: string }[]>([]);
+  const isInitialLoadRef = useRef(true);
 
   // Load active hunt and playlists from Supabase when user is logged in
   useEffect(() => {
@@ -89,6 +90,10 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
         // Silently fail - use default state
       } finally {
         setLoading(false);
+        // Mark initial load as complete after data is loaded
+        setTimeout(() => {
+          isInitialLoadRef.current = false;
+        }, 100);
       }
     };
 
@@ -99,7 +104,20 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
   useEffect(() => {
     if (!user) return;
 
+    // Skip auto-save during initial load to prevent duplicates
+    if (isInitialLoadRef.current) return;
+
     const timer = setTimeout(async () => {
+      // Only save if we have an existing hunt ID OR if user has actually started hunting
+      // (selected a pokemon or has counter > 0)
+      const hasValidHunt = activeHuntIdRef.current !== null;
+      const hasUserData = selectedPokemonId !== null || counter > 0;
+
+      if (!hasValidHunt && !hasUserData) {
+        // Don't create a new hunt for default/empty state
+        return;
+      }
+
       setSaveStatus('saving');
       try {
         const payload = {
@@ -114,11 +132,13 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
         };
 
         if (activeHuntIdRef.current) {
+          // Update existing hunt
           await supabase
             .from('active_hunts')
             .update(payload)
             .eq('id', activeHuntIdRef.current);
         } else {
+          // Create new hunt only if we have user data
           const { data, error } = await supabase.from('active_hunts').insert(payload).select('id').single();
           if (!error && data) activeHuntIdRef.current = data.id;
         }

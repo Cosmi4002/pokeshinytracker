@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { HuntCard } from '@/components/hunts/HuntCard';
+import { useUserPreferences } from '@/hooks/use-user-preferences';
 import type { Tables } from '@/integrations/supabase/types';
 
 type ActiveHuntRow = Tables<'active_hunts'>;
@@ -16,6 +17,7 @@ export default function Hunts() {
     const { user } = useAuth();
     const { toast } = useToast();
     const navigate = useNavigate();
+    const { preferences } = useUserPreferences();
     const [hunts, setHunts] = useState<ActiveHuntRow[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -136,12 +138,19 @@ export default function Hunts() {
                             </CardContent>
                         </Card>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className={
+                            preferences.layout_style === 'list'
+                                ? 'flex flex-col gap-3'
+                                : preferences.layout_style === 'compact'
+                                    ? 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3'
+                                    : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'
+                        }>
                             {hunts.map((hunt) => (
                                 <HuntCard
                                     key={hunt.id}
                                     hunt={hunt}
                                     onDelete={handleDeleteHunt}
+                                    layoutStyle={preferences.layout_style || 'grid'}
                                 />
                             ))}
                         </div>

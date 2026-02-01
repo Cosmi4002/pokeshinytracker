@@ -10,29 +10,43 @@ import Counter from "./pages/Counter";
 import Hunts from "./pages/Hunts";
 import Pokedex from "./pages/Pokedex";
 import Collection from "./pages/Collection";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import { useUserPreferences } from "@/hooks/use-user-preferences";
 
 const queryClient = new QueryClient();
+
+function AppContent() {
+  // Load and apply user preferences globally
+  useUserPreferences();
+
+  return (
+    <>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/counter" element={<Counter />} />
+          <Route path="/counter/:huntId" element={<Counter />} />
+          <Route path="/hunts" element={<Hunts />} />
+          <Route path="/pokedex" element={<Pokedex />} />
+          <Route path="/collection" element={<Collection />} />
+          <Route path="/settings" element={<Settings />} />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </>
+  );
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/counter" element={<Counter />} />
-            <Route path="/counter/:huntId" element={<Counter />} />
-            <Route path="/hunts" element={<Hunts />} />
-            <Route path="/pokedex" element={<Pokedex />} />
-            <Route path="/collection" element={<Collection />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <AppContent />
       </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>
