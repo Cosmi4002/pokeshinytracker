@@ -181,31 +181,35 @@ export default function Collection() {
                   <Plus className="mr-2 h-4 w-4" />
                   Aggiungi Shiny
                 </Button>
-                <ManagePlaylistsDialog
-                  open={isManagePlaylistsDialogOpen}
-                  onOpenChange={setIsManagePlaylistsDialogOpen}
-                  onSuccess={fetchData}
-                />
-                <CreatePlaylistDialog
-                  open={isNewPlaylistDialogOpen}
-                  onOpenChange={setIsNewPlaylistDialogOpen}
-                  onSuccess={fetchData}
-                />
-                <AddShinyDialog
-                  open={isAddDialogOpen}
-                  onOpenChange={setIsAddDialogOpen}
-                  playlists={playlists.map((p) => ({ id: p.id, name: p.name }))}
-                  onSuccess={fetchData}
-                />
-                <EditShinyDialog
-                  open={isEditDialogOpen}
-                  onOpenChange={setIsEditDialogOpen}
-                  entry={editEntry}
-                  playlists={playlists.map((p) => ({ id: p.id, name: p.name }))}
-                  onSuccess={fetchData}
-                />
               </div>
             )}
+            {/* Dialoghi sempre montati per evitare problemi di scope con il bundler */}
+            <ManagePlaylistsDialog
+              open={isManagePlaylistsDialogOpen}
+              onOpenChange={setIsManagePlaylistsDialogOpen}
+              onSuccess={fetchData}
+            />
+            <CreatePlaylistDialog
+              open={isNewPlaylistDialogOpen}
+              onOpenChange={setIsNewPlaylistDialogOpen}
+              onSuccess={fetchData}
+            />
+            <AddShinyDialog
+              open={isAddDialogOpen}
+              onOpenChange={setIsAddDialogOpen}
+              playlists={playlists.map((p) => ({ id: p.id, name: p.name }))}
+              onSuccess={fetchData}
+            />
+            <EditShinyDialog
+              open={isEditDialogOpen}
+              onOpenChange={(open) => {
+                setIsEditDialogOpen(open);
+                if (!open) setEditEntry(null);
+              }}
+              entry={editEntry}
+              playlists={playlists.map((p) => ({ id: p.id, name: p.name }))}
+              onSuccess={fetchData}
+            />
           </div>
 
           {/* Filters */}
