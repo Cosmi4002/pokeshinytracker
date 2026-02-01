@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Calculator, BookOpen, Archive, LogOut, User, Sparkles, Settings as SettingsIcon } from 'lucide-react';
+import { Calculator, BookOpen, Archive, LogOut, User, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabaseProjectRef } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth-context';
@@ -20,7 +20,7 @@ export function Navbar() {
     { to: '/counter', label: 'Counter', icon: Sparkles }, // Changed Icon to distinguish
     { to: '/pokedex', label: 'Pokédex', icon: BookOpen },
     { to: '/collection', label: 'Collection', icon: Archive },
-    { to: '/settings', label: 'Settings', icon: SettingsIcon },
+
   ];
 
   return (
