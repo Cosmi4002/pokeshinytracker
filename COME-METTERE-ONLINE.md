@@ -150,6 +150,18 @@ Esegui in locale `npm run build` per vedere eventuali errori e correggerli prima
 ### Pagina nera / nessun pulsante
 Configura le variabili d’ambiente Supabase in Vercel (vedi **Passo 4** sopra). Senza `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY` (o `VITE_SUPABASE_ANON_KEY`) l’app non può inizializzarsi correttamente.
 
+### "Qualcosa è andato storto" quando salvi un Pokémon
+Le variabili d’ambiente **non sono configurate in Vercel** (o il deploy è stato fatto prima di aggiungerle).
+
+1. Vai su **Vercel** → il tuo progetto → **Settings** → **Environment Variables**
+2. Aggiungi (o controlla che esistano):
+   - **Name:** `VITE_SUPABASE_URL` → **Value:** l’URL del tuo progetto (es. `https://xxxx.supabase.co`)
+   - **Name:** `VITE_SUPABASE_ANON_KEY` → **Value:** la **anon public** key da Supabase (Project Settings → API)
+3. Salva e vai in **Deployments** → sui tre puntini dell’ultimo deploy → **Redeploy**
+4. Aspetta che il nuovo deploy finisca e ricarica il sito
+
+Senza questi valori l’app non può parlare con Supabase, quindi login e salvataggio collezione non funzionano.
+
 ---
 
 **Buona caccia agli shiny!** ✨🎮
