@@ -13,6 +13,11 @@ export const isSupabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
 
 export function getSupabaseConfigErrorMessage() {
   if (isSupabaseConfigured) return null;
+  console.error("Supabase configuration missing:", {
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY,
+    isSupabaseConfigured,
+  });
   return [
     "Supabase non è configurato.",
     "Imposta le variabili d'ambiente:",
@@ -26,16 +31,15 @@ export function getSupabaseConfigErrorMessage() {
 
 function createSupabaseClient() {
   if (!isSupabaseConfigured) {
+    // Provide placeholder client if not configured to avoid crashes,
+    // but operations will fail gracefully and error will be displayed by ErrorBoundary
     return createClient<Database>('https://placeholder.supabase.co', 'placeholder-anon-key', {
       auth: { persistSession: false, autoRefreshToken: false }
     });
   }
-  return createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    auth: {
-      storage: localStorage,
-      persistSession: true,
-      autoRefreshToken: true,
-    }
+  console.log("Supabase client initialized with:", {
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY,
   });
 }
 
