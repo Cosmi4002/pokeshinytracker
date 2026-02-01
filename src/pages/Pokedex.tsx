@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { usePokemonList, getPokemonSpriteUrl, GENERATION_RANGES, POKEMON_WITH_GENDER_DIFF } from '@/hooks/use-pokemon';
+import { POKEMON_FORM_COUNTS } from '@/lib/pokemon-data';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PokemonDetailDialog } from '@/components/pokedex/PokemonDetailDialog';
 import { PokedexCard } from '@/components/pokedex/PokedexCard';
@@ -107,10 +108,15 @@ export default function Pokedex() {
                 const { caught } = getCaughtCountForPokemon(p.id);
 
                 // For percentage, we need to know total forms
-                // Base: 1 (or 2 if gender diff). We estimate for now.
-                const estimatedTotalForms = hasGenderDiff ? 2 : 1;
-                const caughtPct = estimatedTotalForms > 0
-                  ? Math.min(100, (caught / estimatedTotalForms) * 100)
+                let totalForms = 1;
+                if (POKEMON_FORM_COUNTS[p.id]) {
+                  totalForms = POKEMON_FORM_COUNTS[p.id];
+                } else if (hasGenderDiff) {
+                  totalForms = 2;
+                }
+
+                const caughtPct = totalForms > 0
+                  ? Math.min(100, (caught / totalForms) * 100)
                   : 0;
 
                 return (
