@@ -45,8 +45,33 @@ export default function Counter() {
     fetchHunts();
   }, [user, huntId]); // Refetch when huntId changes (e.g. navigation)
 
-  const handleCreateNew = () => {
-    navigate('/counter/new');
+  const handleCreateNew = async () => {
+    if (!user) {
+      // For guests, we can navigate to a demo counter or prompt login
+      navigate('/auth'); // Or some other handling
+      return;
+    }
+
+    // Create a new active hunt entry in Supabase
+    const { data, error } = await supabase.from('active_hunts').insert({
+      user_id: user.id,
+      pokemon_id: null, // Initial empty state
+      pokemon_name: null, // Initial empty state
+      method: 'gen9-random', // Default method
+      counter: 0,
+      has_shiny_charm: false,
+      increment_amount: 1,
+    }).select('id').single();
+
+    if (error) {
+      console.error("Error creating new hunt:", error);
+      // Handle error, maybe show a toast
+      return;
+    }
+
+    if (data?.id) {
+      navigate(`/counter/${data.id}`);
+    }
   };
 
   return (

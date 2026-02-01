@@ -41,28 +41,23 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
     }
 
     const loadData = async () => {
-      // If creating a new hunt, ensure we start fresh (but still fetch playlists)
-      if (huntId === 'new') {
-        setCounter(0);
-        setIncrementAmount(1);
-        setSelectedPokemonId(null);
-        setSelectedPokemonName('');
-        activeHuntIdRef.current = null;
-      }
-
       try {
         const promises: Promise<any>[] = [
           supabase.from('shiny_playlists').select('id, name').eq('user_id', user.id)
         ];
 
-        if (huntId !== 'new') {
-          let query = supabase.from('active_hunts').select('*').eq('user_id', user.id);
-          if (huntId) {
-            query = query.eq('id', huntId).maybeSingle();
-          } else {
-            query = query.order('updated_at', { ascending: false }).limit(1).maybeSingle();
+        let huntToLoadId = huntId;
+        // If no specific huntId is provided in URL, try to load the most recent active hunt for the user.
+        // This is primarily for the multi-counter view to display an existing hunt by default.
+        if (!huntToLoadId) {
+          const { data: recentHuntData } = await supabase.from('active_hunts').select('id').eq('user_id', user.id).order('updated_at', { ascending: false }).limit(1).maybeSingle();
+          if (recentHuntData) {
+            huntToLoadId = recentHuntData.id;
           }
-          promises.push(query);
+        }
+
+        if (huntToLoadId) {
+          promises.push(supabase.from('active_hunts').select('*').eq('id', huntToLoadId).maybeSingle());
         }
 
         const [playlistsRes, huntRes] = await Promise.all(promises);
@@ -71,7 +66,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
           setPlaylists(playlistsRes.data);
         }
 
-        if (huntId !== 'new' && huntRes && huntRes.data) {
+        if (huntRes && huntRes.data) {
           const data = huntRes.data;
           activeHuntIdRef.current = data.id;
           setCounter(data.counter ?? 0);
@@ -80,6 +75,15 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
           setSelectedPokemonName(data.pokemon_name ?? '');
           setSelectedMethod(HUNTING_METHODS.find((m) => m.id === data.method) ?? HUNTING_METHODS[0]);
           setHasShinyCharm(data.has_shiny_charm ?? false);
+        } else {
+          // No hunt found for ID or no recent hunt. Reset to default new hunt state.
+          activeHuntIdRef.current = null;
+          setCounter(0);
+          setIncrementAmount(1);
+          setSelectedPokemonId(null);
+          setSelectedPokemonName('');
+          setSelectedMethod(HUNTING_METHODS[0]);
+          setHasShinyCharm(false);
         }
       } catch {
         // Silently fail - use default state
