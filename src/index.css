@@ -6,74 +6,74 @@
 
 @layer base {
   :root {
-    --background: 30 15% 95%;
-    --foreground: 30 10% 15%;
+    --background: hsl(30 15% 95%);
+    --foreground: hsl(30 10% 15%);
 
-    --card: 30 20% 98%;
-    --card-foreground: 30 10% 15%;
+    --card: hsl(30 20% 98%);
+    --card-foreground: hsl(30 10% 15%);
 
-    --popover: 30 20% 98%;
-    --popover-foreground: 30 10% 15%;
+    --popover: hsl(30 20% 98%);
+    --popover-foreground: hsl(30 10% 15%);
 
-    --secondary: 30 15% 90%;
-    --secondary-foreground: 30 10% 20%;
+    --secondary: hsl(30 15% 90%);
+    --secondary-foreground: hsl(30 10% 20%);
 
-    --muted: 30 10% 90%;
-    --muted-foreground: 30 10% 45%;
+    --muted: hsl(30 10% 90%);
+    --muted-foreground: hsl(30 10% 45%);
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: hsl(0 84.2% 60.2%);
+    --destructive-foreground: hsl(0 0% 100%);
 
-    --border: 30 15% 85%;
-    --input: 30 15% 85%;
+    --border: hsl(30 15% 85%);
+    --input: hsl(30 15% 85%);
     --radius: 0.5rem;
-    --success: 142 76% 36%;
-    --success-foreground: 0 0% 100%;
+    --success: hsl(142 76% 36%);
+    --success-foreground: hsl(0 0% 100%);
 
     /* Default (Yellow/Orange) theme Hues */
     --theme-primary-hue: 45;
     --theme-shiny-hue: 45;
 
-    --primary: var(--theme-primary-hue) 100% 50%;
-    --primary-foreground: var(--theme-primary-hue) 10% 10%;
-    --accent: var(--theme-primary-hue) 100% 50%;
-    --accent-foreground: var(--theme-primary-hue) 10% 10%;
-    --ring: var(--theme-primary-hue) 100% 50%;
-    --shiny: var(--theme-shiny-hue) 100% 50%;
-    --shiny-glow: var(--theme-shiny-hue) 100% 60%;
+    --primary: hsl(var(--theme-primary-hue) 100% 50%);
+    --primary-foreground: hsl(var(--theme-primary-hue) 10% 10%);
+    --accent: hsl(var(--theme-primary-hue) 100% 50%);
+    --accent-foreground: hsl(var(--theme-primary-hue) 10% 10%);
+    --ring: hsl(var(--theme-primary-hue) 100% 50%);
+    --shiny: hsl(var(--theme-shiny-hue) 100% 50%);
+    --shiny-glow: hsl(var(--theme-shiny-hue) 100% 60%);
   }
 
   .dark {
-    --background: 0 0% 15%;
-    --foreground: 0 0% 95%;
+    --background: hsl(0 0% 15%);
+    --foreground: hsl(0 0% 95%);
 
-    --card: 0 0% 18%;
-    --card-foreground: 0 0% 95%;
+    --card: hsl(0 0% 18%);
+    --card-foreground: hsl(0 0% 95%);
 
-    --popover: 0 0% 18%;
-    --popover-foreground: 0 0% 95%;
+    --popover: hsl(0 0% 18%);
+    --popover-foreground: hsl(0 0% 95%);
 
-    --secondary: 0 0% 25%;
-    --secondary-foreground: 0 0% 95%;
+    --secondary: hsl(0 0% 25%);
+    --secondary-foreground: hsl(0 0% 95%);
 
-    --muted: 0 0% 22%;
-    --muted-foreground: 0 0% 65%;
+    --muted: hsl(0 0% 22%);
+    --muted-foreground: hsl(0 0% 65%);
 
-    --destructive: 0 62.8% 50%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: hsl(0 62.8% 50%);
+    --destructive-foreground: hsl(0 0% 100%);
 
-    --border: 0 0% 25%;
-    --input: 0 0% 25%;
+    --border: hsl(0 0% 25%);
+    --input: hsl(0 0% 25%);
 
     /* Dark theme specific sidebar colors - these don't change with data-theme */
-    --sidebar-background: 0 0% 12%;
-    --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 45 100% 50%; /* Keeping original shiny hue for sidebar primary */
-    --sidebar-primary-foreground: 0 0% 10%;
-    --sidebar-accent: 0 0% 20%;
-    --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 0 0% 20%;
-    --sidebar-ring: 45 100% 50%;
+    --sidebar-background: hsl(0 0% 12%);
+    --sidebar-foreground: hsl(0 0% 95%);
+    --sidebar-primary: hsl(45 100% 50%); /* Keeping original shiny hue for sidebar primary */
+    --sidebar-primary-foreground: hsl(0 0% 10%);
+    --sidebar-accent: hsl(0 0% 20%);
+    --sidebar-accent-foreground: hsl(0 0% 95%);
+    --sidebar-border: hsl(0 0% 20%);
+    --sidebar-ring: hsl(45 100% 50%);
   }
 
   /* Theme overrides for primary/shiny hue */
