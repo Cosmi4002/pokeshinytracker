@@ -124,10 +124,6 @@ export function usePokemonDetails(pokemonId: number | null) {
         const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`);
         const data = await response.json();
 
-        // Also fetch species data for forms
-        const speciesResponse = await fetch(data.species.url);
-        const speciesData = await speciesResponse.json();
-
         const hasGenderDiff = POKEMON_WITH_GENDER_DIFF.includes(pokemonId);
 
         const sprites = {
@@ -137,28 +133,60 @@ export function usePokemonDetails(pokemonId: number | null) {
           femaleShiny: hasGenderDiff ? data.sprites.front_shiny_female : undefined,
         };
 
-        // Fetch form data
+        // Load forms from data.forms[] - these have proper sprites
         const forms: PokemonFormDetailed[] = [];
-        if (speciesData.varieties && speciesData.varieties.length > 1) {
-          for (const variety of speciesData.varieties) {
-            if (!variety.is_default) {
-              try {
-                const formResponse = await fetch(variety.pokemon.url);
-                const formData = await formResponse.json();
-                forms.push({
-                  id: formData.id,
-                  formName: variety.pokemon.name,
-                  displayName: formatPokemonName(variety.pokemon.name),
-                  sprites: {
-                    default: formData.sprites.front_default,
-                    shiny: formData.sprites.front_shiny,
-                  },
-                });
-              } catch (e) {
-                // Some forms may not have sprites
+        if (data.forms && data.forms.length > 1) {
+          for (const form of data.forms) {
+            // Skip the default form (same as base)
+            if (form.name === data.name) continue;
+
+            // Extract form ID from URL: /pokemon-form/{id}/
+            const formIdMatch = form.url.match(/\/pokemon-form\/(\d+)\/?$/);
+            const formId = formIdMatch ? parseInt(formIdMatch[1]) : null;
+
+            if (formId) {
+              forms.push({
+                id: formId,
+                formName: form.name,
+                displayName: formatPokemonName(form.name),
+                sprites: {
+                  default: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${formId}.png`,
+                  shiny: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${formId}.png`,
+                },
+              });
+            }
+          }
+        }
+
+        // Also fetch species varieties for regional forms, megas, etc.
+        try {
+          const speciesResponse = await fetch(data.species.url);
+          const speciesData = await speciesResponse.json();
+
+          if (speciesData.varieties && speciesData.varieties.length > 1) {
+            for (const variety of speciesData.varieties) {
+              if (!variety.is_default) {
+                // Extract ID from URL: /pokemon/{id}/
+                const varietyIdMatch = variety.pokemon.url.match(/\/pokemon\/(\d+)\/?$/);
+                const varietyId = varietyIdMatch ? parseInt(varietyIdMatch[1]) : null;
+
+                // Check if this variety is already in forms
+                if (varietyId && !forms.some(f => f.id === varietyId)) {
+                  forms.push({
+                    id: varietyId,
+                    formName: variety.pokemon.name,
+                    displayName: formatPokemonName(variety.pokemon.name),
+                    sprites: {
+                      default: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${varietyId}.png`,
+                      shiny: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${varietyId}.png`,
+                    },
+                  });
+                }
               }
             }
           }
+        } catch (e) {
+          // Ignore species fetch errors - forms from data.forms are enough
         }
 
         setPokemon({

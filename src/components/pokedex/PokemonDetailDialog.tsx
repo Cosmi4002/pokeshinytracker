@@ -24,26 +24,13 @@ interface FormVariant {
     spriteUrl: string;
 }
 
-// Seasonal forms mapping
-const SEASONAL_POKEMON: Record<number, { variants: string[]; baseFormName: string }> = {
-    585: { variants: ['spring', 'summer', 'autumn', 'winter'], baseFormName: 'deerling' }, // Deerling
-    586: { variants: ['spring', 'summer', 'autumn', 'winter'], baseFormName: 'sawsbuck' }, // Sawsbuck
-    412: { variants: ['plant', 'sandy', 'trash'], baseFormName: 'burmy' }, // Burmy
-    413: { variants: ['plant', 'sandy', 'trash'], baseFormName: 'wormadam' }, // Wormadam
-    422: { variants: ['west', 'east'], baseFormName: 'shellos' }, // Shellos
-    423: { variants: ['west', 'east'], baseFormName: 'gastrodon' }, // Gastrodon
-    479: { variants: ['heat', 'wash', 'frost', 'fan', 'mow'], baseFormName: 'rotom' }, // Rotom
-    550: { variants: ['red-striped', 'blue-striped', 'white-striped'], baseFormName: 'basculin' }, // Basculin
-    666: { variants: ['meadow', 'icy-snow', 'polar', 'tundra', 'continental', 'garden', 'elegant', 'modern', 'marine', 'archipelago', 'high-plains', 'sandstorm', 'river', 'monsoon', 'savanna', 'sun', 'ocean', 'jungle', 'fancy', 'pokeball'], baseFormName: 'vivillon' }, // Vivillon
-    669: { variants: ['red', 'yellow', 'orange', 'blue', 'white'], baseFormName: 'flabebe' }, // Flabébé
-    670: { variants: ['red', 'yellow', 'orange', 'blue', 'white'], baseFormName: 'floette' }, // Floette
-    671: { variants: ['red', 'yellow', 'orange', 'blue', 'white'], baseFormName: 'florges' }, // Florges
-    710: { variants: ['small', 'average', 'large', 'super'], baseFormName: 'pumpkaboo' }, // Pumpkaboo
-    711: { variants: ['small', 'average', 'large', 'super'], baseFormName: 'gourgeist' }, // Gourgeist
-    741: { variants: ['baile', 'pom-pom', 'pau', 'sensu'], baseFormName: 'oricorio' }, // Oricorio
-    774: { variants: ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'], baseFormName: 'minior' }, // Minior
-    898: { variants: ['ice', 'shadow'], baseFormName: 'calyrex' }, // Calyrex
-};
+// Seasonal form keywords to detect from API form names
+const SEASONAL_KEYWORDS = ['spring', 'summer', 'autumn', 'winter', 'plant', 'sandy', 'trash',
+    'west', 'east', 'heat', 'wash', 'frost', 'fan', 'mow', 'red-striped', 'blue-striped', 'white-striped',
+    'meadow', 'icy-snow', 'polar', 'tundra', 'continental', 'garden', 'elegant', 'modern', 'marine',
+    'archipelago', 'high-plains', 'sandstorm', 'river', 'monsoon', 'savanna', 'sun', 'ocean', 'jungle',
+    'fancy', 'pokeball', 'small', 'average', 'large', 'super', 'baile', 'pom-pom', 'pau', 'sensu',
+    'red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet', 'ice', 'shadow'];
 
 export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDetailDialogProps) {
     const { pokemon: details, loading: detailsLoading } = usePokemonDetails(pokemon?.id || null);
@@ -87,7 +74,7 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
         }
     };
 
-    // Build all form variants
+    // Build all form variants from API data
     const allVariants = useMemo((): FormVariant[] => {
         if (!details) return [];
 
@@ -116,23 +103,7 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
             });
         }
 
-        // Check for seasonal forms
-        if (SEASONAL_POKEMON[pokemonId]) {
-            const seasonal = SEASONAL_POKEMON[pokemonId];
-            seasonal.variants.forEach(variant => {
-                const formName = `${seasonal.baseFormName}-${variant}`;
-                variants.push({
-                    id: pokemonId,
-                    name: formName,
-                    displayName: variant.charAt(0).toUpperCase() + variant.slice(1).replace('-', ' '),
-                    category: 'seasonal',
-                    gender: 'genderless',
-                    spriteUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${pokemonId}.png`, // Default sprite, API may have form-specific
-                });
-            });
-        }
-
-        // Add forms from species varieties (regional, mega, gmax, etc.)
+        // Add forms from API (includes seasonal, regional, mega, gmax, etc.)
         details.forms.forEach(form => {
             const name = form.formName.toLowerCase();
             let category: FormVariant['category'] = 'form';
@@ -143,6 +114,8 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
                 category = 'mega';
             } else if (name.includes('gmax')) {
                 category = 'gmax';
+            } else if (SEASONAL_KEYWORDS.some(kw => name.includes(kw))) {
+                category = 'seasonal';
             }
 
             variants.push({

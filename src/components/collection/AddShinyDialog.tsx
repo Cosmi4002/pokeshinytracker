@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Loader2 } from 'lucide-react';
+import { GenderSelector } from '@/components/ui/GenderSelector';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -202,16 +203,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
           {/* 4. Sesso */}
           <div className="space-y-2">
             <Label>Sesso</Label>
-            <Select value={gender} onValueChange={setGender}>
-              <SelectTrigger>
-                <SelectValue placeholder="Opzionale" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="male">♂ Maschio</SelectItem>
-                <SelectItem value="female">♀ Femmina</SelectItem>
-                <SelectItem value="genderless">⚪ Senza genere</SelectItem>
-              </SelectContent>
-            </Select>
+            <GenderSelector value={gender} onChange={setGender} />
           </div>
 
           {/* 5. Shiny Charm */}
