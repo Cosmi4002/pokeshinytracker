@@ -35,7 +35,8 @@ export default function Hunts() {
                 .order('updated_at', { ascending: false });
 
             if (error) throw error;
-            setHunts(data || []);
+            // Filter out hunts that don't have a pokemon_id assigned yet (incomplete hunts)
+            setHunts(data?.filter(h => h.pokemon_id !== null) || []);
         } catch (err: any) {
             toast({
                 variant: 'destructive',
