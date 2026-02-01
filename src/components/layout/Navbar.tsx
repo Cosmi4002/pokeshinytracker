@@ -9,6 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { ThemeCustomizer } from '@/components/layout/ThemeCustomizer'; // Import ThemeCustomizer
 
 export function Navbar() {
   const location = useLocation();
@@ -50,6 +51,7 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-2">
+          <ThemeCustomizer /> {/* Add ThemeCustomizer here */}
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
