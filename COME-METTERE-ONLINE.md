@@ -83,17 +83,31 @@ Dopo 1–2 minuti il sito sarà online su `https://pokeshinytracker.vercel.app`
 
 ### Passo 4: Configura Supabase (obbligatorio)
 
-Se vedi una pagina nera senza pulsanti, le variabili d’ambiente non sono impostate.
+Se vedi una pagina nera senza pulsanti, o il login carica all’infinito, le variabili d’ambiente non sono impostate.
+
+**Opzione A — Automatico (consigliato)**
+
+1. Crea un progetto su https://supabase.com (gratuito) e copia **Project URL** e **anon public key** (Project Settings → API).
+2. Nella root del progetto crea (o modifica) il file **`.env.local`** con:
+   ```
+   VITE_SUPABASE_URL=https://TUO_PROJECT.supabase.co
+   VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIs...
+   ```
+3. Collega il progetto a Vercel (se non l’hai già fatto): `npx vercel link` e scegli il progetto.
+4. Esegui lo script che invia le variabili a Vercel:
+   - **Doppio clic** su `scripts\CONFIGURA-VERCEL-SUPABASE.bat`
+   - oppure nel terminale: `powershell -ExecutionPolicy Bypass -File scripts/set-vercel-env.ps1`
+5. In Vercel: **Deployments** → ⋮ sull’ultimo deploy → **Redeploy**.
+
+**Opzione B — Manuale**
 
 1. Crea un progetto su https://supabase.com (gratuito)
 2. In Supabase: **Project Settings** → **API** → copia **Project URL** e **anon public key**
 3. In Vercel: **Project** → **Settings** → **Environment Variables**
 4. Aggiungi:
    - `VITE_SUPABASE_URL` = Project URL
-   - `VITE_SUPABASE_PUBLISHABLE_KEY` = anon public key (oppure usa `VITE_SUPABASE_ANON_KEY`)
+   - `VITE_SUPABASE_ANON_KEY` = anon public key
 5. **Redeploy** il progetto (Deployments → ⋮ → Redeploy)
-
-**Da terminale (CLI):** dalla cartella del progetto con `.env.local` già compilato esegui `.\vercel-env.ps1` poi `npx vercel --prod`.
 
 ### Passo 5: Crea le tabelle nel database Supabase
 
