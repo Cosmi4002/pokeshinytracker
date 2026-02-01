@@ -93,6 +93,8 @@ Se vedi una pagina nera senza pulsanti, le variabili d’ambiente non sono impos
    - `VITE_SUPABASE_PUBLISHABLE_KEY` = anon public key (oppure usa `VITE_SUPABASE_ANON_KEY`)
 5. **Redeploy** il progetto (Deployments → ⋮ → Redeploy)
 
+**Da terminale (CLI):** dalla cartella del progetto con `.env.local` già compilato esegui `.\vercel-env.ps1` poi `npx vercel --prod`.
+
 ### Passo 5: Crea le tabelle nel database Supabase
 
 1. In Supabase: **SQL Editor** → **New query**
