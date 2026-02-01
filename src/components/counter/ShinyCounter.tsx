@@ -262,9 +262,8 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
         <div className="flex justify-center gap-2">
           <Button
             size="lg"
-            variant="secondary"
             onClick={decrement}
-            className="h-12 px-6 text-xl border-2 border-border"
+            className="h-12 px-6 text-xl"
           >
             <Minus className="h-5 w-5" />
           </Button>
