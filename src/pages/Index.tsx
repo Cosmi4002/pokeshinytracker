@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Sparkles, Calculator, BookOpen, Archive, ArrowRight } from 'lucide-react';
+import { Sparkles, Gamepad2, Search, Grid3X3, Crosshair, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useAuth } from '@/lib/auth-context';
 
 export default function Index() {
@@ -17,21 +17,27 @@ export default function Index() {
 
   const features = [
     {
-      icon: Calculator,
+      icon: Gamepad2,
       title: 'Shiny Counter',
-      description: 'Track your encounters with accurate probability statistics based on your hunting method.',
+      description: 'Track your encounters.',
       link: '/counter',
     },
     {
-      icon: BookOpen,
+      icon: Crosshair,
+      title: 'Active Hunts',
+      description: 'Manage your ongoing hunts.',
+      link: '/hunts',
+    },
+    {
+      icon: Search,
       title: 'Shiny Pokédex',
-      description: 'Browse all shiny Pokémon sprites including gender differences, regional forms, and variants.',
+      description: 'Browse shiny sprites.',
       link: '/pokedex',
     },
     {
-      icon: Archive,
+      icon: Grid3X3,
       title: 'Collection',
-      description: 'Save and organize your caught shinies with details like attempts, method, and game.',
+      description: 'Your caught shinies.',
       link: '/collection',
     },
   ];
@@ -40,26 +46,30 @@ export default function Index() {
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5" />
-        
+        <div
+          className="absolute inset-0"
+          style={{ background: 'linear-gradient(to bottom right, color-mix(in srgb, var(--primary), transparent 90%), transparent, color-mix(in srgb, var(--primary), transparent 95%))' }}
+        />
+
         <div className="container mx-auto px-4 py-20 relative">
           <div className="text-center space-y-6 max-w-3xl mx-auto">
             <div className="flex justify-center">
               <div className="relative">
                 <Sparkles className="h-20 w-20 text-primary animate-pulse" />
-                <div className="absolute inset-0 blur-xl bg-primary/30" />
+                <div
+                  className="absolute inset-0 blur-xl"
+                  style={{ backgroundColor: 'color-mix(in srgb, var(--primary), transparent 70%)' }}
+                />
               </div>
             </div>
-            
+
             <h1 className="text-5xl sm:text-6xl font-bold">
               <span className="shiny-text">PokeShinyTracker</span>
             </h1>
-            
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              The ultimate shiny hunting companion. Track your encounters, 
-              browse the shiny Pokédex, and save your precious catches.
-            </p>
-            
+
+            {/* Removed text as requested */}
+            <div className="h-4"></div>
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/auth">
                 <Button size="lg" className="shiny-glow">
@@ -79,14 +89,17 @@ export default function Index() {
 
       {/* Features Section */}
       <div className="container mx-auto px-4 py-16">
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {features.map((feature) => {
             const Icon = feature.icon;
             return (
               <Link key={feature.title} to={feature.link}>
                 <Card className="h-full hover:border-primary transition-colors cursor-pointer group">
                   <CardHeader>
-                    <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                    <div
+                      className="h-12 w-12 rounded-lg flex items-center justify-center mb-4 transition-colors"
+                      style={{ backgroundColor: 'color-mix(in srgb, var(--primary), transparent 90%)' }}
+                    >
                       <Icon className="h-6 w-6 text-primary" />
                     </div>
                     <CardTitle>{feature.title}</CardTitle>
