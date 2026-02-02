@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Plus, Trash2, Filter, LogIn, List, Pencil } from 'lucide-react';
+import { Plus, Trash2, Filter, LogIn, List } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
@@ -7,8 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { HUNTING_METHODS, POKEBALLS, GAMES, SHINY_CHARM_ICON } from '@/lib/pokemon-data';
-import { usePokemonList, getPokemonSpriteUrl } from '@/hooks/use-pokemon';
+import { GAMES } from '@/lib/pokemon-data';
+import { usePokemonList } from '@/hooks/use-pokemon';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
@@ -16,6 +16,7 @@ import { AddShinyDialog } from '@/components/collection/AddShinyDialog';
 import { CreatePlaylistDialog } from '@/components/collection/CreatePlaylistDialog';
 import { ManagePlaylistsDialog } from '@/components/collection/ManagePlaylistsDialog';
 import { EditShinyDialog } from '@/components/collection/EditShinyDialog';
+import { ShinyCard } from '@/components/collection/ShinyCard';
 import type { Tables } from '@/integrations/supabase/types';
 
 type CaughtShinyRow = Tables<'caught_shinies'>;
@@ -297,121 +298,17 @@ export default function Collection() {
             </Card>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredEntries.map((entry) => {
-                const method = HUNTING_METHODS.find((m) => m.id === entry.method);
-                const pokeball = POKEBALLS.find((b) => b.id === entry.pokeball);
-                const game = GAMES.find((g) => g.id === entry.game);
-                const playlistName = entry.playlist_id ? playlistMap[entry.playlist_id] : null;
-
-                return (
-                  <Card key={entry.id} className="group hover:border-primary transition-colors">
-                    <CardContent className="pt-6">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex items-center gap-3">
-                          <img
-                            src={entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, { shiny: true })}
-                            alt={entry.pokemon_name}
-                            className="h-16 w-16 pokemon-sprite"
-                          />
-                          <div>
-                            <h3 className="font-semibold text-lg">{entry.pokemon_name}</h3>
-                            <p className="text-sm text-muted-foreground">
-                              #{entry.pokemon_id.toString().padStart(4, '0')}
-                            </p>
-                          </div>
-                        </div>
-                        {user && (
-                          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                setEditEntry(entry);
-                                setIsEditDialogOpen(true);
-                              }}
-                              title="Modifica"
-                            >
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDelete(entry.id)}
-                              title="Elimina"
-                            >
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Tentativi:</span>
-                          <span className="font-semibold">{(entry.attempts || 1).toLocaleString()}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Metodo:</span>
-                          <span className="font-semibold text-xs">{method?.name}</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-muted-foreground">Genere:</span>
-                          <span className="font-semibold">
-                            {entry.gender === 'male' ? '♂' : entry.gender === 'female' ? '♀' : '-'}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-muted-foreground">Ball:</span>
-                          <div className="flex items-center gap-1">
-                            {pokeball && (
-                              <img src={pokeball.sprite} alt={pokeball.name} className="h-5 w-5" />
-                            )}
-                            <span className="font-semibold text-xs">{pokeball?.name}</span>
-                          </div>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Data cattura:</span>
-                          <span className="font-semibold">
-                            {new Date(entry.caught_date).toLocaleDateString()}
-                          </span>
-                        </div>
-                        {entry.hunt_start_date && (
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Inizio caccia:</span>
-                            <span className="font-semibold text-xs">
-                              {new Date(entry.hunt_start_date).toLocaleDateString()}
-                            </span>
-                          </div>
-                        )}
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Gioco:</span>
-                          <span className="font-semibold text-xs">{game?.name}</span>
-                        </div>
-                        {entry.has_shiny_charm && (
-                          <div className="flex items-center justify-center gap-2 pt-2 border-t">
-                            <img src={SHINY_CHARM_ICON} alt="Shiny Charm" className="h-5 w-5" />
-                            <span className="text-xs font-semibold">Shiny Charm</span>
-                          </div>
-                        )}
-                        {(playlistName || entry.is_fail) && (
-                          <div className="pt-2 border-t flex flex-wrap gap-1 items-center">
-                            {entry.is_fail && (
-                              <span className="text-xs px-2 py-1 rounded-full bg-destructive/20 text-destructive font-semibold">
-                                FAIL
-                              </span>
-                            )}
-                            {playlistName && (
-                              <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary">
-                                {playlistName}
-                              </span>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
+              {filteredEntries.map((entry) => (
+                <ShinyCard
+                  key={entry.id}
+                  entry={entry}
+                  onEdit={() => {
+                    setEditEntry(entry);
+                    setIsEditDialogOpen(true);
+                  }}
+                  onDelete={() => handleDelete(entry.id)}
+                />
+              ))}
             </div>
           )}
         </div>
