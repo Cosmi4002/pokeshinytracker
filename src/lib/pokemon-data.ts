@@ -30,52 +30,53 @@ export const getDynamicOdds = (methodId: string, encounters: number, hasShinyCha
   const method = HUNTING_METHODS.find(m => m.id === methodId);
   if (!method) return 4096;
 
-  let rolls = 1;
   const charmRolls = hasShinyCharm ? 2 : 0;
 
-  // Specific Methods with unique logic
-  if (methodId === 'breeding-shiny-gen2') return 64;
-  if (methodId === 'odd-egg') return 128;
+  // --- Gen 2 ---
+  if (methodId === 'gen2-breeding-shiny') return 64;
+  if (methodId === 'gen2-odd-egg') return 128;
 
-  if (methodId === 'pokeradar-gen4') {
+  // --- Gen 4 ---
+  if (methodId === 'gen4-masuda') return 1639;
+  if (methodId === 'gen4-pokeradar') {
     const chain = Math.min(encounters, 40);
     if (chain >= 40) return 200;
     if (chain >= 30) return 1300 + (40 - chain) * 200;
     return 8192;
   }
 
-  if (methodId === 'pokeradar-bdsp') {
-    const chain = Math.min(encounters, 40);
-    // BDSP odds are slightly different at max chain? Actually no, 1/99 approx at 40.
-    // Let's use the provided logic:
-    if (chain >= 40) return 99;
-    return 4096;
-  }
+  // --- Gen 5 ---
+  if (methodId === 'gen5-masuda') return hasShinyCharm ? 1024 : 1366;
 
-  if (methodId === 'chain-fishing') {
+  // --- Gen 6 ---
+  if (methodId === 'gen6-masuda') return hasShinyCharm ? 512 : 683;
+  if (methodId === 'gen6-chain-fishing') {
     const chain = Math.min(encounters, 20);
     const bonusRolls = 2 * chain;
     const totalRolls = 1 + bonusRolls + charmRolls;
     return Math.round(4096 / totalRolls);
   }
-
-  if (methodId === 'dexnav') {
+  if (methodId === 'gen6-dexnav') {
     if (encounters >= 999) return hasShinyCharm ? 173 : 200;
     return hasShinyCharm ? 512 : 600;
   }
+  if (methodId === 'gen6-horde') {
+    const totalRolls = 5 + (hasShinyCharm ? 2 : 0);
+    return Math.round(4096 / totalRolls);
+  }
 
-  if (methodId === 'sos-battle') {
+  // --- Gen 7 ---
+  if (methodId === 'gen7-masuda') return hasShinyCharm ? 512 : 683;
+  if (methodId === 'gen7-sos') {
     const chain = encounters % 256;
     let extraRolls = 0;
     if (chain >= 31) extraRolls = 12;
     else if (chain >= 21) extraRolls = 8;
     else if (chain >= 11) extraRolls = 4;
-
     const totalRolls = 1 + extraRolls + charmRolls;
     return Math.round(4096 / totalRolls);
   }
-
-  if (methodId === 'catch-combo') {
+  if (methodId === 'gen7-lgpe-combo') {
     let comboRolls = 0;
     if (encounters >= 31) comboRolls = 11;
     else if (encounters >= 21) comboRolls = 8;
@@ -83,37 +84,41 @@ export const getDynamicOdds = (methodId: string, encounters: number, hasShinyCha
     const totalRolls = 1 + comboRolls + charmRolls;
     return Math.round(4096 / totalRolls);
   }
+  if (methodId === 'gen7-wormhole') return hasShinyCharm ? 100 : 300;
 
-  if (methodId === 'number-battled') {
-    return hasShinyCharm ? 512 : 683; // For 500+ battles
+  // --- Gen 8 ---
+  if (methodId === 'gen8-masuda' || methodId === 'gen8-bdsp-masuda') return hasShinyCharm ? 512 : 683;
+  if (methodId === 'gen8-murder') return hasShinyCharm ? 512 : 683;
+  if (methodId === 'gen8-dynamax') return hasShinyCharm ? 100 : 300;
+  if (methodId === 'gen8-bdsp-pokeradar') {
+    const chain = Math.min(encounters, 40);
+    if (chain >= 40) return 99;
+    return 4096;
   }
-
-  if (methodId === 'dynamax-adventure') return hasShinyCharm ? 100 : 300;
-
-  if (methodId.startsWith('sandwich-lv')) {
-    const powerRolls = parseInt(methodId.split('lv')[1]) || 0;
-    const totalRolls = 1 + powerRolls + (hasShinyCharm ? 2 : 0);
+  if (methodId === 'pla-massive') {
+    const totalRolls = 1 + 12 + (hasShinyCharm ? 2 : 0);
     return Math.round(4096 / totalRolls);
   }
 
-  if (methodId === 'mass-outbreak-gen9') {
+  // --- Gen 9 ---
+  if (methodId === 'gen9-masuda') return hasShinyCharm ? 512 : 683;
+  if (methodId === 'gen9-outbreak') {
     let outbreakRolls = 0;
     if (encounters >= 60) outbreakRolls = 2;
     else if (encounters >= 30) outbreakRolls = 1;
     const totalRolls = 1 + outbreakRolls + (hasShinyCharm ? 2 : 0);
     return Math.round(4096 / totalRolls);
   }
-
-  if (methodId === 'massive-mass-outbreak') {
-    const totalRolls = 1 + 12 + (hasShinyCharm ? 2 : 0); // MMA is roughly +12 rolls
+  if (methodId === 'gen9-sandwich-lv3') {
+    const totalRolls = 1 + 3 + (hasShinyCharm ? 2 : 0);
+    return Math.round(4096 / totalRolls);
+  }
+  if (methodId === 'gen9-outbreak-sandwich') {
+    const totalRolls = 1 + 2 + 3 + (hasShinyCharm ? 2 : 0);
     return Math.round(4096 / totalRolls);
   }
 
-  if (methodId === 'masuda-gen4') return 1639;
-  if (methodId === 'masuda-gen5') return hasShinyCharm ? 1024 : 1366;
-  if (methodId === 'masuda-modern') return hasShinyCharm ? 512 : 683;
-
-  // BASE LOGIC for everything else
+  // Default logic
   const baseDenominator = method.baseOdds;
   if (hasShinyCharm && method.supportsShinyCharm) {
     if (method.generation >= 5) {
@@ -125,45 +130,76 @@ export const getDynamicOdds = (methodId: string, encounters: number, hasShinyCha
 };
 
 export const HUNTING_METHODS: HuntingMethod[] = [
-  // --- Standard Methods ---
-  { id: 'random-8192', name: 'Random Encounter (1/8192)', baseOdds: 8192, generation: 2, supportsShinyCharm: false },
-  { id: 'random-4096', name: 'Random Encounter (1/4096)', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
-  { id: 'soft-reset-8192', name: 'Soft Reset (1/8192)', baseOdds: 8192, generation: 2, supportsShinyCharm: false },
-  { id: 'soft-reset-4096', name: 'Soft Reset (1/4096)', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
-  { id: 'runaway-8192', name: 'Runaway (1/8192)', baseOdds: 8192, generation: 2, supportsShinyCharm: false },
-  { id: 'runaway-4096', name: 'Runaway (1/4096)', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
+  // --- Gen 2 ---
+  { id: 'gen2-random', name: 'Random Encounter', baseOdds: 8192, generation: 2, supportsShinyCharm: false },
+  { id: 'gen2-soft-reset', name: 'Soft Reset', baseOdds: 8192, generation: 2, supportsShinyCharm: false },
+  { id: 'gen2-breeding-shiny', name: 'Breeding (Shiny Parent)', baseOdds: 64, generation: 2, supportsShinyCharm: false },
+  { id: 'gen2-odd-egg', name: 'Odd Egg', baseOdds: 128, generation: 2, supportsShinyCharm: false },
+  { id: 'gen2-headbutt', name: 'Headbutt', baseOdds: 8192, generation: 2, supportsShinyCharm: false },
 
-  // --- Breeding ---
-  { id: 'masuda-modern', name: 'Masuda Method (Modern)', baseOdds: 683, generation: 6, supportsShinyCharm: true },
-  { id: 'masuda-gen5', name: 'Masuda Method (Gen 5)', baseOdds: 1366, generation: 5, supportsShinyCharm: true },
-  { id: 'masuda-gen4', name: 'Masuda Method (Gen 4)', baseOdds: 1639, generation: 4, supportsShinyCharm: false },
-  { id: 'breeding-shiny-gen2', name: 'Breeding (Shiny Parent)', baseOdds: 64, generation: 2, supportsShinyCharm: false },
-  { id: 'odd-egg', name: 'Odd Egg', baseOdds: 128, generation: 2, supportsShinyCharm: false },
+  // --- Gen 3 ---
+  { id: 'gen3-random', name: 'Random Encounter', baseOdds: 8192, generation: 3, supportsShinyCharm: false },
+  { id: 'gen3-soft-reset', name: 'Soft Reset', baseOdds: 8192, generation: 3, supportsShinyCharm: false },
+  { id: 'gen3-runaway', name: 'Runaway', baseOdds: 8192, generation: 3, supportsShinyCharm: false },
+  { id: 'gen3-roaming', name: 'Roaming', baseOdds: 8192, generation: 3, supportsShinyCharm: false },
+  { id: 'gen3-fishing', name: 'Fishing', baseOdds: 8192, generation: 3, supportsShinyCharm: false },
 
-  // --- Specific Mechanics ---
-  { id: 'pokeradar-gen4', name: 'Poke Radar (Gen 4)', baseOdds: 8192, generation: 4, supportsShinyCharm: false, description: 'Increases with Chain (max 40)' },
-  { id: 'pokeradar-bdsp', name: 'Poke Radar (BDSP)', baseOdds: 4096, generation: 8, supportsShinyCharm: true, description: 'Increases with Chain (max 40)' },
-  { id: 'chain-fishing', name: 'Chain Fishing', baseOdds: 4096, generation: 6, supportsShinyCharm: true, description: 'Increases with consecutive hooks' },
-  { id: 'dexnav', name: 'DexNav', baseOdds: 4096, generation: 6, supportsShinyCharm: true, description: 'Increases with Search Level' },
-  { id: 'sos-battle', name: 'SOS Battle', baseOdds: 4096, generation: 7, supportsShinyCharm: true, description: 'Increases with Chain' },
-  { id: 'friend-safari', name: 'Friend Safari', baseOdds: 512, generation: 6, supportsShinyCharm: true },
-  { id: 'horde-encounter', name: 'Horde Encounter', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
-  { id: 'ultra-wormhole', name: 'Ultra Wormhole', baseOdds: 4096, generation: 7, supportsShinyCharm: true },
-  { id: 'catch-combo', name: 'Catch Combo (Let\'s Go)', baseOdds: 4096, generation: 7, supportsShinyCharm: true },
-  { id: 'dynamax-adventure', name: 'Dynamax Adventure', baseOdds: 300, generation: 8, supportsShinyCharm: true },
-  { id: 'number-battled', name: 'Number Battled (500+)', baseOdds: 683, generation: 8, supportsShinyCharm: true },
+  // --- Gen 4 ---
+  { id: 'gen4-random', name: 'Random Encounter', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
+  { id: 'gen4-soft-reset', name: 'Soft Reset', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
+  { id: 'gen4-masuda', name: 'Masuda Method', baseOdds: 1639, generation: 4, supportsShinyCharm: false },
+  { id: 'gen4-pokeradar', name: 'Poke Radar', baseOdds: 8192, generation: 4, supportsShinyCharm: false, description: 'Increases with Chain' },
+  { id: 'gen4-runaway', name: 'Runaway', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
+  { id: 'gen4-fishing', name: 'Fishing', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
+  { id: 'gen4-honey-tree', name: 'Honey Tree', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
+  { id: 'gen4-headbutt', name: 'Headbutt', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
 
-  // --- Gen 9 ---
-  { id: 'mass-outbreak-gen9', name: 'Mass Outbreak', baseOdds: 4096, generation: 9, supportsShinyCharm: true, description: 'KO 60+ for max odds' },
-  { id: 'sandwich-lv3', name: 'Sandwich (Sparkling Power 3)', baseOdds: 1024, generation: 9, supportsShinyCharm: true },
+  // --- Gen 5 ---
+  { id: 'gen5-random', name: 'Random Encounter', baseOdds: 8192, generation: 5, supportsShinyCharm: true },
+  { id: 'gen5-soft-reset', name: 'Soft Reset', baseOdds: 8192, generation: 5, supportsShinyCharm: true },
+  { id: 'gen5-masuda', name: 'Masuda Method', baseOdds: 1366, generation: 5, supportsShinyCharm: true },
+  { id: 'gen5-runaway', name: 'Runaway', baseOdds: 8192, generation: 5, supportsShinyCharm: true },
+
+  // --- Gen 6 ---
+  { id: 'gen6-random', name: 'Random Encounter', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
+  { id: 'gen6-soft-reset', name: 'Soft Reset', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
+  { id: 'gen6-masuda', name: 'Masuda Method', baseOdds: 683, generation: 6, supportsShinyCharm: true },
+  { id: 'gen6-friend-safari', name: 'Friend Safari', baseOdds: 512, generation: 6, supportsShinyCharm: true },
+  { id: 'gen6-chain-fishing', name: 'Chain Fishing', baseOdds: 4096, generation: 6, supportsShinyCharm: true, description: 'Increases with consecutive hooks' },
+  { id: 'gen6-dexnav', name: 'DexNav', baseOdds: 4096, generation: 6, supportsShinyCharm: true, description: 'Increases with Search Level' },
+  { id: 'gen6-horde', name: 'Horde Encounter', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
+
+  // --- Gen 7 ---
+  { id: 'gen7-random', name: 'Random Encounter', baseOdds: 4096, generation: 7, supportsShinyCharm: true },
+  { id: 'gen7-soft-reset', name: 'Soft Reset', baseOdds: 4096, generation: 7, supportsShinyCharm: true },
+  { id: 'gen7-masuda', name: 'Masuda Method', baseOdds: 683, generation: 7, supportsShinyCharm: true },
+  { id: 'gen7-sos', name: 'SOS Battle', baseOdds: 4096, generation: 7, supportsShinyCharm: true, description: 'Increases with Chain' },
+  { id: 'gen7-wormhole', name: 'Ultra Wormhole', baseOdds: 4096, generation: 7, supportsShinyCharm: true },
+  { id: 'gen7-lgpe-random', name: 'Let\'s Go Random', baseOdds: 4096, generation: 7, supportsShinyCharm: true },
+  { id: 'gen7-lgpe-combo', name: 'Let\'s Go Catch Combo', baseOdds: 4096, generation: 7, supportsShinyCharm: true },
+
+  // --- Gen 8 ---
+  { id: 'gen8-random', name: 'Random Encounter', baseOdds: 4096, generation: 8, supportsShinyCharm: true },
+  { id: 'gen8-soft-reset', name: 'Soft Reset', baseOdds: 4096, generation: 8, supportsShinyCharm: true },
+  { id: 'gen8-masuda', name: 'Masuda Method', baseOdds: 683, generation: 8, supportsShinyCharm: true },
+  { id: 'gen8-murder', name: 'Number Battled (500+)', baseOdds: 683, generation: 8, supportsShinyCharm: true },
+  { id: 'gen8-dynamax', name: 'Dynamax Adventure', baseOdds: 300, generation: 8, supportsShinyCharm: true },
+  { id: 'gen8-bdsp-pokeradar', name: 'BDSP Poke Radar', baseOdds: 4096, generation: 8, supportsShinyCharm: true, description: 'Increases with Chain' },
+  { id: 'gen8-bdsp-masuda', name: 'BDSP Masuda', baseOdds: 683, generation: 8, supportsShinyCharm: true },
 
   // --- Legends Arceus ---
-  { id: 'massive-mass-outbreak', name: 'Massive Mass Outbreak', baseOdds: 4096, generation: 8, supportsShinyCharm: true },
+  { id: 'pla-random', name: 'Random Encounter', baseOdds: 4096, generation: 8, supportsShinyCharm: true },
+  { id: 'pla-massive', name: 'Massive Mass Outbreak', baseOdds: 4096, generation: 8, supportsShinyCharm: true },
 
-  // --- New Methods ---
-  { id: 'headbutt', name: 'Headbutt', baseOdds: 8192, generation: 2, supportsShinyCharm: false },
-  { id: 'honey-tree', name: 'Honey Tree', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
+  // --- Gen 9 ---
+  { id: 'gen9-random', name: 'Random Encounter', baseOdds: 4096, generation: 9, supportsShinyCharm: true },
+  { id: 'gen9-soft-reset', name: 'Soft Reset', baseOdds: 4096, generation: 9, supportsShinyCharm: true },
+  { id: 'gen9-masuda', name: 'Masuda Method', baseOdds: 683, generation: 9, supportsShinyCharm: true },
+  { id: 'gen9-outbreak', name: 'Mass Outbreak', baseOdds: 4096, generation: 9, supportsShinyCharm: true, description: 'KO 60+' },
+  { id: 'gen9-sandwich-lv3', name: 'Sandwich (Sparkling Power 3)', baseOdds: 1024, generation: 9, supportsShinyCharm: true },
+  { id: 'gen9-outbreak-sandwich', name: 'Outbreak + Sandwich Lv3', baseOdds: 683, generation: 9, supportsShinyCharm: true },
 
+  // --- Custom ---
   { id: 'custom', name: 'Custom Odds', baseOdds: 4096, generation: 0, supportsShinyCharm: false },
 ];
 
