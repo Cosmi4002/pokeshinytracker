@@ -33,6 +33,8 @@ export default function Counter() {
         .from('active_hunts')
         .select('*')
         .eq('user_id', user.id)
+        .eq('is_visible_on_counter', true) // Solo cacce visibili
+        .order('order_index', { ascending: true }) // Ordina per indice
         .order('updated_at', { ascending: false })
         .limit(3); // Fetch up to 3 most recent hunts
 
@@ -61,6 +63,7 @@ export default function Counter() {
       counter: 0,
       has_shiny_charm: false,
       increment_amount: 1,
+      is_visible_on_counter: true, // Visibile nel multi-counter
     }).select('id').single();
 
     if (error) {
