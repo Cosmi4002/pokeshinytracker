@@ -5,6 +5,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent } from '@/components/ui/card';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { PokemonSelector } from './PokemonSelector';
 import { MethodSelector } from './MethodSelector';
 import { calculateShinyStats, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON } from '@/lib/pokemon-data';
@@ -31,6 +41,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
   const [isEditingCounter, setIsEditingCounter] = useState(false);
   const [tempCounterValue, setTempCounterValue] = useState('');
   const [isFinishDialogOpen, setIsFinishDialogOpen] = useState(false);
+  const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
   const [playlists, setPlaylists] = useState<{ id: string; name: string }[]>([]);
   const isInitialLoadRef = useRef(true);
 
@@ -407,15 +418,33 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
 
           {/* Reset Button */}
           <Button
-            variant="destructive"
-            onClick={reset}
-            className="w-full"
+            variant="secondary"
+            onClick={() => setIsResetDialogOpen(true)}
+            className="w-full shiny-glow"
           >
             <RotateCcw className="mr-2 h-4 w-4" />
             Reset Counter
           </Button>
         </CardContent>
       </Card>
+
+      <AlertDialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Sei sicuro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Questa azione riporterà il counter a 0. I dati salvati verranno aggiornati.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annulla</AlertDialogCancel>
+            <AlertDialogAction onClick={() => {
+              reset();
+              setIsResetDialogOpen(false);
+            }}>Conferma</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <FinishHuntDialog
         open={isFinishDialogOpen}
