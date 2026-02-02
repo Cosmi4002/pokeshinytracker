@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Calculator, BookOpen, Archive, LogOut, User, Sparkles } from 'lucide-react';
+import { Calculator, Search, Grid3X3, LogOut, User, Sparkles, Crosshair } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabaseProjectRef } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth-context';
@@ -16,10 +16,10 @@ export function Navbar() {
   const { user, signOut } = useAuth();
 
   const navLinks = [
-    { to: '/hunts', label: 'Hunts', icon: Calculator },
-    { to: '/counter', label: 'Counter', icon: Sparkles }, // Changed Icon to distinguish
-    { to: '/pokedex', label: 'Pokédex', icon: BookOpen },
-    { to: '/collection', label: 'Collection', icon: Archive },
+    { to: '/hunts', label: 'Hunts', icon: Crosshair },
+    { to: '/counter', label: 'Counter', icon: Calculator },
+    { to: '/pokedex', label: 'Pokédex', icon: Search },
+    { to: '/collection', label: 'Collection', icon: Grid3X3 },
 
   ];
 

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Sparkles, Gamepad2, Search, Grid3X3, Crosshair, ArrowRight } from 'lucide-react';
+import { Sparkles, Calculator, Search, Grid3X3, Crosshair, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useAuth } from '@/lib/auth-context';
@@ -17,7 +17,7 @@ export default function Index() {
 
   const features = [
     {
-      icon: Gamepad2,
+      icon: Calculator,
       title: 'Shiny Counter',
       description: 'Track your encounters.',
       link: '/counter',
@@ -115,7 +115,7 @@ export default function Index() {
       {/* Footer */}
       <footer className="border-t py-8">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>Made with ✨ for shiny hunters</p>
+          {/* Footer content removed as requested */}
         </div>
       </footer>
     </div>
