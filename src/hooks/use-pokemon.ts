@@ -72,9 +72,16 @@ function getGeneration(id: number): number {
   return 1;
 }
 
-function formatPokemonName(name: string, id?: number): string {
-  if (id === 585 && name === 'deerling') return 'Spring Form Deerling';
-  if (id === 586 && name === 'sawsbuck') return 'Spring Form Sawsbuck';
+function formatPokemonName(name: string, id: number, baseId?: number): string {
+  const speciesId = baseId || id;
+
+  if (speciesId === 585 || speciesId === 586) {
+    if (name.includes('-summer')) return `Summer Form ${speciesId === 585 ? 'Deerling' : 'Sawsbuck'}`;
+    if (name.includes('-autumn')) return `Autumn Form ${speciesId === 585 ? 'Deerling' : 'Sawsbuck'}`;
+    if (name.includes('-winter')) return `Winter Form ${speciesId === 585 ? 'Deerling' : 'Sawsbuck'}`;
+    if (name.includes('-spring') || name === 'deerling' || name === 'sawsbuck')
+      return `Spring Form ${speciesId === 585 ? 'Deerling' : 'Sawsbuck'}`;
+  }
 
   const regions: Record<string, string> = {
     'alola': 'Alolan',
@@ -83,12 +90,7 @@ function formatPokemonName(name: string, id?: number): string {
     'paldea': 'Paldean'
   };
 
-  const seasonal: Record<string, string> = {
-    'summer': 'Summer',
-    'autumn': 'Autumn',
-    'winter': 'Winter',
-    'spring': 'Spring'
-  };
+
 
   const parts = name.split('-');
 
@@ -104,17 +106,7 @@ function formatPokemonName(name: string, id?: number): string {
     }
   }
 
-  // Check if any part is a season
-  for (const [key, label] of Object.entries(seasonal)) {
-    const index = parts.indexOf(key);
-    if (index !== -1) {
-      const baseName = parts
-        .filter((_, i) => i !== index)
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
-      return `${label} Form ${baseName}`;
-    }
-  }
+
 
   return parts
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -132,20 +124,16 @@ export function usePokemonList() {
         const response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${TOTAL_POKEMON}`);
         const data = await response.json();
 
-        // Mapping variety to base ID by name prefix
+        // Pass 1: Build base name map
         const basePokemonMap = new Map<string, number>();
-
-        const allPokemonRaw = data.results.map((p: { name: string, url: string }) => {
+        const allRaw = data.results.map((p: { name: string, url: string }) => {
           const idMatch = p.url.match(/\/pokemon\/(\d+)\/?$/);
           const id = idMatch ? parseInt(idMatch[1]) : 0;
-          if (id <= 1025) {
-            basePokemonMap.set(p.name, id);
-          }
+          if (id <= 1025) basePokemonMap.set(p.name, id);
           return { id, name: p.name };
         });
 
-        const allPokemon: PokemonBasic[] = allPokemonRaw.map((p: { id: number, name: string }) => {
-          // Determine base ID for sorting
+        const list: PokemonBasic[] = allRaw.map((p: any) => {
           let baseId = p.id;
           if (p.id > 10000) {
             const parts = p.name.split('-');
@@ -162,34 +150,33 @@ export function usePokemonList() {
             id: p.id,
             baseId,
             name: p.name,
-            displayName: formatPokemonName(p.name, p.id),
+            displayName: formatPokemonName(p.name, p.id, baseId),
           };
-        });
-
-        // Filter: Keep base forms (1-1025), regional forms, and seasonal forms
-        const filteredList = allPokemon.filter(p => {
+        }).filter((p: any) => {
           if (p.id <= 1025) return true;
-          const name = p.name.toLowerCase();
-          return name.endsWith('-alola') ||
-            name.endsWith('-galar') ||
-            name.endsWith('-hisui') ||
-            name.endsWith('-paldea') ||
-            name.includes('deerling-') ||
-            name.includes('sawsbuck-');
+          const n = p.name.toLowerCase();
+
+          // Exclude Megas/GMAX to avoid confusion and incorrect sprites
+          if (n.includes('-mega') || n.includes('-gmax') || n.includes('-totem') || n.includes('-cap')) return false;
+
+          // Keep Regional forms
+          if (n.endsWith('-alola') || n.endsWith('-galar') || n.endsWith('-hisui') || n.endsWith('-paldea')) return true;
+
+          // Keep seasonal forms
+          if (n.includes('deerling-') || n.includes('sawsbuck-')) return true;
+
+          return false;
         });
 
-        // Sort by base ID (official number), then by actual ID
-        filteredList.sort((a, b) => {
-          if (a.baseId !== b.baseId) {
-            return a.baseId - b.baseId;
-          }
-          // Same species: base form first
-          if (a.id <= 1025 && b.id > 1025) return -1;
-          if (a.id > 1025 && b.id <= 1025) return 1;
+        // Official order sorting
+        list.sort((a, b) => {
+          if (a.baseId !== b.baseId) return a.baseId - b.baseId;
+          if (a.id <= 1025) return -1;
+          if (b.id <= 1025) return 1;
           return a.id - b.id;
         });
 
-        setPokemon(filteredList);
+        setPokemon(list);
       } catch (err) {
         setError('Failed to fetch Pokemon list');
         console.error(err);
@@ -244,15 +231,30 @@ export function usePokemonDetails(pokemonId: number | null) {
             const formId = formIdMatch ? parseInt(formIdMatch[1]) : null;
 
             if (formId) {
-              forms.push({
-                id: formId,
-                formName: form.name,
-                displayName: formatPokemonName(form.name, formId),
-                sprites: {
-                  default: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${formId}.png`,
-                  shiny: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${formId}.png`,
-                },
-              });
+              try {
+                const formResponse = await fetch(form.url);
+                const formData = await formResponse.json();
+                forms.push({
+                  id: formId,
+                  formName: form.name,
+                  displayName: formatPokemonName(form.name, formId),
+                  sprites: {
+                    default: formData.sprites.front_default,
+                    shiny: formData.sprites.front_shiny,
+                  },
+                });
+              } catch (e) {
+                // Fallback to construction if fetch fails
+                forms.push({
+                  id: formId,
+                  formName: form.name,
+                  displayName: formatPokemonName(form.name, formId),
+                  sprites: {
+                    default: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${formId}.png`,
+                    shiny: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${formId}.png`,
+                  },
+                });
+              }
             }
           }
         }
