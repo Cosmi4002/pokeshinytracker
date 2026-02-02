@@ -32,8 +32,8 @@ export interface PokemonFormDetailed {
   };
 }
 
-// All Pokemon up to Gen 9 (1025 Pokemon)
-const TOTAL_POKEMON = 1025;
+// All Pokemon including varieties
+const TOTAL_POKEMON = 2000;
 
 // Pokemon with visible gender differences
 const POKEMON_WITH_GENDER_DIFF = [
@@ -60,6 +60,11 @@ const GENERATION_RANGES: Record<number, [number, number]> = {
 };
 
 function getGeneration(id: number): number {
+  if (id > 10000) {
+    // For regional forms, we'd ideally fetch species, but we can approximate
+    // or just default to a generation.
+    return 9;
+  }
   for (const [gen, [start, end]] of Object.entries(GENERATION_RANGES)) {
     if (id >= start && id <= end) return parseInt(gen);
   }
@@ -67,8 +72,28 @@ function getGeneration(id: number): number {
 }
 
 function formatPokemonName(name: string): string {
-  return name
-    .split('-')
+  const regions: Record<string, string> = {
+    'alola': 'Alolan',
+    'galar': 'Galarian',
+    'hisui': 'Hisuian',
+    'paldea': 'Paldean'
+  };
+
+  const parts = name.split('-');
+
+  // Check if any part is a region
+  for (const [key, label] of Object.entries(regions)) {
+    const index = parts.indexOf(key);
+    if (index !== -1) {
+      const baseName = parts
+        .filter((_, i) => i !== index)
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+      return `${label} ${baseName}`;
+    }
+  }
+
+  return parts
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 }
@@ -84,13 +109,34 @@ export function usePokemonList() {
         const response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${TOTAL_POKEMON}`);
         const data = await response.json();
 
-        const pokemonList: PokemonBasic[] = data.results.map((p: { name: string }, index: number) => ({
-          id: index + 1,
-          name: p.name,
-          displayName: formatPokemonName(p.name),
-        }));
+        const allPokemon: PokemonBasic[] = data.results.map((p: { name: string, url: string }) => {
+          const idMatch = p.url.match(/\/pokemon\/(\d+)\/?$/);
+          const id = idMatch ? parseInt(idMatch[1]) : 0;
+          return {
+            id,
+            name: p.name,
+            displayName: formatPokemonName(p.name),
+          };
+        });
 
-        setPokemon(pokemonList);
+        // Filter: Keep base forms (1-1025) and regional forms
+        const filteredList = allPokemon.filter(p => {
+          if (p.id <= 1025) return true;
+          const name = p.name.toLowerCase();
+          return name.endsWith('-alola') ||
+            name.endsWith('-galar') ||
+            name.endsWith('-hisui') ||
+            name.endsWith('-paldea');
+        });
+
+        // Sort by ID (base forms first, then varieties)
+        filteredList.sort((a, b) => {
+          if (a.id <= 1025 && b.id <= 1025) return a.id - b.id;
+          if (a.id > 1025 && b.id > 1025) return a.id - b.id;
+          return a.id <= 1025 ? -1 : 1;
+        });
+
+        setPokemon(filteredList);
       } catch (err) {
         setError('Failed to fetch Pokemon list');
         console.error(err);
