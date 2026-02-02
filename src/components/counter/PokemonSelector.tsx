@@ -49,7 +49,7 @@ export function PokemonSelector({ value, onChange }: PokemonSelectorProps) {
                   (e.target as HTMLImageElement).src = '/placeholder.svg';
                 }}
               />
-              <span>#{selectedPokemon.id.toString().padStart(4, '0')} {selectedPokemon.displayName}</span>
+              <span>#{selectedPokemon.baseId.toString().padStart(4, '0')} {selectedPokemon.displayName}</span>
             </div>
           ) : (
             <span className="text-muted-foreground">Select Pokémon...</span>
@@ -84,7 +84,7 @@ export function PokemonSelector({ value, onChange }: PokemonSelectorProps) {
                       (e.target as HTMLImageElement).src = '/placeholder.svg';
                     }}
                   />
-                  <span>#{p.id.toString().padStart(4, '0')} {p.displayName}</span>
+                  <span>#{p.baseId.toString().padStart(4, '0')} {p.displayName}</span>
                   <Check
                     className={cn(
                       "ml-auto h-4 w-4",

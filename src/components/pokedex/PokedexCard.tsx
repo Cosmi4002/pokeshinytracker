@@ -3,6 +3,7 @@ import { useState } from "react";
 
 interface PokedexCardProps {
     pokemonId: number;
+    baseId: number;
     displayName: string;
     spriteUrl: string;
     femaleSprite?: string;
@@ -14,6 +15,7 @@ interface PokedexCardProps {
 
 export function PokedexCard({
     pokemonId,
+    baseId,
     displayName,
     spriteUrl,
     femaleSprite,
@@ -114,7 +116,7 @@ export function PokedexCard({
             {/* Pokemon info */}
             <div className="flex flex-col items-center mt-2 z-10">
                 <p className="text-xs text-muted-foreground">
-                    #{pokemonId.toString().padStart(4, '0')}
+                    #{baseId.toString().padStart(4, '0')}
                 </p>
                 <p className={cn(
                     "text-sm font-medium truncate max-w-full transition-colors",

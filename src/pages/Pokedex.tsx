@@ -36,7 +36,7 @@ export default function Pokedex() {
       if (generation !== 'all') {
         const genNum = parseInt(generation);
         const [start, end] = GENERATION_RANGES[genNum];
-        matchesGen = p.id >= start && p.id <= end;
+        matchesGen = p.baseId >= start && p.baseId <= end;
       }
 
       return matchesSearch && matchesGen;
@@ -104,13 +104,13 @@ export default function Pokedex() {
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3">
               {filteredPokemon.map((p) => {
-                const hasGenderDiff = POKEMON_WITH_GENDER_DIFF.includes(p.id);
+                const hasGenderDiff = POKEMON_WITH_GENDER_DIFF.includes(p.baseId);
                 const { caught } = getCaughtCountForPokemon(p.id);
 
                 // For percentage, we need to know total forms
                 let totalForms = 1;
-                if (POKEMON_FORM_COUNTS[p.id]) {
-                  totalForms = POKEMON_FORM_COUNTS[p.id];
+                if (POKEMON_FORM_COUNTS[p.baseId]) {
+                  totalForms = POKEMON_FORM_COUNTS[p.baseId];
                 } else if (hasGenderDiff) {
                   totalForms = 2;
                 }
@@ -123,6 +123,7 @@ export default function Pokedex() {
                   <PokedexCard
                     key={p.id}
                     pokemonId={p.id}
+                    baseId={p.baseId}
                     displayName={p.displayName}
                     spriteUrl={getPokemonSpriteUrl(p.id, { shiny: true })}
                     femaleSprite={hasGenderDiff ? getPokemonSpriteUrl(p.id, { shiny: true, female: true }) : undefined}
