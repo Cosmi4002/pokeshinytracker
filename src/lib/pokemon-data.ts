@@ -135,6 +135,7 @@ export const HUNTING_METHODS: HuntingMethod[] = [
   { id: 'gen2-headbutt', name: 'Headbutt', baseOdds: 8192, generation: 2, supportsShinyCharm: false },
   { id: 'gen2-odd-egg', name: 'Odd Egg', baseOdds: 128, generation: 2, supportsShinyCharm: false },
   { id: 'gen2-random', name: 'Random Encounter', baseOdds: 8192, generation: 2, supportsShinyCharm: false },
+  { id: 'gen2-roaming', name: 'Roaming Encounter', baseOdds: 8192, generation: 2, supportsShinyCharm: false },
   { id: 'gen2-soft-reset', name: 'Soft Reset', baseOdds: 8192, generation: 2, supportsShinyCharm: false },
 
   // --- Gen 3 ---
@@ -151,6 +152,7 @@ export const HUNTING_METHODS: HuntingMethod[] = [
   { id: 'gen4-masuda', name: 'Masuda Method', baseOdds: 1639, generation: 4, supportsShinyCharm: false },
   { id: 'gen4-pokeradar', name: 'Poke Radar', baseOdds: 8192, generation: 4, supportsShinyCharm: false, description: 'Increases with Chain' },
   { id: 'gen4-random', name: 'Random Encounter', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
+  { id: 'gen4-roaming', name: 'Roaming', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
   { id: 'gen4-runaway', name: 'Runaway', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
   { id: 'gen4-soft-reset', name: 'Soft Reset', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
 
