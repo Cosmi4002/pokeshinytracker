@@ -78,6 +78,22 @@ export default function Hunts() {
         }
     };
 
+    const handleContinueHunt = async (huntId: string) => {
+        try {
+            // Re-enable visibility on counter
+            await supabase
+                .from('active_hunts')
+                .update({ is_visible_on_counter: true })
+                .eq('id', huntId);
+
+            navigate(`/counter/${huntId}`);
+        } catch (error) {
+            console.error("Error updating visibility:", error);
+            // Navigate anyway
+            navigate(`/counter/${huntId}`);
+        }
+    };
+
     const handleCreateHunt = () => {
         // Navigate to counter page with 'new' param to force creation of a new hunt
         navigate('/counter/new');
@@ -150,6 +166,7 @@ export default function Hunts() {
                                     key={hunt.id}
                                     hunt={hunt}
                                     onDelete={handleDeleteHunt}
+                                    onContinue={handleContinueHunt}
                                     layoutStyle={preferences.layout_style || 'grid'}
                                 />
                             ))}

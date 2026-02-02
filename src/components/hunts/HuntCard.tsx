@@ -13,10 +13,11 @@ type ActiveHuntRow = Tables<'active_hunts'>;
 interface HuntCardProps {
     hunt: ActiveHuntRow;
     onDelete: (huntId: string) => void;
+    onContinue?: (huntId: string) => void;
     layoutStyle?: string;
 }
 
-export function HuntCard({ hunt, onDelete, layoutStyle = 'grid' }: HuntCardProps) {
+export function HuntCard({ hunt, onDelete, onContinue, layoutStyle = 'grid' }: HuntCardProps) {
     const method = HUNTING_METHODS.find((m) => m.id === hunt.method);
     const stats = calculateShinyStats(hunt.counter || 0, hunt.method || 'gen9-random', hunt.has_shiny_charm || false);
 
@@ -28,6 +29,12 @@ export function HuntCard({ hunt, onDelete, layoutStyle = 'grid' }: HuntCardProps
     const timeAgo = hunt.updated_at
         ? formatDistanceToNow(new Date(hunt.updated_at), { addSuffix: true, locale: it })
         : 'mai';
+
+    const handleContinueClick = () => {
+        if (onContinue) {
+            onContinue(hunt.id);
+        }
+    };
 
     // List layout - horizontal card
     if (layoutStyle === 'list') {
@@ -65,11 +72,17 @@ export function HuntCard({ hunt, onDelete, layoutStyle = 'grid' }: HuntCardProps
 
                         {/* Actions */}
                         <div className="flex gap-2 flex-shrink-0">
-                            <Link to={`/counter/${hunt.id}`}>
-                                <Button size="sm" variant="default">
+                            {onContinue ? (
+                                <Button size="sm" variant="default" onClick={handleContinueClick}>
                                     <ArrowRight className="h-4 w-4" />
                                 </Button>
-                            </Link>
+                            ) : (
+                                <Link to={`/counter/${hunt.id}`}>
+                                    <Button size="sm" variant="default">
+                                        <ArrowRight className="h-4 w-4" />
+                                    </Button>
+                                </Link>
+                            )}
                             <Button
                                 variant="destructive"
                                 size="sm"
@@ -120,11 +133,17 @@ export function HuntCard({ hunt, onDelete, layoutStyle = 'grid' }: HuntCardProps
                     </div>
 
                     <div className="flex gap-1">
-                        <Link to={`/counter/${hunt.id}`} className="flex-1">
-                            <Button className="w-full" size="sm" variant="default">
+                        {onContinue ? (
+                            <Button className="w-full flex-1" size="sm" variant="default" onClick={handleContinueClick}>
                                 <ArrowRight className="h-3 w-3" />
                             </Button>
-                        </Link>
+                        ) : (
+                            <Link to={`/counter/${hunt.id}`} className="flex-1">
+                                <Button className="w-full" size="sm" variant="default">
+                                    <ArrowRight className="h-3 w-3" />
+                                </Button>
+                            </Link>
+                        )}
                         <Button
                             variant="destructive"
                             size="sm"
@@ -193,12 +212,19 @@ export function HuntCard({ hunt, onDelete, layoutStyle = 'grid' }: HuntCardProps
 
                 {/* Actions */}
                 <div className="flex gap-2">
-                    <Link to={`/counter/${hunt.id}`} className="flex-1">
-                        <Button className="w-full" variant="default">
+                    {onContinue ? (
+                        <Button className="w-full flex-1" variant="default" onClick={handleContinueClick}>
                             <ArrowRight className="mr-2 h-4 w-4" />
                             Continua
                         </Button>
-                    </Link>
+                    ) : (
+                        <Link to={`/counter/${hunt.id}`} className="flex-1">
+                            <Button className="w-full" variant="default">
+                                <ArrowRight className="mr-2 h-4 w-4" />
+                                Continua
+                            </Button>
+                        </Link>
+                    )}
                     <Button
                         variant="destructive"
                         size="icon"
