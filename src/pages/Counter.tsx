@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Plus, LayoutGrid, Maximize2 } from 'lucide-react';
+import { Plus, LayoutGrid, Maximize2, X } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { ShinyCounter } from '@/components/counter/ShinyCounter';
 import { Button } from '@/components/ui/button';
@@ -36,7 +36,7 @@ export default function Counter() {
         .eq('is_visible_on_counter', true) // Solo cacce visibili
         .order('order_index', { ascending: true }) // Ordina per indice
         .order('updated_at', { ascending: false })
-        .limit(3); // Fetch up to 3 most recent hunts
+        .limit(6); // Fetch up to 6 most recent hunts
 
       if (data) {
         setActiveHunts(data);
@@ -46,6 +46,21 @@ export default function Counter() {
 
     fetchHunts();
   }, [user, huntId]); // Refetch when huntId changes (e.g. navigation)
+
+  const handleHideHunt = async (huntId: string) => {
+    // Optimistic update
+    setActiveHunts(prev => prev.filter(h => h.id !== huntId));
+
+    const { error } = await supabase
+      .from('active_hunts')
+      .update({ is_visible_on_counter: false })
+      .eq('id', huntId);
+
+    if (error) {
+      console.error("Error hiding hunt:", error);
+      // Revert optimistic update if needed, or just let the next fetch handle it
+    }
+  };
 
   const handleCreateNew = async () => {
     if (!user) {
@@ -72,8 +87,19 @@ export default function Counter() {
       return;
     }
 
+    // Refresh local state instead of navigating
     if (data?.id) {
-      navigate(`/counter/${data.id}`);
+      // Refresh list
+      const { data: newData } = await supabase
+        .from('active_hunts')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('is_visible_on_counter', true)
+        .order('order_index', { ascending: true })
+        .order('updated_at', { ascending: false })
+        .limit(6);
+
+      if (newData) setActiveHunts(newData);
     }
   };
 
@@ -89,7 +115,7 @@ export default function Counter() {
               Multi-Counter View
             </h1>
             <div className="text-sm text-muted-foreground">
-              Mostrando fino a 3 cacce recenti
+              Mostrando fino a 6 cacce attive
             </div>
           </div>
         )}
@@ -110,7 +136,7 @@ export default function Counter() {
           <ShinyCounter />
         ) : (
           /* Multi Counter Grid */
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {loading ? (
               <div className="col-span-3 text-center py-12">Caricamento counters...</div>
             ) : (
@@ -119,12 +145,33 @@ export default function Counter() {
                 {activeHunts.map((hunt) => (
                   <div
                     key={hunt.id}
-                    className="border rounded-xl p-4 shadow-sm relative hover:shadow-md transition-shadow"
+                    className="border rounded-xl p-4 shadow-sm relative hover:shadow-md transition-shadow group/card"
                     style={{ backgroundColor: 'color-mix(in srgb, var(--card), transparent 50%)' }}
                   >
-                    <div className="absolute top-2 right-2 z-10">
-                      <Button variant="ghost" size="icon" onClick={() => navigate(`/counter/${hunt.id}`)} title="Focus mode">
-                        <Maximize2 className="h-4 w-4 text-muted-foreground" />
+                    <div className="absolute top-2 right-2 z-10 flex gap-1 opacity-0 group-hover/card:opacity-100 transition-opacity">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/counter/${hunt.id}`);
+                        }}
+                        title="Focus mode"
+                      >
+                        <Maximize2 className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleHideHunt(hunt.id);
+                        }}
+                        title="Chiudi (Nascondi)"
+                      >
+                        <X className="h-4 w-4" />
                       </Button>
                     </div>
                     {/* Minimal variant could be created, but standard is fine currently as it fits in columns */}
@@ -135,8 +182,8 @@ export default function Counter() {
                 ))}
 
                 {/* Empty Slots */}
-                {activeHunts.length < 3 && (
-                  Array.from({ length: 3 - activeHunts.length }).map((_, index) => (
+                {activeHunts.length < 6 && (
+                  Array.from({ length: 6 - activeHunts.length }).map((_, index) => (
                     <Card
                       key={`empty-${index}`}
                       className="border-dashed border-2 flex items-center justify-center min-h-[500px] transition-colors cursor-pointer group"
