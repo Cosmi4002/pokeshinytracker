@@ -253,10 +253,14 @@ export const POKEBALLS = [
   { id: 'loveball', name: 'Love Ball', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/love-ball.png' },
   { id: 'friendball', name: 'Friend Ball', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/friend-ball.png' },
   { id: 'moonball', name: 'Moon Ball', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/moon-ball.png' },
-  { id: ' dreamball', name: 'Dream Ball', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/dream-ball.png' },
   { id: 'beastball', name: 'Beast Ball', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/beast-ball.png' },
   { id: 'dreamball', name: 'Dream Ball', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/dream-ball.png' },
-  { id: 'strangeball', name: 'Strange Ball', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/strange-ball.png' },
+  { id: 'featherball', name: 'Feather Ball', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/feather-ball.png' },
+  { id: 'wingball', name: 'Wing Ball', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/wing-ball.png' },
+  { id: 'jetball', name: 'Jet Ball', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/jet-ball.png' },
+  { id: 'leadenball', name: 'Leaden Ball', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/leaden-ball.png' },
+  { id: 'gigatonball', name: 'Gigaton Ball', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/gigaton-ball.png' },
+  { id: 'originball', name: 'Origin Ball', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/origin-ball.png' },
 ];
 
 export const GAMES = [
