@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Trash2, Loader2, List } from 'lucide-react';
+import { Trash2, Loader2, List, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -21,6 +21,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
+import { EditPlaylistDialog } from './EditPlaylistDialog';
 import type { Tables } from '@/integrations/supabase/types';
 
 type PlaylistRow = Tables<'shiny_playlists'>;
@@ -42,6 +43,8 @@ export function ManagePlaylistsDialog({ open, onOpenChange, onSuccess }: ManageP
     const [loading, setLoading] = useState(true);
     const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
     const [playlistToDelete, setPlaylistToDelete] = useState<PlaylistWithCount | null>(null);
+    const [playlistToEdit, setPlaylistToEdit] = useState<PlaylistWithCount | null>(null);
+    const [isEditOpen, setIsEditOpen] = useState(false);
 
     const fetchPlaylists = async () => {
         if (!user) {
@@ -145,6 +148,16 @@ export function ManagePlaylistsDialog({ open, onOpenChange, onSuccess }: ManageP
         }
     };
 
+    const handleEditClick = (playlist: PlaylistWithCount) => {
+        setPlaylistToEdit(playlist);
+        setIsEditOpen(true);
+    };
+
+    const handleEditSuccess = () => {
+        fetchPlaylists();
+        onSuccess();
+    };
+
     const getCategoryLabel = (categoryType: string) => {
         const labels: Record<string, string> = {
             custom: 'Personalizzata',
@@ -196,19 +209,29 @@ export function ManagePlaylistsDialog({ open, onOpenChange, onSuccess }: ManageP
                                                     </span>
                                                 </div>
                                             </div>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => handleDeleteClick(playlist)}
-                                                disabled={deleteLoading !== null}
-                                                className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                                            >
-                                                {deleteLoading === playlist.id ? (
-                                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                                ) : (
-                                                    <Trash2 className="h-4 w-4" />
-                                                )}
-                                            </Button>
+                                            <div className="flex items-center gap-2">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => handleEditClick(playlist)}
+                                                    className="text-primary hover:text-primary hover:bg-primary/10"
+                                                >
+                                                    <Pencil className="h-4 w-4" />
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => handleDeleteClick(playlist)}
+                                                    disabled={deleteLoading !== null}
+                                                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                                >
+                                                    {deleteLoading === playlist.id ? (
+                                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                                    ) : (
+                                                        <Trash2 className="h-4 w-4" />
+                                                    )}
+                                                </Button>
+                                            </div>
                                         </div>
                                     </CardContent>
                                 </Card>
@@ -217,6 +240,13 @@ export function ManagePlaylistsDialog({ open, onOpenChange, onSuccess }: ManageP
                     )}
                 </DialogContent>
             </Dialog>
+
+            <EditPlaylistDialog
+                open={isEditOpen}
+                onOpenChange={setIsEditOpen}
+                onSuccess={handleEditSuccess}
+                playlist={playlistToEdit}
+            />
 
             {/* Delete Confirmation Dialog */}
             <AlertDialog open={playlistToDelete !== null} onOpenChange={(open) => !open && setPlaylistToDelete(null)}>
