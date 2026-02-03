@@ -343,36 +343,28 @@ export const getGenerationFromMethod = (methodId: string): number => {
 // Helper to normalize Pokemon names for Showdown sprites
 export const toShowdownSlug = (name: string): string => {
   if (!name) return '';
-  return name.toLowerCase()
+  let slug = name.toLowerCase()
     .replace('’', '')
     .replace('\'', '')
     .replace('%', '')
     .replace(':', '')
     .replace(' ', '')
     .replace('.', '')
-    .replace('-', '')
     .replace('♀', 'f')
     .replace('♂', 'm');
+
+  // Handle specific forms for Showdown
+  if (slug === 'pikachu-partner-cap') return 'pikachu-partner';
+  if (slug === 'zygarde-50') return 'zygarde';
+
+  // Seasonal forms for Showdown mapping
+  if (slug.includes('deerling-') || slug.includes('sawsbuck-')) {
+    // Showdown uses simple suffix if not standard
+    return slug;
+  }
+
+  return slug;
 };
-
-export function getGameSpecificSpriteUrl(pokemonId: number, methodId: string, pokemonName?: string): string {
-  if (!pokemonId) return '';
-
-  // If we have a name, prioritize Showdown animated sprites
-  if (pokemonName) {
-    const slug = toShowdownSlug(pokemonName);
-    return `https://play.pokemonshowdown.com/sprites/ani-shiny/${slug}.gif`;
-  }
-
-  // Fallback to PokeAPI animated for Gen 5 if no name provided
-  const generation = getGenerationFromMethod(methodId);
-  if (generation === 5) {
-    return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/shiny/${pokemonId}.gif`;
-  }
-
-  // Default fallback
-  return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${pokemonId}.png`;
-}
 
 export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolean, name?: string, female?: boolean, form?: string } = {}): string {
   if (!pokemonId) return '';
@@ -382,11 +374,13 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
   if (name) {
     let slug = toShowdownSlug(name);
 
-    // Showdown gender-specific suffix
+    // Showdown gender-specific suffix handling
     if (female) {
-      // Common female-specific names on Showdown (e.g., unfezant-f, jellicent-f, hippowdon-f)
-      const genderSpecific = ['unfezant', 'pyroar', 'jellicent', 'hippowdon', 'hippopotas', 'frillish', 'meowstic', 'indeedee'];
-      if (genderSpecific.includes(slug)) {
+      const genderDiffs = [
+        'unfezant', 'jellicent', 'frillish', 'hippowdon', 'hippopotas',
+        'pyroar', 'meowstic', 'indeedee', 'basculegion', 'oinkologne'
+      ];
+      if (genderDiffs.some(pkmn => slug.includes(pkmn))) {
         slug = `${slug}-f`;
       }
     }
@@ -395,10 +389,14 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
     return `https://play.pokemonshowdown.com/sprites/${type}/${slug}.gif`;
   }
 
-  // Fallback to PokeAPI static/animated
+  // Fallback to PokeAPI standard shiny/default
   const shinyPath = shiny ? '/shiny' : '';
   return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon${shinyPath}/${pokemonId}.png`;
 }
+
+// Alias for transition compatibility
+export const getGameSpecificSpriteUrl = (id: number, methodId: string, name?: string) =>
+  getPokemonSpriteUrl(id, { shiny: true, name });
 
 // Manually tracked form counts for completion stats
 export const POKEMON_FORM_COUNTS: Record<number, number> = {

@@ -112,7 +112,14 @@
     box-shadow: 0 0 20px color-mix(in srgb, var(--shiny), transparent 70%);
   }
 
-  .pokemon-sprite {
-    image-rendering: pixelated;
-  }
+  /* Pokemon Sprite Styling */
+.pokemon-sprite {
+  image-rendering: auto; /* Ensure 3D models are smooth, not pixelated */
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+  transition: transform 0.3s ease;
+}
+
+.pokemon-sprite:hover {
+  transform: scale(1.1);
+}
 }

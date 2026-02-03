@@ -60,7 +60,7 @@ export function FinishHuntDialog({
 
   const [form, setForm] = useState('');
   const [gender, setGender] = useState<string>('');
-  const [hasShinyCharm, setHasShinyCharm] = useState(initialHasShinyCharm);
+  const [currentHasShinyCharm, setCurrentHasShinyCharm] = useState(initialHasShinyCharm);
   const [pokeball, setPokeball] = useState('pokeball');
   const [game, setGame] = useState('');
   const [method, setMethod] = useState<HuntingMethod>(initialMethod);
@@ -114,7 +114,7 @@ export function FinishHuntDialog({
         sprite_url: spriteUrl,
         form: form || null,
         gender: gender || null,
-        has_shiny_charm: hasShinyCharm,
+        has_shiny_charm: currentHasShinyCharm,
         pokeball,
         game,
         method: method.id,
@@ -171,7 +171,7 @@ export function FinishHuntDialog({
               alt={pokemonName}
               className="w-20 h-20 pokemon-sprite object-contain"
               onError={(e) => {
-                (e.target as HTMLImageElement).src = getPokemonSpriteUrl(pokemonId, { shiny: true });
+                (e.target as HTMLImageElement).src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${pokemonId}.png`;
               }}
             />
             <div>
@@ -206,10 +206,10 @@ export function FinishHuntDialog({
 
           <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
             <div className="flex items-center gap-2">
-              <img src={SHINY_CHARM_ICON} alt="Shiny Charm" className="h-6 w-6 pokemon-sprite" />
+              <img src={SHINY_CHARM_ICON} alt="Shiny Charm" className="h-6 w-6" />
               <Label>Shiny Charm</Label>
             </div>
-            <Switch checked={hasShinyCharm} onCheckedChange={setHasShinyCharm} />
+            <Switch checked={currentHasShinyCharm} onCheckedChange={setCurrentHasShinyCharm} />
           </div>
 
           <div className="space-y-2">
@@ -222,7 +222,7 @@ export function FinishHuntDialog({
                 {POKEBALLS.map((ball) => (
                   <SelectItem key={ball.id} value={ball.id}>
                     <div className="flex items-center gap-2">
-                      <img src={ball.sprite} alt={ball.name} className="h-5 w-5 pokemon-sprite" />
+                      <img src={ball.sprite} alt={ball.name} className="h-5 w-5" />
                       <span>{ball.name}</span>
                     </div>
                   </SelectItem>
@@ -253,7 +253,7 @@ export function FinishHuntDialog({
           </div>
 
           <div className="space-y-2">
-            <Label>Numero tentativi (counter)</Label>
+            <Label>Numero tentativi</Label>
             <Input
               type="number"
               min={1}
@@ -264,7 +264,7 @@ export function FinishHuntDialog({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Data inizio caccia</Label>
+              <Label>Data inizio</Label>
               <Input type="date" value={huntStartDate} onChange={(e) => setHuntStartDate(e.target.value)} />
             </div>
             <div className="space-y-2">
@@ -274,13 +274,13 @@ export function FinishHuntDialog({
           </div>
 
           <div className="flex items-center justify-between p-3 rounded-lg border border-destructive/30 bg-destructive/5">
-            <Label>FAIL (caccia fallita / phase)</Label>
+            <Label>FAIL / phase</Label>
             <Switch checked={isFail} onCheckedChange={setIsFail} />
           </div>
 
           {playlists.length > 0 && (
             <div className="space-y-2">
-              <Label>Playlist (opzionale)</Label>
+              <Label>Playlist</Label>
               <Select value={playlistId || 'none'} onValueChange={(val) => setPlaylistId(val === 'none' ? '' : val)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Nessuna playlist" />
@@ -298,11 +298,11 @@ export function FinishHuntDialog({
           )}
 
           <div className="space-y-2">
-            <Label>Note (opzionale)</Label>
+            <Label>Note</Label>
             <Textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Aggiungi note su questa caccia..."
+              placeholder="..."
             />
           </div>
 
@@ -318,7 +318,7 @@ export function FinishHuntDialog({
             </Button>
             <Button type="submit" className="flex-1 shiny-glow" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Salva nella collezione
+              Salva
             </Button>
           </div>
         </form>

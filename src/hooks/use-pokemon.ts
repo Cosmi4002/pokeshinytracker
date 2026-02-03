@@ -153,17 +153,27 @@ export function usePokemonList() {
             displayName: formatPokemonName(p.name, p.id, baseId),
           };
         }).filter((p: any) => {
-          if (p.id <= 1025) return true;
-          const n = p.name.toLowerCase();
+          if (p.id <= 1025) {
+            // Exclude specific variants that are just duplicate entries or alternate forms not needed as separate Dex entries
+            const n = p.name.toLowerCase();
+            if (n.includes('-totem')) return false;
+            if (n.includes('-cap') && !n.includes('partner-cap')) return false;
+            return true;
+          }
 
-          // Exclude Megas/GMAX to avoid confusion and incorrect sprites
-          if (n.includes('-mega') || n.includes('-gmax') || n.includes('-totem') || n.includes('-cap')) return false;
+          const n = p.name.toLowerCase();
 
           // Keep Regional forms
           if (n.endsWith('-alola') || n.endsWith('-galar') || n.endsWith('-hisui') || n.endsWith('-paldea')) return true;
 
-          // Keep seasonal forms
+          // Keep seasonal forms (Deerling & Sawsbuck)
           if (n.includes('deerling-') || n.includes('sawsbuck-')) return true;
+
+          // Special case: Pikachu Partner Cap (Only Cap Pikachu obtainable as shiny in Gen 7)
+          if (n === 'pikachu-partner-cap') return true;
+
+          // Explicitly exclude categories requested by user
+          if (n.includes('-mega') || n.includes('-gmax') || n.includes('-totem')) return false;
 
           return false;
         });
