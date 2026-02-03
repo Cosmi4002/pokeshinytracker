@@ -369,29 +369,18 @@ export const toShowdownSlug = (name: string): string => {
 export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolean, name?: string, female?: boolean, form?: string } = {}): string {
   if (!pokemonId) return '';
 
-  const { shiny = false, name, female = false, form } = options;
+  const { shiny = false, female = false, form } = options;
 
-  if (name) {
-    let slug = toShowdownSlug(name);
+  // We use the High-Definition Home sprites from PokeAPI GitHub repository
+  // These are much cleaner and professional-looking than Showdown GIFs
+  const baseUrl = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home";
 
-    // Showdown gender-specific suffix handling
-    if (female) {
-      const genderDiffs = [
-        'unfezant', 'jellicent', 'frillish', 'hippowdon', 'hippopotas',
-        'pyroar', 'meowstic', 'indeedee', 'basculegion', 'oinkologne'
-      ];
-      if (genderDiffs.some(pkmn => slug.includes(pkmn))) {
-        slug = `${slug}-f`;
-      }
-    }
-
-    const type = shiny ? 'ani-shiny' : 'ani';
-    return `https://play.pokemonshowdown.com/sprites/${type}/${slug}.gif`;
-  }
-
-  // Fallback to PokeAPI standard shiny/default
   const shinyPath = shiny ? '/shiny' : '';
-  return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon${shinyPath}/${pokemonId}.png`;
+
+  // Use pokemonId or form ID if provided
+  const idPath = form ? form : pokemonId;
+
+  return `${baseUrl}${shinyPath}/${idPath}.png`;
 }
 
 // Alias for transition compatibility
