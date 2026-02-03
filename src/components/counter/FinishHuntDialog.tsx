@@ -81,8 +81,9 @@ export function FinishHuntDialog({
       shiny: true,
       female: gender === 'female',
       form: formSuffix,
+      name: pokemonName,
     });
-  }, [pokemonId, gender, form]);
+  }, [pokemonId, gender, form, pokemonName]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -214,9 +214,9 @@ export function usePokemonDetails(pokemonId: number | null) {
 
         const sprites = {
           default: data.sprites.front_default,
-          shiny: data.sprites.front_shiny,
+          shiny: getPokemonSpriteUrl(pokemonId, { shiny: true, name: data.name }),
           femaleDefault: hasGenderDiff ? data.sprites.front_female : undefined,
-          femaleShiny: hasGenderDiff ? data.sprites.front_shiny_female : undefined,
+          femaleShiny: hasGenderDiff ? getPokemonSpriteUrl(pokemonId, { shiny: true, female: true, name: data.name }) : undefined,
         };
 
         // Load forms from data.forms[] - these have proper sprites
@@ -232,19 +232,18 @@ export function usePokemonDetails(pokemonId: number | null) {
 
             if (formId) {
               try {
-                const formResponse = await fetch(form.url);
-                const formData = await formResponse.json();
+                // For forms, we use the form name to get the right Showdown sprite
                 forms.push({
                   id: formId,
                   formName: form.name,
                   displayName: formatPokemonName(form.name, formId),
                   sprites: {
-                    default: formData.sprites.front_default,
-                    shiny: formData.sprites.front_shiny,
+                    default: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${formId}.png`,
+                    shiny: getPokemonSpriteUrl(formId, { shiny: true, name: form.name }),
                   },
                 });
               } catch (e) {
-                // Fallback to construction if fetch fails
+                // Fallback
                 forms.push({
                   id: formId,
                   formName: form.name,
@@ -279,7 +278,7 @@ export function usePokemonDetails(pokemonId: number | null) {
                     displayName: formatPokemonName(variety.pokemon.name, varietyId),
                     sprites: {
                       default: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${varietyId}.png`,
-                      shiny: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${varietyId}.png`,
+                      shiny: getPokemonSpriteUrl(varietyId, { shiny: true, name: variety.pokemon.name }),
                     },
                   });
                 }
@@ -314,15 +313,36 @@ export function usePokemonDetails(pokemonId: number | null) {
   return { pokemon, loading, error };
 }
 
+// Helper to normalize Pokemon names for Showdown sprites
+export const toShowdownSlug = (name: string): string => {
+  if (!name) return '';
+  return name.toLowerCase()
+    .replace('’', '')
+    .replace('\'', '')
+    .replace('%', '')
+    .replace(':', '')
+    .replace(' ', '')
+    .replace('.', '')
+    .replace('-', '')
+    .replace('♀', 'f')
+    .replace('♂', 'm');
+};
+
 export function getPokemonSpriteUrl(
   id: number,
   options: {
     shiny?: boolean;
     female?: boolean;
     form?: string;
+    name?: string;
   } = {}
 ): string {
-  const { shiny = false, female = false, form } = options;
+  const { shiny = false, female = false, form, name } = options;
+
+  if (shiny && name) {
+    const slug = toShowdownSlug(name);
+    return `https://play.pokemonshowdown.com/sprites/ani-shiny/${slug}.gif`;
+  }
 
   // Use PokeAPI sprites
   const baseUrl = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';

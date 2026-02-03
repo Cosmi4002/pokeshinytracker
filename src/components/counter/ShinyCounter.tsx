@@ -230,7 +230,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
         {selectedPokemonId && (
           <div className="flex justify-center mb-4">
             <img
-              src={getGameSpecificSpriteUrl(selectedPokemonId, selectedMethod.id)}
+              src={getGameSpecificSpriteUrl(selectedPokemonId, selectedMethod.id, selectedPokemonName)}
               alt={selectedPokemonName}
               className="w-32 h-32 object-contain pokemon-sprite animate-in fade-in zoom-in duration-500"
               onError={(e) => {

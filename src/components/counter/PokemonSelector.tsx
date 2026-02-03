@@ -42,7 +42,7 @@ export function PokemonSelector({ value, onChange }: PokemonSelectorProps) {
           {selectedPokemon ? (
             <div className="flex items-center gap-2">
               <img
-                src={getPokemonSpriteUrl(selectedPokemon.id, { shiny: true })}
+                src={getPokemonSpriteUrl(selectedPokemon.id, { shiny: true, name: selectedPokemon.name })}
                 alt={selectedPokemon.displayName}
                 className="h-8 w-8 pokemon-sprite"
                 onError={(e) => {
@@ -76,7 +76,7 @@ export function PokemonSelector({ value, onChange }: PokemonSelectorProps) {
                   className="flex items-center gap-2"
                 >
                   <img
-                    src={getPokemonSpriteUrl(p.id, { shiny: true })}
+                    src={getPokemonSpriteUrl(p.id, { shiny: true, name: p.name })}
                     alt={p.displayName}
                     className="h-8 w-8 pokemon-sprite"
                     loading="lazy"

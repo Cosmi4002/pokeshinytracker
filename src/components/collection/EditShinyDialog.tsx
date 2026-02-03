@@ -68,8 +68,9 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
       shiny: true,
       female: gender === 'female',
       form: formSuffix,
+      name: pokemonName,
     });
-  }, [pokemonId, gender, form]);
+  }, [pokemonId, gender, form, pokemonName]);
 
   useEffect(() => {
     if (open && entry) {
@@ -111,6 +112,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
           shiny: true,
           female: gender === 'female',
           form: form ? `${pokemonId}-${form}` : undefined,
+          name: pokemonName,
         });
 
       const { error } = await supabase

@@ -125,8 +125,8 @@ export default function Pokedex() {
                     pokemonId={p.id}
                     baseId={p.baseId}
                     displayName={p.displayName}
-                    spriteUrl={getPokemonSpriteUrl(p.id, { shiny: true })}
-                    femaleSprite={hasGenderDiff ? getPokemonSpriteUrl(p.id, { shiny: true, female: true }) : undefined}
+                    spriteUrl={getPokemonSpriteUrl(p.id, { shiny: true, name: p.name })}
+                    femaleSprite={hasGenderDiff ? getPokemonSpriteUrl(p.id, { shiny: true, female: true, name: p.name }) : undefined}
                     hasGenderDiff={hasGenderDiff}
                     caughtPercentage={caughtPct}
                     hasCaughtAny={caught > 0}

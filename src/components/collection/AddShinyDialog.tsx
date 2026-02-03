@@ -65,8 +65,9 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
       shiny: true,
       female: gender === 'female',
       form: formSuffix,
+      name: pokemonName,
     });
-  }, [pokemonId, gender, form]);
+  }, [pokemonId, gender, form, pokemonName]);
 
   const resetFormState = () => {
     setPokemonId(null);
@@ -104,6 +105,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
           shiny: true,
           female: gender === 'female',
           form: form ? `${pokemonId}-${form}` : undefined,
+          name: pokemonName,
         });
 
       const { error } = await supabase.from('caught_shinies').insert({

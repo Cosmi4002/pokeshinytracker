@@ -42,7 +42,7 @@ export function HuntCard({ hunt, onDelete, onContinue, layoutStyle = 'grid' }: H
                         <div className="flex-shrink-0">
                             {hunt.pokemon_id ? (
                                 <img
-                                    src={getGameSpecificSpriteUrl(hunt.pokemon_id, hunt.method || 'gen9-random') || ''}
+                                    src={getGameSpecificSpriteUrl(hunt.pokemon_id, hunt.method || 'gen9-random', hunt.pokemon_name || undefined) || ''}
                                     alt={hunt.pokemon_name || 'Pokemon'}
                                     className="w-16 h-16 object-contain pokemon-sprite"
                                     onError={(e) => {
@@ -103,7 +103,7 @@ export function HuntCard({ hunt, onDelete, onContinue, layoutStyle = 'grid' }: H
                     <div className="flex justify-center mb-2">
                         {hunt.pokemon_id ? (
                             <img
-                                src={getGameSpecificSpriteUrl(hunt.pokemon_id, hunt.method || 'gen9-random') || ''}
+                                src={getGameSpecificSpriteUrl(hunt.pokemon_id, hunt.method || 'gen9-random', hunt.pokemon_name || undefined) || ''}
                                 alt={hunt.pokemon_name || 'Pokemon'}
                                 className="w-16 h-16 object-contain pokemon-sprite"
                                 onError={(e) => {
@@ -162,7 +162,7 @@ export function HuntCard({ hunt, onDelete, onContinue, layoutStyle = 'grid' }: H
                 <div className="flex justify-center mb-4">
                     {hunt.pokemon_id ? (
                         <img
-                            src={getGameSpecificSpriteUrl(hunt.pokemon_id, hunt.method || 'gen9-random') || ''}
+                            src={getGameSpecificSpriteUrl(hunt.pokemon_id, hunt.method || 'gen9-random', hunt.pokemon_name || undefined) || ''}
                             alt={hunt.pokemon_name || 'Pokemon'}
                             className="w-24 h-24 object-contain pokemon-sprite"
                             onError={(e) => {
