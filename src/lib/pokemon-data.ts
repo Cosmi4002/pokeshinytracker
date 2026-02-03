@@ -374,15 +374,29 @@ export function getGameSpecificSpriteUrl(pokemonId: number, methodId: string, po
   return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${pokemonId}.png`;
 }
 
-export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolean, name?: string } = {}): string {
+export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolean, name?: string, female?: boolean, form?: string } = {}): string {
   if (!pokemonId) return '';
 
-  if (options.shiny && options.name) {
-    const slug = toShowdownSlug(options.name);
-    return `https://play.pokemonshowdown.com/sprites/ani-shiny/${slug}.gif`;
+  const { shiny = false, name, female = false, form } = options;
+
+  if (name) {
+    let slug = toShowdownSlug(name);
+
+    // Showdown gender-specific suffix
+    if (female) {
+      // Common female-specific names on Showdown (e.g., unfezant-f, jellicent-f, hippowdon-f)
+      const genderSpecific = ['unfezant', 'pyroar', 'jellicent', 'hippowdon', 'hippopotas', 'frillish', 'meowstic', 'indeedee'];
+      if (genderSpecific.includes(slug)) {
+        slug = `${slug}-f`;
+      }
+    }
+
+    const type = shiny ? 'ani-shiny' : 'ani';
+    return `https://play.pokemonshowdown.com/sprites/${type}/${slug}.gif`;
   }
 
-  const shinyPath = options.shiny ? '/shiny' : '';
+  // Fallback to PokeAPI static/animated
+  const shinyPath = shiny ? '/shiny' : '';
   return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon${shinyPath}/${pokemonId}.png`;
 }
 

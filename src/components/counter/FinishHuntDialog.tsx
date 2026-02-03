@@ -24,8 +24,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
-import { POKEBALLS, GAMES, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON } from '@/lib/pokemon-data';
-import { getPokemonSpriteUrl } from '@/hooks/use-pokemon';
+import { POKEBALLS, GAMES, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, getPokemonSpriteUrl } from '@/lib/pokemon-data';
 import { usePokemonDetails } from '@/hooks/use-pokemon';
 import { MethodSelector } from '@/components/counter/MethodSelector';
 
@@ -166,7 +165,6 @@ export function FinishHuntDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* 1. Sprite (cambia con sesso/form) */}
           <div className="flex items-center gap-4 p-4 bg-muted rounded-lg">
             <img
               src={spriteUrl}
@@ -182,7 +180,6 @@ export function FinishHuntDialog({
             </div>
           </div>
 
-          {/* 2. Forma (opzionale) */}
           {formOptions.length > 0 && (
             <div className="space-y-2">
               <Label>Forma / variante</Label>
@@ -202,13 +199,11 @@ export function FinishHuntDialog({
             </div>
           )}
 
-          {/* 3. Sesso */}
           <div className="space-y-2">
             <Label>Genere</Label>
             <GenderSelector value={gender} onChange={setGender} />
           </div>
 
-          {/* 4. Shiny Charm */}
           <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
             <div className="flex items-center gap-2">
               <img src={SHINY_CHARM_ICON} alt="Shiny Charm" className="h-6 w-6 pokemon-sprite" />
@@ -217,7 +212,6 @@ export function FinishHuntDialog({
             <Switch checked={hasShinyCharm} onCheckedChange={setHasShinyCharm} />
           </div>
 
-          {/* 5. Poké Ball */}
           <div className="space-y-2">
             <Label>Poké Ball *</Label>
             <Select value={pokeball} onValueChange={setPokeball}>
@@ -237,7 +231,6 @@ export function FinishHuntDialog({
             </Select>
           </div>
 
-          {/* 6. Gioco */}
           <div className="space-y-2">
             <Label>Gioco *</Label>
             <Select value={game} onValueChange={setGame}>
@@ -254,13 +247,11 @@ export function FinishHuntDialog({
             </Select>
           </div>
 
-          {/* 7. Metodo */}
           <div className="space-y-2">
             <Label>Metodo *</Label>
             <MethodSelector value={method.id} onChange={setMethod} />
           </div>
 
-          {/* 8. Counter */}
           <div className="space-y-2">
             <Label>Numero tentativi (counter)</Label>
             <Input
@@ -271,7 +262,6 @@ export function FinishHuntDialog({
             />
           </div>
 
-          {/* 9. Data inizio e fine */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Data inizio caccia</Label>
@@ -283,13 +273,11 @@ export function FinishHuntDialog({
             </div>
           </div>
 
-          {/* 10. FAIL */}
           <div className="flex items-center justify-between p-3 rounded-lg border border-destructive/30 bg-destructive/5">
             <Label>FAIL (caccia fallita / phase)</Label>
             <Switch checked={isFail} onCheckedChange={setIsFail} />
           </div>
 
-          {/* 11. Playlist */}
           {playlists.length > 0 && (
             <div className="space-y-2">
               <Label>Playlist (opzionale)</Label>
@@ -309,7 +297,6 @@ export function FinishHuntDialog({
             </div>
           )}
 
-          {/* 12. Note */}
           <div className="space-y-2">
             <Label>Note (opzionale)</Label>
             <Textarea
