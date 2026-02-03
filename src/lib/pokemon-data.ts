@@ -334,6 +334,62 @@ export function calculateShinyStats(encounters: number, methodId: string, hasShi
 export const SHINY_CHARM_ICON = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/shiny-charm.png';
 
 
+// Helper to get generation from method ID
+export const getGenerationFromMethod = (methodId: string): number => {
+  const method = HUNTING_METHODS.find(m => m.id === methodId);
+  return method ? method.generation : 9; // Default to 9 (Modern)
+};
+
+export function getGameSpecificSpriteUrl(pokemonId: number, methodId: string): string {
+  if (!pokemonId) return '';
+
+  const generation = getGenerationFromMethod(methodId);
+
+  // Base URLs
+  const baseUrl = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon";
+
+  // GEN 1 (RB/Y) - Shiny logic technically exists via stats, visuals usually handled as Gen 2 style in trackers
+  // But strictly, Gen 1 sprites are grayscale/custom. Let's use Gen 2 Shiny for Gen 1 hunts for visual clarity,
+  // OR Gen 1 styles if user really wants retro. Usually trackers use Gen 2 shiny for retro vibes.
+  // Let's stick to Gen 2 Crystal for Gen 1 & 2 for best 8-bit shiny look.
+  if (generation <= 2) {
+    return `${baseUrl}/versions/generation-ii/crystal/shiny/${pokemonId}.png`;
+  }
+
+  // GEN 3 (RSE/FRLG)
+  if (generation === 3) {
+    return `${baseUrl}/versions/generation-iii/emerald/shiny/${pokemonId}.png`;
+  }
+
+  // GEN 4 (DPPt/HGSS)
+  if (generation === 4) {
+    return `${baseUrl}/versions/generation-iv/platinum/shiny/${pokemonId}.png`;
+  }
+
+  // GEN 5 (BW/B2W2) - Animated!
+  if (generation === 5) {
+    return `${baseUrl}/versions/generation-v/black-white/animated/shiny/${pokemonId}.gif`;
+  }
+
+  // GEN 6 (XY/ORAS) - 3D Models
+  if (generation === 6) {
+    // PokeAPI X-Y sprites are small icons usually. Let's use standard shiny for modern 3D look.
+    // Alternatively: `versions/generation-vi/x-y/shiny/`
+    return `${baseUrl}/shiny/${pokemonId}.png`; // Standard modern sprite
+  }
+
+  // GEN 7 (SM/USUM/LGPE)
+  if (generation === 7) {
+    // Let's Go has specifcs but standard shiny is safe
+    return `${baseUrl}/shiny/${pokemonId}.png`;
+  }
+
+  // GEN 8+ (SwSh/BDSP/LA/SV)
+  // Use Home sprites for high quality modern look if possible, or standard.
+  // PokeAPI standard IS modern (Gen 8/9 style).
+  return `${baseUrl}/shiny/${pokemonId}.png`;
+}
+
 export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolean } = {}): string {
   if (!pokemonId) return '';
   const shinyPath = options.shiny ? '/shiny' : '';

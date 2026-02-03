@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { PokemonSelector } from './PokemonSelector';
 import { MethodSelector } from './MethodSelector';
-import { calculateShinyStats, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON } from '@/lib/pokemon-data';
+import { calculateShinyStats, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, getGameSpecificSpriteUrl, getPokemonSpriteUrl } from '@/lib/pokemon-data';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
 import { FinishHuntDialog } from './FinishHuntDialog';
@@ -189,11 +189,6 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
     }
   };
 
-  const getPokemonAnimatedSpriteUrl = (pokemonId: number | null): string | null => {
-    if (!pokemonId) return null;
-    // Try animated shiny sprite from Pokemon Showdown (Gen 5 B/W style)
-    return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/shiny/${pokemonId}.gif`;
-  };
   const reset = async () => {
     setCounter(0);
     if (user && activeHuntIdRef.current) {
@@ -235,13 +230,13 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
         {selectedPokemonId && (
           <div className="flex justify-center mb-4">
             <img
-              src={getPokemonAnimatedSpriteUrl(selectedPokemonId) || ''}
+              src={getGameSpecificSpriteUrl(selectedPokemonId, selectedMethod.id)}
               alt={selectedPokemonName}
               className="w-32 h-32 object-contain pokemon-sprite animate-in fade-in zoom-in duration-500"
               onError={(e) => {
-                // Fallback to static shiny sprite if animated fails
+                // Fallback to standard shiny sprite if specific version fails
                 const target = e.target as HTMLImageElement;
-                target.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${selectedPokemonId}.png`;
+                target.src = getPokemonSpriteUrl(selectedPokemonId, { shiny: true });
               }}
             />
           </div>

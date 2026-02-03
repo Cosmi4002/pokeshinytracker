@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Trash2, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { HUNTING_METHODS } from '@/lib/pokemon-data';
+import { HUNTING_METHODS, getGameSpecificSpriteUrl } from '@/lib/pokemon-data';
 import { calculateShinyStats } from '@/lib/pokemon-data';
 import type { Tables } from '@/integrations/supabase/types';
 import { formatDistanceToNow } from 'date-fns';
@@ -21,10 +21,6 @@ export function HuntCard({ hunt, onDelete, onContinue, layoutStyle = 'grid' }: H
     const method = HUNTING_METHODS.find((m) => m.id === hunt.method);
     const stats = calculateShinyStats(hunt.counter || 0, hunt.method || 'gen9-random', hunt.has_shiny_charm || false);
 
-    const getPokemonAnimatedSpriteUrl = (pokemonId: number | null): string | null => {
-        if (!pokemonId) return null;
-        return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/shiny/${pokemonId}.gif`;
-    };
 
     const timeAgo = hunt.updated_at
         ? formatDistanceToNow(new Date(hunt.updated_at), { addSuffix: true, locale: it })
@@ -46,7 +42,7 @@ export function HuntCard({ hunt, onDelete, onContinue, layoutStyle = 'grid' }: H
                         <div className="flex-shrink-0">
                             {hunt.pokemon_id ? (
                                 <img
-                                    src={getPokemonAnimatedSpriteUrl(hunt.pokemon_id) || ''}
+                                    src={getGameSpecificSpriteUrl(hunt.pokemon_id, hunt.method || 'gen9-random') || ''}
                                     alt={hunt.pokemon_name || 'Pokemon'}
                                     className="w-16 h-16 object-contain pokemon-sprite"
                                     onError={(e) => {
@@ -107,7 +103,7 @@ export function HuntCard({ hunt, onDelete, onContinue, layoutStyle = 'grid' }: H
                     <div className="flex justify-center mb-2">
                         {hunt.pokemon_id ? (
                             <img
-                                src={getPokemonAnimatedSpriteUrl(hunt.pokemon_id) || ''}
+                                src={getGameSpecificSpriteUrl(hunt.pokemon_id, hunt.method || 'gen9-random') || ''}
                                 alt={hunt.pokemon_name || 'Pokemon'}
                                 className="w-16 h-16 object-contain pokemon-sprite"
                                 onError={(e) => {
@@ -166,7 +162,7 @@ export function HuntCard({ hunt, onDelete, onContinue, layoutStyle = 'grid' }: H
                 <div className="flex justify-center mb-4">
                     {hunt.pokemon_id ? (
                         <img
-                            src={getPokemonAnimatedSpriteUrl(hunt.pokemon_id) || ''}
+                            src={getGameSpecificSpriteUrl(hunt.pokemon_id, hunt.method || 'gen9-random') || ''}
                             alt={hunt.pokemon_name || 'Pokemon'}
                             className="w-24 h-24 object-contain pokemon-sprite"
                             onError={(e) => {
