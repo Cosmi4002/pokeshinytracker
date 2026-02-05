@@ -158,27 +158,27 @@ export default function Collection() {
           )}
 
           {/* Header */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
             <div>
-              <h1 className="text-3xl font-bold shiny-text">La mia collezione Shiny</h1>
-              <p className="text-muted-foreground">
+              <h1 className="text-3xl sm:text-4xl font-bold shiny-text">La mia collezione Shiny</h1>
+              <p className="text-muted-foreground mt-1 font-medium">
                 {entries.length} shiny Pokémon catturati
               </p>
             </div>
 
             {user && (
-              <div className="flex gap-2">
+              <div className="flex flex-wrap justify-center gap-2 w-full md:w-auto">
                 {playlists.length > 0 && (
-                  <Button variant="outline" onClick={() => setIsManagePlaylistsDialogOpen(true)}>
+                  <Button variant="outline" size="sm" onClick={() => setIsManagePlaylistsDialogOpen(true)} className="flex-1 sm:flex-none">
                     <List className="mr-2 h-4 w-4" />
                     Gestisci Playlist
                   </Button>
                 )}
-                <Button variant="outline" onClick={() => setIsNewPlaylistDialogOpen(true)}>
+                <Button variant="outline" size="sm" onClick={() => setIsNewPlaylistDialogOpen(true)} className="flex-1 sm:flex-none">
                   <Plus className="mr-2 h-4 w-4" />
                   Nuova Playlist
                 </Button>
-                <Button className="shiny-glow" onClick={() => setIsAddDialogOpen(true)}>
+                <Button className="shiny-glow w-full sm:w-auto" onClick={() => setIsAddDialogOpen(true)}>
                   <Plus className="mr-2 h-4 w-4" />
                   Aggiungi Shiny
                 </Button>

@@ -52,10 +52,14 @@ export function MethodSelector({ value, onChange }: MethodSelectorProps) {
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[400px] p-0" align="start">
+      <PopoverContent
+        className="w-[var(--radix-popover-trigger-width)] p-0"
+        align="start"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
         <Command>
           <CommandInput placeholder="Search method..." />
-          <CommandList className="max-h-[300px] overflow-y-auto">
+          <CommandList className="max-h-[50vh] overflow-y-auto overscroll-contain touch-pan-y">
             <CommandEmpty>No method found.</CommandEmpty>
             {Object.entries(methodsByGen).map(([gen, methods]) => (
               <CommandGroup key={gen} heading={gen}>

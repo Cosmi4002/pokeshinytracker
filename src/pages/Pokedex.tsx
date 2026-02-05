@@ -59,29 +59,29 @@ export default function Pokedex() {
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="container mx-auto py-8 px-4">
-        <div className="space-y-6">
+        <div className="space-y-6 max-w-7xl mx-auto">
           {/* Header & Filters */}
-          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+          <div className="flex flex-col md:flex-row gap-6 items-center justify-between text-center md:text-left">
             <div>
-              <h1 className="text-3xl font-bold shiny-text">Shiny Pokédex</h1>
-              <p className="text-muted-foreground mt-1">
+              <h1 className="text-3xl sm:text-4xl font-bold shiny-text">Shiny Pokédex</h1>
+              <p className="text-muted-foreground mt-1 font-medium">
                 {completionStats.caught} / {completionStats.total} catturati
               </p>
             </div>
 
-            <div className="flex gap-2 w-full sm:w-auto">
-              <div className="relative flex-1 sm:w-64">
+            <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-center">
+              <div className="relative w-full sm:w-72">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Cerca Pokémon..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="pl-10 bg-white text-black"
+                  className="pl-10 h-11 bg-white/5 border-primary/20 focus:border-primary transition-all text-foreground"
                 />
               </div>
 
               <Select value={generation} onValueChange={setGeneration}>
-                <SelectTrigger className="w-[140px] bg-white text-black">
+                <SelectTrigger className="w-full sm:w-[160px] h-11 bg-white/5 border-primary/20">
                   <SelectValue placeholder="Generazione" />
                 </SelectTrigger>
                 <SelectContent>

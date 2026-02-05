@@ -25,13 +25,13 @@ export function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link to="/" className="flex items-center gap-2">
+      <div className="container mx-auto flex h-16 items-center justify-between px-4 gap-2">
+        <Link to="/" className="flex items-center gap-2 shrink-0">
           <Sparkles className="h-6 w-6 text-primary" />
-          <span className="text-xl font-bold shiny-text">PokeShinyTracker</span>
+          <span className="text-lg sm:text-xl font-bold shiny-text whitespace-nowrap">PokeShinyTracker</span>
         </Link>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5 sm:gap-1 overflow-x-auto no-scrollbar">
           {navLinks.map((link) => {
             const Icon = link.icon;
             const isActive = location.pathname === link.to;
@@ -41,22 +41,25 @@ export function Navbar() {
                 <Button
                   variant={isActive ? 'default' : 'ghost'}
                   size="sm"
-                  className="gap-2"
+                  className={cn(
+                    "h-9 px-2 sm:px-3 gap-1.5 sm:gap-2",
+                    isActive && "bg-primary text-primary-foreground shadow-sm"
+                  )}
                 >
                   <Icon className="h-4 w-4" />
-                  <span className="hidden sm:inline">{link.label}</span>
+                  <span className="hidden md:inline">{link.label}</span>
                 </Button>
               </Link>
             );
           })}
         </div>
 
-        <div className="flex items-center gap-2">
-          <ThemeCustomizer /> {/* Add ThemeCustomizer here */}
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          <ThemeCustomizer />
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" className="h-9 w-9">
                   <User className="h-5 w-5" />
                 </Button>
               </DropdownMenuTrigger>
