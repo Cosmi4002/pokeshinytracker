@@ -366,23 +366,44 @@ export const toShowdownSlug = (name: string): string => {
   return slug;
 };
 
-// No local mapping used for lightweight fast data transfer
+import spriteMapping from './sprite-mapping.json';
+
+const MAPPING: Record<string, string> = spriteMapping;
 
 export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolean, name?: string, female?: boolean, form?: string, animated?: boolean } = {}): string {
   if (!pokemonId) return '';
 
-  const { shiny = false, female = false, name } = options;
+  const { shiny = false, female = false, name, form } = options;
 
-  // 1. Prefer Showdown animated sprites if name is provided (come prima)
+  // 1. Try mapping for forms first (likely missing externally)
+  const keysToTry = [];
+  if (form) keysToTry.push(form);
+  if (name) {
+    const slug = toShowdownSlug(name);
+    keysToTry.push(slug);
+    if (slug.includes('-')) {
+      const parts = slug.split('-');
+      keysToTry.push(`${pokemonId}-${parts.slice(1).join('-')}`);
+    }
+  }
+
+  for (const key of keysToTry) {
+    // Only use local mapping for complex forms or high IDs (Gen 9+)
+    // Standard Pokédex entries are better externally (lighter/faster)
+    if (MAPPING[key] && (key.includes('-') || pokemonId > 905)) {
+      return `/sprites/${MAPPING[key]}`;
+    }
+  }
+
+  // 2. Prefer Showdown for animated sprites (standard names)
   if (name) {
     const slug = toShowdownSlug(name);
     const prefix = shiny ? 'ani-shiny' : 'ani';
     return `https://play.pokemonshowdown.com/sprites/${prefix}/${slug}.gif`;
   }
 
-  // 2. Default to static sprites from PokeAPI (much lighter for bulk loading)
+  // 3. Last fallback: static sprites from PokeAPI
   const path = shiny ? '/shiny' : '';
-  // Female sprites are secondary, using PokeAPI
   const genderPath = female ? '/female' : '';
 
   return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon${path}${genderPath}/${pokemonId}.png`;
