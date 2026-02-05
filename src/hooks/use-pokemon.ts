@@ -324,4 +324,4 @@ export function usePokemonDetails(pokemonId: number | null) {
   return { pokemon, loading, error };
 }
 
-export { GENERATION_RANGES, POKEMON_WITH_GENDER_DIFF };
+export { GENERATION_RANGES, POKEMON_WITH_GENDER_DIFF, toShowdownSlug, getPokemonSpriteUrl };
