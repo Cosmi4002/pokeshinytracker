@@ -203,8 +203,11 @@ export function usePokemonList() {
         // Official order sorting
         list.sort((a, b) => {
           if (a.baseId !== b.baseId) return a.baseId - b.baseId;
-          if (a.id <= 1025) return -1;
-          if (b.id <= 1025) return 1;
+          const aName = a.name.toLowerCase();
+          const bName = b.name.toLowerCase();
+          // Put the base form first
+          if (aName === bName.split('-')[0]) return -1;
+          if (bName === aName.split('-')[0]) return 1;
           return a.id - b.id;
         });
 
@@ -251,78 +254,69 @@ export function usePokemonDetails(pokemonId: number | null) {
           femaleShiny: hasGenderDiff ? getPokemonSpriteUrl(pokemonId, { shiny: true, female: true, name: data.name, animated: true }) : undefined,
         };
 
-        // Load forms from data.forms[] - these have proper sprites
         const forms: PokemonFormDetailed[] = [];
+
+        // 1. Fetch form data
         if (data.forms && data.forms.length > 1) {
           for (const form of data.forms) {
-            // Skip the default form (same as base)
             if (form.name === data.name) continue;
 
-            // Extract form ID from URL: /pokemon-form/{id}/
+            // Skip regional forms here - they are independent entries
+            const fn = form.name.toLowerCase();
+            if (fn.includes('-alola') || fn.includes('-galar') || fn.includes('-hisui') || fn.includes('-paldea')) continue;
+
             const formIdMatch = form.url.match(/\/pokemon-form\/(\d+)\/?$/);
             const formId = formIdMatch ? parseInt(formIdMatch[1]) : null;
 
             if (formId) {
-              try {
-                // For forms, we use the form name to get the right Showdown sprite
-                forms.push({
-                  id: formId,
-                  formName: form.name,
-                  displayName: formatPokemonName(form.name, formId),
-                  sprites: {
-                    default: getPokemonSpriteUrl(formId, { name: form.name }),
-                    shiny: getPokemonSpriteUrl(formId, { shiny: true, name: form.name }),
-                  },
-                });
-              } catch (e) {
-                // Fallback
-                forms.push({
-                  id: formId,
-                  formName: form.name,
-                  displayName: formatPokemonName(form.name, formId),
-                  sprites: {
-                    default: getPokemonSpriteUrl(formId, { name: form.name }),
-                    shiny: getPokemonSpriteUrl(formId, { shiny: true, name: form.name }),
-                  },
-                });
-              }
+              forms.push({
+                id: formId,
+                formName: form.name,
+                displayName: formatPokemonName(form.name, formId),
+                sprites: {
+                  default: getPokemonSpriteUrl(formId, { name: form.name }),
+                  shiny: getPokemonSpriteUrl(formId, { shiny: true, name: form.name }),
+                },
+              });
             }
           }
         }
 
-        // Also fetch species varieties for regional forms, megas, etc.
+        // 2. Fetch species varieties (Megas, Regionals, etc.)
         try {
           const speciesResponse = await fetch(data.species.url);
           const speciesData = await speciesResponse.json();
 
           if (speciesData.varieties && speciesData.varieties.length > 1) {
             for (const variety of speciesData.varieties) {
-              if (!variety.is_default) {
-                // Extract ID from URL: /pokemon/{id}/
-                const varietyIdMatch = variety.pokemon.url.match(/\/pokemon\/(\d+)\/?$/);
-                const varietyId = varietyIdMatch ? parseInt(varietyIdMatch[1]) : null;
+              if (variety.is_default) continue;
 
-                // Check if this variety is already in forms
-                if (varietyId && !forms.some(f => f.id === varietyId)) {
-                  const vn = variety.pokemon.name.toLowerCase();
-                  // Skip mega, totem, etc. in details as well
-                  if (vn.includes('-mega') || vn.includes('-totem') || vn.includes('-gmax') || vn.includes('-primal')) continue;
+              const vn = variety.pokemon.name.toLowerCase();
 
-                  forms.push({
-                    id: varietyId,
-                    formName: variety.pokemon.name,
-                    displayName: formatPokemonName(variety.pokemon.name, varietyId),
-                    sprites: {
-                      default: getPokemonSpriteUrl(varietyId, { name: variety.pokemon.name }),
-                      shiny: getPokemonSpriteUrl(varietyId, { shiny: true, name: variety.pokemon.name }),
-                    },
-                  });
-                }
+              // SKIP regional forms - they are handled as base pokemon now
+              if (vn.includes('-alola') || vn.includes('-galar') || vn.includes('-hisui') || vn.includes('-paldea')) continue;
+
+              // Skip mega, totem, etc.
+              if (vn.includes('-mega') || vn.includes('-totem') || vn.includes('-gmax') || vn.includes('-primal') || vn.includes('-eternal')) continue;
+
+              const varietyIdMatch = variety.pokemon.url.match(/\/pokemon\/(\d+)\/?$/);
+              const varietyId = varietyIdMatch ? parseInt(varietyIdMatch[1]) : null;
+
+              if (varietyId && !forms.some(f => f.id === varietyId)) {
+                forms.push({
+                  id: varietyId,
+                  formName: variety.pokemon.name,
+                  displayName: formatPokemonName(variety.pokemon.name, varietyId),
+                  sprites: {
+                    default: getPokemonSpriteUrl(varietyId, { name: variety.pokemon.name }),
+                    shiny: getPokemonSpriteUrl(varietyId, { name: variety.pokemon.name, shiny: true }),
+                  },
+                });
               }
             }
           }
         } catch (e) {
-          // Ignore species fetch errors - forms from data.forms are enough
+          // Ignore species fetch errors
         }
 
         setPokemon({
