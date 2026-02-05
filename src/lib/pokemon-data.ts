@@ -366,44 +366,26 @@ export const toShowdownSlug = (name: string): string => {
   return slug;
 };
 
-import spriteMapping from './sprite-mapping.json';
-
-const MAPPING: Record<string, string> = spriteMapping;
+// No local mapping used for lightweight fast data transfer
 
 export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolean, name?: string, female?: boolean, form?: string, animated?: boolean } = {}): string {
   if (!pokemonId) return '';
 
-  const { shiny = false, female = false, form, name, animated = false } = options;
+  const { shiny = false, female = false, name } = options;
 
-  // 1. If animated is true (or we want to fallback to local animation), try local mapping first
-  if (animated) {
-    const keysToTry = [];
-    if (form) keysToTry.push(form);
-    if (name) {
-      const slug = toShowdownSlug(name);
-      keysToTry.push(slug);
-      if (slug.includes('-')) {
-        const parts = slug.split('-');
-        keysToTry.push(`${pokemonId}-${parts.slice(1).join('-')}`);
-      }
-    }
-    keysToTry.push(pokemonId.toString());
-
-    for (const key of keysToTry) {
-      if (MAPPING[key]) {
-        return `/sprites/${MAPPING[key]}`;
-      }
-    }
+  // 1. Prefer Showdown animated sprites if name is provided (come prima)
+  if (name) {
+    const slug = toShowdownSlug(name);
+    const prefix = shiny ? 'ani-shiny' : 'ani';
+    return `https://play.pokemonshowdown.com/sprites/${prefix}/${slug}.gif`;
   }
 
-  // 2. Default to static sprites from PokeAPI (much lighter than GIFs)
-  // For regional forms or IDs > 10000, PokeAPI usually has sprites
-  const spriteType = shiny ? 'shiny' : 'default';
-  const genderSuffix = female ? '/female' : '';
-  
-  // Note: PokeAPI static sprites are usually at:
-  // https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/1.png
-  return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${spriteType}/${pokemonId}.png`;
+  // 2. Default to static sprites from PokeAPI (much lighter for bulk loading)
+  const path = shiny ? '/shiny' : '';
+  // Female sprites are secondary, using PokeAPI
+  const genderPath = female ? '/female' : '';
+
+  return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon${path}${genderPath}/${pokemonId}.png`;
 }
 
 // Alias for transition compatibility
