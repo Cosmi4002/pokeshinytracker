@@ -174,7 +174,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
                 alt={pokemonName}
                 className="h-24 w-24 pokemon-sprite object-contain"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = getPokemonSpriteUrl(pokemonId, { shiny: true, name: pokemonName });
+                  (e.target as HTMLImageElement).src = '/placeholder.svg';
                 }}
               />
             </div>

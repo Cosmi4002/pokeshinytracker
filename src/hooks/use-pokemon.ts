@@ -224,9 +224,9 @@ export function usePokemonDetails(pokemonId: number | null) {
         const hasGenderDiff = POKEMON_WITH_GENDER_DIFF.includes(pokemonId);
 
         const sprites = {
-          default: data.sprites.front_default,
+          default: getPokemonSpriteUrl(pokemonId, { name: data.name }),
           shiny: getPokemonSpriteUrl(pokemonId, { shiny: true, name: data.name }),
-          femaleDefault: hasGenderDiff ? data.sprites.front_female : undefined,
+          femaleDefault: hasGenderDiff ? getPokemonSpriteUrl(pokemonId, { female: true, name: data.name }) : undefined,
           femaleShiny: hasGenderDiff ? getPokemonSpriteUrl(pokemonId, { shiny: true, female: true, name: data.name }) : undefined,
         };
 
@@ -249,7 +249,7 @@ export function usePokemonDetails(pokemonId: number | null) {
                   formName: form.name,
                   displayName: formatPokemonName(form.name, formId),
                   sprites: {
-                    default: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${formId}.png`,
+                    default: getPokemonSpriteUrl(formId, { name: form.name }),
                     shiny: getPokemonSpriteUrl(formId, { shiny: true, name: form.name }),
                   },
                 });
@@ -260,8 +260,8 @@ export function usePokemonDetails(pokemonId: number | null) {
                   formName: form.name,
                   displayName: formatPokemonName(form.name, formId),
                   sprites: {
-                    default: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${formId}.png`,
-                    shiny: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${formId}.png`,
+                    default: getPokemonSpriteUrl(formId, { name: form.name }),
+                    shiny: getPokemonSpriteUrl(formId, { shiny: true, name: form.name }),
                   },
                 });
               }
@@ -288,7 +288,7 @@ export function usePokemonDetails(pokemonId: number | null) {
                     formName: variety.pokemon.name,
                     displayName: formatPokemonName(variety.pokemon.name, varietyId),
                     sprites: {
-                      default: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${varietyId}.png`,
+                      default: getPokemonSpriteUrl(varietyId, { name: variety.pokemon.name }),
                       shiny: getPokemonSpriteUrl(varietyId, { shiny: true, name: variety.pokemon.name }),
                     },
                   });

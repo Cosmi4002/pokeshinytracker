@@ -395,12 +395,7 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
     }
   }
 
-  // Fallback to external PokeAPI Home sprites
-  const baseUrl = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home";
-  const shinyPath = shiny ? '/shiny' : '';
-  const idPath = form ? form : pokemonId;
-
-  return `${baseUrl}${shinyPath}/${idPath}.png`;
+  return "/placeholder.svg";
 }
 
 // Alias for transition compatibility

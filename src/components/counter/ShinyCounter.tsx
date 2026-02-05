@@ -234,9 +234,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
               alt={selectedPokemonName}
               className="w-32 h-32 object-contain pokemon-sprite animate-in fade-in zoom-in duration-500"
               onError={(e) => {
-                // Fallback to standard shiny sprite if specific version fails
-                const target = e.target as HTMLImageElement;
-                target.src = getPokemonSpriteUrl(selectedPokemonId!, { shiny: true, name: selectedPokemonName });
+                (e.target as HTMLImageElement).src = '/placeholder.svg';
               }}
             />
           </div>

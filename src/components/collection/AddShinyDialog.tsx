@@ -163,7 +163,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
                 alt={pokemonName}
                 className="h-24 w-24 pokemon-sprite object-contain"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = getPokemonSpriteUrl(pokemonId, { shiny: true, name: pokemonName });
+                  (e.target as HTMLImageElement).src = '/placeholder.svg';
                 }}
               />
             </div>

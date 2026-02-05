@@ -46,8 +46,7 @@ export function HuntCard({ hunt, onDelete, onContinue, layoutStyle = 'grid' }: H
                                     alt={hunt.pokemon_name || 'Pokemon'}
                                     className="w-16 h-16 object-contain pokemon-sprite"
                                     onError={(e) => {
-                                        const target = e.target as HTMLImageElement;
-                                        target.src = getPokemonSpriteUrl(hunt.pokemon_id!, { shiny: true, name: hunt.pokemon_name || undefined });
+                                        (e.target as HTMLImageElement).src = '/placeholder.svg';
                                     }}
                                 />
                             ) : (
@@ -107,8 +106,7 @@ export function HuntCard({ hunt, onDelete, onContinue, layoutStyle = 'grid' }: H
                                 alt={hunt.pokemon_name || 'Pokemon'}
                                 className="w-16 h-16 object-contain pokemon-sprite"
                                 onError={(e) => {
-                                    const target = e.target as HTMLImageElement;
-                                    target.src = getPokemonSpriteUrl(hunt.pokemon_id!, { shiny: true, name: hunt.pokemon_name || undefined });
+                                    (e.target as HTMLImageElement).src = '/placeholder.svg';
                                 }}
                             />
                         ) : (
@@ -166,8 +164,7 @@ export function HuntCard({ hunt, onDelete, onContinue, layoutStyle = 'grid' }: H
                             alt={hunt.pokemon_name || 'Pokemon'}
                             className="w-24 h-24 object-contain pokemon-sprite"
                             onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.src = getPokemonSpriteUrl(hunt.pokemon_id!, { shiny: true, name: hunt.pokemon_name || undefined });
+                                (e.target as HTMLImageElement).src = '/placeholder.svg';
                             }}
                         />
                     ) : (
