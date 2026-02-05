@@ -338,6 +338,10 @@ export const toShowdownSlug = (name: string): string => {
     .replace('♂', 'm');
 };
 
+import spriteMapping from '../lib/sprite-mapping.json';
+
+const MAPPING: Record<string, string> = spriteMapping;
+
 export function getPokemonSpriteUrl(
   id: number,
   options: {
@@ -346,25 +350,45 @@ export function getPokemonSpriteUrl(
     form?: string;
     name?: string;
   } = {}
-): string {
   const { shiny = false, female = false, form, name } = options;
 
-  if (shiny && name) {
-    const slug = toShowdownSlug(name);
-    return `https://play.pokemonshowdown.com/sprites/ani-shiny/${slug}.gif`;
+  // 1. Check if we have a custom mapping for this Pokemon/form
+  // We prefer local GIFs from the mapping for both shiny and normal if mapped
+  const keysToTry = [];
+  if (form) keysToTry.push(form);
+if (name) {
+  const slug = toShowdownSlug(name);
+  keysToTry.push(slug);
+  // Also try baseId-form if we can parse it
+  if (slug.includes('-')) {
+    const parts = slug.split('-');
+    keysToTry.push(`${id}-${parts.slice(1).join('-')}`);
   }
+}
+keysToTry.push(id.toString());
 
-  // Use PokeAPI sprites
-  const baseUrl = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
+for (const key of keysToTry) {
+  if (MAPPING[key]) {
+    return `/sprites/${MAPPING[key]}`;
+  }
+}
 
-  let path = '';
-  if (shiny) path += '/shiny';
-  if (female) path += '/female';
+if (shiny && name) {
+  const slug = toShowdownSlug(name);
+  return `https://play.pokemonshowdown.com/sprites/ani-shiny/${slug}.gif`;
+}
 
-  // Handle form IDs (like -alola, -galar, etc.)
-  const pokemonId = form ? form : id.toString();
+// Use PokeAPI sprites
+const baseUrl = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
 
-  return `${baseUrl}${path}/${pokemonId}.png`;
+let path = '';
+if (shiny) path += '/shiny';
+if (female) path += '/female';
+
+// Handle form IDs (like -alola, -galar, etc.)
+const pokemonId = form ? form : id.toString();
+
+return `${baseUrl}${path}/${pokemonId}.png`;
 }
 
 export function getShinyCharmIcon(): string {

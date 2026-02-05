@@ -366,18 +366,38 @@ export const toShowdownSlug = (name: string): string => {
   return slug;
 };
 
+import spriteMapping from './sprite-mapping.json';
+
+const MAPPING: Record<string, string> = spriteMapping;
+
 export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolean, name?: string, female?: boolean, form?: string } = {}): string {
   if (!pokemonId) return '';
 
-  const { shiny = false, female = false, form } = options;
+  const { shiny = false, female = false, form, name } = options;
 
-  // We use the High-Definition Home sprites from PokeAPI GitHub repository
-  // These are much cleaner and professional-looking than Showdown GIFs
+  // 1. Check if we have a custom mapping for this Pokemon/form
+  const keysToTry = [];
+  if (form) keysToTry.push(form);
+  if (name) {
+    const slug = toShowdownSlug(name);
+    keysToTry.push(slug);
+    // Also try baseId-form if we can parse it
+    if (slug.includes('-')) {
+      const parts = slug.split('-');
+      keysToTry.push(`${pokemonId}-${parts.slice(1).join('-')}`);
+    }
+  }
+  keysToTry.push(pokemonId.toString());
+
+  for (const key of keysToTry) {
+    if (MAPPING[key]) {
+      return `/sprites/${MAPPING[key]}`;
+    }
+  }
+
+  // Fallback to external PokeAPI Home sprites
   const baseUrl = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home";
-
   const shinyPath = shiny ? '/shiny' : '';
-
-  // Use pokemonId or form ID if provided
   const idPath = form ? form : pokemonId;
 
   return `${baseUrl}${shinyPath}/${idPath}.png`;

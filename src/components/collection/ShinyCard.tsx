@@ -1,7 +1,7 @@
 import { Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getGameTheme } from '@/lib/game-themes';
-import { POKEBALLS, HUNTING_METHODS } from '@/lib/pokemon-data';
+import { POKEBALLS, HUNTING_METHODS, getPokemonSpriteUrl } from '@/lib/pokemon-data';
 import type { Tables } from '@/integrations/supabase/types';
 
 type CaughtShinyRow = Tables<'caught_shinies'>;
@@ -70,10 +70,9 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
 
             {/* Card content */}
             <div className="relative p-5 flex items-start gap-4">
-                {/* Pokemon sprite */}
                 <div className="flex-shrink-0">
                     <img
-                        src={entry.sprite_url || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${entry.pokemon_id}.png`}
+                        src={entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, { shiny: true })}
                         alt={entry.pokemon_name}
                         className="w-24 h-24 pokemon-sprite drop-shadow-lg"
                         style={{ imageRendering: 'pixelated' }}
