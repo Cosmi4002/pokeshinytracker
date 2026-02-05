@@ -407,6 +407,10 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
 export const getGameSpecificSpriteUrl = (id: number, methodId: string, name?: string) =>
   getPokemonSpriteUrl(id, { shiny: true, name });
 
+export function getShinyCharmIcon(): string {
+  return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/shiny-charm.png';
+}
+
 // Manually tracked form counts for completion stats
 export const POKEMON_FORM_COUNTS: Record<number, number> = {
   // Gen 1
