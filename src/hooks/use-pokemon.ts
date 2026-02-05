@@ -174,7 +174,7 @@ export function usePokemonList() {
           if (n === 'pikachu-partner-cap') return true;
 
           // Explicitly exclude categories requested by user
-          if (n.includes('-mega') || n.includes('-gmax') || n.includes('-totem')) return false;
+          if (n.includes('-mega') || n.includes('-totem') || n.includes('-gmax') || n.includes('-primal')) return false;
 
           return false;
         });
@@ -283,6 +283,10 @@ export function usePokemonDetails(pokemonId: number | null) {
 
                 // Check if this variety is already in forms
                 if (varietyId && !forms.some(f => f.id === varietyId)) {
+                  const vn = variety.pokemon.name.toLowerCase();
+                  // Skip mega, totem, etc. in details as well
+                  if (vn.includes('-mega') || vn.includes('-totem') || vn.includes('-gmax') || vn.includes('-primal')) continue;
+
                   forms.push({
                     id: varietyId,
                     formName: variety.pokemon.name,
