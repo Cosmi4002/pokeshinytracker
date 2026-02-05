@@ -10,6 +10,7 @@ import Counter from "./pages/Counter";
 import Hunts from "./pages/Hunts";
 import Pokedex from "./pages/Pokedex";
 import Collection from "./pages/Collection";
+import SpriteMapper from "./pages/SpriteMapper";
 
 import NotFound from "./pages/NotFound";
 import { useUserPreferences } from "@/hooks/use-user-preferences";
@@ -33,6 +34,7 @@ function AppContent() {
           <Route path="/hunts" element={<Hunts />} />
           <Route path="/pokedex" element={<Pokedex />} />
           <Route path="/collection" element={<Collection />} />
+          <Route path="/sprite-mapper" element={<SpriteMapper />} />
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
