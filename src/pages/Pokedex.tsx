@@ -26,17 +26,19 @@ export default function Pokedex() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const filteredPokemon = useMemo(() => {
+    const searchLower = search.toLowerCase();
+    const genNum = generation !== 'all' ? parseInt(generation) : null;
+    const genRange = genNum !== null ? GENERATION_RANGES[genNum] : null;
+
     return pokemon.filter((p) => {
       // Search filter
-      const matchesSearch = p.displayName.toLowerCase().includes(search.toLowerCase()) ||
+      const matchesSearch = !search || p.displayName.toLowerCase().includes(searchLower) ||
         p.id.toString().includes(search);
 
       // Generation filter
       let matchesGen = true;
-      if (generation !== 'all') {
-        const genNum = parseInt(generation);
-        const [start, end] = GENERATION_RANGES[genNum];
-        matchesGen = p.baseId >= start && p.baseId <= end;
+      if (genRange) {
+        matchesGen = p.baseId >= genRange[0] && p.baseId <= genRange[1];
       }
 
       return matchesSearch && matchesGen;

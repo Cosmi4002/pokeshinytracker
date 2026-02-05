@@ -370,32 +370,40 @@ import spriteMapping from './sprite-mapping.json';
 
 const MAPPING: Record<string, string> = spriteMapping;
 
-export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolean, name?: string, female?: boolean, form?: string } = {}): string {
+export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolean, name?: string, female?: boolean, form?: string, animated?: boolean } = {}): string {
   if (!pokemonId) return '';
 
-  const { shiny = false, female = false, form, name } = options;
+  const { shiny = false, female = false, form, name, animated = false } = options;
 
-  // 1. Check if we have a custom mapping for this Pokemon/form
-  const keysToTry = [];
-  if (form) keysToTry.push(form);
-  if (name) {
-    const slug = toShowdownSlug(name);
-    keysToTry.push(slug);
-    // Also try baseId-form if we can parse it
-    if (slug.includes('-')) {
-      const parts = slug.split('-');
-      keysToTry.push(`${pokemonId}-${parts.slice(1).join('-')}`);
+  // 1. If animated is true (or we want to fallback to local animation), try local mapping first
+  if (animated) {
+    const keysToTry = [];
+    if (form) keysToTry.push(form);
+    if (name) {
+      const slug = toShowdownSlug(name);
+      keysToTry.push(slug);
+      if (slug.includes('-')) {
+        const parts = slug.split('-');
+        keysToTry.push(`${pokemonId}-${parts.slice(1).join('-')}`);
+      }
+    }
+    keysToTry.push(pokemonId.toString());
+
+    for (const key of keysToTry) {
+      if (MAPPING[key]) {
+        return `/sprites/${MAPPING[key]}`;
+      }
     }
   }
-  keysToTry.push(pokemonId.toString());
 
-  for (const key of keysToTry) {
-    if (MAPPING[key]) {
-      return `/sprites/${MAPPING[key]}`;
-    }
-  }
-
-  return "/placeholder.svg";
+  // 2. Default to static sprites from PokeAPI (much lighter than GIFs)
+  // For regional forms or IDs > 10000, PokeAPI usually has sprites
+  const spriteType = shiny ? 'shiny' : 'default';
+  const genderSuffix = female ? '/female' : '';
+  
+  // Note: PokeAPI static sprites are usually at:
+  // https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/1.png
+  return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${spriteType}/${pokemonId}.png`;
 }
 
 // Alias for transition compatibility

@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, memo } from "react";
 
 interface PokedexCardProps {
     pokemonId: number;
@@ -13,7 +13,7 @@ interface PokedexCardProps {
     onClick: () => void;
 }
 
-export function PokedexCard({
+export const PokedexCard = memo(function PokedexCard({
     pokemonId,
     baseId,
     displayName,
@@ -37,7 +37,7 @@ export function PokedexCard({
             onClick={onClick}
             className={cn(
                 "relative group flex flex-col items-center justify-center p-3 rounded-2xl transition-all duration-500 border-2",
-                "backdrop-blur-sm overflow-hidden cursor-pointer w-full",
+                "backdrop-blur-sm overflow-hidden cursor-pointer w-full min-h-[160px]", // Added min-h for stability
                 "hover:scale-105 active:scale-95",
                 // Base state
                 !hasCaughtAny && "border-white/5 hover:border-primary grayscale hover:grayscale-0",
@@ -79,9 +79,9 @@ export function PokedexCard({
             )}
 
             {/* Sprites container */}
-            <div className="relative flex justify-center gap-1 z-10">
+            <div className="relative flex justify-center gap-1 z-10 h-16 w-full"> {/* Fixed height for container */}
                 {/* Default/Male sprite */}
-                {!imgError && (
+                {!imgError ? (
                     <img
                         src={spriteUrl}
                         alt={`${displayName} shiny`}
@@ -94,6 +94,8 @@ export function PokedexCard({
                         loading="lazy"
                         onError={() => setImgError(true)}
                     />
+                ) : (
+                    <div className="h-16 w-16" /> // Placeholder to prevent shift
                 )}
 
                 {/* Female sprite */}
@@ -142,4 +144,4 @@ export function PokedexCard({
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out pointer-events-none" />
         </button>
     );
-}
+});

@@ -124,7 +124,7 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
                 displayName: form.displayName,
                 category,
                 gender: 'genderless',
-                spriteUrl: form.sprites.shiny,
+                spriteUrl: getPokemonSpriteUrl(form.id, { shiny: true, name: form.formName, animated: true }),
             });
         });
 

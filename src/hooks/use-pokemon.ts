@@ -224,10 +224,10 @@ export function usePokemonDetails(pokemonId: number | null) {
         const hasGenderDiff = POKEMON_WITH_GENDER_DIFF.includes(pokemonId);
 
         const sprites = {
-          default: getPokemonSpriteUrl(pokemonId, { name: data.name }),
-          shiny: getPokemonSpriteUrl(pokemonId, { shiny: true, name: data.name }),
-          femaleDefault: hasGenderDiff ? getPokemonSpriteUrl(pokemonId, { female: true, name: data.name }) : undefined,
-          femaleShiny: hasGenderDiff ? getPokemonSpriteUrl(pokemonId, { shiny: true, female: true, name: data.name }) : undefined,
+          default: getPokemonSpriteUrl(pokemonId, { name: data.name, animated: true }),
+          shiny: getPokemonSpriteUrl(pokemonId, { shiny: true, name: data.name, animated: true }),
+          femaleDefault: hasGenderDiff ? getPokemonSpriteUrl(pokemonId, { female: true, name: data.name, animated: true }) : undefined,
+          femaleShiny: hasGenderDiff ? getPokemonSpriteUrl(pokemonId, { shiny: true, female: true, name: data.name, animated: true }) : undefined,
         };
 
         // Load forms from data.forms[] - these have proper sprites
