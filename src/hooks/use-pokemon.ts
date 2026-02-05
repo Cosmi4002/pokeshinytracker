@@ -154,27 +154,48 @@ export function usePokemonList() {
             displayName: formatPokemonName(p.name, p.id, baseId),
           };
         }).filter((p: any) => {
+          const n = p.name.toLowerCase();
+
+          // Rule 1: Explicitly exclude categories requested by user (Mega, Totem, Gmax, Primal, etc.)
+          if (
+            n.includes('-mega') ||
+            n.includes('-totem') ||
+            n.includes('-gmax') ||
+            n.includes('-primal') ||
+            n.includes('-eternal')
+          ) {
+            return false;
+          }
+
+          // Rule 2: Exclude extra Cap Pikachu (except Partner Cap which is shiny-lock relevant in some contexts)
+          if (n.includes('-cap') && n !== 'pikachu-partner-cap') {
+            return false;
+          }
+
+          // Rule 3: Keep all standard Pokemon (Gen 1-9)
           if (p.id <= 1025) {
-            // Exclude specific variants that are just duplicate entries or alternate forms not needed as separate Dex entries
-            const n = p.name.toLowerCase();
-            if (n.includes('-totem')) return false;
-            if (n.includes('-cap') && !n.includes('partner-cap')) return false;
             return true;
           }
 
-          const n = p.name.toLowerCase();
+          // Rule 4: Keep Regional forms
+          if (
+            n.endsWith('-alola') ||
+            n.endsWith('-galar') ||
+            n.endsWith('-hisui') ||
+            n.endsWith('-paldea')
+          ) {
+            return true;
+          }
 
-          // Keep Regional forms
-          if (n.endsWith('-alola') || n.endsWith('-galar') || n.endsWith('-hisui') || n.endsWith('-paldea')) return true;
+          // Rule 5: Keep seasonal forms (Deerling & Sawsbuck)
+          if (n.includes('deerling-') || n.includes('sawsbuck-')) {
+            return true;
+          }
 
-          // Keep seasonal forms (Deerling & Sawsbuck)
-          if (n.includes('deerling-') || n.includes('sawsbuck-')) return true;
-
-          // Special case: Pikachu Partner Cap (Only Cap Pikachu obtainable as shiny in Gen 7)
-          if (n === 'pikachu-partner-cap') return true;
-
-          // Explicitly exclude categories requested by user
-          if (n.includes('-mega') || n.includes('-totem') || n.includes('-gmax') || n.includes('-primal')) return false;
+          // Rule 6: Special case for Pikachu Partner Cap
+          if (n === 'pikachu-partner-cap') {
+            return true;
+          }
 
           return false;
         });

@@ -60,11 +60,11 @@ export function PokemonSelector({ value, onChange }: PokemonSelectorProps) {
       <PopoverContent className="w-[350px] p-0" align="start">
         <Command>
           <CommandInput placeholder="Search Pokémon..." />
-          <CommandList>
+          <CommandList className="max-h-[300px] overflow-y-auto">
             <CommandEmpty>
               {loading ? 'Loading...' : 'No Pokémon found.'}
             </CommandEmpty>
-            <CommandGroup className="max-h-[300px] overflow-y-auto">
+            <CommandGroup>
               {pokemon.map((p) => (
                 <CommandItem
                   key={p.id}

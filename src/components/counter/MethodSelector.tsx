@@ -55,7 +55,7 @@ export function MethodSelector({ value, onChange }: MethodSelectorProps) {
       <PopoverContent className="w-[400px] p-0" align="start">
         <Command>
           <CommandInput placeholder="Search method..." />
-          <CommandList>
+          <CommandList className="max-h-[300px] overflow-y-auto">
             <CommandEmpty>No method found.</CommandEmpty>
             {Object.entries(methodsByGen).map(([gen, methods]) => (
               <CommandGroup key={gen} heading={gen}>
