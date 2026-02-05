@@ -376,7 +376,7 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
   const { shiny = false, female = false, name, form } = options;
 
   // 1. Try mapping for forms first (likely missing externally)
-  const keysToTry = [];
+  const keysToTry = [pokemonId.toString()];
   if (form) keysToTry.push(form);
   if (name) {
     const slug = toShowdownSlug(name);
@@ -387,10 +387,13 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
     }
   }
 
+  // IDs that MUST use local mapping if available (manual fixes)
+  const FORCED_LOCAL_IDS = [29, 32, 122, 413, 10157, 10004, 10005, 1013, 1032, 1029, 1022];
+
   for (const key of keysToTry) {
-    // Only use local mapping for complex forms or high IDs (Gen 9+)
-    // Standard Pokédex entries are better externally (lighter/faster)
-    if (MAPPING[key] && (key.includes('-') || pokemonId > 905)) {
+    // Use local mapping if:
+    // - It exists AND (it's a complex form OR Gen 9+ OR explicitly forced in the list)
+    if (MAPPING[key] && (key.includes('-') || pokemonId > 905 || FORCED_LOCAL_IDS.includes(pokemonId))) {
       return `/sprites/${MAPPING[key]}`;
     }
   }
