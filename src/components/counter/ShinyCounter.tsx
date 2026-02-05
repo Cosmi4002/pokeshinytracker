@@ -236,7 +236,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
               onError={(e) => {
                 // Fallback to standard shiny sprite if specific version fails
                 const target = e.target as HTMLImageElement;
-                target.src = getPokemonSpriteUrl(selectedPokemonId, { shiny: true });
+                target.src = getPokemonSpriteUrl(selectedPokemonId!, { shiny: true, name: selectedPokemonName });
               }}
             />
           </div>

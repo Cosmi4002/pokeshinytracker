@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Trash2, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { HUNTING_METHODS, getGameSpecificSpriteUrl } from '@/lib/pokemon-data';
+import { HUNTING_METHODS, getGameSpecificSpriteUrl, getPokemonSpriteUrl } from '@/lib/pokemon-data';
 import { calculateShinyStats } from '@/lib/pokemon-data';
 import type { Tables } from '@/integrations/supabase/types';
 import { formatDistanceToNow } from 'date-fns';
@@ -47,7 +47,7 @@ export function HuntCard({ hunt, onDelete, onContinue, layoutStyle = 'grid' }: H
                                     className="w-16 h-16 object-contain pokemon-sprite"
                                     onError={(e) => {
                                         const target = e.target as HTMLImageElement;
-                                        target.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${hunt.pokemon_id}.png`;
+                                        target.src = getPokemonSpriteUrl(hunt.pokemon_id!, { shiny: true, name: hunt.pokemon_name || undefined });
                                     }}
                                 />
                             ) : (
@@ -108,7 +108,7 @@ export function HuntCard({ hunt, onDelete, onContinue, layoutStyle = 'grid' }: H
                                 className="w-16 h-16 object-contain pokemon-sprite"
                                 onError={(e) => {
                                     const target = e.target as HTMLImageElement;
-                                    target.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${hunt.pokemon_id}.png`;
+                                    target.src = getPokemonSpriteUrl(hunt.pokemon_id!, { shiny: true, name: hunt.pokemon_name || undefined });
                                 }}
                             />
                         ) : (
@@ -167,7 +167,7 @@ export function HuntCard({ hunt, onDelete, onContinue, layoutStyle = 'grid' }: H
                             className="w-24 h-24 object-contain pokemon-sprite"
                             onError={(e) => {
                                 const target = e.target as HTMLImageElement;
-                                target.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${hunt.pokemon_id}.png`;
+                                target.src = getPokemonSpriteUrl(hunt.pokemon_id!, { shiny: true, name: hunt.pokemon_name || undefined });
                             }}
                         />
                     ) : (

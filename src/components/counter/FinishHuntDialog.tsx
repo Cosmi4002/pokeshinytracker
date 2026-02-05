@@ -171,7 +171,7 @@ export function FinishHuntDialog({
               alt={pokemonName}
               className="w-20 h-20 pokemon-sprite object-contain"
               onError={(e) => {
-                (e.target as HTMLImageElement).src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${pokemonId}.png`;
+                (e.target as HTMLImageElement).src = getPokemonSpriteUrl(pokemonId, { shiny: true, name: pokemonName });
               }}
             />
             <div>

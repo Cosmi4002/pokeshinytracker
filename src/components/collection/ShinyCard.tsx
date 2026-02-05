@@ -72,7 +72,7 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
             <div className="relative p-5 flex items-start gap-4">
                 <div className="flex-shrink-0">
                     <img
-                        src={entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, { shiny: true })}
+                        src={entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, { shiny: true, name: entry.pokemon_name })}
                         alt={entry.pokemon_name}
                         className="w-24 h-24 pokemon-sprite drop-shadow-lg"
                         style={{ imageRendering: 'pixelated' }}
