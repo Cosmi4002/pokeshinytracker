@@ -350,45 +350,46 @@ export function getPokemonSpriteUrl(
     form?: string;
     name?: string;
   } = {}
+): string {
   const { shiny = false, female = false, form, name } = options;
 
   // 1. Check if we have a custom mapping for this Pokemon/form
   // We prefer local GIFs from the mapping for both shiny and normal if mapped
   const keysToTry = [];
   if (form) keysToTry.push(form);
-if (name) {
-  const slug = toShowdownSlug(name);
-  keysToTry.push(slug);
-  // Also try baseId-form if we can parse it
-  if (slug.includes('-')) {
-    const parts = slug.split('-');
-    keysToTry.push(`${id}-${parts.slice(1).join('-')}`);
+  if (name) {
+    const slug = toShowdownSlug(name);
+    keysToTry.push(slug);
+    // Also try baseId-form if we can parse it
+    if (slug.includes('-')) {
+      const parts = slug.split('-');
+      keysToTry.push(`${id}-${parts.slice(1).join('-')}`);
+    }
   }
-}
-keysToTry.push(id.toString());
+  keysToTry.push(id.toString());
 
-for (const key of keysToTry) {
-  if (MAPPING[key]) {
-    return `/sprites/${MAPPING[key]}`;
+  for (const key of keysToTry) {
+    if (MAPPING[key]) {
+      return `/sprites/${MAPPING[key]}`;
+    }
   }
-}
 
-if (shiny && name) {
-  const slug = toShowdownSlug(name);
-  return `https://play.pokemonshowdown.com/sprites/ani-shiny/${slug}.gif`;
-}
+  if (shiny && name) {
+    const slug = toShowdownSlug(name);
+    return `https://play.pokemonshowdown.com/sprites/ani-shiny/${slug}.gif`;
+  }
 
-// Use PokeAPI sprites
-const baseUrl = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
+  // Use PokeAPI sprites
+  const baseUrl = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
 
-let path = '';
-if (shiny) path += '/shiny';
-if (female) path += '/female';
+  let path = '';
+  if (shiny) path += '/shiny';
+  if (female) path += '/female';
 
-// Handle form IDs (like -alola, -galar, etc.)
-const pokemonId = form ? form : id.toString();
+  // Handle form IDs (like -alola, -galar, etc.)
+  const pokemonId = form ? form : id.toString();
 
-return `${baseUrl}${path}/${pokemonId}.png`;
+  return `${baseUrl}${path}/${pokemonId}.png`;
 }
 
 export function getShinyCharmIcon(): string {
