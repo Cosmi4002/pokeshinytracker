@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Calculator, Search, Grid3X3, LogOut, User, Sparkles, Crosshair } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { supabaseProjectRef } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth-context';
 import {
