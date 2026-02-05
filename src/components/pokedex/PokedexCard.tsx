@@ -86,7 +86,7 @@ export function PokedexCard({
                         src={spriteUrl}
                         alt={`${displayName} shiny`}
                         className={cn(
-                            "h-16 w-16 pokemon-sprite transition-all duration-500",
+                            "h-16 w-16 pokemon-sprite transition-all duration-500 object-contain",
                             hasCaughtAny
                                 ? "drop-shadow-[0_0_10px_rgba(255,255,255,0.6)] scale-105"
                                 : "opacity-60 group-hover:opacity-100 group-hover:scale-110"
@@ -102,7 +102,7 @@ export function PokedexCard({
                         src={femaleSprite}
                         alt={`${displayName} shiny female`}
                         className={cn(
-                            "h-16 w-16 pokemon-sprite transition-all duration-500",
+                            "h-16 w-16 pokemon-sprite transition-all duration-500 object-contain",
                             hasCaughtAny
                                 ? "drop-shadow-[0_0_10px_rgba(255,255,255,0.6)] scale-105"
                                 : "opacity-60 group-hover:opacity-100 group-hover:scale-110"

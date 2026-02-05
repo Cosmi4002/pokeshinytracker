@@ -44,7 +44,7 @@ export function PokemonSelector({ value, onChange }: PokemonSelectorProps) {
               <img
                 src={getPokemonSpriteUrl(selectedPokemon.id, { shiny: true, name: selectedPokemon.name })}
                 alt={selectedPokemon.displayName}
-                className="h-8 w-8 pokemon-sprite"
+                className="h-8 w-8 pokemon-sprite object-contain"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = '/placeholder.svg';
                 }}
@@ -78,7 +78,7 @@ export function PokemonSelector({ value, onChange }: PokemonSelectorProps) {
                   <img
                     src={getPokemonSpriteUrl(p.id, { shiny: true, name: p.name })}
                     alt={p.displayName}
-                    className="h-8 w-8 pokemon-sprite"
+                    className="h-8 w-8 pokemon-sprite object-contain"
                     loading="lazy"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = '/placeholder.svg';
