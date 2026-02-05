@@ -76,44 +76,12 @@ function getGeneration(id: number): number {
 function formatPokemonName(name: string, id: number, baseId?: number): string {
   const speciesId = baseId || id;
 
-  // Special cases for Nidoran
-  if (speciesId === 29) return 'Nidoran (F)';
-  if (speciesId === 32) return 'Nidoran (M)';
-
-  // Special cases for Unown letters
-  if (speciesId === 201) {
-    const parts = name.split('-');
-    if (parts.length > 1) {
-      const letter = parts[1].toUpperCase();
-      if (letter === 'EXCLAMATION') return 'Unown (!)';
-      if (letter === 'QUESTION') return 'Unown (?)';
-      return `Unown (${letter})`;
-    }
-    return 'Unown (A)';
-  }
-
   if (speciesId === 585 || speciesId === 586) {
     if (name.includes('-summer')) return `Summer Form ${speciesId === 585 ? 'Deerling' : 'Sawsbuck'}`;
     if (name.includes('-autumn')) return `Autumn Form ${speciesId === 585 ? 'Deerling' : 'Sawsbuck'}`;
     if (name.includes('-winter')) return `Winter Form ${speciesId === 585 ? 'Deerling' : 'Sawsbuck'}`;
     if (name.includes('-spring') || name === 'deerling' || name === 'sawsbuck')
       return `Spring Form ${speciesId === 585 ? 'Deerling' : 'Sawsbuck'}`;
-  }
-
-  // Improved formatting for varieties
-  if (id > 10000) {
-    if (speciesId === 386) return `${name.split('-')[1].charAt(0).toUpperCase() + name.split('-')[1].slice(1)} Form Deoxys`;
-    if (speciesId === 479) return `Rotom ${name.split('-')[1].charAt(0).toUpperCase() + name.split('-')[1].slice(1)}`;
-    if (speciesId === 487) return `${name.split('-')[1].charAt(0).toUpperCase() + name.split('-')[1].slice(1)} Form Giratina`;
-    if (speciesId === 492) return `${name.split('-')[1].charAt(0).toUpperCase() + name.split('-')[1].slice(1)} Form Shaymin`;
-    if (speciesId === 641) return `${name.split('-')[1].charAt(0).toUpperCase() + name.split('-')[1].slice(1)} Form Tornadus`;
-    if (speciesId === 642) return `${name.split('-')[1].charAt(0).toUpperCase() + name.split('-')[1].slice(1)} Form Thundurus`;
-    if (speciesId === 645) return `${name.split('-')[1].charAt(0).toUpperCase() + name.split('-')[1].slice(1)} Form Landorus`;
-    if (speciesId === 413) return `${name.split('-')[1].charAt(0).toUpperCase() + name.split('-')[1].slice(1)} Cloak Wormadam`;
-    if (speciesId === 550) return `${name.split('-')[1].charAt(0).toUpperCase() + name.split('-')[1].slice(1)} Striped Basculin`;
-    if (speciesId === 555) return `${name.split('-')[1].charAt(0).toUpperCase() + name.split('-')[1].slice(1)} Mode Darmanitan`;
-    if (speciesId === 647) return `${name.split('-')[1].charAt(0).toUpperCase() + name.split('-')[1].slice(1)} Form Keldeo`;
-    if (speciesId === 648) return `${name.split('-')[1].charAt(0).toUpperCase() + name.split('-')[1].slice(1)} Form Meloetta`;
   }
 
   const regions: Record<string, string> = {
@@ -226,28 +194,6 @@ export function usePokemonList() {
 
           // Rule 6: Special case for Pikachu Partner Cap
           if (n === 'pikachu-partner-cap') {
-            return true;
-          }
-
-          // Rule 7: User requested missing forms/varieties
-          const requestedSpeciesIds = [
-            122, // Mr Mime (includes Galarian)
-            201, // Unown
-            386, // Deoxys
-            413, // Wormadam
-            439, // Mime Jr
-            479, // Rotom
-            487, // Giratina
-            492, // Shaymin
-            550, // Basculin
-            555, // Darmanitan
-            641, // Tornadus
-            642, // Thundurus
-            645, // Landorus
-            647, // Keldeo
-            648, // Meloetta
-          ];
-          if (requestedSpeciesIds.includes(baseId)) {
             return true;
           }
 
