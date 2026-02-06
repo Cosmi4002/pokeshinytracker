@@ -46,7 +46,7 @@ export default function SpriteMapper() {
       .then(res => res.json())
       .then((files: string[]) => {
         // filter for webm
-        const webmFiles = files.filter(f => f.endsWith('.webp'));
+        const webmFiles = files.filter(f => f.endsWith('.gif'));
         // Sort numerically if possible to help user predict order
         webmFiles.sort((a, b) => {
           const numA = parseInt(a.replace(/\D/g, ''));
