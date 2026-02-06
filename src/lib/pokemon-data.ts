@@ -402,7 +402,7 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
   if (name) {
     const slug = toShowdownSlug(name);
     const prefix = shiny ? 'ani-shiny' : 'ani';
-    return `https://play.pokemonshowdown.com/sprites/${prefix}/${slug}.gif`;
+    return `https://play.pokemonshowdown.com/sprites/${prefix}/${slug}.webm`;
   }
 
   // 3. Last fallback: static sprites from PokeAPI

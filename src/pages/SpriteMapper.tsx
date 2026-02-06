@@ -45,15 +45,15 @@ export default function SpriteMapper() {
     fetch("/sprites/index.json")
       .then(res => res.json())
       .then((files: string[]) => {
-        // filter for gifs
-        const gifFiles = files.filter(f => f.endsWith('.gif'));
+        // filter for webm
+        const webmFiles = files.filter(f => f.endsWith('.webm'));
         // Sort numerically if possible to help user predict order
-        gifFiles.sort((a, b) => {
+        webmFiles.sort((a, b) => {
           const numA = parseInt(a.replace(/\D/g, ''));
           const numB = parseInt(b.replace(/\D/g, ''));
           return numA - numB;
         });
-        setSprites(gifFiles);
+        setSprites(webmFiles);
         setLoading(false);
       })
       .catch(err => {
