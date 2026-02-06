@@ -76,6 +76,10 @@ function getGeneration(id: number): number {
 function formatPokemonName(name: string, id: number, baseId?: number): string {
   const speciesId = baseId || id;
 
+  // Nidoran gender symbols
+  if (name === 'nidoran-f' || speciesId === 29) return 'Nidoran♀';
+  if (name === 'nidoran-m' || speciesId === 32) return 'Nidoran♂';
+
   if (speciesId === 585 || speciesId === 586) {
     if (name.includes('-summer')) return `Summer Form ${speciesId === 585 ? 'Deerling' : 'Sawsbuck'}`;
     if (name.includes('-autumn')) return `Autumn Form ${speciesId === 585 ? 'Deerling' : 'Sawsbuck'}`;

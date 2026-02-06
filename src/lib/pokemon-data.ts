@@ -376,7 +376,11 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
   const { shiny = false, female = false, name, form } = options;
 
   // 1. Try mapping for forms first (likely missing externally)
-  const keysToTry = [pokemonId.toString()];
+  const keysToTry: string[] = [];
+
+  if (female) keysToTry.push(`${pokemonId}-f`);
+  keysToTry.push(pokemonId.toString());
+
   if (form) keysToTry.push(form);
   if (name) {
     const slug = toShowdownSlug(name);
