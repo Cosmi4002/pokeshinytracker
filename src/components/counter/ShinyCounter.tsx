@@ -343,7 +343,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
         <CardContent className="pt-4 grid grid-cols-2 gap-4 text-center">
           <div>
             <div className="text-sm text-muted-foreground mb-1">Odds Correnti</div>
-            <div className="font-mono font-bold text-lg text-primary">
+            <div className="font-mono font-bold text-base sm:text-lg text-primary break-all">
               1 / {stats.currentOdds.toLocaleString()}
             </div>
             <div className="text-xs text-muted-foreground">
@@ -352,7 +352,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
           </div>
           <div>
             <div className="text-sm text-muted-foreground mb-1">Prob. Totale</div>
-            <span className="font-mono font-bold text-lg text-primary">{stats.binomialProbability}%</span>
+            <span className="font-mono font-bold text-base sm:text-lg text-primary">{stats.binomialProbability}%</span>
           </div>
         </CardContent>
       </Card>

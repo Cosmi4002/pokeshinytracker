@@ -32,7 +32,7 @@ export function Navbar() {
         <Link to="/" className="flex items-center gap-2 shrink-0">
           <Sparkles className="h-6 w-6" style={{ color: accentColor }} />
           <span
-            className="text-lg sm:text-xl font-bold whitespace-nowrap bg-clip-text text-transparent bg-gradient-to-r"
+            className="text-lg sm:text-xl font-bold whitespace-nowrap bg-clip-text text-transparent bg-gradient-to-r hidden sm:block"
             style={{
               backgroundImage: `linear-gradient(to right, ${accentColor}, color-mix(in srgb, ${accentColor}, white 30%))`
             }}
@@ -41,7 +41,7 @@ export function Navbar() {
           </span>
         </Link>
 
-        <div className="flex items-center gap-0.5 sm:gap-1 overflow-x-auto no-scrollbar">
+        <div className="flex items-center gap-1 sm:gap-1">
           {navLinks.map((link) => {
             const Icon = link.icon;
             const isActive = location.pathname === link.to;

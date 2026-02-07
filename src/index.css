@@ -98,6 +98,14 @@
 }
 
 @layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
   .shiny-text {
     background: linear-gradient(90deg,
         var(--shiny) 0%,
