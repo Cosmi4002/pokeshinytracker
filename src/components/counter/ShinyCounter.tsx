@@ -21,6 +21,7 @@ import { calculateShinyStats, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, 
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
 import { FinishHuntDialog } from './FinishHuntDialog';
+import { useRandomColor } from '@/lib/random-color-context';
 
 interface ShinyCounterProps {
   huntId?: string;
@@ -28,6 +29,7 @@ interface ShinyCounterProps {
 
 export function ShinyCounter({ huntId }: ShinyCounterProps) {
   const { user } = useAuth();
+  const { accentColor } = useRandomColor();
   const [counter, setCounter] = useState(0);
   const [incrementAmount, setIncrementAmount] = useState(1);
   const [selectedPokemonId, setSelectedPokemonId] = useState<number | null>(null);
@@ -223,7 +225,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
   }
 
   return (
-    <div className="w-full h-full space-y-4">
+    <div className="w-full h-full space-y-3">
       {/* Counter Display */}
       <div className="text-center space-y-4">
         {/* Pokemon Sprite */}
@@ -232,7 +234,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
             <img
               src={getGameSpecificSpriteUrl(selectedPokemonId, selectedMethod.id, selectedPokemonName)}
               alt={selectedPokemonName}
-              className="w-32 h-32 object-contain pokemon-sprite animate-in fade-in zoom-in duration-500"
+              className="w-40 h-40 object-contain pokemon-sprite animate-in fade-in zoom-in duration-500"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = '/placeholder.svg';
               }}
@@ -249,16 +251,29 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
             onBlur={handleCounterBlur}
             onKeyDown={handleCounterKeyDown}
             autoFocus
-            className="text-6xl font-bold tabular-nums text-center h-24 border-2 border-primary"
-            style={{ fontSize: '4rem' }}
+            className="text-6xl font-bold tabular-nums text-center h-24 border-2 bg-background focus:ring-0"
+            style={{
+              fontSize: '4rem',
+              color: accentColor,
+              borderColor: accentColor,
+              backgroundColor: 'var(--background)' // Force background color
+            }}
           />
         ) : (
           <div
             onClick={handleCounterClick}
-            className="text-6xl font-bold tabular-nums shiny-text cursor-pointer hover:scale-105 transition-transform duration-200"
+            className="text-6xl font-bold tabular-nums cursor-pointer hover:scale-105 transition-transform duration-200 text-center flex justify-center items-center h-24"
             title="Click to edit counter"
           >
-            {counter.toLocaleString()}
+            <span
+              style={{
+                color: accentColor,
+                filter: `drop-shadow(0 0 15px ${accentColor}60)`
+              }}
+              className="transition-all duration-300"
+            >
+              {counter.toLocaleString()}
+            </span>
           </div>
         )}
 
@@ -267,14 +282,20 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
           <Button
             size="lg"
             onClick={decrement}
-            className="h-12 px-6 text-xl"
+            variant="outline"
+            className="h-12 px-6 text-xl hover:bg-background"
+            style={{ borderColor: accentColor, color: accentColor }}
           >
             <Minus className="h-5 w-5" />
           </Button>
           <Button
             size="lg"
             onClick={increment}
-            className="h-12 px-6 text-xl shiny-glow"
+            className="h-12 px-6 text-xl"
+            style={{
+              backgroundColor: accentColor,
+              boxShadow: `0 0 20px ${accentColor}40`
+            }}
           >
             <Plus className="h-5 w-5" />
           </Button>
@@ -319,7 +340,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
 
       {/* Stats Card */}
       <Card>
-        <CardContent className="pt-6 grid grid-cols-2 gap-4 text-center">
+        <CardContent className="pt-4 grid grid-cols-2 gap-4 text-center">
           <div>
             <div className="text-sm text-muted-foreground mb-1">Odds Correnti</div>
             <div className="font-mono font-bold text-lg text-primary">
@@ -338,7 +359,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
 
       {/* Setup Section */}
       <Card>
-        <CardContent className="pt-6 space-y-4">
+        <CardContent className="pt-4 space-y-4">
           <h3 className="font-semibold text-lg">Setup</h3>
 
           {/* Pokemon Selector */}
@@ -413,9 +434,13 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
           <Button
             variant="secondary"
             onClick={() => setIsResetDialogOpen(true)}
-            className="w-full shiny-glow"
+            className="w-full transition-all duration-300 hover:scale-[1.02]"
+            style={{
+              boxShadow: `0 0 15px ${accentColor}40`,
+              border: `1px solid ${accentColor}60`
+            }}
           >
-            <RotateCcw className="mr-2 h-4 w-4" />
+            <RotateCcw className="mr-2 h-4 w-4" style={{ color: accentColor }} />
             Reset Counter
           </Button>
         </CardContent>

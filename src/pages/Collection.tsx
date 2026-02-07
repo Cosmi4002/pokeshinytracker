@@ -12,6 +12,7 @@ import { usePokemonList } from '@/hooks/use-pokemon';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
+import { useRandomColor } from '@/lib/random-color-context';
 import { AddShinyDialog } from '@/components/collection/AddShinyDialog';
 import { CreatePlaylistDialog } from '@/components/collection/CreatePlaylistDialog';
 import { ManagePlaylistsDialog } from '@/components/collection/ManagePlaylistsDialog';
@@ -24,6 +25,7 @@ type PlaylistRow = Tables<'shiny_playlists'>;
 
 export default function Collection() {
   const { user, loading: authLoading } = useAuth();
+  const { accentColor } = useRandomColor();
   const { pokemon } = usePokemonList();
   const { toast } = useToast();
 
@@ -133,13 +135,24 @@ export default function Collection() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div
+      className="min-h-screen bg-background transition-colors duration-1000"
+      style={{
+        backgroundImage: `radial-gradient(circle at 50% 0%, ${accentColor}15 0%, transparent 70%)`
+      }}
+    >
       <Navbar />
       <main className="container mx-auto py-8 px-4">
         <div className="space-y-6">
           {/* Login banner */}
           {!user && (
-            <Card className="border-primary/50 bg-primary/5">
+            <Card
+              className="border-primary/50 bg-primary/5 transition-all duration-500"
+              style={{
+                borderColor: accentColor,
+                boxShadow: `0 0 20px ${accentColor}20`
+              }}
+            >
               <CardContent className="py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <LogIn className="h-10 w-10 text-primary" />
@@ -151,7 +164,15 @@ export default function Collection() {
                   </div>
                 </div>
                 <Link to="/auth">
-                  <Button className="shiny-glow">Accedi / Registrati</Button>
+                  <Button
+                    className="shadow-lg hover:shadow-xl transition-all duration-300"
+                    style={{
+                      backgroundColor: accentColor,
+                      boxShadow: `0 0 15px ${accentColor}60`
+                    }}
+                  >
+                    Accedi / Registrati
+                  </Button>
                 </Link>
               </CardContent>
             </Card>
@@ -160,7 +181,14 @@ export default function Collection() {
           {/* Header */}
           <div className="flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
             <div>
-              <h1 className="text-3xl sm:text-4xl font-bold shiny-text">La mia collezione Shiny</h1>
+              <h1
+                className="text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r"
+                style={{
+                  backgroundImage: `linear-gradient(to right, ${accentColor}, color-mix(in srgb, ${accentColor}, white 30%))`
+                }}
+              >
+                La mia collezione Shiny
+              </h1>
               <p className="text-muted-foreground mt-1 font-medium">
                 {entries.length} shiny Pokémon catturati
               </p>
@@ -297,7 +325,7 @@ export default function Collection() {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {filteredEntries.map((entry) => (
                 <ShinyCard
                   key={entry.id}

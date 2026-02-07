@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/lib/auth-context";
+import { RandomColorProvider } from "@/lib/random-color-context";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Counter from "./pages/Counter";
@@ -48,7 +49,9 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <TooltipProvider>
-        <AppContent />
+        <RandomColorProvider>
+          <AppContent />
+        </RandomColorProvider>
       </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>

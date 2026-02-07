@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Moon, Sun, Palette, Layout, Save, RotateCcw } from 'lucide-react';
+import { Moon, Sun, Palette, Layout, Save, RotateCcw, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -21,9 +21,11 @@ import { useTheme } from '@/lib/theme-context';
 import { useUserPreferences } from '@/hooks/use-user-preferences';
 import { ColorPicker } from '@/components/settings/ColorPicker';
 import { useToast } from '@/hooks/use-toast';
+import { useRandomColor } from '@/lib/random-color-context';
 
 export function ThemeCustomizer() {
   const { setTheme, theme, setColorScheme, colorScheme } = useTheme();
+  const { accentColor, setManualColor, resetToRandom, isRandom } = useRandomColor();
   const { preferences, loading, savePreferences } = useUserPreferences();
   const { toast } = useToast();
 
@@ -35,15 +37,29 @@ export function ThemeCustomizer() {
 
   // Update local state when preferences load or dialog opens
   useEffect(() => {
-    if (preferences && open) {
-      setThemeColor(preferences.theme_color || '#8b5cf6');
-      setBackgroundColor(preferences.background_color || '#0f172a');
-      setLayoutStyle(preferences.layout_style || 'grid');
+    if (open) {
+      if (preferences) {
+        // If we are in random mode, use the accentColor for the picker (visual feedback)
+        // or keep the last saved preference?
+        // Let's use accentColor if isRandom is true, so the picker shows the current dynamic color
+        if (isRandom) {
+          setThemeColor(accentColor);
+        } else {
+          setThemeColor(preferences.theme_color || '#8b5cf6');
+        }
+        setBackgroundColor(preferences.background_color || '#0f172a');
+        setLayoutStyle(preferences.layout_style || 'grid');
+      }
     }
-  }, [preferences, open]);
+  }, [preferences, open, isRandom, accentColor]);
 
   const handleSave = async () => {
     setSaving(true);
+
+    // 1. Update Context (Local Immediate Effect)
+    setManualColor(themeColor);
+
+    // 2. Persist to Supabase
     const result = await savePreferences({
       theme_color: themeColor,
       background_color: backgroundColor,
@@ -55,7 +71,7 @@ export function ThemeCustomizer() {
     if (result?.success) {
       toast({
         title: '✅ Preferenze salvate',
-        description: 'Le tue personalizzazioni sono state applicate',
+        description: 'Colore personalizzato applicato',
       });
       setOpen(false);
     } else {
@@ -68,10 +84,14 @@ export function ThemeCustomizer() {
   };
 
   const handleReset = () => {
-    setThemeColor('#8b5cf6');
-    setBackgroundColor('#0f172a');
-    setLayoutStyle('grid');
-    setColorScheme('dark');
+    // 1. Reset Context to Random
+    resetToRandom();
+
+    toast({
+      title: '🔄 Modalità Random Attiva',
+      description: 'I colori seguiranno il tema della Home',
+    });
+    setOpen(false);
   };
 
   const backgroundPresets = [
@@ -88,7 +108,15 @@ export function ThemeCustomizer() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="icon" className="dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 shiny-glow shiny-border-glow">
+        <Button
+          variant="outline"
+          size="icon"
+          className="dark:bg-gray-800 dark:text-gray-100 transition-all duration-300"
+          style={{
+            borderColor: accentColor,
+            boxShadow: `0 0 10px ${accentColor}40`
+          }}
+        >
           {colorScheme === 'dark' ? <Moon className="h-[1.2rem] w-[1.2rem]" /> : <Sun className="h-[1.2rem] w-[1.2rem]" />}
           <span className="sr-only">Toggle theme</span>
         </Button>
@@ -131,11 +159,23 @@ export function ThemeCustomizer() {
               <Palette className="h-4 w-4" />
               Colore Principale
             </Label>
-            <ColorPicker
-              label="Colore tema"
-              value={themeColor}
-              onChange={setThemeColor}
-            />
+            <div className="flex flex-col gap-3">
+              <Button
+                variant={isRandom ? "default" : "outline"}
+                onClick={handleReset}
+                className="w-full justify-start border-dashed"
+                style={isRandom ? { backgroundColor: accentColor } : { borderColor: accentColor, color: accentColor }}
+              >
+                <Sparkles className="mr-2 h-4 w-4" />
+                Usa Colore Home (Random)
+              </Button>
+
+              <ColorPicker
+                label="O scegli un colore fisso"
+                value={themeColor}
+                onChange={setThemeColor}
+              />
+            </div>
           </div>
 
           {/* Background Color */}
@@ -191,17 +231,10 @@ export function ThemeCustomizer() {
               onClick={handleSave}
               disabled={saving || loading}
               className="flex-1 shiny-glow"
+              style={{ backgroundColor: accentColor }}
             >
               <Save className="mr-2 h-4 w-4" />
-              {saving ? 'Salvataggio...' : 'Salva'}
-            </Button>
-            <Button
-              onClick={handleReset}
-              variant="outline"
-              disabled={loading}
-            >
-              <RotateCcw className="mr-2 h-4 w-4" />
-              Reset
+              {saving ? 'Salvataggio...' : 'Salva Preferenze'}
             </Button>
           </div>
         </div>

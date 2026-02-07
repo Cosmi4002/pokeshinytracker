@@ -6,6 +6,7 @@ import { ShinyCounter } from '@/components/counter/ShinyCounter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/lib/auth-context';
+import { useRandomColor } from '@/lib/random-color-context';
 import { supabase } from '@/integrations/supabase/client';
 import type { Tables } from '@/integrations/supabase/types';
 
@@ -14,6 +15,7 @@ type ActiveHunt = Tables<'active_hunts'>;
 export default function Counter() {
   const { huntId } = useParams<{ huntId?: string }>();
   const { user } = useAuth();
+  const { accentColor } = useRandomColor();
   const navigate = useNavigate();
   const [activeHunts, setActiveHunts] = useState<ActiveHunt[]>([]);
   const [loading, setLoading] = useState(true);
@@ -79,6 +81,7 @@ export default function Counter() {
       has_shiny_charm: false,
       increment_amount: 1,
       is_visible_on_counter: true, // Visibile nel multi-counter
+      started_at: new Date().toISOString(), // Auto start date
     }).select('id').single();
 
     if (error) {
@@ -104,14 +107,24 @@ export default function Counter() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div
+      className="min-h-screen bg-background transition-colors duration-1000"
+      style={{
+        backgroundImage: `radial-gradient(circle at 50% 0%, ${accentColor}15 0%, transparent 70%)`
+      }}
+    >
       <Navbar />
       <main className="container mx-auto py-8 px-4">
 
         {/* View Switcher Header (only if logged in) */}
         {user && !isSingleView && (
           <div className="mb-6 flex justify-between items-center">
-            <h1 className="text-2xl font-bold shiny-text">
+            <h1
+              className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r"
+              style={{
+                backgroundImage: `linear-gradient(to right, ${accentColor}, color-mix(in srgb, ${accentColor}, white 30%))`
+              }}
+            >
               Multi-Counter View
             </h1>
             <div className="text-sm text-muted-foreground">
@@ -136,7 +149,7 @@ export default function Counter() {
           <ShinyCounter />
         ) : (
           /* Multi Counter Grid */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {loading ? (
               <div className="col-span-3 text-center py-12">Caricamento counters...</div>
             ) : (
@@ -175,7 +188,7 @@ export default function Counter() {
                       </Button>
                     </div>
                     {/* Minimal variant could be created, but standard is fine currently as it fits in columns */}
-                    <div className="scale-90 origin-top text-xs">
+                    <div className="scale-85 sm:scale-90 origin-top text-xs">
                       <ShinyCounter huntId={hunt.id} />
                     </div>
                   </div>

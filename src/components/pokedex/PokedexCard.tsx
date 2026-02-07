@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { useState, memo } from "react";
+import { useRandomColor } from '@/lib/random-color-context';
 
 interface PokedexCardProps {
     pokemonId: number;
@@ -24,6 +25,7 @@ export const PokedexCard = memo(function PokedexCard({
     hasCaughtAny,
     onClick
 }: PokedexCardProps) {
+    const { accentColor } = useRandomColor();
     const [imgError, setImgError] = useState(false);
     const [femaleImgError, setFemaleImgError] = useState(false);
 
@@ -37,25 +39,31 @@ export const PokedexCard = memo(function PokedexCard({
             onClick={onClick}
             className={cn(
                 "relative group flex flex-col items-center justify-center p-3 rounded-2xl transition-all duration-500 border-2",
-                "backdrop-blur-sm overflow-hidden cursor-pointer w-full min-h-[160px]", // Added min-h for stability
+                "backdrop-blur-sm overflow-hidden cursor-pointer w-full min-h-[180px]", // Increased for larger sprites
                 "hover:scale-105 active:scale-95",
                 // Base state
-                !hasCaughtAny && "border-white/5 hover:border-primary grayscale hover:grayscale-0",
+                !hasCaughtAny && "border-white/5 grayscale hover:grayscale-0",
                 // Partial caught
-                isPartial && "border-primary",
+                // isPartial && "border-primary",
                 // Complete caught
-                isComplete && "border-primary shadow-[0_0_25px_rgba(var(--primary),0.4)] ring-1 ring-primary"
+                // isComplete && "border-primary shadow-[0_0_25px_rgba(var(--primary),0.4)] ring-1 ring-primary"
             )}
             style={{
                 // Fix for dynamic opacity with hex vars
+                borderColor: hasCaughtAny ? accentColor : undefined,
+                boxShadow: isComplete ? `0 0 25px ${accentColor}60` : undefined,
                 backgroundColor: !hasCaughtAny
-                    ? 'color-mix(in srgb, var(--muted), transparent 90%)'
-                    : isPartial
-                        ? 'color-mix(in srgb, var(--primary), transparent 80%)'
-                        : 'color-mix(in srgb, var(--primary), transparent 85%)',
+                    ? 'rgba(0, 0, 0, 0.6)'
+                    : `color-mix(in srgb, ${accentColor}, black 80%)`,
                 // Dynamic partial glow using CSS variable
                 '--glow-opacity': glowIntensity,
             } as React.CSSProperties}
+            onMouseEnter={(e) => {
+                if (!hasCaughtAny) e.currentTarget.style.borderColor = accentColor;
+            }}
+            onMouseLeave={(e) => {
+                if (!hasCaughtAny) e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)';
+            }}
         >
             {/* Background gradient for partial completion */}
             {isPartial && (
@@ -79,23 +87,24 @@ export const PokedexCard = memo(function PokedexCard({
             )}
 
             {/* Sprites container */}
-            <div className="relative flex justify-center gap-1 z-10 h-16 w-full"> {/* Fixed height for container */}
+            <div className="relative flex justify-center gap-1 z-10 h-20 w-full"> {/* Fixed height for larger sprites */}
                 {/* Default/Male sprite */}
                 {!imgError ? (
                     <img
                         src={spriteUrl}
                         alt={`${displayName} shiny`}
                         className={cn(
-                            "h-16 w-16 pokemon-sprite transition-all duration-500 object-contain",
+                            "h-20 w-20 pokemon-sprite transition-all duration-500 object-contain",
                             hasCaughtAny
-                                ? "drop-shadow-[0_0_10px_rgba(255,255,255,0.6)] scale-105"
+                                ? "drop-shadow-[0_0_12px_rgba(255,255,255,0.7)] scale-105"
                                 : "opacity-60 group-hover:opacity-100 group-hover:scale-110"
                         )}
+                        style={{ imageRendering: 'auto' }}
                         loading="lazy"
                         onError={() => setImgError(true)}
                     />
                 ) : (
-                    <div className="h-16 w-16" /> // Placeholder to prevent shift
+                    <div className="h-20 w-20" /> // Placeholder to prevent shift
                 )}
 
                 {/* Female sprite */}
@@ -104,11 +113,12 @@ export const PokedexCard = memo(function PokedexCard({
                         src={femaleSprite}
                         alt={`${displayName} shiny female`}
                         className={cn(
-                            "h-16 w-16 pokemon-sprite transition-all duration-500 object-contain",
+                            "h-20 w-20 pokemon-sprite transition-all duration-500 object-contain",
                             hasCaughtAny
-                                ? "drop-shadow-[0_0_10px_rgba(255,255,255,0.6)] scale-105"
+                                ? "drop-shadow-[0_0_12px_rgba(255,255,255,0.7)] scale-105"
                                 : "opacity-60 group-hover:opacity-100 group-hover:scale-110"
                         )}
+                        style={{ imageRendering: 'auto' }}
                         loading="lazy"
                         onError={() => setFemaleImgError(true)}
                     />

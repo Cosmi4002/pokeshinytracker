@@ -11,10 +11,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ThemeCustomizer } from '@/components/layout/ThemeCustomizer'; // Import ThemeCustomizer
+import { useRandomColor } from '@/lib/random-color-context';
 
 export function Navbar() {
   const location = useLocation();
   const { user, signOut } = useAuth();
+  const { accentColor } = useRandomColor();
 
   const navLinks = [
     { to: '/hunts', label: 'Hunts', icon: Crosshair },
@@ -28,8 +30,15 @@ export function Navbar() {
     <nav className="sticky top-0 z-50 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 gap-2">
         <Link to="/" className="flex items-center gap-2 shrink-0">
-          <Sparkles className="h-6 w-6 text-primary" />
-          <span className="text-lg sm:text-xl font-bold shiny-text whitespace-nowrap">PokeShinyTracker</span>
+          <Sparkles className="h-6 w-6" style={{ color: accentColor }} />
+          <span
+            className="text-lg sm:text-xl font-bold whitespace-nowrap bg-clip-text text-transparent bg-gradient-to-r"
+            style={{
+              backgroundImage: `linear-gradient(to right, ${accentColor}, color-mix(in srgb, ${accentColor}, white 30%))`
+            }}
+          >
+            PokeShinyTracker
+          </span>
         </Link>
 
         <div className="flex items-center gap-0.5 sm:gap-1 overflow-x-auto no-scrollbar">
@@ -78,7 +87,17 @@ export function Navbar() {
             </DropdownMenu>
           ) : (
             <Link to="/auth">
-              <Button size="sm">Login</Button>
+              <Button
+                size="sm"
+                className="font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                style={{
+                  backgroundColor: accentColor,
+                  color: 'white',
+                  boxShadow: `0 0 15px ${accentColor}40`
+                }}
+              >
+                Login
+              </Button>
             </Link>
           )}
         </div>

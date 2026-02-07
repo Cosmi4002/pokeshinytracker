@@ -73,7 +73,7 @@ function getGeneration(id: number): number {
   return 1;
 }
 
-function formatPokemonName(name: string, id: number, baseId?: number): string {
+export function formatPokemonName(name: string, id: number, baseId?: number): string {
   const speciesId = baseId || id;
 
   // Nidoran gender symbols

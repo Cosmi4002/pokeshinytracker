@@ -9,12 +9,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { HuntCard } from '@/components/hunts/HuntCard';
 import { useUserPreferences } from '@/hooks/use-user-preferences';
+import { useRandomColor } from '@/lib/random-color-context';
 import type { Tables } from '@/integrations/supabase/types';
 
 type ActiveHuntRow = Tables<'active_hunts'>;
 
 export default function Hunts() {
     const { user } = useAuth();
+    const { accentColor } = useRandomColor();
     const { toast } = useToast();
     const navigate = useNavigate();
     const { preferences } = useUserPreferences();
@@ -111,19 +113,38 @@ export default function Hunts() {
     }
 
     return (
-        <div className="min-h-screen bg-background">
+        <div
+            className="min-h-screen bg-background transition-colors duration-1000"
+            style={{
+                backgroundImage: `radial-gradient(circle at 50% 0%, ${accentColor}15 0%, transparent 70%)`
+            }}
+        >
             <Navbar />
             <main className="container mx-auto py-8 px-4">
                 <div className="space-y-6">
                     {/* Header */}
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <div>
-                            <h1 className="text-3xl font-bold shiny-text">Le mie cacce attive</h1>
+                            <h1
+                                className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r"
+                                style={{
+                                    backgroundImage: `linear-gradient(to right, ${accentColor}, color-mix(in srgb, ${accentColor}, white 30%))`
+                                }}
+                            >
+                                Le mie cacce attive
+                            </h1>
                             <p className="text-muted-foreground">
                                 {hunts.length} {hunts.length === 1 ? 'caccia attiva' : 'cacce attive'}
                             </p>
                         </div>
-                        <Button className="shiny-glow" onClick={handleCreateHunt}>
+                        <Button
+                            className="text-white hover:opacity-90 transition-opacity"
+                            onClick={handleCreateHunt}
+                            style={{
+                                backgroundColor: accentColor,
+                                boxShadow: `0 0 20px ${accentColor}40`
+                            }}
+                        >
                             <Plus className="mr-2 h-4 w-4" />
                             Nuova caccia
                         </Button>
@@ -131,13 +152,27 @@ export default function Hunts() {
 
                     {/* Hunts Grid */}
                     {!user ? (
-                        <Card>
+                        <Card
+                            className="border-primary/50 bg-primary/5 transition-all duration-500"
+                            style={{
+                                borderColor: accentColor,
+                                boxShadow: `0 0 20px ${accentColor}20`
+                            }}
+                        >
                             <CardContent className="py-12 text-center">
                                 <p className="text-muted-foreground mb-4">
                                     Accedi per salvare e gestire le tue cacce shiny
                                 </p>
                                 <Link to="/auth">
-                                    <Button>Accedi / Registrati</Button>
+                                    <Button
+                                        className="shadow-lg hover:shadow-xl transition-all duration-300"
+                                        style={{
+                                            backgroundColor: accentColor,
+                                            boxShadow: `0 0 15px ${accentColor}60`
+                                        }}
+                                    >
+                                        Accedi / Registrati
+                                    </Button>
                                 </Link>
                             </CardContent>
                         </Card>

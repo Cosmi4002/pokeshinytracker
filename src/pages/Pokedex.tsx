@@ -16,9 +16,11 @@ import { PokemonDetailDialog } from '@/components/pokedex/PokemonDetailDialog';
 import { PokedexCard } from '@/components/pokedex/PokedexCard';
 import { PokemonBasic } from '@/hooks/use-pokemon';
 import { usePokedexCaught } from '@/hooks/use-pokedex-caught';
+import { useRandomColor } from '@/lib/random-color-context';
 
 export default function Pokedex() {
   const { pokemon, loading } = usePokemonList();
+  const { accentColor } = useRandomColor();
   const { getCaughtCountForPokemon, isCaught, loading: caughtLoading } = usePokedexCaught();
   const [search, setSearch] = useState('');
   const [generation, setGeneration] = useState<string>('all');
@@ -56,14 +58,26 @@ export default function Pokedex() {
   }, [filteredPokemon, getCaughtCountForPokemon]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div
+      className="min-h-screen bg-background transition-colors duration-1000"
+      style={{
+        backgroundImage: `radial-gradient(circle at 50% 0%, ${accentColor}15 0%, transparent 70%)`
+      }}
+    >
       <Navbar />
       <main className="container mx-auto py-8 px-4">
         <div className="space-y-6 max-w-7xl mx-auto">
           {/* Header & Filters */}
           <div className="flex flex-col md:flex-row gap-6 items-center justify-between text-center md:text-left">
             <div>
-              <h1 className="text-3xl sm:text-4xl font-bold shiny-text">Shiny Pokédex</h1>
+              <h1
+                className="text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r"
+                style={{
+                  backgroundImage: `linear-gradient(to right, ${accentColor}, color-mix(in srgb, ${accentColor}, white 30%))`
+                }}
+              >
+                Shiny Pokédex
+              </h1>
               <p className="text-muted-foreground mt-1 font-medium">
                 {completionStats.caught} / {completionStats.total} catturati
               </p>
@@ -98,13 +112,13 @@ export default function Pokedex() {
 
           {/* Pokemon Grid */}
           {loading || caughtLoading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
               {Array.from({ length: 24 }).map((_, i) => (
                 <Skeleton key={i} className="aspect-square rounded-lg" />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
               {filteredPokemon.map((p) => {
                 const hasGenderDiff = POKEMON_WITH_GENDER_DIFF.includes(p.baseId);
                 const { caught } = getCaughtCountForPokemon(p.id);

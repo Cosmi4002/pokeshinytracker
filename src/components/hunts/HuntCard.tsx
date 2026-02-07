@@ -7,6 +7,7 @@ import { calculateShinyStats } from '@/lib/pokemon-data';
 import type { Tables } from '@/integrations/supabase/types';
 import { formatDistanceToNow } from 'date-fns';
 import { it } from 'date-fns/locale';
+import { useRandomColor } from '@/lib/random-color-context';
 
 type ActiveHuntRow = Tables<'active_hunts'>;
 
@@ -18,6 +19,7 @@ interface HuntCardProps {
 }
 
 export function HuntCard({ hunt, onDelete, onContinue, layoutStyle = 'grid' }: HuntCardProps) {
+    const { accentColor } = useRandomColor();
     const method = HUNTING_METHODS.find((m) => m.id === hunt.method);
     const stats = calculateShinyStats(hunt.counter || 0, hunt.method || 'gen9-random', hunt.has_shiny_charm || false);
 
@@ -154,7 +156,18 @@ export function HuntCard({ hunt, onDelete, onContinue, layoutStyle = 'grid' }: H
 
     // Default grid layout
     return (
-        <Card className="group hover:border-primary transition-all duration-200 relative overflow-hidden">
+        <Card
+            className="group transition-all duration-200 relative overflow-hidden"
+            style={{ borderColor: 'transparent' }}
+            onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = accentColor;
+                // e.currentTarget.style.boxShadow = `0 4px 12px ${accentColor}20`;
+            }}
+            onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'transparent';
+                // e.currentTarget.style.boxShadow = '';
+            }}
+        >
             <CardContent className="pt-6">
                 {/* Pokemon Sprite */}
                 <div className="flex justify-center mb-4">
@@ -181,7 +194,15 @@ export function HuntCard({ hunt, onDelete, onContinue, layoutStyle = 'grid' }: H
 
                 {/* Counter */}
                 <div className="text-center mb-4">
-                    <div className="text-4xl font-bold tabular-nums shiny-text">
+                    <div
+                        className="text-4xl font-bold tabular-nums"
+                        style={{
+                            background: `linear-gradient(90deg, ${accentColor} 0%, color-mix(in srgb, ${accentColor}, white 40%) 50%, ${accentColor} 100%)`,
+                            backgroundClip: 'text',
+                            WebkitBackgroundClip: 'text',
+                            color: 'transparent'
+                        }}
+                    >
                         {(hunt.counter || 0).toLocaleString()}
                     </div>
                     <p className="text-sm text-muted-foreground">incontri</p>
@@ -206,13 +227,20 @@ export function HuntCard({ hunt, onDelete, onContinue, layoutStyle = 'grid' }: H
                 {/* Actions */}
                 <div className="flex gap-2">
                     {onContinue ? (
-                        <Button className="w-full flex-1" variant="default" onClick={handleContinueClick}>
+                        <Button
+                            className="w-full flex-1"
+                            onClick={handleContinueClick}
+                            style={{ backgroundColor: accentColor }}
+                        >
                             <ArrowRight className="mr-2 h-4 w-4" />
                             Continua
                         </Button>
                     ) : (
                         <Link to={`/counter/${hunt.id}`} className="flex-1">
-                            <Button className="w-full" variant="default">
+                            <Button
+                                className="w-full"
+                                style={{ backgroundColor: accentColor }}
+                            >
                                 <ArrowRight className="mr-2 h-4 w-4" />
                                 Continua
                             </Button>

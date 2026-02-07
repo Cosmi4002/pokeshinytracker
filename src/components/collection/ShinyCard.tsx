@@ -1,7 +1,9 @@
 import { Pencil, Trash2 } from 'lucide-react';
+import { useRandomColor } from '@/lib/random-color-context';
 import { Button } from '@/components/ui/button';
 import { getGameTheme } from '@/lib/game-themes';
 import { POKEBALLS, HUNTING_METHODS, getPokemonSpriteUrl } from '@/lib/pokemon-data';
+import { formatPokemonName } from '@/hooks/use-pokemon';
 import type { Tables } from '@/integrations/supabase/types';
 
 type CaughtShinyRow = Tables<'caught_shinies'>;
@@ -13,6 +15,7 @@ interface ShinyCardProps {
 }
 
 export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
+    const { accentColor } = useRandomColor();
     const theme = getGameTheme(entry.game);
     const pokeball = POKEBALLS.find((b) => b.id === entry.pokeball);
     const method = HUNTING_METHODS.find((m) => m.id === entry.method);
@@ -28,10 +31,10 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
 
     return (
         <div
-            className="relative overflow-hidden rounded-xl border-2 group transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
+            className="relative overflow-hidden rounded-xl border-2 group transition-all duration-300 hover:scale-[1.03] hover:shadow-2xl hover:shadow-primary/20"
             style={{
                 background: `linear-gradient(135deg, ${theme.primary} 0%, ${theme.secondary} 100%)`,
-                borderColor: theme.accent,
+                borderColor: accentColor,
             }}
         >
             {/* Pokeball background overlay */}
@@ -70,19 +73,21 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
 
             {/* Card content */}
             <div className="relative p-5 flex items-start gap-4">
-                <div className="flex-shrink-0">
+                <div className="flex-shrink-0 relative">
                     <img
                         src={entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, { shiny: true, name: entry.pokemon_name })}
                         alt={entry.pokemon_name}
-                        className="w-24 h-24 pokemon-sprite drop-shadow-lg object-contain"
-                        style={{ imageRendering: 'pixelated' }}
+                        className="w-32 h-32 pokemon-sprite drop-shadow-lg object-contain transition-all duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_20px_rgba(255,255,255,0.8)]"
+                        style={{ imageRendering: 'auto' }}
                     />
+                    {/* Shiny sparkle effect */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-full blur-sm" />
                 </div>
 
                 {/* Info section */}
                 <div className="flex-1 min-w-0">
                     <h3 className="text-2xl font-bold text-white drop-shadow-md mb-1">
-                        {entry.pokemon_name}
+                        {formatPokemonName(entry.pokemon_name, entry.pokemon_id)}
                     </h3>
                     <p className="text-white/90 text-sm font-medium mb-2 drop-shadow">
                         {formatDate(entry.caught_date)}
