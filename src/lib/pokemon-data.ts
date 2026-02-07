@@ -344,14 +344,21 @@ export const getGenerationFromMethod = (methodId: string): number => {
 export const toShowdownSlug = (name: string): string => {
   if (!name) return '';
   let slug = name.toLowerCase()
-    .replace('’', '')
-    .replace('\'', '')
-    .replace('%', '')
-    .replace(':', '')
-    .replace(' ', '')
-    .replace('.', '')
-    .replace('♀', 'f')
-    .replace('♂', 'm');
+    .replace(/[’'%: .]/g, '')
+    .replace(/♀/g, 'f')
+    .replace(/♂/g, 'm')
+    .replace(/é/g, 'e');
+
+  // Handle specific PokeAPI -> Showdown name differences
+  if (slug === 'nidoran-f') return 'nidoranf';
+  if (slug === 'nidoran-m') return 'nidoranm';
+  if (slug === 'mr-mime') return 'mrmime';
+  if (slug === 'mime-jr') return 'mimejr';
+  if (slug === 'mr-rime') return 'mrrime';
+  if (slug === 'type-null') return 'typenull';
+
+  // Remove common PokeAPI standard suffixes that Showdown doesn't use
+  slug = slug.replace(/-standard|-normal/g, '');
 
   // Handle specific forms for Showdown
   if (slug === 'pikachu-partner-cap') return 'pikachu-partner';
@@ -359,7 +366,6 @@ export const toShowdownSlug = (name: string): string => {
 
   // Seasonal forms for Showdown mapping
   if (slug.includes('deerling-') || slug.includes('sawsbuck-')) {
-    // Showdown uses simple suffix if not standard
     return slug;
   }
 
@@ -367,8 +373,11 @@ export const toShowdownSlug = (name: string): string => {
 };
 
 import spriteMapping from './sprite-mapping.json';
+import shinyRemoteMapping from './shiny-remote-mapping.json';
+import showdownShinyMapping from './showdown-shiny-mapping.json';
 
 const MAPPING: Record<string, string> = spriteMapping;
+const SHOWDOWN_MAPPING: Record<string, string> = showdownShinyMapping as any;
 
 export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolean, name?: string, female?: boolean, form?: string, animated?: boolean } = {}): string {
   if (!pokemonId) return '';
@@ -391,18 +400,45 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
     }
   }
 
-  // IDs that MUST use local mapping if available (manual fixes)
-  const FORCED_LOCAL_IDS = [29, 32, 122, 413, 10157, 10004, 10005, 1013, 1032, 1029, 1022];
+  /* 
+  // FORCE REMOTE MAPPING REMOVED (URLs 403 Forbidden)
+  // LOCAL MAPPING DISABLED (Files deleted)
+  
+  // Fallthrough to standard remote sources (Showdown/PokeAPI)
+  */
 
-  for (const key of keysToTry) {
-    // Use local mapping if:
-    // - It exists AND (it's a complex form OR Gen 9+ OR explicitly forced in the list)
-    if (MAPPING[key] && (key.includes('-') || pokemonId > 905 || FORCED_LOCAL_IDS.includes(pokemonId))) {
-      return `/sprites/${MAPPING[key]}`;
+  // 2. Handle Shiny sprites with new Showdown mapping
+  if (shiny) {
+    const shinyKeys: string[] = [];
+
+    // Most specific first: ID + Form
+    if (form) shinyKeys.push(`${pokemonId}-${form.toLowerCase()}`);
+
+    // ID + Name-based suffix (e.g. 25-cap)
+    if (name) {
+      const slug = toShowdownSlug(name);
+      if (slug.includes('-')) {
+        const parts = slug.split('-');
+        shinyKeys.push(`${pokemonId}-${parts.slice(1).join('-')}`);
+      }
+    }
+
+    // Gender
+    if (female) shinyKeys.push(`${pokemonId}-f`);
+
+    // Base ID
+    shinyKeys.push(pokemonId.toString());
+
+    for (const key of shinyKeys) {
+      if (SHOWDOWN_MAPPING[key]) return SHOWDOWN_MAPPING[key];
+      // Fallback to secondary mapping
+      if ((shinyRemoteMapping as Record<string, string>)[key]) {
+        return (shinyRemoteMapping as Record<string, string>)[key];
+      }
     }
   }
 
-  // 2. Prefer Showdown for animated sprites (standard names)
+  // 3. Prefer Showdown for animated sprites (non-shiny or as fallback)
   if (name) {
     const slug = toShowdownSlug(name);
     const prefix = shiny ? 'ani-shiny' : 'ani';

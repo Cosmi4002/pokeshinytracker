@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { usePokemonDetails, PokemonBasic } from "@/hooks/use-pokemon";
+import { usePokemonDetails, PokemonBasic, getPokemonSpriteUrl } from "@/hooks/use-pokemon";
 import { ShinyButton } from "./ShinyButton";
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
