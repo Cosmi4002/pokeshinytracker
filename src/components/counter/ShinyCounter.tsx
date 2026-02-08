@@ -45,6 +45,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
   const [isFinishDialogOpen, setIsFinishDialogOpen] = useState(false);
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
   const [playlists, setPlaylists] = useState<{ id: string; name: string }[]>([]);
+  const [huntCreatedAt, setHuntCreatedAt] = useState<string | null>(null);
   const isInitialLoadRef = useRef(true);
 
   // Load active hunt and playlists from Supabase when user is logged in
@@ -89,6 +90,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
           setSelectedPokemonName(data.pokemon_name ?? '');
           setSelectedMethod(HUNTING_METHODS.find((m) => m.id === data.method) ?? HUNTING_METHODS[0]);
           setHasShinyCharm(data.has_shiny_charm ?? false);
+          setHuntCreatedAt(data.created_at);
         } else {
           // No hunt found for ID or no recent hunt. Reset to default new hunt state.
           activeHuntIdRef.current = null;
@@ -98,6 +100,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
           setSelectedPokemonName('');
           setSelectedMethod(HUNTING_METHODS[0]);
           setHasShinyCharm(false);
+          setHuntCreatedAt(null);
         }
       } catch {
         // Silently fail - use default state
@@ -152,8 +155,12 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
             .eq('id', activeHuntIdRef.current);
         } else {
           // Create new hunt only if we have user data
-          const { data, error } = await supabase.from('active_hunts').insert(payload).select('id').single();
-          if (!error && data) activeHuntIdRef.current = data.id;
+          const insertPayload = { ...payload, created_at: new Date().toISOString() };
+          const { data, error } = await supabase.from('active_hunts').insert(insertPayload).select('id').single();
+          if (!error && data) {
+            activeHuntIdRef.current = data.id;
+            setHuntCreatedAt(insertPayload.created_at);
+          }
         }
         setSaveStatus('saved');
       } catch {
@@ -473,7 +480,9 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
         counter={counter}
         method={selectedMethod.id}
         hasShinyCharm={hasShinyCharm}
+        hasShinyCharm={hasShinyCharm}
         playlists={playlists}
+        startDate={huntCreatedAt}
       />
     </div>
   );

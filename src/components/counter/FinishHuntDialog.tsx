@@ -38,6 +38,7 @@ interface FinishHuntDialogProps {
   method: string;
   hasShinyCharm: boolean;
   playlists: { id: string; name: string }[];
+  startDate?: string | null;
 }
 
 export function FinishHuntDialog({
@@ -50,6 +51,7 @@ export function FinishHuntDialog({
   method: initialMethodId,
   hasShinyCharm: initialHasShinyCharm,
   playlists,
+  startDate,
 }: FinishHuntDialogProps) {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -65,7 +67,7 @@ export function FinishHuntDialog({
   const [game, setGame] = useState('');
   const [method, setMethod] = useState<HuntingMethod>(initialMethod);
   const [attempts, setAttempts] = useState(counter);
-  const [huntStartDate, setHuntStartDate] = useState('');
+  const [huntStartDate, setHuntStartDate] = useState(startDate ? startDate.split('T')[0] : '');
   const [caughtDate, setCaughtDate] = useState(new Date().toISOString().split('T')[0]);
   const [isFail, setIsFail] = useState(false);
   const [playlistId, setPlaylistId] = useState<string>('');

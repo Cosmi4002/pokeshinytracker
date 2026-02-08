@@ -81,7 +81,7 @@ export default function Counter() {
       has_shiny_charm: false,
       increment_amount: 1,
       is_visible_on_counter: true, // Visibile nel multi-counter
-      started_at: new Date().toISOString(), // Auto start date
+      created_at: new Date().toISOString(), // Auto start date
     }).select('id').single();
 
     if (error) {
@@ -149,7 +149,7 @@ export default function Counter() {
           <ShinyCounter />
         ) : (
           /* Multi Counter Grid */
-          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {loading ? (
               <div className="col-span-3 text-center py-12">Caricamento counters...</div>
             ) : (
@@ -188,7 +188,7 @@ export default function Counter() {
                       </Button>
                     </div>
                     {/* Minimal variant could be created, but standard is fine currently as it fits in columns */}
-                    <div className="scale-85 sm:scale-90 origin-top text-xs">
+                    <div className="scale-100 sm:scale-95 origin-top text-xs">
                       <ShinyCounter huntId={hunt.id} />
                     </div>
                   </div>
