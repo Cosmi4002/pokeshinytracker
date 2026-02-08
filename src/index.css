@@ -2,134 +2,139 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ShinyTracker Dark Theme - Pokemon Style */
+
 @layer base {
-  :root {
-    --background: hsl(30 15% 95%);
-    --foreground: hsl(30 10% 15%);
+    :root {
+        --background: hsl(30 15% 95%);
+        --foreground: hsl(30 10% 15%);
 
-    --card: hsl(30 20% 98%);
-    --card-foreground: hsl(30 10% 15%);
+        --card: hsl(30 20% 98%);
+        --card-foreground: hsl(30 10% 15%);
 
-    --popover: hsl(30 20% 98%);
-    --popover-foreground: hsl(30 10% 15%);
+        --popover: hsl(30 20% 98%);
+        --popover-foreground: hsl(30 10% 15%);
 
-    --secondary: hsl(30 15% 90%);
-    --secondary-foreground: hsl(30 10% 20%);
+        --secondary: hsl(30 15% 90%);
+        --secondary-foreground: hsl(30 10% 20%);
 
-    --muted: hsl(30 10% 90%);
-    --muted-foreground: hsl(30 10% 45%);
+        --muted: hsl(30 10% 90%);
+        --muted-foreground: hsl(30 10% 45%);
 
-    --destructive: hsl(0 84.2% 60.2%);
-    --destructive-foreground: hsl(0 0% 100%);
+        --destructive: hsl(0 84.2% 60.2%);
+        --destructive-foreground: hsl(0 0% 100%);
 
-    --border: hsl(30 15% 85%);
-    --input: hsl(30 15% 85%);
-    --radius: 0.5rem;
-    --success: hsl(142 76% 36%);
-    --success-foreground: hsl(0 0% 100%);
+        --border: hsl(30 15% 85%);
+        --input: hsl(30 15% 85%);
+        --radius: 0.5rem;
+        --success: hsl(142 76% 36%);
+        --success-foreground: hsl(0 0% 100%);
 
-    /* Default (Yellow/Orange) theme Hues */
-    --theme-primary-hue: 45;
-    --theme-shiny-hue: 45;
+        /* Default (Yellow/Orange) theme Hues */
+        --theme-primary-hue: 45;
+        --theme-shiny-hue: 45;
 
-    --primary: hsl(var(--theme-primary-hue) 100% 50%);
-    --primary-foreground: hsl(var(--theme-primary-hue) 10% 10%);
-    --accent: hsl(var(--theme-primary-hue) 100% 50%);
-    --accent-foreground: hsl(var(--theme-primary-hue) 10% 10%);
-    --ring: hsl(var(--theme-primary-hue) 100% 50%);
-    --shiny: hsl(var(--theme-shiny-hue) 100% 50%);
-    --shiny-glow: hsl(var(--theme-shiny-hue) 100% 60%);
-  }
+        --primary: hsl(var(--theme-primary-hue) 100% 50%);
+        --primary-foreground: hsl(var(--theme-primary-hue) 10% 10%);
+        --accent: hsl(var(--theme-primary-hue) 100% 50%);
+        --accent-foreground: hsl(var(--theme-primary-hue) 10% 10%);
+        --ring: hsl(var(--theme-primary-hue) 100% 50%);
+        --shiny: hsl(var(--theme-shiny-hue) 100% 50%);
+        --shiny-glow: hsl(var(--theme-shiny-hue) 100% 60%);
+    }
 
-  .dark {
-    --background: hsl(0 0% 15%);
-    --foreground: hsl(0 0% 95%);
+    .dark {
+        --background: hsl(0 0% 15%);
+        --foreground: hsl(0 0% 95%);
 
-    --card: hsl(0 0% 18%);
-    --card-foreground: hsl(0 0% 95%);
+        --card: hsl(0 0% 18%);
+        --card-foreground: hsl(0 0% 95%);
 
-    --popover: hsl(0 0% 18%);
-    --popover-foreground: hsl(0 0% 95%);
+        --popover: hsl(0 0% 18%);
+        --popover-foreground: hsl(0 0% 95%);
 
-    --secondary: hsl(0 0% 25%);
-    --secondary-foreground: hsl(0 0% 95%);
+        --secondary: hsl(0 0% 25%);
+        --secondary-foreground: hsl(0 0% 95%);
 
-    --muted: hsl(0 0% 25%);
-    --muted-foreground: hsl(0 0% 65%);
+        --muted: hsl(0 0% 25%);
+        --muted-foreground: hsl(0 0% 65%);
 
-    --destructive: hsl(0 62.8% 30.6%);
-    --destructive-foreground: hsl(0 0% 95%);
+        --destructive: hsl(0 62.8% 30.6%);
+        --destructive-foreground: hsl(0 0% 95%);
 
-    --border: hsl(0 0% 25%);
-    --input: hsl(0 0% 25%);
-    --success: hsl(142 70% 45%);
-    --success-foreground: hsl(0 0% 100%);
-  }
-
-  * {
-    @apply border-border;
-    -webkit-text-stroke: 0.3px currentColor;
-    /* Global text stroke as requested */
-  }
-
-  body {
-    @apply bg-background text-foreground;
-  }
-
-  /* High contrast for dropdowns/popovers on mobile */
-  [role="listbox"],
-  [role="menu"],
-  [data-radix-popper-content-wrapper] {
-    background-color: var(--popover) !important;
-    color: var(--popover-foreground) !important;
-  }
-
-  [role="option"],
-  [role="menuitem"] {
-    background-color: transparent;
-    color: var(--popover-foreground);
-  }
-
-  [role="option"][data-highlighted],
-  [role="menuitem"][data-highlighted] {
-    background-color: var(--accent);
-    color: var(--accent-foreground);
-  }
+        --border: hsl(0 0% 25%);
+        --input: hsl(0 0% 25%);
+        --success: hsl(142 70% 45%);
+        --success-foreground: hsl(0 0% 100%);
+    }
 }
 
+@layer base {
+    * {
+        @apply border-border;
+    }
+
+    body {
+        @apply bg-background text-foreground;
+    }
+
+
+
+    /* High contrast for dropdowns/popovers on mobile */
+    [role="listbox"],
+    [role="menu"],
+    [data-radix-popper-content-wrapper] {
+        background-color: var(--popover) !important;
+        color: var(--popover-foreground) !important;
+    }
+
+    [role="option"],
+    [role="menuitem"] {
+        background-color: transparent;
+        color: var(--popover-foreground);
+    }
+
+    [role="option"][data-highlighted],
+    [role="menuitem"][data-highlighted] {
+        background-color: var(--accent);
+        color: var(--accent-foreground);
+    }
+}
+
+/* Custom Utilities */
 @layer utilities {
-  .text-shadow {
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-  }
+    .text-shadow {
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
 
-  .shiny-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-red-500 to-yellow-500 bg-[length:200%_auto] animate-gradient;
-  }
+    .shiny-text {
+        @apply bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 via-red-500 to-yellow-500 bg-[length:200%_auto] animate-gradient;
+    }
 
-  .glass-panel {
-    @apply bg-white/10 backdrop-blur-md border border-white/20 shadow-xl;
-  }
+    .glass-panel {
+        @apply bg-white/10 backdrop-blur-md border border-white/20 shadow-xl;
+    }
 
-  .shiny-card {
-    transition: all 0.3s ease;
-  }
+    .shiny-card {
+        transition: all 0.3s ease;
+    }
 
-  .shiny-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px -10px var(--shiny-glow);
-  }
+    .shiny-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px -10px var(--shiny-glow);
+    }
 
-  /* Glow effects */
-  .shiny-glow {
-    box-shadow: 0 0 15px var(--shiny-glow);
-  }
+    /* Glow effects */
+    .shiny-glow {
+        box-shadow: 0 0 15px var(--shiny-glow);
+    }
 
-  .shiny-border {
-    border: 1px solid var(--shiny-glow);
-  }
+    .shiny-border {
+        border: 1px solid var(--shiny-glow);
+    }
 
-  /* Counters */
-  .counter-display {
-    font-variant-numeric: tabular-nums;
-  }
+    /* Counters */
+    .counter-display {
+        font-variant-numeric: tabular-nums;
+    }
 }
