@@ -92,6 +92,19 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
                                 src={GAME_LOGOS[entry.game]}
                                 alt={entry.game}
                                 className="h-6 w-auto object-contain brightness-110 drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
+                                crossOrigin="anonymous"
+                                referrerPolicy="no-referrer"
+                                onError={(e) => {
+                                    // Fallback to text if still fails
+                                    e.currentTarget.style.display = 'none';
+                                    const parent = e.currentTarget.parentElement;
+                                    if (parent) {
+                                        const span = document.createElement('span');
+                                        span.className = "text-[10px] font-bold text-white px-2 uppercase";
+                                        span.innerText = entry.game.slice(0, 3);
+                                        parent.appendChild(span);
+                                    }
+                                }}
                             />
                         ) : (
                             <span className="text-[10px] font-bold text-white px-2 uppercase">{entry.game.slice(0, 3)}</span>
