@@ -1,20 +1,12 @@
-import { Check, ChevronsUpDown } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { useState } from 'react';
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { HUNTING_METHODS, HuntingMethod } from '@/lib/pokemon-data';
 
 interface MethodSelectorProps {
@@ -23,10 +15,6 @@ interface MethodSelectorProps {
 }
 
 export function MethodSelector({ value, onChange }: MethodSelectorProps) {
-  const [open, setOpen] = useState(false);
-
-  const selectedMethod = HUNTING_METHODS.find(m => m.id === value);
-
   // Group methods by generation
   const methodsByGen = HUNTING_METHODS.reduce((acc, method) => {
     const gen = method.generation === 0 ? 'Custom' : `Generation ${method.generation}`;
@@ -35,63 +23,35 @@ export function MethodSelector({ value, onChange }: MethodSelectorProps) {
     return acc;
   }, {} as Record<string, HuntingMethod[]>);
 
+  const handleValueChange = (newValue: string) => {
+    const method = HUNTING_METHODS.find((m) => m.id === newValue);
+    if (method) {
+      onChange(method);
+    }
+  };
+
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-full justify-between h-12"
-        >
-          {selectedMethod ? (
-            <span className="truncate">{selectedMethod.name}</span>
-          ) : (
-            <span className="text-muted-foreground">Select Method...</span>
-          )}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent
-        className="w-[var(--radix-popover-trigger-width)] p-0"
-        align="start"
-        onOpenAutoFocus={(e) => e.preventDefault()}
-      >
-        <Command>
-          <CommandInput placeholder="Search method..." />
-          <CommandList className="max-h-[50vh] overflow-y-auto overscroll-contain touch-pan-y">
-            <CommandEmpty>No method found.</CommandEmpty>
-            {Object.entries(methodsByGen).map(([gen, methods]) => (
-              <CommandGroup key={gen} heading={gen}>
-                {methods.map((method) => (
-                  <CommandItem
-                    key={method.id}
-                    value={method.name}
-                    onSelect={() => {
-                      onChange(method);
-                      setOpen(false);
-                    }}
-                    className="flex items-center justify-between"
-                  >
-                    <span className="truncate">{method.name}</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground">
-                        1/{method.baseOdds}
-                      </span>
-                      <Check
-                        className={cn(
-                          "h-4 w-4",
-                          value === method.id ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                    </div>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
+    <Select value={value} onValueChange={handleValueChange}>
+      <SelectTrigger className="w-full h-12">
+        <SelectValue placeholder="Select Method" />
+      </SelectTrigger>
+      <SelectContent>
+        {Object.entries(methodsByGen).map(([gen, methods]) => (
+          <SelectGroup key={gen}>
+            <SelectLabel>{gen}</SelectLabel>
+            {methods.map((method) => (
+              <SelectItem key={method.id} value={method.id}>
+                <span className="flex items-center justify-between w-full min-w-[200px] gap-2">
+                  <span>{method.name}</span>
+                  <span className="text-xs text-muted-foreground ml-auto">
+                    1/{method.baseOdds}
+                  </span>
+                </span>
+              </SelectItem>
             ))}
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+          </SelectGroup>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }

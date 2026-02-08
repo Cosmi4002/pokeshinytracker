@@ -24,11 +24,24 @@ interface PokemonSelectorProps {
 
 export function PokemonSelector({ value, onChange }: PokemonSelectorProps) {
   const [open, setOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const { pokemon, loading } = usePokemonList();
 
   const selectedPokemon = useMemo(() => {
     return pokemon.find(p => p.id === value);
   }, [pokemon, value]);
+
+  const filteredPokemon = useMemo(() => {
+    if (!searchTerm) return pokemon.slice(0, 50);
+    const searchLower = searchTerm.toLowerCase();
+    return pokemon
+      .filter(p =>
+        p.name.toLowerCase().includes(searchLower) ||
+        p.displayName.toLowerCase().includes(searchLower) ||
+        p.baseId.toString().includes(searchLower)
+      )
+      .slice(0, 50);
+  }, [pokemon, searchTerm]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -62,20 +75,26 @@ export function PokemonSelector({ value, onChange }: PokemonSelectorProps) {
         align="start"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
-        <Command>
-          <CommandInput placeholder="Search Pokémon..." />
-          <CommandList className="max-h-[50vh] overflow-y-auto overscroll-contain touch-pan-y">
-            <CommandEmpty>
-              {loading ? 'Loading...' : 'No Pokémon found.'}
-            </CommandEmpty>
+        <Command shouldFilter={false}>
+          <CommandInput
+            placeholder="Search Pokémon..."
+            value={searchTerm}
+            onValueChange={setSearchTerm}
+          />
+          <CommandList className="max-h-[50vh] overflow-y-auto overscroll-contain">
+            {loading && <div className="p-4 text-sm text-center text-muted-foreground">Loading...</div>}
+            {!loading && filteredPokemon.length === 0 && (
+              <div className="py-6 text-center text-sm text-muted-foreground">No Pokémon found.</div>
+            )}
             <CommandGroup>
-              {pokemon.map((p) => (
+              {filteredPokemon.map((p) => (
                 <CommandItem
                   key={p.id}
-                  value={`${p.id} ${p.name} ${p.displayName}`}
+                  value={`${p.id}-${p.name}`}
                   onSelect={() => {
                     onChange(p.id, p.name);
                     setOpen(false);
+                    setSearchTerm('');
                   }}
                   className="flex items-center gap-2"
                 >
