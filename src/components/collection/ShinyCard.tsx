@@ -1,7 +1,7 @@
 import { Pencil, Trash2, Calendar, Hash } from 'lucide-react';
 import { useRandomColor } from '@/lib/random-color-context';
 import { Button } from '@/components/ui/button';
-import { getGameTheme, GAME_ICONS, GAME_COVER_ART } from '@/lib/game-themes';
+import { getGameTheme, GAME_ICONS, GAME_COVER_ART, GAME_LOGOS } from '@/lib/game-themes';
 import { POKEBALLS, HUNTING_METHODS, getPokemonSpriteUrl } from '@/lib/pokemon-data';
 import { formatPokemonName } from '@/hooks/use-pokemon';
 import type { Tables } from '@/integrations/supabase/types';
@@ -86,12 +86,12 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
                         </Button>
                     </div>
 
-                    <div className="p-1 rounded-xl bg-black/40 backdrop-blur-md border border-white/10 shadow-lg">
-                        {GAME_ICONS[entry.game] ? (
+                    <div className="p-1 px-2 rounded-xl bg-black/40 backdrop-blur-md border border-white/10 shadow-lg min-w-[80px] flex items-center justify-center">
+                        {GAME_LOGOS[entry.game] ? (
                             <img
-                                src={GAME_ICONS[entry.game]}
+                                src={GAME_LOGOS[entry.game]}
                                 alt={entry.game}
-                                className="w-8 h-8 object-contain"
+                                className="h-6 w-auto object-contain brightness-110 drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
                             />
                         ) : (
                             <span className="text-[10px] font-bold text-white px-2 uppercase">{entry.game.slice(0, 3)}</span>
