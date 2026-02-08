@@ -32,15 +32,14 @@ export function PokemonSelector({ value, onChange }: PokemonSelectorProps) {
   }, [pokemon, value]);
 
   const filteredPokemon = useMemo(() => {
-    if (!searchTerm) return pokemon.slice(0, 50);
+    if (!searchTerm) return pokemon;
     const searchLower = searchTerm.toLowerCase();
     return pokemon
       .filter(p =>
         p.name.toLowerCase().includes(searchLower) ||
         p.displayName.toLowerCase().includes(searchLower) ||
         p.baseId.toString().includes(searchLower)
-      )
-      .slice(0, 50);
+      );
   }, [pokemon, searchTerm]);
 
   return (

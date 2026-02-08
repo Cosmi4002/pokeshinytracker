@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { HuntCard } from '@/components/hunts/HuntCard';
+import { EditHuntDialog } from '@/components/hunts/EditHuntDialog';
 import { useUserPreferences } from '@/hooks/use-user-preferences';
 import { useRandomColor } from '@/lib/random-color-context';
 import type { Tables } from '@/integrations/supabase/types';
@@ -22,6 +23,8 @@ export default function Hunts() {
     const { preferences } = useUserPreferences();
     const [hunts, setHunts] = useState<ActiveHuntRow[]>([]);
     const [loading, setLoading] = useState(true);
+    const [editingHunt, setEditingHunt] = useState<ActiveHuntRow | null>(null);
+    const [isEditOpen, setIsEditOpen] = useState(false);
 
     const fetchHunts = async () => {
         if (!user) {
@@ -55,6 +58,11 @@ export default function Hunts() {
     useEffect(() => {
         fetchHunts();
     }, [user?.id]);
+
+    const handleEditHunt = (hunt: ActiveHuntRow) => {
+        setEditingHunt(hunt);
+        setIsEditOpen(true);
+    };
 
     const handleDeleteHunt = async (huntId: string) => {
         try {
@@ -201,6 +209,7 @@ export default function Hunts() {
                                     key={hunt.id}
                                     hunt={hunt}
                                     onDelete={handleDeleteHunt}
+                                    onEdit={handleEditHunt}
                                     onContinue={handleContinueHunt}
                                     layoutStyle={preferences.layout_style || 'grid'}
                                 />
@@ -208,6 +217,13 @@ export default function Hunts() {
                         </div>
                     )}
                 </div>
+
+                <EditHuntDialog
+                    open={isEditOpen}
+                    onOpenChange={setIsEditOpen}
+                    hunt={editingHunt}
+                    onSuccess={fetchHunts}
+                />
             </main>
         </div>
     );

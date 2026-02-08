@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Trash2, Clock } from 'lucide-react';
+import { ArrowRight, Trash2, Clock, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { HUNTING_METHODS, getGameSpecificSpriteUrl, getPokemonSpriteUrl } from '@/lib/pokemon-data';
@@ -14,11 +14,12 @@ type ActiveHuntRow = Tables<'active_hunts'>;
 interface HuntCardProps {
     hunt: ActiveHuntRow;
     onDelete: (huntId: string) => void;
+    onEdit: (hunt: ActiveHuntRow) => void;
     onContinue?: (huntId: string) => void;
     layoutStyle?: string;
 }
 
-export function HuntCard({ hunt, onDelete, onContinue, layoutStyle = 'grid' }: HuntCardProps) {
+export function HuntCard({ hunt, onDelete, onEdit, onContinue, layoutStyle = 'grid' }: HuntCardProps) {
     const { accentColor } = useRandomColor();
     const method = HUNTING_METHODS.find((m) => m.id === hunt.method);
     const stats = calculateShinyStats(hunt.counter || 0, hunt.method || 'gen9-random', hunt.has_shiny_charm || false);
@@ -81,6 +82,14 @@ export function HuntCard({ hunt, onDelete, onContinue, layoutStyle = 'grid' }: H
                                 </Link>
                             )}
                             <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => onEdit(hunt)}
+                                className="opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                                <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button
                                 variant="destructive"
                                 size="sm"
                                 onClick={() => onDelete(hunt.id)}
@@ -141,6 +150,14 @@ export function HuntCard({ hunt, onDelete, onContinue, layoutStyle = 'grid' }: H
                             </Link>
                         )}
                         <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => onEdit(hunt)}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                            <Pencil className="h-3 w-3" />
+                        </Button>
+                        <Button
                             variant="destructive"
                             size="sm"
                             onClick={() => onDelete(hunt.id)}
@@ -150,7 +167,7 @@ export function HuntCard({ hunt, onDelete, onContinue, layoutStyle = 'grid' }: H
                         </Button>
                     </div>
                 </CardContent>
-            </Card>
+            </Card >
         );
     }
 
@@ -247,6 +264,14 @@ export function HuntCard({ hunt, onDelete, onContinue, layoutStyle = 'grid' }: H
                         </Link>
                     )}
                     <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => onEdit(hunt)}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                        <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
                         variant="destructive"
                         size="icon"
                         onClick={() => onDelete(hunt.id)}
@@ -256,6 +281,6 @@ export function HuntCard({ hunt, onDelete, onContinue, layoutStyle = 'grid' }: H
                     </Button>
                 </div>
             </CardContent>
-        </Card>
+        </Card >
     );
 }

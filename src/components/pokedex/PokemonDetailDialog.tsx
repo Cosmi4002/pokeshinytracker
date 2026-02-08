@@ -82,17 +82,20 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
         const pokemonId = details.id;
 
         // Base Male/Default
+        const isPartnerCap = details.id === 10148;
+        const showGenderLabels = details.hasGenderDifference && !isPartnerCap;
+
         variants.push({
             id: pokemonId,
             name: details.name,
-            displayName: details.hasGenderDifference ? 'Maschio' : 'Default',
-            category: details.hasGenderDifference ? 'gender' : 'base',
-            gender: details.hasGenderDifference ? 'male' : 'genderless',
+            displayName: showGenderLabels ? 'Maschio' : 'Default',
+            category: showGenderLabels ? 'gender' : 'base',
+            gender: showGenderLabels ? 'male' : 'genderless',
             spriteUrl: details.sprites.shiny,
         });
 
         // Female variant
-        if (details.hasGenderDifference && details.sprites.femaleShiny) {
+        if (details.hasGenderDifference && details.sprites.femaleShiny && !isPartnerCap) {
             variants.push({
                 id: pokemonId,
                 name: `${details.name}-female`,

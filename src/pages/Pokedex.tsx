@@ -120,7 +120,8 @@ export default function Pokedex() {
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
               {filteredPokemon.map((p) => {
-                const hasGenderDiff = POKEMON_WITH_GENDER_DIFF.includes(p.baseId);
+                // Show gender diff if the species has it, but hide for Partner Cap form specifically
+                const hasGenderDiff = POKEMON_WITH_GENDER_DIFF.includes(p.baseId) && p.id !== 10148;
                 const { caught } = getCaughtCountForPokemon(p.id);
 
                 // For percentage, we need to know total forms

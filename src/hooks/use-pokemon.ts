@@ -81,11 +81,12 @@ export function formatPokemonName(name: string, id: number, baseId?: number): st
   if (name === 'nidoran-m' || speciesId === 32) return 'Nidoran♂';
 
   if (speciesId === 585 || speciesId === 586) {
-    if (name.includes('-summer')) return `Summer Form ${speciesId === 585 ? 'Deerling' : 'Sawsbuck'}`;
-    if (name.includes('-autumn')) return `Autumn Form ${speciesId === 585 ? 'Deerling' : 'Sawsbuck'}`;
-    if (name.includes('-winter')) return `Winter Form ${speciesId === 585 ? 'Deerling' : 'Sawsbuck'}`;
+    const baseName = speciesId === 585 ? 'Deerling' : 'Sawsbuck';
+    if (name.includes('-summer')) return `${baseName} (Summer)`;
+    if (name.includes('-autumn')) return `${baseName} (Autumn)`;
+    if (name.includes('-winter')) return `${baseName} (Winter)`;
     if (name.includes('-spring') || name === 'deerling' || name === 'sawsbuck')
-      return `Spring Form ${speciesId === 585 ? 'Deerling' : 'Sawsbuck'}`;
+      return `${baseName} (Spring)`;
   }
 
   const regions: Record<string, string> = {

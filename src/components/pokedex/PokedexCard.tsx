@@ -87,42 +87,52 @@ export const PokedexCard = memo(function PokedexCard({
             )}
 
             {/* Sprites container */}
-            <div className="relative flex justify-center gap-1 z-10 h-28 w-full"> {/* Fixed height for larger sprites */}
-                {/* Default/Male sprite */}
-                {!imgError ? (
-                    <img
-                        src={spriteUrl}
-                        alt={`${displayName} shiny`}
-                        className={cn(
-                            "h-28 w-28 pokemon-sprite transition-all duration-500 object-contain",
-                            hasCaughtAny
-                                ? "drop-shadow-[0_0_12px_rgba(255,255,255,0.7)] scale-105"
-                                : "opacity-60 group-hover:opacity-100 group-hover:scale-110"
-                        )}
-                        style={{ imageRendering: 'auto' }}
-                        loading="lazy"
-                        onError={() => setImgError(true)}
-                    />
-                ) : (
-                    <div className="h-20 w-20" /> // Placeholder to prevent shift
-                )}
+            <div className="relative flex items-center justify-center z-10 h-32 w-full px-2"> {/* Increased height for better centering */}
+                {/* Wrapper for sprites to ensure balanced centering */}
+                <div className="flex items-center justify-center gap-1 w-full translate-y-2">
+                    {/* Default/Male sprite */}
+                    {!imgError ? (
+                        <div className={cn(
+                            "relative flex items-center justify-center transition-all duration-500",
+                            hasGenderDiff ? "w-24" : "w-32"
+                        )}>
+                            <img
+                                src={spriteUrl}
+                                alt={`${displayName} shiny`}
+                                className={cn(
+                                    "h-full w-full pokemon-sprite transition-all duration-500 object-contain",
+                                    hasCaughtAny
+                                        ? "drop-shadow-[0_0_12px_rgba(255,255,255,0.7)] scale-105"
+                                        : "opacity-60 group-hover:opacity-100 group-hover:scale-110"
+                                )}
+                                style={{ imageRendering: 'auto' }}
+                                loading="lazy"
+                                onError={() => setImgError(true)}
+                            />
+                        </div>
+                    ) : (
+                        <div className="h-20 w-20" />
+                    )}
 
-                {/* Female sprite */}
-                {hasGenderDiff && femaleSprite && !femaleImgError && (
-                    <img
-                        src={femaleSprite}
-                        alt={`${displayName} shiny female`}
-                        className={cn(
-                            "h-20 w-20 pokemon-sprite transition-all duration-500 object-contain",
-                            hasCaughtAny
-                                ? "drop-shadow-[0_0_12px_rgba(255,255,255,0.7)] scale-105"
-                                : "opacity-60 group-hover:opacity-100 group-hover:scale-110"
-                        )}
-                        style={{ imageRendering: 'auto' }}
-                        loading="lazy"
-                        onError={() => setFemaleImgError(true)}
-                    />
-                )}
+                    {/* Female sprite */}
+                    {hasGenderDiff && femaleSprite && !femaleImgError && (
+                        <div className="relative w-20 flex items-center justify-center transition-all duration-500 -ml-2">
+                            <img
+                                src={femaleSprite}
+                                alt={`${displayName} shiny female`}
+                                className={cn(
+                                    "h-full w-full pokemon-sprite transition-all duration-500 object-contain",
+                                    hasCaughtAny
+                                        ? "drop-shadow-[0_0_12px_rgba(255,255,255,0.7)] scale-105"
+                                        : "opacity-60 group-hover:opacity-100 group-hover:scale-110"
+                                )}
+                                style={{ imageRendering: 'auto' }}
+                                loading="lazy"
+                                onError={() => setFemaleImgError(true)}
+                            />
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Pokemon info */}

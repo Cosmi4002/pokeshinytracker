@@ -74,7 +74,7 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
                             onClick={onEdit}
                             className="h-8 w-8 rounded-full bg-black/50 hover:bg-white text-white hover:text-black border border-white/10 backdrop-blur-md shadow-lg"
                         >
-                            <Hash className="h-4 w-4" />
+                            <Pencil className="h-4 w-4" />
                         </Button>
                         <Button
                             variant="secondary"
