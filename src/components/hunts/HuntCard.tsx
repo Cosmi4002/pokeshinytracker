@@ -60,7 +60,7 @@ export function HuntCard({ hunt, onDelete, onContinue, layoutStyle = 'grid' }: H
 
                         {/* Info */}
                         <div className="flex-1 min-w-0">
-                            <h3 className="font-bold truncate">{hunt.pokemon_name || 'Pokemon sconosciuto'}</h3>
+                            <h3 className="font-bold truncate capitalize">{hunt.pokemon_name || 'Pokemon sconosciuto'}</h3>
                             <div className="text-2xl font-bold tabular-nums shiny-text">
                                 {(hunt.counter || 0).toLocaleString()}
                             </div>
@@ -118,7 +118,7 @@ export function HuntCard({ hunt, onDelete, onContinue, layoutStyle = 'grid' }: H
                         )}
                     </div>
 
-                    <h3 className="text-sm font-bold text-center mb-1 truncate">
+                    <h3 className="text-sm font-bold text-center mb-1 truncate capitalize">
                         {hunt.pokemon_name || 'Pokemon sconosciuto'}
                     </h3>
 
@@ -175,20 +175,20 @@ export function HuntCard({ hunt, onDelete, onContinue, layoutStyle = 'grid' }: H
                         <img
                             src={getGameSpecificSpriteUrl(hunt.pokemon_id, hunt.method || 'gen9-random', hunt.pokemon_name || undefined) || ''}
                             alt={hunt.pokemon_name || 'Pokemon'}
-                            className="w-24 h-24 object-contain pokemon-sprite"
+                            className="w-24 h-24 lg:w-40 lg:h-40 object-contain pokemon-sprite"
                             onError={(e) => {
                                 (e.target as HTMLImageElement).src = '/placeholder.svg';
                             }}
                         />
                     ) : (
-                        <div className="w-24 h-24 flex items-center justify-center bg-muted rounded-lg">
+                        <div className="w-24 h-24 lg:w-40 lg:h-40 flex items-center justify-center bg-muted rounded-lg">
                             <span className="text-4xl">?</span>
                         </div>
                     )}
                 </div>
 
                 {/* Pokemon Name */}
-                <h3 className="text-xl font-bold text-center mb-2">
+                <h3 className="text-xl font-bold text-center mb-2 capitalize">
                     {hunt.pokemon_name || 'Pokemon sconosciuto'}
                 </h3>
 

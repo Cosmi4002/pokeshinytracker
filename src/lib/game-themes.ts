@@ -24,7 +24,7 @@ export const GAME_THEMES: Record<string, GameTheme> = {
     secondary: '#2C7A7B',
     accent: '#81E6D9',
   },
-  
+
   // Gen 3
   ruby: {
     primary: '#E53E3E',
@@ -51,7 +51,7 @@ export const GAME_THEMES: Record<string, GameTheme> = {
     secondary: '#2C7A7B',
     accent: '#81E6D9',
   },
-  
+
   // Gen 4
   diamond: {
     primary: '#4299E1',
@@ -78,7 +78,7 @@ export const GAME_THEMES: Record<string, GameTheme> = {
     secondary: '#718096',
     accent: '#E2E8F0',
   },
-  
+
   // Gen 5
   black: {
     primary: '#2D3748',
@@ -100,7 +100,7 @@ export const GAME_THEMES: Record<string, GameTheme> = {
     secondary: '#A0AEC0',
     accent: '#F7FAFC',
   },
-  
+
   // Gen 6
   x: {
     primary: '#4299E1',
@@ -122,7 +122,7 @@ export const GAME_THEMES: Record<string, GameTheme> = {
     secondary: '#2C5282',
     accent: '#63B3ED',
   },
-  
+
   // Gen 7
   sun: {
     primary: '#F6AD55',
@@ -154,7 +154,7 @@ export const GAME_THEMES: Record<string, GameTheme> = {
     secondary: '#975A16',
     accent: '#F6E05E',
   },
-  
+
   // Gen 8
   sword: {
     primary: '#4299E1',
@@ -181,7 +181,7 @@ export const GAME_THEMES: Record<string, GameTheme> = {
     secondary: '#2C7A7B',
     accent: '#81E6D9',
   },
-  
+
   // Gen 9
   scarlet: {
     primary: '#F56565',
@@ -203,3 +203,93 @@ export function getGameTheme(gameId: string): GameTheme {
     accent: '#90CDF4',
   };
 }
+// Game icons mapping (using Pokesprite via GitHub CDN)
+export const GAME_ICONS: Record<string, string> = {
+  // Gen 2
+  gold: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/gold.png',
+  silver: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/silver.png',
+  crystal: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/crystal.png',
+  // Gen 3
+  ruby: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/ruby.png',
+  sapphire: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/sapphire.png',
+  emerald: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/emerald.png',
+  firered: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/firered.png',
+  leafgreen: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/leafgreen.png',
+  // Gen 4
+  diamond: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/diamond.png',
+  pearl: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/pearl.png',
+  platinum: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/platinum.png',
+  heartgold: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/heartgold.png',
+  soulsilver: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/soulsilver.png',
+  // Gen 5
+  black: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/black.png',
+  white: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/white.png',
+  black2: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/black-2.png',
+  white2: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/white-2.png',
+  // Gen 6
+  x: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/x.png',
+  y: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/y.png',
+  omegaruby: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/omega-ruby.png',
+  alphasapphire: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/alpha-sapphire.png',
+  // Gen 7
+  sun: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/sun.png',
+  moon: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/moon.png',
+  ultrasun: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/ultra-sun.png',
+  ultramoon: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/ultra-moon.png',
+  lgp: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/lets-go-pikachu.png',
+  lge: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/lets-go-eevee.png',
+  // Gen 8
+  sword: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/sword.png',
+  shield: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/shield.png',
+  brilliantdiamond: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/brilliant-diamond.png',
+  shiningpearl: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/shining-pearl.png',
+  pla: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/legends-arceus.png',
+  // Gen 9
+  scarlet: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/scarlet.png',
+  violet: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/violet.png',
+};
+// Game cover art mapping
+export const GAME_COVER_ART: Record<string, string> = {
+  // Gen 2
+  gold: 'https://img.pokemondb.net/boxes/gold.jpg',
+  silver: 'https://img.pokemondb.net/boxes/silver.jpg',
+  crystal: 'https://img.pokemondb.net/boxes/crystal.jpg',
+  // Gen 3
+  ruby: 'https://img.pokemondb.net/boxes/ruby.jpg',
+  sapphire: 'https://img.pokemondb.net/boxes/sapphire.jpg',
+  emerald: 'https://img.pokemondb.net/boxes/emerald.jpg',
+  firered: 'https://img.pokemondb.net/boxes/firered.jpg',
+  leafgreen: 'https://img.pokemondb.net/boxes/leafgreen.jpg',
+  // Gen 4
+  diamond: 'https://img.pokemondb.net/boxes/diamond.jpg',
+  pearl: 'https://img.pokemondb.net/boxes/pearl.jpg',
+  platinum: 'https://img.pokemondb.net/boxes/platinum.jpg',
+  heartgold: 'https://img.pokemondb.net/boxes/heartgold.jpg',
+  soulsilver: 'https://img.pokemondb.net/boxes/soulsilver.jpg',
+  // Gen 5
+  black: 'https://img.pokemondb.net/boxes/black.jpg',
+  white: 'https://img.pokemondb.net/boxes/white.jpg',
+  black2: 'https://img.pokemondb.net/boxes/black-2.jpg',
+  white2: 'https://img.pokemondb.net/boxes/white-2.jpg',
+  // Gen 6
+  x: 'https://img.pokemondb.net/boxes/x.jpg',
+  y: 'https://img.pokemondb.net/boxes/y.jpg',
+  omegaruby: 'https://img.pokemondb.net/boxes/omega-ruby.jpg',
+  alphasapphire: 'https://img.pokemondb.net/boxes/alpha-sapphire.jpg',
+  // Gen 7
+  sun: 'https://img.pokemondb.net/boxes/sun.jpg',
+  moon: 'https://img.pokemondb.net/boxes/moon.jpg',
+  ultrasun: 'https://img.pokemondb.net/boxes/ultra-sun.jpg',
+  ultramoon: 'https://img.pokemondb.net/boxes/ultra-moon.jpg',
+  lgp: 'https://img.pokemondb.net/boxes/lets-go-pikachu.jpg',
+  lge: 'https://img.pokemondb.net/boxes/lets-go-eevee.jpg',
+  // Gen 8
+  sword: 'https://img.pokemondb.net/boxes/sword.jpg',
+  shield: 'https://img.pokemondb.net/boxes/shield.jpg',
+  brilliantdiamond: 'https://img.pokemondb.net/boxes/brilliant-diamond.jpg',
+  shiningpearl: 'https://img.pokemondb.net/boxes/shining-pearl.jpg',
+  pla: 'https://img.pokemondb.net/boxes/legends-arceus.jpg',
+  // Gen 9
+  scarlet: 'https://img.pokemondb.net/boxes/scarlet.jpg',
+  violet: 'https://img.pokemondb.net/boxes/violet.jpg',
+};

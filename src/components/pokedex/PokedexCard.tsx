@@ -87,14 +87,14 @@ export const PokedexCard = memo(function PokedexCard({
             )}
 
             {/* Sprites container */}
-            <div className="relative flex justify-center gap-1 z-10 h-20 w-full"> {/* Fixed height for larger sprites */}
+            <div className="relative flex justify-center gap-1 z-10 h-28 w-full"> {/* Fixed height for larger sprites */}
                 {/* Default/Male sprite */}
                 {!imgError ? (
                     <img
                         src={spriteUrl}
                         alt={`${displayName} shiny`}
                         className={cn(
-                            "h-20 w-20 pokemon-sprite transition-all duration-500 object-contain",
+                            "h-28 w-28 pokemon-sprite transition-all duration-500 object-contain",
                             hasCaughtAny
                                 ? "drop-shadow-[0_0_12px_rgba(255,255,255,0.7)] scale-105"
                                 : "opacity-60 group-hover:opacity-100 group-hover:scale-110"
