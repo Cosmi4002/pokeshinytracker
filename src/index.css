@@ -3,15 +3,6 @@
 @tailwind utilities;
 
 @layer base {
-  * {
-    -webkit-text-stroke: 0.3px currentColor;
-    /* Leggero bordo a tutti i testi */
-  }
-}
-
-/* ShinyTracker Dark Theme - Pokemon Style */
-
-@layer base {
   :root {
     --background: hsl(30 15% 95%);
     --foreground: hsl(30 10% 15%);
@@ -74,26 +65,15 @@
     --success: hsl(142 70% 45%);
     --success-foreground: hsl(0 0% 100%);
   }
-}
 
-@layer base {
   * {
     @apply border-border;
+    -webkit-text-stroke: 0.3px currentColor;
+    /* Global text stroke as requested */
   }
 
   body {
     @apply bg-background text-foreground;
-  }
-
-  /* Global Font Weight Override */
-  .font-bold {
-    font-weight: 600 !important;
-    /* Semibold intead of Bold */
-  }
-
-  .font-extrabold {
-    font-weight: 700 !important;
-    /* Bold instead of ExtraBold */
   }
 
   /* High contrast for dropdowns/popovers on mobile */
@@ -117,7 +97,6 @@
   }
 }
 
-/* Custom Utilities */
 @layer utilities {
   .text-shadow {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
