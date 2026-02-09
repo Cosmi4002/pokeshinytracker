@@ -417,6 +417,10 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
     // ID + Name-based suffix (e.g. 25-cap)
     if (name) {
       const slug = toShowdownSlug(name);
+
+      // Try exact slug lookup (e.g. "silvally-fire")
+      shinyKeys.push(slug);
+
       if (slug.includes('-')) {
         const parts = slug.split('-');
         shinyKeys.push(`${pokemonId}-${parts.slice(1).join('-')}`);

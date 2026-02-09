@@ -63,11 +63,11 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
 
   const spriteUrl = useMemo(() => {
     if (!pokemonId) return '';
-    const formSuffix = form ? `${pokemonId}-${form}` : undefined;
+    // getPokemonSpriteUrl handles prepending ID
     return getPokemonSpriteUrl(pokemonId, {
       shiny: true,
       female: gender === 'female',
-      form: formSuffix,
+      form: form || undefined,
       name: pokemonName,
     });
   }, [pokemonId, gender, form, pokemonName]);

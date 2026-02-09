@@ -28,9 +28,7 @@ interface FormVariant {
 const SEASONAL_KEYWORDS = ['spring', 'summer', 'autumn', 'winter', 'plant', 'sandy', 'trash',
     'west', 'east', 'heat', 'wash', 'frost', 'fan', 'mow', 'red-striped', 'blue-striped', 'white-striped',
     'meadow', 'icy-snow', 'polar', 'tundra', 'continental', 'garden', 'elegant', 'modern', 'marine',
-    'archipelago', 'high-plains', 'sandstorm', 'river', 'monsoon', 'savanna', 'sun', 'ocean', 'jungle',
-    'fancy', 'pokeball', 'small', 'average', 'large', 'super', 'baile', 'pom-pom', 'pau', 'sensu',
-    'red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet', 'ice', 'shadow'];
+    'fancy', 'pokeball', 'small', 'average', 'large', 'super', 'baile', 'pom-pom', 'pau', 'sensu'];
 
 export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDetailDialogProps) {
     const { pokemon: details, loading: detailsLoading } = usePokemonDetails(pokemon?.id || null);
@@ -107,13 +105,18 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
         }
 
         // Add forms from API (includes seasonal, regional, mega, gmax, etc.)
-        details.forms.forEach(form => {
+        for (const form of details.forms) {
             const name = form.formName.toLowerCase();
+
+            // Skip regional forms here - they are independent entries or handled elsewhere
+            if (name.includes('-alola') || name.includes('-galar') || name.includes('-hisui') || name.includes('-paldea')) continue;
+            
+            // Skip redundant "normal" or "standard" forms (e.g. Silvally-Normal) which are same as base
+            if (name === `${details.name}-normal` || name === `${details.name}-standard`) continue;
+
             let category: FormVariant['category'] = 'form';
 
-            if (name.includes('alola') || name.includes('galar') || name.includes('hisui') || name.includes('paldea')) {
-                category = 'regional';
-            } else if (name.includes('mega')) {
+            if (name.includes('mega')) {
                 category = 'mega';
             } else if (name.includes('gmax')) {
                 category = 'gmax';
@@ -129,7 +132,7 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
                 gender: 'genderless',
                 spriteUrl: getPokemonSpriteUrl(form.id, { shiny: true, name: form.formName, animated: true }),
             });
-        });
+        }
 
         return variants;
     }, [details]);

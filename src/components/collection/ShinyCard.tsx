@@ -57,7 +57,12 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
                 {/* Pokemon Sprite */}
                 <div className="absolute inset-0 flex items-center justify-center z-10 p-4">
                     <img
-                        src={entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, { shiny: true, name: entry.pokemon_name })}
+                        src={getPokemonSpriteUrl(entry.pokemon_id, {
+                            shiny: true,
+                            name: entry.pokemon_name,
+                            form: entry.form,
+                            female: entry.gender === 'female'
+                        })}
                         alt={entry.pokemon_name}
                         className="w-32 h-32 lg:w-40 lg:h-40 object-contain pokemon-sprite drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] transition-all duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_25px_rgba(255,255,255,0.2)]"
                         style={{ imageRendering: 'auto' }}

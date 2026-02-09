@@ -77,11 +77,11 @@ export function FinishHuntDialog({
   const formOptions = useMemo(() => pokemonDetails?.forms ?? [], [pokemonDetails]);
 
   const spriteUrl = useMemo(() => {
-    const formSuffix = form ? `${pokemonId}-${form}` : undefined;
+    // getPokemonSpriteUrl handles prepending ID, so we just pass the form name
     return getPokemonSpriteUrl(pokemonId, {
       shiny: true,
       female: gender === 'female',
-      form: formSuffix,
+      form: form || undefined,
       name: pokemonName,
     });
   }, [pokemonId, gender, form, pokemonName]);
