@@ -457,3 +457,10 @@ meltan: https://img.pokemondb.net/sprites/go/shiny/1x/meltan.png
 melmetal: https://img.pokemondb.net/sprites/home/shiny/1x/melmetal.png
 melmetal: https://img.pokemondb.net/sprites/home/shiny/1x/melmetal-gigantamax.png
 melmetal: https://img.pokemondb.net/sprites/go/shiny/1x/melmetal.pngminior : https://play.pokemonshowdown.com/sprites/xyani-shiny/minior-meteor.gif
+minior (red) : https://play.pokemonshowdown.com/sprites/xy-shiny/minior-red.png
+minior (orange) : https://play.pokemonshowdown.com/sprites/xy-shiny/minior-orange.png
+minior (yellow) : https://play.pokemonshowdown.com/sprites/xy-shiny/minior-yellow.png
+minior (green) : https://play.pokemonshowdown.com/sprites/xy-shiny/minior-green.png
+minior (blue) : https://play.pokemonshowdown.com/sprites/xy-shiny/minior-blue.png
+minior (indigo) : https://play.pokemonshowdown.com/sprites/xy-shiny/minior-indigo.png
+minior (violet) : https://play.pokemonshowdown.com/sprites/xy-shiny/minior-violet.png

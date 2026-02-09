@@ -202,6 +202,11 @@ export function usePokemonList() {
             return true;
           }
 
+          // Rule 7: Exclude Minior Meteor forms (redundant with base)
+          if (n.startsWith('minior-') && n.includes('-meteor')) {
+            return false;
+          }
+
           return false;
         });
 
@@ -270,6 +275,9 @@ export function usePokemonDetails(pokemonId: number | null) {
             const fn = form.name.toLowerCase();
             if (fn.includes('-alola') || fn.includes('-galar') || fn.includes('-hisui') || fn.includes('-paldea')) continue;
 
+            // Skip Minior Meteor forms
+            if (fn.startsWith('minior-') && fn.includes('-meteor')) continue;
+
             const formIdMatch = form.url.match(/\/pokemon-form\/(\d+)\/?$/);
             const formId = formIdMatch ? parseInt(formIdMatch[1]) : null;
 
@@ -300,6 +308,9 @@ export function usePokemonDetails(pokemonId: number | null) {
 
               // SKIP regional forms - they are handled as base pokemon now
               if (vn.includes('-alola') || vn.includes('-galar') || vn.includes('-hisui') || vn.includes('-paldea')) continue;
+
+              // Skip Minior Meteor forms
+              if (vn.startsWith('minior-') && vn.includes('-meteor')) continue;
 
               // Skip mega, totem, etc.
               if (vn.includes('-mega') || vn.includes('-totem') || vn.includes('-gmax') || vn.includes('-primal') || vn.includes('-eternal')) continue;
