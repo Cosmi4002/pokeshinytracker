@@ -410,14 +410,24 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
   // 2. Handle Shiny sprites with new Showdown mapping
   if (shiny) {
     // FORCE STATIC PNG FOR MINIOR (User Request)
-    // All shiny Minior Cores are black/identical. User requested static PNG, not GIF.
+    // Use the core sprite for ALL Minior forms (Meteor and Cores)
     if (name && name.toLowerCase().includes('minior')) {
-      // Check if it's a Core color
-      if (name.includes('red') || name.includes('blue') || name.includes('yellow') ||
-        name.includes('green') || name.includes('orange') || name.includes('indigo') ||
-        name.includes('violet')) {
-        return 'https://play.pokemonshowdown.com/sprites/xy-shiny/minior-red.png';
-      }
+      return 'https://img.pokemondb.net/sprites/home/shiny/minior-core.png';
+    }
+
+    // FORCE STATIC PNG FOR MELMETAL (User Request)
+    if (name && name.toLowerCase().includes('melmetal')) {
+      return 'https://img.pokemondb.net/sprites/home/shiny/melmetal.png';
+    }
+
+    // FORCE STATIC PNG FOR ORICORIO POM-POM (User Request)
+    if (name && name.toLowerCase().includes('oricorio') && (name.toLowerCase().includes('pom-pom') || (form && form.toLowerCase().includes('pom-pom')))) {
+      return 'https://img.pokemondb.net/sprites/home/shiny/oricorio-pom-pom.png';
+    }
+
+    // FORCE STATIC PNG FOR MIMIKYU (User Request)
+    if (name && name.toLowerCase().includes('mimikyu')) {
+      return 'https://img.pokemondb.net/sprites/home/shiny/mimikyu.png';
     }
 
     const shinyKeys: string[] = [];

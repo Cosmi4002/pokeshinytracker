@@ -464,3 +464,10 @@ minior (green) : https://play.pokemonshowdown.com/sprites/xy-shiny/minior-green.
 minior (blue) : https://play.pokemonshowdown.com/sprites/xy-shiny/minior-blue.png
 minior (indigo) : https://play.pokemonshowdown.com/sprites/xy-shiny/minior-indigo.png
 minior (violet) : https://play.pokemonshowdown.com/sprites/xy-shiny/minior-violet.png
+minior (red) : https://play.pokemonshowdown.com/sprites/xy-shiny/minior-red.png
+minior (orange) : https://play.pokemonshowdown.com/sprites/xy-shiny/minior-red.png
+minior (yellow) : https://play.pokemonshowdown.com/sprites/xy-shiny/minior-red.png
+minior (green) : https://play.pokemonshowdown.com/sprites/xy-shiny/minior-red.png
+minior (blue) : https://play.pokemonshowdown.com/sprites/xy-shiny/minior-red.png
+minior (indigo) : https://play.pokemonshowdown.com/sprites/xy-shiny/minior-red.png
+minior (violet) : https://play.pokemonshowdown.com/sprites/xy-shiny/minior-red.png

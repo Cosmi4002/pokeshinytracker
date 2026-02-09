@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { HUNTING_METHODS, getGameSpecificSpriteUrl, getPokemonSpriteUrl } from '@/lib/pokemon-data';
 import { calculateShinyStats } from '@/lib/pokemon-data';
+import { formatPokemonName } from '@/hooks/use-pokemon';
 import type { Tables } from '@/integrations/supabase/types';
 import { formatDistanceToNow } from 'date-fns';
 import { it } from 'date-fns/locale';
@@ -61,7 +62,7 @@ export function HuntCard({ hunt, onDelete, onEdit, onContinue, layoutStyle = 'gr
 
                         {/* Info */}
                         <div className="flex-1 min-w-0">
-                            <h3 className="font-bold truncate capitalize">{hunt.pokemon_name || 'Pokemon sconosciuto'}</h3>
+                            <h3 className="font-bold truncate capitalize">{formatPokemonName(hunt.pokemon_name || '', hunt.pokemon_id)}</h3>
                             <div className="text-2xl font-bold tabular-nums shiny-text">
                                 {(hunt.counter || 0).toLocaleString()}
                             </div>
@@ -128,7 +129,7 @@ export function HuntCard({ hunt, onDelete, onEdit, onContinue, layoutStyle = 'gr
                     </div>
 
                     <h3 className="text-sm font-bold text-center mb-1 truncate capitalize">
-                        {hunt.pokemon_name || 'Pokemon sconosciuto'}
+                        {formatPokemonName(hunt.pokemon_name || '', hunt.pokemon_id)}
                     </h3>
 
                     <div className="text-center mb-2">
@@ -206,7 +207,7 @@ export function HuntCard({ hunt, onDelete, onEdit, onContinue, layoutStyle = 'gr
 
                 {/* Pokemon Name */}
                 <h3 className="text-xl font-bold text-center mb-2 capitalize">
-                    {hunt.pokemon_name || 'Pokemon sconosciuto'}
+                    {formatPokemonName(hunt.pokemon_name || '', hunt.pokemon_id)}
                 </h3>
 
                 {/* Counter */}

@@ -1,5 +1,4 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { usePokemonDetails, PokemonBasic, getPokemonSpriteUrl } from "@/hooks/use-pokemon";
 import { ShinyButton } from "./ShinyButton";
 import { useState, useEffect, useMemo } from "react";
@@ -170,7 +169,7 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
     const categoryLabels: Record<string, string> = {
         base: '🔹 Forme Base',
         regional: '🌍 Forme Regionali',
-        seasonal: '🍂 Forme Stagionali',
+        seasonal: pokemon?.name.toLowerCase().includes('oricorio') ? '💃 Dance Styles' : '🍂 Forme Stagionali',
         mega: '⚡ Mega Evoluzioni',
         gmax: '🌟 Gigantamax',
         form: '🔄 Altre Forme',
@@ -244,7 +243,7 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col p-0 gap-0">
+            <DialogContent className="max-w-4xl h-[85vh] flex flex-col p-0 gap-0 overflow-hidden">
                 <DialogHeader className="p-6 pb-2">
                     <DialogTitle className="text-2xl font-bold flex items-center gap-2">
                         <span className="shiny-text capitalize">{pokemon.displayName}</span>
@@ -258,72 +257,74 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
                     </DialogDescription>
                 </DialogHeader>
 
-                <ScrollArea className="flex-1 p-6 pt-2">
-                    {detailsLoading ? (
-                        <div className="flex items-center justify-center h-40">Caricamento dettagli...</div>
-                    ) : details ? (
-                        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                            <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7 mb-4">
-                                <TabsTrigger value="all">Tutti</TabsTrigger>
-                                {availableCategories.map(cat => (
-                                    <TabsTrigger key={cat} value={cat} className="text-xs">
-                                        {categoryLabels[cat].split(' ')[0]}
-                                    </TabsTrigger>
-                                ))}
-                            </TabsList>
+                <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar">
+                    <div className="p-6 pt-2">
+                        {detailsLoading ? (
+                            <div className="flex items-center justify-center h-40">Caricamento dettagli...</div>
+                        ) : details ? (
+                            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                                <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7 mb-4">
+                                    <TabsTrigger value="all">Tutti</TabsTrigger>
+                                    {availableCategories.map(cat => (
+                                        <TabsTrigger key={cat} value={cat} className="text-xs">
+                                            {categoryLabels[cat].split(' ')[0]}
+                                        </TabsTrigger>
+                                    ))}
+                                </TabsList>
 
-                            <TabsContent value="all" className="space-y-6">
-                                {availableCategories.map(category => (
-                                    <div key={category} className="space-y-3">
-                                        <h3 className="text-lg font-semibold border-b border-primary/20 pb-2 text-primary/80">
-                                            {categoryLabels[category]}
-                                        </h3>
-                                        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                                            {groupedVariants[category].map((variant) => {
-                                                const key = `${variant.id}-${variant.gender}`;
-                                                return (
-                                                    <ShinyButton
-                                                        key={variant.name + variant.gender}
-                                                        label={variant.displayName}
-                                                        spriteUrl={variant.spriteUrl}
-                                                        isCaught={caughtForms.has(key)}
-                                                        isLoading={loadingAction === key}
-                                                        onClick={() => toggleCaught(variant)}
-                                                    />
-                                                );
-                                            })}
+                                <TabsContent value="all" className="space-y-6">
+                                    {availableCategories.map(category => (
+                                        <div key={category} className="space-y-3">
+                                            <h3 className="text-lg font-semibold border-b border-primary/20 pb-2 text-primary/80">
+                                                {categoryLabels[category]}
+                                            </h3>
+                                            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                                                {groupedVariants[category].map((variant) => {
+                                                    const key = `${variant.id}-${variant.gender}`;
+                                                    return (
+                                                        <ShinyButton
+                                                            key={variant.name + variant.gender}
+                                                            label={variant.displayName}
+                                                            spriteUrl={variant.spriteUrl}
+                                                            isCaught={caughtForms.has(key)}
+                                                            isLoading={loadingAction === key}
+                                                            onClick={() => toggleCaught(variant)}
+                                                        />
+                                                    );
+                                                })}
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
-                            </TabsContent>
-
-                            {availableCategories.map(category => (
-                                <TabsContent key={category} value={category}>
-                                    <div className="space-y-3">
-                                        <h3 className="text-lg font-semibold border-b border-primary/20 pb-2 text-primary/80">
-                                            {categoryLabels[category]}
-                                        </h3>
-                                        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                                            {groupedVariants[category].map((variant) => {
-                                                const key = `${variant.id}-${variant.gender}`;
-                                                return (
-                                                    <ShinyButton
-                                                        key={variant.name + variant.gender}
-                                                        label={variant.displayName}
-                                                        spriteUrl={variant.spriteUrl}
-                                                        isCaught={caughtForms.has(key)}
-                                                        isLoading={loadingAction === key}
-                                                        onClick={() => toggleCaught(variant)}
-                                                    />
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
+                                    ))}
                                 </TabsContent>
-                            ))}
-                        </Tabs>
-                    ) : null}
-                </ScrollArea>
+
+                                {availableCategories.map(category => (
+                                    <TabsContent key={category} value={category}>
+                                        <div className="space-y-3">
+                                            <h3 className="text-lg font-semibold border-b border-primary/20 pb-2 text-primary/80">
+                                                {categoryLabels[category]}
+                                            </h3>
+                                            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                                                {groupedVariants[category].map((variant) => {
+                                                    const key = `${variant.id}-${variant.gender}`;
+                                                    return (
+                                                        <ShinyButton
+                                                            key={variant.name + variant.gender}
+                                                            label={variant.displayName}
+                                                            spriteUrl={variant.spriteUrl}
+                                                            isCaught={caughtForms.has(key)}
+                                                            isLoading={loadingAction === key}
+                                                            onClick={() => toggleCaught(variant)}
+                                                        />
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    </TabsContent>
+                                ))}
+                            </Tabs>
+                        ) : null}
+                    </div>
+                </div>
             </DialogContent>
         </Dialog>
     );

@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { PokemonSelector } from '@/components/counter/PokemonSelector';
 import { MethodSelector } from '@/components/counter/MethodSelector';
+import { formatPokemonName } from '@/hooks/use-pokemon';
 import { HUNTING_METHODS, SHINY_CHARM_ICON, HuntingMethod } from '@/lib/pokemon-data';
 import type { Tables } from '@/integrations/supabase/types';
 

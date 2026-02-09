@@ -89,6 +89,26 @@ export function formatPokemonName(name: string, id: number, baseId?: number): st
       return `${baseName} (Spring)`;
   }
 
+  // Oricorio style naming
+  if (name.toLowerCase().includes('oricorio')) {
+    const styleMatch = name.toLowerCase().match(/baile|pom-pom|pau|sensu/);
+    if (styleMatch) {
+      const style = styleMatch[0].split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('-');
+      return `Oricorio ${style} Style`;
+    }
+    return 'Oricorio';
+  }
+
+  // Minior color naming (requested by user)
+  if (name.toLowerCase().includes('minior')) {
+    const colorMatch = name.toLowerCase().match(/red|orange|yellow|green|blue|indigo|violet/);
+    if (colorMatch) {
+      const color = colorMatch[0].charAt(0).toUpperCase() + colorMatch[0].slice(1);
+      return `Minior ${color}`;
+    }
+    return 'Minior';
+  }
+
   const regions: Record<string, string> = {
     'alola': 'Alolan',
     'galar': 'Galarian',

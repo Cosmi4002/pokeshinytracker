@@ -137,4 +137,22 @@
     .counter-display {
         font-variant-numeric: tabular-nums;
     }
+
+    /* Custom Scrollbar Utility */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        @apply bg-transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        @apply bg-primary/50 rounded-full hover:bg-primary;
+    }
+
+    .custom-scrollbar {
+        scrollbar-width: thin;
+        scrollbar-color: hsl(var(--theme-primary-hue) 100% 50%) transparent;
+    }
 }

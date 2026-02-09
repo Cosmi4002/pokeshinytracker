@@ -25,7 +25,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
 import { POKEBALLS, GAMES, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, getPokemonSpriteUrl } from '@/lib/pokemon-data';
-import { usePokemonDetails } from '@/hooks/use-pokemon';
+import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
 import { MethodSelector } from '@/components/counter/MethodSelector';
 
 interface FinishHuntDialogProps {
@@ -140,7 +140,7 @@ export function FinishHuntDialog({
 
       toast({
         title: '🎉 Caccia completata!',
-        description: `${pokemonName} shiny è stato aggiunto alla tua collezione!`,
+        description: `${formatPokemonName(pokemonName, pokemonId)} shiny è stato aggiunto alla tua collezione!`,
       });
 
       onOpenChange(false);
@@ -177,7 +177,7 @@ export function FinishHuntDialog({
               }}
             />
             <div>
-              <h3 className="font-bold text-lg">{pokemonName}</h3>
+              <h3 className="font-bold text-lg">{formatPokemonName(pokemonName, pokemonId)}</h3>
               <p className="text-sm text-muted-foreground">#{pokemonId.toString().padStart(4, '0')}</p>
             </div>
           </div>

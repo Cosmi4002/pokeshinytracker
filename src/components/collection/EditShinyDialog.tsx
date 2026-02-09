@@ -24,7 +24,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { PokemonSelector } from '@/components/counter/PokemonSelector';
 import { MethodSelector } from '@/components/counter/MethodSelector';
 import { POKEBALLS, GAMES, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON } from '@/lib/pokemon-data';
-import { getPokemonSpriteUrl } from '@/hooks/use-pokemon';
+import { getPokemonSpriteUrl, formatPokemonName } from '@/hooks/use-pokemon';
 import { usePokemonDetails } from '@/hooks/use-pokemon';
 import type { Tables } from '@/integrations/supabase/types';
 
@@ -141,7 +141,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
 
       toast({
         title: 'Modifiche salvate',
-        description: `${pokemonName} è stato aggiornato nella collezione.`,
+        description: `${formatPokemonName(pokemonName, pokemonId)} è stato aggiornato nella collezione.`,
       });
       onOpenChange(false);
       onSuccess();
