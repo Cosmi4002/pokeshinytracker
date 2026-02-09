@@ -83,14 +83,17 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
         const isPartnerCap = details.id === 10148;
         const showGenderLabels = details.hasGenderDifference && !isPartnerCap;
 
-        variants.push({
-            id: pokemonId,
-            name: details.name,
-            displayName: showGenderLabels ? 'Maschio' : 'Default',
-            category: showGenderLabels ? 'gender' : 'base',
-            gender: showGenderLabels ? 'male' : 'genderless',
-            spriteUrl: details.sprites.shiny,
-        });
+        // Skip adding Base variant for Minior (it's the Meteor form, user wants only Cores)
+        if (details.name !== 'minior') {
+            variants.push({
+                id: pokemonId,
+                name: details.name,
+                displayName: showGenderLabels ? 'Maschio' : 'Default',
+                category: showGenderLabels ? 'gender' : 'base',
+                gender: showGenderLabels ? 'male' : 'genderless',
+                spriteUrl: details.sprites.shiny,
+            });
+        }
 
         // Female variant
         if (details.hasGenderDifference && details.sprites.femaleShiny && !isPartnerCap) {
