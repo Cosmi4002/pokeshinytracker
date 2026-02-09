@@ -1,0 +1,459 @@
+rowlet: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/rowlet.png
+rowlet: https://img.pokemondb.net/sprites/home/shiny/1x/rowlet.png
+rowlet: https://img.pokemondb.net/sprites/legends-arceus/shiny/1x/rowlet.png
+rowlet: https://img.pokemondb.net/sprites/bank/shiny/rowlet.png
+rowlet: https://img.pokemondb.net/sprites/go/shiny/1x/rowlet.png
+rowlet: https://img.pokemondb.net/sprites/go/shiny/1x/rowlet-halloween.png
+dartrix: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/dartrix.png
+dartrix: https://img.pokemondb.net/sprites/home/shiny/1x/dartrix.png
+dartrix: https://img.pokemondb.net/sprites/legends-arceus/shiny/1x/dartrix.png
+dartrix: https://img.pokemondb.net/sprites/bank/shiny/dartrix.png
+dartrix: https://img.pokemondb.net/sprites/go/shiny/1x/dartrix.png
+dartrix: https://img.pokemondb.net/sprites/go/shiny/1x/dartrix-halloween.png
+decidueye: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/decidueye.png
+decidueye: https://img.pokemondb.net/sprites/home/shiny/1x/decidueye.png
+decidueye: https://img.pokemondb.net/sprites/home/shiny/1x/decidueye-hisuian.png
+decidueye: https://img.pokemondb.net/sprites/legends-arceus/shiny/1x/decidueye-hisuian.png
+decidueye: https://img.pokemondb.net/sprites/bank/shiny/decidueye.png
+decidueye: https://img.pokemondb.net/sprites/go/shiny/1x/decidueye.png
+decidueye: https://img.pokemondb.net/sprites/go/shiny/1x/decidueye-halloween.png
+decidueye: https://img.pokemondb.net/sprites/go/shiny/1x/decidueye-hisuian.png
+litten: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/litten.png
+litten: https://img.pokemondb.net/sprites/home/shiny/1x/litten.png
+litten: https://img.pokemondb.net/sprites/bank/shiny/litten.png
+litten: https://img.pokemondb.net/sprites/go/shiny/1x/litten.png
+torracat: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/torracat.png
+torracat: https://img.pokemondb.net/sprites/home/shiny/1x/torracat.png
+torracat: https://img.pokemondb.net/sprites/bank/shiny/torracat.png
+torracat: https://img.pokemondb.net/sprites/go/shiny/1x/torracat.png
+incineroar: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/incineroar.png
+incineroar: https://img.pokemondb.net/sprites/home/shiny/1x/incineroar.png
+incineroar: https://img.pokemondb.net/sprites/bank/shiny/incineroar.png
+incineroar: https://img.pokemondb.net/sprites/go/shiny/1x/incineroar.png
+popplio: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/popplio.png
+popplio: https://img.pokemondb.net/sprites/home/shiny/1x/popplio.png
+popplio: https://img.pokemondb.net/sprites/bank/shiny/popplio.png
+popplio: https://img.pokemondb.net/sprites/go/shiny/1x/popplio.png
+brionne: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/brionne.png
+brionne: https://img.pokemondb.net/sprites/home/shiny/1x/brionne.png
+brionne: https://img.pokemondb.net/sprites/bank/shiny/brionne.png
+brionne: https://img.pokemondb.net/sprites/go/shiny/1x/brionne.png
+primarina: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/primarina.png
+primarina: https://img.pokemondb.net/sprites/home/shiny/1x/primarina.png
+primarina: https://img.pokemondb.net/sprites/bank/shiny/primarina.png
+primarina: https://img.pokemondb.net/sprites/go/shiny/1x/primarina.png
+pikipek: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/pikipek.png
+pikipek: https://img.pokemondb.net/sprites/home/shiny/1x/pikipek.png
+pikipek: https://img.pokemondb.net/sprites/bank/shiny/pikipek.png
+pikipek: https://img.pokemondb.net/sprites/go/shiny/1x/pikipek.png
+trumbeak: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/trumbeak.png
+trumbeak: https://img.pokemondb.net/sprites/home/shiny/1x/trumbeak.png
+trumbeak: https://img.pokemondb.net/sprites/bank/shiny/trumbeak.png
+trumbeak: https://img.pokemondb.net/sprites/go/shiny/1x/trumbeak.png
+toucannon: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/toucannon.png
+toucannon: https://img.pokemondb.net/sprites/home/shiny/1x/toucannon.png
+toucannon: https://img.pokemondb.net/sprites/bank/shiny/toucannon.png
+toucannon: https://img.pokemondb.net/sprites/go/shiny/1x/toucannon.png
+yungoos: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/yungoos.png
+yungoos: https://img.pokemondb.net/sprites/home/shiny/1x/yungoos.png
+yungoos: https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/yungoos.png
+yungoos: https://img.pokemondb.net/sprites/bank/shiny/yungoos.png
+yungoos: https://img.pokemondb.net/sprites/go/shiny/1x/yungoos.png
+gumshoos: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/gumshoos.png
+gumshoos: https://img.pokemondb.net/sprites/home/shiny/1x/gumshoos.png
+gumshoos: https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/gumshoos.png
+gumshoos: https://img.pokemondb.net/sprites/bank/shiny/gumshoos.png
+gumshoos: https://img.pokemondb.net/sprites/go/shiny/1x/gumshoos.png
+grubbin: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/grubbin.png
+grubbin: https://img.pokemondb.net/sprites/home/shiny/1x/grubbin.png
+grubbin: https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/grubbin.png
+grubbin: https://img.pokemondb.net/sprites/bank/shiny/grubbin.png
+grubbin: https://img.pokemondb.net/sprites/go/shiny/1x/grubbin.png
+charjabug: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/charjabug.png
+charjabug: https://img.pokemondb.net/sprites/home/shiny/1x/charjabug.png
+charjabug: https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/charjabug.png
+charjabug: https://img.pokemondb.net/sprites/bank/shiny/charjabug.png
+charjabug: https://img.pokemondb.net/sprites/go/shiny/1x/charjabug.png
+vikavolt: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/vikavolt.png
+vikavolt: https://img.pokemondb.net/sprites/home/shiny/1x/vikavolt.png
+vikavolt: https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/vikavolt.png
+vikavolt: https://img.pokemondb.net/sprites/bank/shiny/vikavolt.png
+vikavolt: https://img.pokemondb.net/sprites/go/shiny/1x/vikavolt.png
+crabrawler: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/crabrawler.png
+crabrawler: https://img.pokemondb.net/sprites/home/shiny/1x/crabrawler.png
+crabrawler: https://img.pokemondb.net/sprites/bank/shiny/crabrawler.png
+crabrawler: https://img.pokemondb.net/sprites/go/shiny/1x/crabrawler.png
+crabominable: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/crabominable.png
+crabominable: https://img.pokemondb.net/sprites/home/shiny/1x/crabominable.png
+crabominable: https://img.pokemondb.net/sprites/bank/shiny/crabominable.png
+crabominable: https://img.pokemondb.net/sprites/go/shiny/1x/crabominable.png
+oricorio (Baile Style): https://img.pokemondb.net/sprites/sun-moon/shiny/1x/oricorio-baile.png
+oricorio (Baile Style): https://img.pokemondb.net/sprites/home/shiny/1x/oricorio-baile.png
+oricorio (Pa'u Style): https://img.pokemondb.net/sprites/home/shiny/1x/oricorio-pau.png
+oricorio (Pom-Pom Style): https://img.pokemondb.net/sprites/home/shiny/1x/oricorio-pom-pom.png
+oricorio (Sensu Style): https://img.pokemondb.net/sprites/home/shiny/1x/oricorio-sensu.png
+oricorio (Pa'u Style): https://img.pokemondb.net/sprites/sun-moon/shiny/1x/oricorio-pau.png
+oricorio (Pom-Pom Style): https://img.pokemondb.net/sprites/sun-moon/shiny/1x/oricorio-pom-pom.png
+oricorio (Sensu Style): https://img.pokemondb.net/sprites/sun-moon/shiny/1x/oricorio-sensu.png
+oricorio (Baile Style): https://img.pokemondb.net/sprites/bank/shiny/oricorio-baile.png
+oricorio (Pa'u Style): https://img.pokemondb.net/sprites/bank/shiny/oricorio-pau.png
+oricorio (Pom-Pom Style): https://img.pokemondb.net/sprites/bank/shiny/oricorio-pom-pom.png
+oricorio (Sensu Style): https://img.pokemondb.net/sprites/bank/shiny/oricorio-sensu.png
+oricorio (Baile Style): https://img.pokemondb.net/sprites/go/shiny/1x/oricorio-baile.png
+oricorio (Pa'u Style): https://img.pokemondb.net/sprites/go/shiny/1x/oricorio-pau.png
+oricorio (Pom-Pom Style): https://img.pokemondb.net/sprites/go/shiny/1x/oricorio-pom-pom.png
+oricorio (Sensu Style): https://img.pokemondb.net/sprites/go/shiny/1x/oricorio-sensu.png
+cutiefly: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/cutiefly.png
+cutiefly: https://img.pokemondb.net/sprites/home/shiny/1x/cutiefly.png
+cutiefly: https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/cutiefly.png
+cutiefly: https://img.pokemondb.net/sprites/bank/shiny/cutiefly.png
+cutiefly: https://img.pokemondb.net/sprites/go/shiny/1x/cutiefly.png
+ribombee: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/ribombee.png
+ribombee: https://img.pokemondb.net/sprites/home/shiny/1x/ribombee.png
+ribombee: https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/ribombee.png
+ribombee: https://img.pokemondb.net/sprites/bank/shiny/ribombee.png
+ribombee: https://img.pokemondb.net/sprites/go/shiny/1x/ribombee.png
+rockruff: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/rockruff.png
+rockruff: https://img.pokemondb.net/sprites/home/shiny/1x/rockruff.png
+rockruff: https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/rockruff.png
+rockruff: https://img.pokemondb.net/sprites/bank/shiny/rockruff.png
+rockruff: https://img.pokemondb.net/sprites/go/shiny/1x/rockruff.png
+rockruff: https://img.pokemondb.net/sprites/go/shiny/1x/rockruff-dusk.png
+lycanroc (Midday Form): https://img.pokemondb.net/sprites/sun-moon/shiny/1x/lycanroc-midday.png
+lycanroc (Midday Form): https://img.pokemondb.net/sprites/home/shiny/1x/lycanroc-midday.png
+lycanroc (Dusk Form): https://img.pokemondb.net/sprites/home/shiny/1x/lycanroc-dusk.png
+lycanroc (Midnight Form): https://img.pokemondb.net/sprites/home/shiny/1x/lycanroc-midnight.png
+lycanroc (Midday Form): https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/lycanroc-midday.png
+lycanroc (Dusk Form): https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/lycanroc-dusk.png
+lycanroc (Midnight Form): https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/lycanroc-midnight.png
+lycanroc (Midnight Form): https://img.pokemondb.net/sprites/sun-moon/shiny/1x/lycanroc-midnight.png
+lycanroc (Midday Form): https://img.pokemondb.net/sprites/bank/shiny/lycanroc-midday.png
+lycanroc (Dusk Form): https://img.pokemondb.net/sprites/bank/shiny/lycanroc-dusk.png
+lycanroc (Midnight Form): https://img.pokemondb.net/sprites/bank/shiny/lycanroc-midnight.png
+lycanroc (Dusk Form): https://img.pokemondb.net/sprites/go/shiny/1x/lycanroc-dusk.png
+lycanroc (Midday Form): https://img.pokemondb.net/sprites/go/shiny/1x/lycanroc-midday.png
+lycanroc (Midnight Form): https://img.pokemondb.net/sprites/go/shiny/1x/lycanroc-midnight.png
+mareanie: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/mareanie.png
+mareanie: https://img.pokemondb.net/sprites/home/shiny/1x/mareanie.png
+mareanie: https://img.pokemondb.net/sprites/bank/shiny/mareanie.png
+mareanie: https://img.pokemondb.net/sprites/go/shiny/1x/mareanie.png
+toxapex: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/toxapex.png
+toxapex: https://img.pokemondb.net/sprites/home/shiny/1x/toxapex.png
+toxapex: https://img.pokemondb.net/sprites/bank/shiny/toxapex.png
+toxapex: https://img.pokemondb.net/sprites/go/shiny/1x/toxapex.png
+mudbray: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/mudbray.png
+mudbray: https://img.pokemondb.net/sprites/home/shiny/1x/mudbray.png
+mudbray: https://img.pokemondb.net/sprites/bank/shiny/mudbray.png
+mudbray: https://img.pokemondb.net/sprites/go/shiny/1x/mudbray.png
+mudsdale: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/mudsdale.png
+mudsdale: https://img.pokemondb.net/sprites/home/shiny/1x/mudsdale.png
+mudsdale: https://img.pokemondb.net/sprites/bank/shiny/mudsdale.png
+mudsdale: https://img.pokemondb.net/sprites/go/shiny/1x/mudsdale.png
+dewpider: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/dewpider.png
+dewpider: https://img.pokemondb.net/sprites/home/shiny/1x/dewpider.png
+dewpider: https://img.pokemondb.net/sprites/bank/shiny/dewpider.png
+dewpider: https://img.pokemondb.net/sprites/go/shiny/1x/dewpider.png
+araquanid: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/araquanid.png
+araquanid: https://img.pokemondb.net/sprites/home/shiny/1x/araquanid.png
+araquanid: https://img.pokemondb.net/sprites/bank/shiny/araquanid.png
+araquanid: https://img.pokemondb.net/sprites/go/shiny/1x/araquanid.png
+fomantis: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/fomantis.png
+fomantis: https://img.pokemondb.net/sprites/home/shiny/1x/fomantis.png
+fomantis: https://img.pokemondb.net/sprites/bank/shiny/fomantis.png
+fomantis: https://img.pokemondb.net/sprites/go/shiny/1x/fomantis.png
+lurantis: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/lurantis.png
+lurantis: https://img.pokemondb.net/sprites/home/shiny/1x/lurantis.png
+lurantis: https://img.pokemondb.net/sprites/bank/shiny/lurantis.png
+lurantis: https://img.pokemondb.net/sprites/go/shiny/1x/lurantis.png
+morelull: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/morelull.png
+morelull: https://img.pokemondb.net/sprites/home/shiny/1x/morelull.png
+morelull: https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/morelull.png
+morelull: https://img.pokemondb.net/sprites/bank/shiny/morelull.png
+morelull: https://img.pokemondb.net/sprites/go/shiny/1x/morelull.png
+shiinotic: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/shiinotic.png
+shiinotic: https://img.pokemondb.net/sprites/home/shiny/1x/shiinotic.png
+shiinotic: https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/shiinotic.png
+shiinotic: https://img.pokemondb.net/sprites/bank/shiny/shiinotic.png
+shiinotic: https://img.pokemondb.net/sprites/go/shiny/1x/shiinotic.png
+salandit: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/salandit.png
+salandit: https://img.pokemondb.net/sprites/home/shiny/1x/salandit.png
+salandit: https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/salandit.png
+salandit: https://img.pokemondb.net/sprites/bank/shiny/salandit.png
+salandit: https://img.pokemondb.net/sprites/go/shiny/1x/salandit.png
+salazzle: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/salazzle.png
+salazzle: https://img.pokemondb.net/sprites/home/shiny/1x/salazzle.png
+salazzle: https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/salazzle.png
+salazzle: https://img.pokemondb.net/sprites/bank/shiny/salazzle.png
+salazzle: https://img.pokemondb.net/sprites/go/shiny/1x/salazzle.png
+stufful: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/stufful.png
+stufful: https://img.pokemondb.net/sprites/home/shiny/1x/stufful.png
+stufful: https://img.pokemondb.net/sprites/bank/shiny/stufful.png
+stufful: https://img.pokemondb.net/sprites/go/shiny/1x/stufful.png
+bewear: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/bewear.png
+bewear: https://img.pokemondb.net/sprites/home/shiny/1x/bewear.png
+bewear: https://img.pokemondb.net/sprites/bank/shiny/bewear.png
+bewear: https://img.pokemondb.net/sprites/go/shiny/1x/bewear.png
+bounsweet: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/bounsweet.png
+bounsweet: https://img.pokemondb.net/sprites/home/shiny/1x/bounsweet.png
+bounsweet: https://img.pokemondb.net/sprites/bank/shiny/bounsweet.png
+bounsweet: https://img.pokemondb.net/sprites/go/shiny/1x/bounsweet.png
+steenee: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/steenee.png
+steenee: https://img.pokemondb.net/sprites/home/shiny/1x/steenee.png
+steenee: https://img.pokemondb.net/sprites/bank/shiny/steenee.png
+steenee: https://img.pokemondb.net/sprites/go/shiny/1x/steenee.png
+tsareena: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/tsareena.png
+tsareena: https://img.pokemondb.net/sprites/home/shiny/1x/tsareena.png
+tsareena: https://img.pokemondb.net/sprites/bank/shiny/tsareena.png
+tsareena: https://img.pokemondb.net/sprites/go/shiny/1x/tsareena.png
+comfey: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/comfey.png
+comfey: https://img.pokemondb.net/sprites/home/shiny/1x/comfey.png
+comfey: https://img.pokemondb.net/sprites/bank/shiny/comfey.png
+comfey: https://img.pokemondb.net/sprites/go/shiny/1x/comfey.png
+oranguru: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/oranguru.png
+oranguru: https://img.pokemondb.net/sprites/home/shiny/1x/oranguru.png
+oranguru: https://img.pokemondb.net/sprites/bank/shiny/oranguru.png
+oranguru: https://img.pokemondb.net/sprites/go/shiny/1x/oranguru.png
+passimian: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/passimian.png
+passimian: https://img.pokemondb.net/sprites/home/shiny/1x/passimian.png
+passimian: https://img.pokemondb.net/sprites/bank/shiny/passimian.png
+passimian: https://img.pokemondb.net/sprites/go/shiny/1x/passimian.png
+wimpod: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/wimpod.png
+wimpod: https://img.pokemondb.net/sprites/home/shiny/1x/wimpod.png
+wimpod: https://img.pokemondb.net/sprites/bank/shiny/wimpod.png
+wimpod: https://img.pokemondb.net/sprites/go/shiny/1x/wimpod.png
+golisopod: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/golisopod.png
+golisopod: https://img.pokemondb.net/sprites/home/shiny/1x/golisopod.png
+golisopod: https://img.pokemondb.net/sprites/bank/shiny/golisopod.png
+golisopod: https://img.pokemondb.net/sprites/go/shiny/1x/golisopod.png
+sandygast: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/sandygast.png
+sandygast: https://img.pokemondb.net/sprites/home/shiny/1x/sandygast.png
+sandygast: https://img.pokemondb.net/sprites/bank/shiny/sandygast.png
+sandygast: https://img.pokemondb.net/sprites/go/shiny/1x/sandygast.png
+palossand: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/palossand.png
+palossand: https://img.pokemondb.net/sprites/home/shiny/1x/palossand.png
+palossand: https://img.pokemondb.net/sprites/bank/shiny/palossand.png
+palossand: https://img.pokemondb.net/sprites/go/shiny/1x/palossand.png
+pyukumuku: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/pyukumuku.png
+pyukumuku: https://img.pokemondb.net/sprites/home/shiny/1x/pyukumuku.png
+pyukumuku: https://img.pokemondb.net/sprites/bank/shiny/pyukumuku.png
+pyukumuku: https://img.pokemondb.net/sprites/go/shiny/1x/pyukumuku.png
+silvally (Normal Type): https://img.pokemondb.net/sprites/home/shiny/1x/silvally-normal.png
+silvally (Bug Type): https://img.pokemondb.net/sprites/home/shiny/1x/silvally-bug.png
+silvally (Dark Type): https://img.pokemondb.net/sprites/home/shiny/1x/silvally-dark.png
+silvally (Dragon Type): https://img.pokemondb.net/sprites/home/shiny/1x/silvally-dragon.png
+silvally (Electric Type): https://img.pokemondb.net/sprites/home/shiny/1x/silvally-electric.png
+silvally (Fairy Type): https://img.pokemondb.net/sprites/home/shiny/1x/silvally-fairy.png
+silvally (Fighting Type): https://img.pokemondb.net/sprites/home/shiny/1x/silvally-fighting.png
+silvally (Fire Type): https://img.pokemondb.net/sprites/home/shiny/1x/silvally-fire.png
+silvally (Flying Type): https://img.pokemondb.net/sprites/home/shiny/1x/silvally-flying.png
+silvally (Ghost Type): https://img.pokemondb.net/sprites/home/shiny/1x/silvally-ghost.png
+silvally (Grass Type): https://img.pokemondb.net/sprites/home/shiny/1x/silvally-grass.png
+silvally (Ground Type): https://img.pokemondb.net/sprites/home/shiny/1x/silvally-ground.png
+silvally (Ice Type): https://img.pokemondb.net/sprites/home/shiny/1x/silvally-ice.png
+silvally (Poison Type): https://img.pokemondb.net/sprites/home/shiny/1x/silvally-poison.png
+silvally (Psychic Type): https://img.pokemondb.net/sprites/home/shiny/1x/silvally-psychic.png
+silvally (Rock Type): https://img.pokemondb.net/sprites/home/shiny/1x/silvally-rock.png
+silvally (Steel Type): https://img.pokemondb.net/sprites/home/shiny/1x/silvally-steel.png
+silvally (Water Type): https://img.pokemondb.net/sprites/home/shiny/1x/silvally-water.png
+silvally (Bug Type): https://img.pokemondb.net/sprites/sun-moon/shiny/1x/silvally-bug.png
+silvally (Dark Type): https://img.pokemondb.net/sprites/sun-moon/shiny/1x/silvally-dark.png
+silvally (Dragon Type): https://img.pokemondb.net/sprites/sun-moon/shiny/1x/silvally-dragon.png
+silvally (Electric Type): https://img.pokemondb.net/sprites/sun-moon/shiny/1x/silvally-electric.png
+silvally (Fairy Type): https://img.pokemondb.net/sprites/sun-moon/shiny/1x/silvally-fairy.png
+silvally (Fighting Type): https://img.pokemondb.net/sprites/sun-moon/shiny/1x/silvally-fighting.png
+silvally (Fire Type): https://img.pokemondb.net/sprites/sun-moon/shiny/1x/silvally-fire.png
+silvally (Flying Type): https://img.pokemondb.net/sprites/sun-moon/shiny/1x/silvally-flying.png
+silvally (Ghost Type): https://img.pokemondb.net/sprites/sun-moon/shiny/1x/silvally-ghost.png
+silvally (Grass Type): https://img.pokemondb.net/sprites/sun-moon/shiny/1x/silvally-grass.png
+silvally (Ground Type): https://img.pokemondb.net/sprites/sun-moon/shiny/1x/silvally-ground.png
+silvally (Ice Type): https://img.pokemondb.net/sprites/sun-moon/shiny/1x/silvally-ice.png
+silvally (Poison Type): https://img.pokemondb.net/sprites/sun-moon/shiny/1x/silvally-poison.png
+silvally (Psychic Type): https://img.pokemondb.net/sprites/sun-moon/shiny/1x/silvally-psychic.png
+silvally (Rock Type): https://img.pokemondb.net/sprites/sun-moon/shiny/1x/silvally-rock.png
+silvally (Steel Type): https://img.pokemondb.net/sprites/sun-moon/shiny/1x/silvally-steel.png
+silvally (Water Type): https://img.pokemondb.net/sprites/sun-moon/shiny/1x/silvally-water.png
+silvally (Normal Type): https://img.pokemondb.net/sprites/bank/shiny/silvally-normal.png
+silvally (Bug Type): https://img.pokemondb.net/sprites/bank/shiny/silvally-bug.png
+silvally (Dark Type): https://img.pokemondb.net/sprites/bank/shiny/silvally-dark.png
+silvally (Dragon Type): https://img.pokemondb.net/sprites/bank/shiny/silvally-dragon.png
+silvally (Electric Type): https://img.pokemondb.net/sprites/bank/shiny/silvally-electric.png
+silvally (Fairy Type): https://img.pokemondb.net/sprites/bank/shiny/silvally-fairy.png
+silvally (Fighting Type): https://img.pokemondb.net/sprites/bank/shiny/silvally-fighting.png
+silvally (Fire Type): https://img.pokemondb.net/sprites/bank/shiny/silvally-fire.png
+silvally (Flying Type): https://img.pokemondb.net/sprites/bank/shiny/silvally-flying.png
+silvally (Ghost Type): https://img.pokemondb.net/sprites/bank/shiny/silvally-ghost.png
+silvally (Grass Type): https://img.pokemondb.net/sprites/bank/shiny/silvally-grass.png
+silvally (Ground Type): https://img.pokemondb.net/sprites/bank/shiny/silvally-ground.png
+silvally (Ice Type): https://img.pokemondb.net/sprites/bank/shiny/silvally-ice.png
+silvally (Poison Type): https://img.pokemondb.net/sprites/bank/shiny/silvally-poison.png
+silvally (Psychic Type): https://img.pokemondb.net/sprites/bank/shiny/silvally-psychic.png
+silvally (Rock Type): https://img.pokemondb.net/sprites/bank/shiny/silvally-rock.png
+silvally (Steel Type): https://img.pokemondb.net/sprites/bank/shiny/silvally-steel.png
+silvally (Water Type): https://img.pokemondb.net/sprites/bank/shiny/silvally-water.png
+minior (Blue Core): https://img.pokemondb.net/sprites/bank/shiny/minior-blue.png
+minior (Green Core): https://img.pokemondb.net/sprites/bank/shiny/minior-green.png
+minior (Indigo Core): https://img.pokemondb.net/sprites/bank/shiny/minior-indigo.png
+minior (Orange Core): https://img.pokemondb.net/sprites/bank/shiny/minior-orange.png
+minior (Red Core): https://img.pokemondb.net/sprites/bank/shiny/minior-red.png
+minior (Violet Core): https://img.pokemondb.net/sprites/bank/shiny/minior-violet.png
+minior (Yellow Core): https://img.pokemondb.net/sprites/bank/shiny/minior-yellow.png
+komala: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/komala.png
+komala: https://img.pokemondb.net/sprites/home/shiny/1x/komala.png
+komala: https://img.pokemondb.net/sprites/bank/shiny/komala.png
+komala: https://img.pokemondb.net/sprites/go/shiny/1x/komala.png
+turtonator: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/turtonator.png
+turtonator: https://img.pokemondb.net/sprites/home/shiny/1x/turtonator.png
+turtonator: https://img.pokemondb.net/sprites/bank/shiny/turtonator.png
+turtonator: https://img.pokemondb.net/sprites/go/shiny/1x/turtonator.png
+togedemaru: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/togedemaru.png
+togedemaru: https://img.pokemondb.net/sprites/home/shiny/1x/togedemaru.png
+togedemaru: https://img.pokemondb.net/sprites/bank/shiny/togedemaru.png
+togedemaru: https://img.pokemondb.net/sprites/go/shiny/1x/togedemaru.png
+mimikyu: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/mimikyu.png
+mimikyu: https://img.pokemondb.net/sprites/home/shiny/1x/mimikyu.png
+mimikyu: https://img.pokemondb.net/sprites/home/shiny/1x/mimikyu-busted.png
+mimikyu: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/mimikyu-busted.png
+mimikyu: https://img.pokemondb.net/sprites/bank/shiny/mimikyu-busted.png
+mimikyu: https://img.pokemondb.net/sprites/bank/shiny/mimikyu-disguised.png
+bruxish: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/bruxish.png
+bruxish: https://img.pokemondb.net/sprites/home/shiny/1x/bruxish.png
+bruxish: https://img.pokemondb.net/sprites/bank/shiny/bruxish.png
+bruxish: https://img.pokemondb.net/sprites/go/shiny/1x/bruxish.png
+drampa: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/drampa.png
+drampa: https://img.pokemondb.net/sprites/home/shiny/1x/drampa.png
+drampa: https://img.pokemondb.net/sprites/bank/shiny/drampa.png
+drampa: https://img.pokemondb.net/sprites/go/shiny/1x/drampa.png
+dhelmise: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/dhelmise.png
+dhelmise: https://img.pokemondb.net/sprites/home/shiny/1x/dhelmise.png
+dhelmise: https://img.pokemondb.net/sprites/bank/shiny/dhelmise.png
+dhelmise: https://img.pokemondb.net/sprites/go/shiny/1x/dhelmise.png
+jangmo-o: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/jangmo-o.png
+jangmo-o: https://img.pokemondb.net/sprites/home/shiny/1x/jangmo-o.png
+jangmo-o: https://img.pokemondb.net/sprites/bank/shiny/jangmo-o.png
+jangmo-o: https://img.pokemondb.net/sprites/go/shiny/1x/jangmo-o.png
+hakamo-o: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/hakamo-o.png
+hakamo-o: https://img.pokemondb.net/sprites/home/shiny/1x/hakamo-o.png
+hakamo-o: https://img.pokemondb.net/sprites/bank/shiny/hakamo-o.png
+hakamo-o: https://img.pokemondb.net/sprites/go/shiny/1x/hakamo-o.png
+kommo-o: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/kommo-o.png
+kommo-o: https://img.pokemondb.net/sprites/home/shiny/1x/kommo-o.png
+kommo-o: https://img.pokemondb.net/sprites/bank/shiny/kommo-o.png
+kommo-o: https://img.pokemondb.net/sprites/go/shiny/1x/kommo-o.png
+tapu-koko: https://img.pokemondb.net/sprites/home/shiny/1x/tapu-koko.png
+tapu-koko: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/tapu-koko.png
+tapu-koko: https://img.pokemondb.net/sprites/bank/shiny/tapu-koko.png
+tapu-koko: https://img.pokemondb.net/sprites/go/shiny/1x/tapu-koko.png
+tapu-lele: https://img.pokemondb.net/sprites/home/shiny/1x/tapu-lele.png
+tapu-lele: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/tapu-lele.png
+tapu-lele: https://img.pokemondb.net/sprites/bank/shiny/tapu-lele.png
+tapu-lele: https://img.pokemondb.net/sprites/go/shiny/1x/tapu-lele.png
+tapu-bulu: https://img.pokemondb.net/sprites/home/shiny/1x/tapu-bulu.png
+tapu-bulu: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/tapu-bulu.png
+tapu-bulu: https://img.pokemondb.net/sprites/bank/shiny/tapu-bulu.png
+tapu-bulu: https://img.pokemondb.net/sprites/go/shiny/1x/tapu-bulu.png
+tapu-fini: https://img.pokemondb.net/sprites/home/shiny/1x/tapu-fini.png
+tapu-fini: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/tapu-fini.png
+tapu-fini: https://img.pokemondb.net/sprites/bank/shiny/tapu-fini.png
+tapu-fini: https://img.pokemondb.net/sprites/go/shiny/1x/tapu-fini.png
+cosmog: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/cosmog.png
+cosmog: https://img.pokemondb.net/sprites/home/shiny/1x/cosmog.png
+cosmog: https://img.pokemondb.net/sprites/bank/shiny/cosmog.png
+cosmoem: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/cosmoem.png
+cosmoem: https://img.pokemondb.net/sprites/home/shiny/1x/cosmoem.png
+cosmoem: https://img.pokemondb.net/sprites/bank/shiny/cosmoem.png
+cosmoem: https://img.pokemondb.net/sprites/go/shiny/1x/cosmoem.png
+solgaleo: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/solgaleo.png
+solgaleo: https://img.pokemondb.net/sprites/home/shiny/1x/solgaleo.png
+solgaleo: https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/solgaleo.png
+solgaleo: https://img.pokemondb.net/sprites/bank/shiny/solgaleo.png
+solgaleo: https://img.pokemondb.net/sprites/go/shiny/1x/solgaleo.png
+lunala: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/lunala.png
+lunala: https://img.pokemondb.net/sprites/home/shiny/1x/lunala.png
+lunala: https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/lunala.png
+lunala: https://img.pokemondb.net/sprites/bank/shiny/lunala.png
+lunala: https://img.pokemondb.net/sprites/go/shiny/1x/lunala.png
+nihilego: https://img.pokemondb.net/sprites/home/shiny/1x/nihilego.png
+nihilego: https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/nihilego.png
+nihilego: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/nihilego.png
+nihilego: https://img.pokemondb.net/sprites/bank/shiny/nihilego.png
+nihilego: https://img.pokemondb.net/sprites/go/shiny/1x/nihilego.png
+buzzwole: https://img.pokemondb.net/sprites/home/shiny/1x/buzzwole.png
+buzzwole: https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/buzzwole.png
+buzzwole: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/buzzwole.png
+buzzwole: https://img.pokemondb.net/sprites/bank/shiny/buzzwole.png
+buzzwole: https://img.pokemondb.net/sprites/go/shiny/1x/buzzwole.png
+pheromosa: https://img.pokemondb.net/sprites/home/shiny/1x/pheromosa.png
+pheromosa: https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/pheromosa.png
+pheromosa: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/pheromosa.png
+pheromosa: https://img.pokemondb.net/sprites/bank/shiny/pheromosa.png
+pheromosa: https://img.pokemondb.net/sprites/go/shiny/1x/pheromosa.png
+xurkitree: https://img.pokemondb.net/sprites/home/shiny/1x/xurkitree.png
+xurkitree: https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/xurkitree.png
+xurkitree: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/xurkitree.png
+xurkitree: https://img.pokemondb.net/sprites/bank/shiny/xurkitree.png
+xurkitree: https://img.pokemondb.net/sprites/go/shiny/1x/xurkitree.png
+celesteela: https://img.pokemondb.net/sprites/home/shiny/1x/celesteela.png
+celesteela: https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/celesteela.png
+celesteela: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/celesteela.png
+celesteela: https://img.pokemondb.net/sprites/bank/shiny/celesteela.png
+celesteela: https://img.pokemondb.net/sprites/go/shiny/1x/celesteela.png
+kartana: https://img.pokemondb.net/sprites/home/shiny/1x/kartana.png
+kartana: https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/kartana.png
+kartana: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/kartana.png
+kartana: https://img.pokemondb.net/sprites/bank/shiny/kartana.png
+kartana: https://img.pokemondb.net/sprites/go/shiny/1x/kartana.png
+guzzlord: https://img.pokemondb.net/sprites/home/shiny/1x/guzzlord.png
+guzzlord: https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/guzzlord.png
+guzzlord: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/guzzlord.png
+guzzlord: https://img.pokemondb.net/sprites/bank/shiny/guzzlord.png
+guzzlord: https://img.pokemondb.net/sprites/go/shiny/1x/guzzlord.png
+necrozma: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/necrozma.png
+necrozma: https://img.pokemondb.net/sprites/home/shiny/1x/necrozma.png
+necrozma: https://img.pokemondb.net/sprites/home/shiny/1x/necrozma-dawn-wings.png
+necrozma: https://img.pokemondb.net/sprites/home/shiny/1x/necrozma-dusk-mane.png
+necrozma: https://img.pokemondb.net/sprites/home/shiny/1x/necrozma-ultra.png
+necrozma: https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/necrozma.png
+necrozma: https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/necrozma-dawn-wings.png
+necrozma: https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/necrozma-dusk-mane.png
+necrozma: https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/necrozma-ultra.png
+necrozma: https://img.pokemondb.net/sprites/bank/shiny/necrozma.png
+necrozma: https://img.pokemondb.net/sprites/bank/shiny/necrozma-dawn-wings.png
+necrozma: https://img.pokemondb.net/sprites/bank/shiny/necrozma-dusk-mane.png
+necrozma: https://img.pokemondb.net/sprites/bank/shiny/necrozma-ultra.png
+necrozma: https://img.pokemondb.net/sprites/go/shiny/1x/necrozma.png
+necrozma: https://img.pokemondb.net/sprites/go/shiny/1x/necrozma-dawn-wings.png
+necrozma: https://img.pokemondb.net/sprites/go/shiny/1x/necrozma-dusk-mane.png
+magearna: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/magearna.png
+magearna: https://img.pokemondb.net/sprites/home/shiny/1x/magearna.png
+magearna: https://img.pokemondb.net/sprites/home/shiny/1x/magearna-original.png
+magearna: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/magearna-original.png
+magearna: https://img.pokemondb.net/sprites/bank/shiny/magearna.png
+magearna: https://img.pokemondb.net/sprites/bank/shiny/magearna-original.png
+marshadow: https://img.pokemondb.net/sprites/sun-moon/shiny/1x/marshadow.png
+marshadow: https://img.pokemondb.net/sprites/home/shiny/1x/marshadow.png
+marshadow: https://img.pokemondb.net/sprites/bank/shiny/marshadow.png
+marshadow: https://img.pokemondb.net/sprites/go/shiny/1x/marshadow.png
+poipole: https://img.pokemondb.net/sprites/home/shiny/1x/poipole.png
+poipole: https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/poipole.png
+poipole: https://img.pokemondb.net/sprites/bank/shiny/poipole.png
+poipole: https://img.pokemondb.net/sprites/go/shiny/1x/poipole.png
+naganadel: https://img.pokemondb.net/sprites/home/shiny/1x/naganadel.png
+naganadel: https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/naganadel.png
+naganadel: https://img.pokemondb.net/sprites/bank/shiny/naganadel.png
+naganadel: https://img.pokemondb.net/sprites/go/shiny/1x/naganadel.png
+stakataka: https://img.pokemondb.net/sprites/home/shiny/1x/stakataka.png
+stakataka: https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/stakataka.png
+stakataka: https://img.pokemondb.net/sprites/bank/shiny/stakataka.png
+stakataka: https://img.pokemondb.net/sprites/go/shiny/1x/stakataka.png
+blacephalon: https://img.pokemondb.net/sprites/home/shiny/1x/blacephalon.png
+blacephalon: https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/blacephalon.png
+blacephalon: https://img.pokemondb.net/sprites/bank/shiny/blacephalon.png
+blacephalon: https://img.pokemondb.net/sprites/go/shiny/1x/blacephalon.png
+zeraora: https://img.pokemondb.net/sprites/ultra-sun-ultra-moon/shiny/1x/zeraora.png
+zeraora: https://img.pokemondb.net/sprites/home/shiny/1x/zeraora.png
+zeraora: https://img.pokemondb.net/sprites/bank/shiny/zeraora.png
+meltan: https://img.pokemondb.net/sprites/home/shiny/1x/meltan.png
+meltan: https://img.pokemondb.net/sprites/go/shiny/1x/meltan.png
+melmetal: https://img.pokemondb.net/sprites/home/shiny/1x/melmetal.png
+melmetal: https://img.pokemondb.net/sprites/home/shiny/1x/melmetal-gigantamax.png
+melmetal: https://img.pokemondb.net/sprites/go/shiny/1x/melmetal.pngminior : https://play.pokemonshowdown.com/sprites/xyani-shiny/minior-meteor.gif

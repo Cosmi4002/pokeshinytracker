@@ -110,9 +110,12 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
 
             // Skip regional forms here - they are independent entries or handled elsewhere
             if (name.includes('-alola') || name.includes('-galar') || name.includes('-hisui') || name.includes('-paldea')) continue;
-            
+
             // Skip redundant "normal" or "standard" forms (e.g. Silvally-Normal) which are same as base
             if (name === `${details.name}-normal` || name === `${details.name}-standard`) continue;
+
+            // Skip Minior Meteor forms (redundant with Base)
+            if (name.startsWith('minior-') && name.includes('-meteor')) continue;
 
             let category: FormVariant['category'] = 'form';
 
