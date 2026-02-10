@@ -480,7 +480,6 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
         counter={counter}
         method={selectedMethod.id}
         hasShinyCharm={hasShinyCharm}
-        hasShinyCharm={hasShinyCharm}
         playlists={playlists}
         startDate={huntCreatedAt}
       />
