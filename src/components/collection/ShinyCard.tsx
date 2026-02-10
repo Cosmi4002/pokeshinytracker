@@ -111,8 +111,6 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
                                         src={GAME_LOGOS[entry.game]}
                                         alt={entry.game}
                                         className="h-20 lg:h-24 w-auto object-contain"
-                                        crossOrigin="anonymous"
-                                        referrerPolicy="no-referrer"
                                     />
                                 )}
                             </div>
