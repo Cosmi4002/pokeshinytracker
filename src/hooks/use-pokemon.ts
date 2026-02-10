@@ -205,8 +205,8 @@ export function usePokemonList() {
             return false;
           }
 
-          // Rule 2: Exclude extra Cap Pikachu (except Partner Cap which is shiny-lock relevant in some contexts)
-          if (n.includes('-cap') && n !== 'pikachu-partner-cap') {
+          // Rule 2: Exclude all Pikachu forms except Partner Cap (user request)
+          if (p.baseId === 25 && p.id > 10000 && n !== 'pikachu-partner-cap') {
             return false;
           }
 

@@ -331,7 +331,7 @@ export function calculateShinyStats(encounters: number, methodId: string, hasShi
   };
 }
 
-export const SHINY_CHARM_ICON = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/shiny-charm.png';
+export const SHINY_CHARM_ICON = '/img/items/shiny-charm.png';
 
 
 // Helper to get generation from method ID
@@ -430,6 +430,11 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
       return 'https://img.pokemondb.net/sprites/home/shiny/mimikyu.png';
     }
 
+    // FORCE HD SPRITE FOR PIKACHU PARTNER CAP (User Request)
+    if (name && name.toLowerCase() === 'pikachu-partner-cap') {
+      return '/img/pokemon/pikachu-partner-cap.png';
+    }
+
     const shinyKeys: string[] = [];
 
     // Most specific first: ID + Form
@@ -482,7 +487,7 @@ export const getGameSpecificSpriteUrl = (id: number, methodId: string, name?: st
   getPokemonSpriteUrl(id, { shiny: true, name });
 
 export function getShinyCharmIcon(): string {
-  return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/shiny-charm.png';
+  return '/img/items/shiny-charm.png';
 }
 
 // Manually tracked form counts for completion stats
