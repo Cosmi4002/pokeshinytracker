@@ -76,6 +76,9 @@ function getGeneration(id: number): number {
 export function formatPokemonName(name: string, id: number, baseId?: number): string {
   const speciesId = baseId || id;
 
+  // If name already contains spaces, it's likely already formatted (e.g. from DB)
+  if (name.includes(' ')) return name;
+
   // Nidoran gender symbols
   if (name === 'nidoran-f' || speciesId === 29) return 'Nidoran♀';
   if (name === 'nidoran-m' || speciesId === 32) return 'Nidoran♂';
@@ -99,7 +102,7 @@ export function formatPokemonName(name: string, id: number, baseId?: number): st
     return 'Oricorio';
   }
 
-  // Minior color naming (requested by user)
+  // Minior color naming
   if (name.toLowerCase().includes('minior')) {
     const colorMatch = name.toLowerCase().match(/red|orange|yellow|green|blue|indigo|violet/);
     if (colorMatch) {
@@ -107,6 +110,16 @@ export function formatPokemonName(name: string, id: number, baseId?: number): st
       return `Minior ${color}`;
     }
     return 'Minior';
+  }
+
+  // Silvally type naming
+  if (name.toLowerCase().includes('silvally')) {
+    const parts = name.split('-');
+    if (parts.length > 1) {
+      const type = parts[1].charAt(0).toUpperCase() + parts[1].slice(1);
+      return `Silvally ${type}`;
+    }
+    return 'Silvally';
   }
 
   const regions: Record<string, string> = {

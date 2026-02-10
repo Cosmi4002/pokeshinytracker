@@ -108,10 +108,15 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
           name: pokemonName,
         });
 
+      // Calculate the final display name (e.g. "Silvally Bug")
+      const finalDisplayName = form
+        ? formOptions.find(f => f.formName.replace(/^[^-]+-/, '') === form)?.displayName || formatPokemonName(pokemonName, pokemonId)
+        : formatPokemonName(pokemonName, pokemonId);
+
       const { error } = await supabase.from('caught_shinies').insert({
         user_id: user.id,
         pokemon_id: pokemonId,
-        pokemon_name: pokemonName,
+        pokemon_name: finalDisplayName,
         sprite_url: finalSpriteUrl,
         form: form || null,
         gender: gender || null,
