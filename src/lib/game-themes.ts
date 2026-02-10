@@ -315,7 +315,7 @@ export const GAME_LOGOS: Record<string, string> = {
   // Gen 5
   black: '/img/game-logos/black.png',
   white: '/img/game-logos/white.png',
-  black2: '/img/game-logos/black2.png',
+  black2: 'https://archives.bulbagarden.net/media/upload/b/be/Black_2_EN_logo.png',
   white2: '/img/game-logos/white2.png',
   // Gen 6
   x: '/img/game-logos/x.png',

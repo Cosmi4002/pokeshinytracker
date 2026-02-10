@@ -91,12 +91,12 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
                         </Button>
                     </div>
 
-                    <div className="p-1 px-2 rounded-xl bg-black/40 backdrop-blur-md border border-white/10 shadow-lg min-w-[80px] flex items-center justify-center">
+                    <div className="p-1 px-3 rounded-xl bg-black/60 backdrop-blur-md border border-white/20 shadow-2xl flex items-center justify-center max-w-[120px]">
                         {GAME_LOGOS[entry.game] ? (
                             <img
                                 src={GAME_LOGOS[entry.game]}
                                 alt={entry.game}
-                                className="h-6 w-auto object-contain brightness-110 drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
+                                className="h-8 md:h-10 w-auto object-contain brightness-125 drop-shadow-[0_0_12px_rgba(255,255,255,0.4)] transition-all duration-300 group-hover:scale-110"
                                 crossOrigin="anonymous"
                                 referrerPolicy="no-referrer"
                                 onError={(e) => {
