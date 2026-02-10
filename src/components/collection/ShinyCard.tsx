@@ -65,7 +65,7 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
                         })}
                         alt={entry.pokemon_name}
                         className="w-40 h-40 lg:w-56 lg:h-56 object-contain pokemon-sprite drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] transition-all duration-500 group-hover:scale-110"
-                        style={{ imageRendering: 'pixelated' }}
+                        style={{ imageRendering: 'auto' }}
                         onError={() => setImgError(true)}
                     />
                 </div>

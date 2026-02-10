@@ -242,7 +242,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
               src={getGameSpecificSpriteUrl(selectedPokemonId, selectedMethod.id, selectedPokemonName)}
               alt={selectedPokemonName}
               className="w-40 h-40 object-contain pokemon-sprite animate-in fade-in zoom-in duration-500"
-              style={{ imageRendering: 'pixelated' }}
+              style={{ imageRendering: 'auto' }}
               onError={(e) => {
                 (e.target as HTMLImageElement).src = '/placeholder.svg';
               }}

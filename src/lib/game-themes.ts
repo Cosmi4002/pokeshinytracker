@@ -315,7 +315,7 @@ export const GAME_LOGOS: Record<string, string> = {
   // Gen 5
   black: '/img/game-logos/black.png',
   white: '/img/game-logos/white.png',
-  black2: 'https://archives.bulbagarden.net/media/upload/5/50/Pok%C3%A9mon_Black_2_logo_EN.png',
+  black2: '/img/game-logos/black2.png',
   white2: '/img/game-logos/white2.png',
   // Gen 6
   x: '/img/game-logos/x.png',
