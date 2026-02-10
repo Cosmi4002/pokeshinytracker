@@ -91,30 +91,6 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
                         </Button>
                     </div>
 
-                    <div className="p-1 px-3 rounded-xl bg-black/60 backdrop-blur-md border border-white/20 shadow-2xl flex items-center justify-center max-w-[120px]">
-                        {GAME_LOGOS[entry.game] ? (
-                            <img
-                                src={GAME_LOGOS[entry.game]}
-                                alt={entry.game}
-                                className="h-8 md:h-10 w-auto object-contain brightness-125 drop-shadow-[0_0_12px_rgba(255,255,255,0.4)] transition-all duration-300 group-hover:scale-110"
-                                crossOrigin="anonymous"
-                                referrerPolicy="no-referrer"
-                                onError={(e) => {
-                                    // Fallback to text if still fails
-                                    e.currentTarget.style.display = 'none';
-                                    const parent = e.currentTarget.parentElement;
-                                    if (parent) {
-                                        const span = document.createElement('span');
-                                        span.className = "text-[10px] font-bold text-white px-2 uppercase";
-                                        span.innerText = entry.game.slice(0, 3);
-                                        parent.appendChild(span);
-                                    }
-                                }}
-                            />
-                        ) : (
-                            <span className="text-[10px] font-bold text-white px-2 uppercase">{entry.game.slice(0, 3)}</span>
-                        )}
-                    </div>
                 </div>
 
                 {/* Sparkling overlays */}
@@ -131,7 +107,16 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
                         <h3 className="text-xl lg:text-2xl font-black text-white tracking-tight capitalize leading-none truncate">
                             {formatPokemonName(entry.pokemon_name, entry.pokemon_id)}
                         </h3>
-                        <div className="flex gap-1 flex-shrink-0">
+                        <div className="flex gap-1.5 flex-shrink-0 items-center">
+                            {GAME_LOGOS[entry.game] && (
+                                <img
+                                    src={GAME_LOGOS[entry.game]}
+                                    alt={entry.game}
+                                    className="h-4 lg:h-5 w-auto object-contain brightness-125 drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
+                                    crossOrigin="anonymous"
+                                    referrerPolicy="no-referrer"
+                                />
+                            )}
                             {entry.gender && (
                                 <span className={cn(
                                     "text-lg font-bold drop-shadow-sm",
