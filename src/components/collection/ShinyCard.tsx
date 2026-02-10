@@ -30,7 +30,7 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
 
     return (
         <div
-            className="group relative h-full flex flex-col overflow-hidden rounded-2xl border bg-[#2a2a2a] shadow-2xl transition-all duration-500 hover:shadow-[0_0_30px_rgba(0,0,0,0.5)] hover:-translate-y-2 border-white/10"
+            className="group relative h-full flex flex-col overflow-hidden rounded-2xl border bg-[#2d2d2d] shadow-2xl transition-all duration-500 hover:shadow-[0_0_30px_rgba(0,0,0,0.5)] hover:-translate-y-2 border-white/10"
             style={{
                 borderColor: `${theme.primary}50`,
             }}
@@ -54,7 +54,6 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
                     />
                 )}
 
-                {/* Pokemon Sprite */}
                 <div className="absolute inset-0 flex items-center justify-center z-10 p-4">
                     <img
                         src={getPokemonSpriteUrl(entry.pokemon_id, {
@@ -64,7 +63,7 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
                             female: entry.gender === 'female'
                         })}
                         alt={entry.pokemon_name}
-                        className="w-40 h-40 lg:w-56 lg:h-56 object-contain pokemon-sprite drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] transition-all duration-500 group-hover:scale-110"
+                        className="w-36 h-36 lg:w-48 lg:h-48 object-contain pokemon-sprite drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] transition-all duration-500 group-hover:scale-110"
                         style={{ imageRendering: 'auto' }}
                         onError={() => setImgError(true)}
                     />
@@ -99,41 +98,39 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
             </div>
 
             {/* BOTTOM AREA: CONTENT (Clean & High Contrast) */}
-            <div className="flex-1 p-4 bg-[#2a2a2a] relative z-10 border-t border-white/10">
+            <div className="flex-1 p-4 bg-[#242424] relative z-10 border-t border-white/10">
                 <div className="space-y-4">
                     {/* Header: Name and Indicators */}
                     <div className="flex flex-col gap-2">
-                        {/* Top Header Label: Game & Status */}
-                        <div className="flex items-center justify-between w-full">
-                            <div>
-                                {entry.is_fail && (
-                                    <span className="bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-tighter">
-                                        FAIL
-                                    </span>
-                                )}
-                            </div>
-                            <div className="flex items-center gap-3">
-                                {GAME_LOGOS[entry.game] && (
-                                    <img
-                                        src={GAME_LOGOS[entry.game]}
-                                        alt={entry.game}
-                                        className="h-10 lg:h-12 w-auto object-contain"
-                                    />
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Name and Gender Row */}
-                        <div className="flex items-center gap-2 mt-1 min-w-0">
-                            <h3 className="text-lg lg:text-xl font-black text-white tracking-tight capitalize leading-none overflow-visible">
+                        {/* Name and Gender Row - NOW AT THE TOP */}
+                        <div className="flex items-center gap-2 min-w-0">
+                            <h3 className="text-xl lg:text-2xl font-black text-white tracking-tight capitalize leading-none overflow-visible">
                                 {formatPokemonName(entry.pokemon_name, entry.pokemon_id)}
                             </h3>
-                            {entry.gender && (
+                            {(entry.gender === 'male' || entry.gender === 'female') && (
                                 <span className={cn(
                                     "text-xl font-bold drop-shadow-sm flex-shrink-0 leading-none",
                                     entry.gender === 'male' ? "text-blue-400" : "text-pink-400"
                                 )}>
                                     {entry.gender === 'male' ? '♂' : '♀'}
+                                </span>
+                            )}
+                        </div>
+
+                        {/* Sub Header: Game Logo & Status */}
+                        <div className="flex items-center justify-between w-full mt-0.5">
+                            <div className="flex items-center gap-3">
+                                {GAME_LOGOS[entry.game] && (
+                                    <img
+                                        src={GAME_LOGOS[entry.game]}
+                                        alt={entry.game}
+                                        className="h-14 lg:h-18 w-auto object-contain brightness-110"
+                                    />
+                                )}
+                            </div>
+                            {entry.is_fail && (
+                                <span className="bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-tighter">
+                                    FAIL
                                 </span>
                             )}
                         </div>
@@ -182,8 +179,13 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
                             <span className="text-[10px] text-white/40 font-semibold uppercase">{pokeball.name}</span>
                         </div>
                         {entry.has_shiny_charm && (
-                            <div className="text-[10px] text-yellow-500 font-bold flex items-center gap-1">
-                                <span className="animate-pulse">✨</span> CHARM
+                            <div className="flex items-center gap-1.5" title="Shiny Charm Active">
+                                <img
+                                    src="/img/items/shiny-charm.png"
+                                    className="w-6 h-6 object-contain animate-pulse drop-shadow-[0_0_5px_rgba(234,179,8,0.5)]"
+                                    alt="Shiny Charm"
+                                />
+                                <span className="text-[10px] text-yellow-500 font-black uppercase tracking-tighter">CHARM</span>
                             </div>
                         )}
                     </div>
