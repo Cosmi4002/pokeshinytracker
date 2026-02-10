@@ -30,7 +30,7 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
 
     return (
         <div
-            className="group relative h-full flex flex-col overflow-hidden rounded-2xl border bg-[#1a1a1a] shadow-2xl transition-all duration-500 hover:shadow-[0_0_30px_rgba(0,0,0,0.5)] hover:-translate-y-2 border-white/10"
+            className="group relative h-full flex flex-col overflow-hidden rounded-2xl border bg-[#2a2a2a] shadow-2xl transition-all duration-500 hover:shadow-[0_0_30px_rgba(0,0,0,0.5)] hover:-translate-y-2 border-white/10"
             style={{
                 borderColor: `${theme.primary}50`,
             }}
@@ -99,7 +99,7 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
             </div>
 
             {/* BOTTOM AREA: CONTENT (Clean & High Contrast) */}
-            <div className="flex-1 p-4 bg-[#1a1a1a] relative z-10 border-t border-white/10">
+            <div className="flex-1 p-4 bg-[#2a2a2a] relative z-10 border-t border-white/10">
                 <div className="space-y-4">
                     {/* Header: Name and Indicators */}
                     <div className="flex flex-col gap-2">
@@ -117,7 +117,7 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
                                     <img
                                         src={GAME_LOGOS[entry.game]}
                                         alt={entry.game}
-                                        className="h-20 lg:h-24 w-auto object-contain"
+                                        className="h-10 lg:h-12 w-auto object-contain"
                                     />
                                 )}
                             </div>
