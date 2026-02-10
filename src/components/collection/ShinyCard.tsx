@@ -104,26 +104,28 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
                 <div className="space-y-4">
                     {/* Header: Name and Indicators */}
                     <div className="flex items-center justify-between gap-2">
-                        <h3 className="text-xl lg:text-2xl font-black text-white tracking-tight capitalize leading-none truncate">
-                            {formatPokemonName(entry.pokemon_name, entry.pokemon_id)}
-                        </h3>
+                        <div className="flex items-center gap-2 min-w-0">
+                            <h3 className="text-xl lg:text-2xl font-black text-white tracking-tight capitalize leading-none truncate">
+                                {formatPokemonName(entry.pokemon_name, entry.pokemon_id)}
+                            </h3>
+                            {entry.gender && (
+                                <span className={cn(
+                                    "text-lg lg:text-xl font-bold drop-shadow-sm flex-shrink-0",
+                                    entry.gender === 'male' ? "text-blue-400" : "text-pink-400"
+                                )}>
+                                    {entry.gender === 'male' ? '♂' : '♀'}
+                                </span>
+                            )}
+                        </div>
                         <div className="flex gap-1.5 flex-shrink-0 items-center">
                             {GAME_LOGOS[entry.game] && (
                                 <img
                                     src={GAME_LOGOS[entry.game]}
                                     alt={entry.game}
-                                    className="h-4 lg:h-5 w-auto object-contain brightness-125 drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
+                                    className="h-10 lg:h-12 w-auto object-contain brightness-125 drop-shadow-[0_0_12px_rgba(255,255,255,0.4)] transition-all duration-300 group-hover:scale-110"
                                     crossOrigin="anonymous"
                                     referrerPolicy="no-referrer"
                                 />
-                            )}
-                            {entry.gender && (
-                                <span className={cn(
-                                    "text-lg font-bold drop-shadow-sm",
-                                    entry.gender === 'male' ? "text-blue-400" : "text-pink-400"
-                                )}>
-                                    {entry.gender === 'male' ? '♂' : '♀'}
-                                </span>
                             )}
                             {entry.is_fail && (
                                 <span className="bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter">
