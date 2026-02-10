@@ -148,7 +148,12 @@
     }
 
     .custom-scrollbar::-webkit-scrollbar-thumb {
-        @apply bg-primary/50 rounded-full hover:bg-primary;
+        background-color: hsla(var(--theme-primary-hue), 100%, 50%, 0.5);
+        border-radius: 9999px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background-color: var(--primary);
     }
 
     .custom-scrollbar {
