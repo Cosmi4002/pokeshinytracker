@@ -105,7 +105,7 @@ export const PokedexCard = memo(function PokedexCard({
                                         ? "drop-shadow-[0_0_12px_rgba(255,255,255,0.7)] scale-105"
                                         : "opacity-60 group-hover:opacity-100 group-hover:scale-110"
                                 )}
-                                style={{ imageRendering: 'auto' }}
+                                style={{ imageRendering: 'pixelated' }}
                                 loading="lazy"
                                 onError={() => setImgError(true)}
                             />
@@ -126,7 +126,7 @@ export const PokedexCard = memo(function PokedexCard({
                                         ? "drop-shadow-[0_0_12px_rgba(255,255,255,0.7)] scale-105"
                                         : "opacity-60 group-hover:opacity-100 group-hover:scale-110"
                                 )}
-                                style={{ imageRendering: 'auto' }}
+                                style={{ imageRendering: 'pixelated' }}
                                 loading="lazy"
                                 onError={() => setFemaleImgError(true)}
                             />

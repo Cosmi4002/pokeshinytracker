@@ -64,8 +64,8 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
                             female: entry.gender === 'female'
                         })}
                         alt={entry.pokemon_name}
-                        className="w-40 h-40 lg:w-56 lg:h-56 object-contain pokemon-sprite drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] transition-all duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_25px_rgba(255,255,255,0.2)]"
-                        style={{ imageRendering: 'auto' }}
+                        className="w-40 h-40 lg:w-56 lg:h-56 object-contain pokemon-sprite drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] transition-all duration-500 group-hover:scale-110"
+                        style={{ imageRendering: 'pixelated' }}
                         onError={() => setImgError(true)}
                     />
                 </div>
@@ -90,7 +90,6 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
                             <Trash2 className="h-4 w-4" />
                         </Button>
                     </div>
-
                 </div>
 
                 {/* Sparkling overlays */}
@@ -103,33 +102,38 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
             <div className="flex-1 p-4 bg-[#0f0f0f] relative z-10 border-t border-white/10">
                 <div className="space-y-4">
                     {/* Header: Name and Indicators */}
-                    <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2 min-w-0">
-                            <h3 className="text-xl lg:text-2xl font-black text-white tracking-tight capitalize leading-none truncate">
+                    <div className="flex flex-col gap-2">
+                        {/* Top Header Label: Game & Status */}
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                {GAME_LOGOS[entry.game] && (
+                                    <img
+                                        src={GAME_LOGOS[entry.game]}
+                                        alt={entry.game}
+                                        className="h-20 lg:h-24 w-auto object-contain"
+                                        crossOrigin="anonymous"
+                                        referrerPolicy="no-referrer"
+                                    />
+                                )}
+                            </div>
+                            {entry.is_fail && (
+                                <span className="bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-tighter">
+                                    FAIL
+                                </span>
+                            )}
+                        </div>
+
+                        {/* Name and Gender Row */}
+                        <div className="flex items-center gap-2 mt-1 min-w-0">
+                            <h3 className="text-lg lg:text-xl font-black text-white tracking-tight capitalize leading-none truncate overflow-visible">
                                 {formatPokemonName(entry.pokemon_name, entry.pokemon_id)}
                             </h3>
                             {entry.gender && (
                                 <span className={cn(
-                                    "text-lg lg:text-xl font-bold drop-shadow-sm flex-shrink-0",
+                                    "text-xl font-bold drop-shadow-sm flex-shrink-0 leading-none",
                                     entry.gender === 'male' ? "text-blue-400" : "text-pink-400"
                                 )}>
                                     {entry.gender === 'male' ? '♂' : '♀'}
-                                </span>
-                            )}
-                        </div>
-                        <div className="flex gap-1.5 flex-shrink-0 items-center">
-                            {GAME_LOGOS[entry.game] && (
-                                <img
-                                    src={GAME_LOGOS[entry.game]}
-                                    alt={entry.game}
-                                    className="h-10 lg:h-12 w-auto object-contain brightness-125 drop-shadow-[0_0_12px_rgba(255,255,255,0.4)] transition-all duration-300 group-hover:scale-110"
-                                    crossOrigin="anonymous"
-                                    referrerPolicy="no-referrer"
-                                />
-                            )}
-                            {entry.is_fail && (
-                                <span className="bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter">
-                                    FAIL
                                 </span>
                             )}
                         </div>
