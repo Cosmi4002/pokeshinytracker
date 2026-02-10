@@ -102,36 +102,38 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
             <div className="flex-1 p-4 bg-[#2a2a2a] relative z-10 border-t border-white/10">
                 <div className="space-y-4">
                     {/* Header: Name and Indicators */}
-                    <div className="flex flex-col gap-1.5">
-                        {/* Name and Gender Row - NOW AT THE TOP */}
-                        <div className="flex items-center gap-2 min-w-0">
-                            <h3 className="text-xl lg:text-2xl font-black text-white tracking-tight capitalize leading-none truncate overflow-visible">
-                                {formatPokemonName(entry.pokemon_name, entry.pokemon_id)}
-                            </h3>
-                            {entry.gender && (
-                                <span className={cn(
-                                    "text-2xl font-bold drop-shadow-sm flex-shrink-0 leading-none",
-                                    entry.gender === 'male' ? "text-blue-400" : "text-pink-400"
-                                )}>
-                                    {entry.gender === 'male' ? '♂' : '♀'}
-                                </span>
-                            )}
-                        </div>
-
-                        {/* Sub Header: Game Logo & Status */}
-                        <div className="flex items-center justify-between w-full mt-0.5">
+                    <div className="flex flex-col gap-2">
+                        {/* Top Header Label: Game & Status */}
+                        <div className="flex items-center justify-between w-full">
+                            <div>
+                                {entry.is_fail && (
+                                    <span className="bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-tighter">
+                                        FAIL
+                                    </span>
+                                )}
+                            </div>
                             <div className="flex items-center gap-3">
                                 {GAME_LOGOS[entry.game] && (
                                     <img
                                         src={GAME_LOGOS[entry.game]}
                                         alt={entry.game}
-                                        className="h-8 lg:h-10 w-auto object-contain brightness-110"
+                                        className="h-10 lg:h-12 w-auto object-contain"
                                     />
                                 )}
                             </div>
-                            {entry.is_fail && (
-                                <span className="bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-tighter">
-                                    FAIL
+                        </div>
+
+                        {/* Name and Gender Row */}
+                        <div className="flex items-center gap-2 mt-1 min-w-0">
+                            <h3 className="text-lg lg:text-xl font-black text-white tracking-tight capitalize leading-none overflow-visible">
+                                {formatPokemonName(entry.pokemon_name, entry.pokemon_id)}
+                            </h3>
+                            {entry.gender && (
+                                <span className={cn(
+                                    "text-xl font-bold drop-shadow-sm flex-shrink-0 leading-none",
+                                    entry.gender === 'male' ? "text-blue-400" : "text-pink-400"
+                                )}>
+                                    {entry.gender === 'male' ? '♂' : '♀'}
                                 </span>
                             )}
                         </div>
