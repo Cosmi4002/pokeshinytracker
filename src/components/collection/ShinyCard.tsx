@@ -30,7 +30,7 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
 
     return (
         <div
-            className="group relative h-full flex flex-col overflow-hidden rounded-2xl border bg-[#0f0f0f] shadow-2xl transition-all duration-500 hover:shadow-[0_0_30px_rgba(0,0,0,0.5)] hover:-translate-y-2 border-white/10"
+            className="group relative h-full flex flex-col overflow-hidden rounded-2xl border bg-[#1a1a1a] shadow-2xl transition-all duration-500 hover:shadow-[0_0_30px_rgba(0,0,0,0.5)] hover:-translate-y-2 border-white/10"
             style={{
                 borderColor: `${theme.primary}50`,
             }}
@@ -99,12 +99,19 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
             </div>
 
             {/* BOTTOM AREA: CONTENT (Clean & High Contrast) */}
-            <div className="flex-1 p-4 bg-[#0f0f0f] relative z-10 border-t border-white/10">
+            <div className="flex-1 p-4 bg-[#1a1a1a] relative z-10 border-t border-white/10">
                 <div className="space-y-4">
                     {/* Header: Name and Indicators */}
                     <div className="flex flex-col gap-2">
                         {/* Top Header Label: Game & Status */}
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between w-full">
+                            <div>
+                                {entry.is_fail && (
+                                    <span className="bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-tighter">
+                                        FAIL
+                                    </span>
+                                )}
+                            </div>
                             <div className="flex items-center gap-3">
                                 {GAME_LOGOS[entry.game] && (
                                     <img
@@ -114,11 +121,6 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
                                     />
                                 )}
                             </div>
-                            {entry.is_fail && (
-                                <span className="bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-tighter">
-                                    FAIL
-                                </span>
-                            )}
                         </div>
 
                         {/* Name and Gender Row */}
