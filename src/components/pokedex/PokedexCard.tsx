@@ -39,7 +39,7 @@ export const PokedexCard = memo(function PokedexCard({
             onClick={onClick}
             className={cn(
                 "relative group flex flex-col items-center justify-center p-3 rounded-2xl transition-all duration-500 border-2",
-                "backdrop-blur-sm overflow-hidden cursor-pointer w-full min-h-[180px]", // Increased for larger sprites
+                "backdrop-blur-sm overflow-hidden cursor-pointer w-full min-h-[210px]", // Increased for larger sprites
                 "hover:scale-105 active:scale-95",
                 // Base state
                 !hasCaughtAny && "border-white/5 grayscale hover:grayscale-0",
@@ -87,14 +87,14 @@ export const PokedexCard = memo(function PokedexCard({
             )}
 
             {/* Sprites container */}
-            <div className="relative flex items-center justify-center z-10 h-32 w-full px-2"> {/* Increased height for better centering */}
+            <div className="relative flex items-center justify-center z-10 h-36 w-full px-2"> {/* Increased height for better centering */}
                 {/* Wrapper for sprites to ensure balanced centering */}
                 <div className="flex items-center justify-center gap-1 w-full translate-y-2">
                     {/* Default/Male sprite */}
                     {!imgError ? (
                         <div className={cn(
                             "relative flex items-center justify-center transition-all duration-500",
-                            hasGenderDiff ? "w-24" : "w-32"
+                            hasGenderDiff ? "w-28" : "w-40"
                         )}>
                             <img
                                 src={spriteUrl}
@@ -116,7 +116,7 @@ export const PokedexCard = memo(function PokedexCard({
 
                     {/* Female sprite */}
                     {hasGenderDiff && femaleSprite && !femaleImgError && (
-                        <div className="relative w-20 flex items-center justify-center transition-all duration-500 -ml-2">
+                        <div className="relative w-24 flex items-center justify-center transition-all duration-500 -ml-4">
                             <img
                                 src={femaleSprite}
                                 alt={`${displayName} shiny female`}

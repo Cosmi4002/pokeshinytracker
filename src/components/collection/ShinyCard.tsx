@@ -64,7 +64,7 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
                             female: entry.gender === 'female'
                         })}
                         alt={entry.pokemon_name}
-                        className="w-32 h-32 lg:w-40 lg:h-40 object-contain pokemon-sprite drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] transition-all duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_25px_rgba(255,255,255,0.2)]"
+                        className="w-40 h-40 lg:w-56 lg:h-56 object-contain pokemon-sprite drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] transition-all duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_25px_rgba(255,255,255,0.2)]"
                         style={{ imageRendering: 'auto' }}
                         onError={() => setImgError(true)}
                     />
