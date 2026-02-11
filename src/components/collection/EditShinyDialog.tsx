@@ -55,6 +55,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
   const [huntStartDate, setHuntStartDate] = useState('');
   const [caughtDate, setCaughtDate] = useState(new Date().toISOString().split('T')[0]);
   const [isFail, setIsFail] = useState(false);
+  const [phaseNumber, setPhaseNumber] = useState<number | null>(null);
   const [playlistId, setPlaylistId] = useState<string>('');
   const [notes, setNotes] = useState('');
 
@@ -87,6 +88,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
       setHuntStartDate(entry.hunt_start_date ?? '');
       setCaughtDate(entry.caught_date ?? new Date().toISOString().split('T')[0]);
       setIsFail(entry.is_fail ?? false);
+      setPhaseNumber(entry.phase_number ?? null);
       setPlaylistId(entry.playlist_id ?? '');
       setNotes(entry.notes ?? '');
     }
@@ -136,6 +138,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
           hunt_start_date: huntStartDate || null,
           caught_date: caughtDate,
           is_fail: isFail,
+          phase_number: phaseNumber,
           playlist_id: playlistId || null,
           notes: notes || null,
         })
@@ -285,15 +288,27 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
             <MethodSelector value={method.id} onChange={setMethod} />
           </div>
 
-          {/* 9. Counter */}
-          <div className="space-y-2">
-            <Label>Numero tentativi (counter)</Label>
-            <Input
-              type="number"
-              min={1}
-              value={attempts}
-              onChange={(e) => setAttempts(Math.max(1, parseInt(e.target.value) || 1))}
-            />
+          {/* 9. Counter and Phase Number - Grid Layout */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Numero tentativi (counter)</Label>
+              <Input
+                type="number"
+                min={1}
+                value={attempts}
+                onChange={(e) => setAttempts(Math.max(1, parseInt(e.target.value) || 1))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Phase Number (opzionale)</Label>
+              <Input
+                type="number"
+                min={1}
+                placeholder="Es: 1, 2, 3..."
+                value={phaseNumber || ''}
+                onChange={(e) => setPhaseNumber(e.target.value ? parseInt(e.target.value) || null : null)}
+              />
+            </div>
           </div>
 
           {/* 10. Date */}
@@ -308,9 +323,9 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
             </div>
           </div>
 
-          {/* 11. FAIL */}
+          {/* 11. FAIL - Separated from Phase */}
           <div className="flex items-center justify-between p-3 rounded-lg border border-destructive/30 bg-destructive/5">
-            <Label>FAIL (caccia fallita / phase)</Label>
+            <Label>FAIL (caccia fallita)</Label>
             <Switch checked={isFail} onCheckedChange={setIsFail} />
           </div>
 

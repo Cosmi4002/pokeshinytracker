@@ -52,6 +52,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
   const [huntStartDate, setHuntStartDate] = useState('');
   const [caughtDate, setCaughtDate] = useState(new Date().toISOString().split('T')[0]);
   const [isFail, setIsFail] = useState(false);
+  const [phaseNumber, setPhaseNumber] = useState<number | null>(null);
   const [playlistId, setPlaylistId] = useState<string>('');
   const [notes, setNotes] = useState('');
 
@@ -82,6 +83,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
     setHuntStartDate('');
     setCaughtDate(new Date().toISOString().split('T')[0]);
     setIsFail(false);
+    setPhaseNumber(null);
     setPlaylistId('');
     setNotes('');
   };
@@ -128,6 +130,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
         hunt_start_date: huntStartDate || null,
         caught_date: caughtDate,
         is_fail: isFail,
+        phase_number: phaseNumber,
         playlist_id: playlistId || null,
         notes: notes || null,
       });
@@ -229,7 +232,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-72 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-muted/20 [&::-webkit-scrollbar-thumb]:bg-primary/40 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-primary/60">
                 {POKEBALLS.map((ball) => (
                   <SelectItem key={ball.id} value={ball.id}>
                     <div className="flex items-center gap-2">
@@ -249,7 +252,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-72 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-muted/20 [&::-webkit-scrollbar-thumb]:bg-primary/40 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-primary/60">
                 {GAMES.map((g) => (
                   <SelectItem key={g.id} value={g.id}>
                     {g.name}
@@ -265,15 +268,27 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
             <MethodSelector value={method.id} onChange={setMethod} />
           </div>
 
-          {/* 9. Counter */}
-          <div className="space-y-2">
-            <Label>Numero tentativi (counter)</Label>
-            <Input
-              type="number"
-              min={1}
-              value={attempts}
-              onChange={(e) => setAttempts(Math.max(1, parseInt(e.target.value) || 1))}
-            />
+          {/* 9. Counter and Phase Number - Grid Layout */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Numero tentativi (counter)</Label>
+              <Input
+                type="number"
+                min={1}
+                value={attempts}
+                onChange={(e) => setAttempts(Math.max(1, parseInt(e.target.value) || 1))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Phase Number (opzionale)</Label>
+              <Input
+                type="number"
+                min={1}
+                placeholder="Es: 1, 2, 3..."
+                value={phaseNumber || ''}
+                onChange={(e) => setPhaseNumber(e.target.value ? parseInt(e.target.value) || null : null)}
+              />
+            </div>
           </div>
 
           {/* 10. Data inizio e fine */}
@@ -292,9 +307,9 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
             </div>
           </div>
 
-          {/* 11. FAIL */}
+          {/* 11. FAIL - Separated from Phase */}
           <div className="flex items-center justify-between p-3 rounded-lg border border-destructive/30 bg-destructive/5">
-            <Label>FAIL (caccia fallita / phase)</Label>
+            <Label>FAIL (caccia fallita)</Label>
             <Switch checked={isFail} onCheckedChange={setIsFail} />
           </div>
 

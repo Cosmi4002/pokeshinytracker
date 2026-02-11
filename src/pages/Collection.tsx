@@ -281,7 +281,7 @@ export default function Collection() {
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="max-h-64">
+                    <SelectContent className="max-h-72 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-muted/20 [&::-webkit-scrollbar-thumb]:bg-primary/40 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-primary/60">
                       <SelectItem value="all">Tutti</SelectItem>
                       {GAMES.map((game) => (
                         <SelectItem key={game.id} value={game.id}>

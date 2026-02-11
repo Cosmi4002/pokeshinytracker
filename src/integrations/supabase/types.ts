@@ -70,6 +70,7 @@ export type Database = {
           is_fail: boolean
           method: string
           notes: string | null
+          phase_number: number | null
           playlist_id: string | null
           pokeball: string
           pokemon_id: number
@@ -91,6 +92,7 @@ export type Database = {
           is_fail?: boolean
           method: string
           notes?: string | null
+          phase_number?: number | null
           playlist_id?: string | null
           pokeball?: string
           pokemon_id: number
@@ -112,6 +114,7 @@ export type Database = {
           is_fail?: boolean
           method?: string
           notes?: string | null
+          phase_number?: number | null
           playlist_id?: string | null
           pokeball?: string
           pokemon_id?: number

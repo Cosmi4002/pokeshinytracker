@@ -64,9 +64,9 @@ export const GAME_THEMES: Record<string, GameTheme> = {
     accent: '#FCE7F3',
   },
   platinum: {
-    primary: '#718096',
-    secondary: '#4A5568',
-    accent: '#A0AEC0',
+    primary: '#E5E4E2', // Platinum
+    secondary: '#B8860B', // Dark Goldenrod (Ochre accent)
+    accent: '#DAA520', // Goldenrod
   },
   heartgold: {
     primary: '#F6AD55',
@@ -150,9 +150,9 @@ export const GAME_THEMES: Record<string, GameTheme> = {
     accent: '#FBD38D',
   },
   lge: {
-    primary: '#D69E2E',
-    secondary: '#975A16',
-    accent: '#F6E05E',
+    primary: '#8B4513', // Saddle Brown
+    secondary: '#5D4037', // Darker Brown
+    accent: '#D2691E', // Chocolate
   },
 
   // Gen 8
@@ -297,9 +297,9 @@ export const GAME_COVER_ART: Record<string, string> = {
 // High-quality game logos from Bulbagarden (Local Hosting)
 export const GAME_LOGOS: Record<string, string> = {
   // Gen 2
-  gold: '/img/game-logos/gold.png',
-  silver: '/img/game-logos/silver.png',
-  crystal: '/img/game-logos/crystal.png',
+  gold: 'https://upload.wikimedia.org/wikipedia/commons/2/2f/Pok%C3%A9mon_Gold_Logo.svg',
+  silver: 'https://upload.wikimedia.org/wikipedia/commons/9/93/Pok%C3%A9mon_Silver_Logo.svg',
+  crystal: 'https://upload.wikimedia.org/wikipedia/commons/1/1a/Pok%C3%A9mon_Crystal_Logo.svg',
   // Gen 3
   ruby: '/img/game-logos/ruby.png',
   sapphire: '/img/game-logos/sapphire.png',
@@ -313,8 +313,8 @@ export const GAME_LOGOS: Record<string, string> = {
   heartgold: '/img/game-logos/heartgold.png',
   soulsilver: '/img/game-logos/soulsilver.png',
   // Gen 5
-  black: '/img/game-logos/black.png',
-  white: '/img/game-logos/white.png',
+  black: 'https://upload.wikimedia.org/wikipedia/commons/d/d4/Pok%C3%A9mon_Black_Version_logo.png',
+  white: 'https://upload.wikimedia.org/wikipedia/commons/8/82/Pok%C3%A9mon_White_Version_logo.png',
   black2: '/img/game-logos/black2.png',
   white2: '/img/game-logos/white2.png',
   // Gen 6
