@@ -59,9 +59,9 @@ export const GAME_THEMES: Record<string, GameTheme> = {
     accent: '#90CDF4',
   },
   pearl: {
-    primary: '#ED8936',
-    secondary: '#C05621',
-    accent: '#FBD38D',
+    primary: '#F9A8D4',
+    secondary: '#F472B6',
+    accent: '#FCE7F3',
   },
   platinum: {
     primary: '#718096',
