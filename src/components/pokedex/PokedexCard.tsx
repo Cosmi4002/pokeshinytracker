@@ -130,40 +130,39 @@ export const PokedexCard = memo(function PokedexCard({
                                 onError={() => setFemaleImgError(true)}
                             />
                         </div>
-                        </div>
                     )}
+                </div>
             </div>
-        </div>
 
-            {/* Pokemon info */ }
-    <div className="flex flex-col items-center mt-2 z-10">
-        <p className="text-xs text-muted-foreground">
-            #{baseId.toString().padStart(4, '0')}
-        </p>
-        <p className={cn(
-            "text-sm font-medium truncate max-w-full transition-colors",
-            hasCaughtAny && "text-white drop-shadow-[0_0_5px_rgba(var(--primary),0.8)]"
-        )}>
-            {displayName}
-        </p>
-    </div>
-
-    {/* Completion indicator */ }
-    {
-        hasCaughtAny && (
-            <div className={cn(
-                "absolute top-1 right-1 flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold",
-                isComplete
-                    ? "bg-primary/80 text-white"
-                    : "bg-primary/40 text-primary-foreground/80"
-            )}>
-                {isComplete ? "✓" : `${Math.round(caughtPercentage)}%`}
+            {/* Pokemon info */}
+            <div className="flex flex-col items-center mt-2 z-10">
+                <p className="text-xs text-muted-foreground">
+                    #{baseId.toString().padStart(4, '0')}
+                </p>
+                <p className={cn(
+                    "text-sm font-medium truncate max-w-full transition-colors",
+                    hasCaughtAny && "text-white drop-shadow-[0_0_5px_rgba(var(--primary),0.8)]"
+                )}>
+                    {displayName}
+                </p>
             </div>
-        )
-    }
 
-    {/* Premium shine sweep effect */ }
-    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out pointer-events-none" />
+            {/* Completion indicator */}
+            {
+                hasCaughtAny && (
+                    <div className={cn(
+                        "absolute top-1 right-1 flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold",
+                        isComplete
+                            ? "bg-primary/80 text-white"
+                            : "bg-primary/40 text-primary-foreground/80"
+                    )}>
+                        {isComplete ? "✓" : `${Math.round(caughtPercentage)}%`}
+                    </div>
+                )
+            }
+
+            {/* Premium shine sweep effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out pointer-events-none" />
         </button >
     );
 });
