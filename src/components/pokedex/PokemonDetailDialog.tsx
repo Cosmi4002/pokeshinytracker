@@ -108,6 +108,9 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
 
         // Add forms from API (includes seasonal, regional, mega, gmax, etc.)
         for (const form of details.forms) {
+            // Skip ALL Pikachu cap forms — user only wants Male/Female + Partner Cap (separate entry)
+            if (details.id === 25) continue;
+
             const name = form.formName.toLowerCase();
 
             // Skip regional forms here - they are independent entries or handled elsewhere
