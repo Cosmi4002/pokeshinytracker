@@ -94,13 +94,13 @@ export const PokedexCard = memo(function PokedexCard({
                     {!imgError ? (
                         <div className={cn(
                             "relative flex items-center justify-center transition-all duration-500",
-                            hasGenderDiff ? "w-40" : "w-44"
+                            hasGenderDiff ? "w-[48%]" : "w-full max-w-[180px]"
                         )}>
                             <img
                                 src={spriteUrl}
                                 alt={`${displayName} shiny`}
                                 className={cn(
-                                    "h-full w-full pokemon-sprite transition-all duration-500 object-contain max-h-40",
+                                    "h-full w-full pokemon-sprite transition-all duration-500 object-contain max-h-48",
                                     hasCaughtAny
                                         ? "drop-shadow-[0_0_12px_rgba(255,255,255,0.7)] scale-105"
                                         : "opacity-60 group-hover:opacity-100 group-hover:scale-110"
@@ -114,9 +114,8 @@ export const PokedexCard = memo(function PokedexCard({
                         <div className="h-20 w-20" />
                     )}
 
-                    {/* Female sprite */}
                     {hasGenderDiff && femaleSprite && !femaleImgError && (
-                        <div className="relative w-36 flex items-center justify-center transition-all duration-500 -ml-4">
+                        <div className="relative w-[48%] flex items-center justify-center transition-all duration-500">
                             <img
                                 src={femaleSprite}
                                 alt={`${displayName} shiny female`}
@@ -131,37 +130,40 @@ export const PokedexCard = memo(function PokedexCard({
                                 onError={() => setFemaleImgError(true)}
                             />
                         </div>
+                        </div>
                     )}
-                </div>
             </div>
+        </div>
 
-            {/* Pokemon info */}
-            <div className="flex flex-col items-center mt-2 z-10">
-                <p className="text-xs text-muted-foreground">
-                    #{baseId.toString().padStart(4, '0')}
-                </p>
-                <p className={cn(
-                    "text-sm font-medium truncate max-w-full transition-colors",
-                    hasCaughtAny && "text-white drop-shadow-[0_0_5px_rgba(var(--primary),0.8)]"
-                )}>
-                    {displayName}
-                </p>
+            {/* Pokemon info */ }
+    <div className="flex flex-col items-center mt-2 z-10">
+        <p className="text-xs text-muted-foreground">
+            #{baseId.toString().padStart(4, '0')}
+        </p>
+        <p className={cn(
+            "text-sm font-medium truncate max-w-full transition-colors",
+            hasCaughtAny && "text-white drop-shadow-[0_0_5px_rgba(var(--primary),0.8)]"
+        )}>
+            {displayName}
+        </p>
+    </div>
+
+    {/* Completion indicator */ }
+    {
+        hasCaughtAny && (
+            <div className={cn(
+                "absolute top-1 right-1 flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold",
+                isComplete
+                    ? "bg-primary/80 text-white"
+                    : "bg-primary/40 text-primary-foreground/80"
+            )}>
+                {isComplete ? "✓" : `${Math.round(caughtPercentage)}%`}
             </div>
+        )
+    }
 
-            {/* Completion indicator */}
-            {hasCaughtAny && (
-                <div className={cn(
-                    "absolute top-1 right-1 flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold",
-                    isComplete
-                        ? "bg-primary/80 text-white"
-                        : "bg-primary/40 text-primary-foreground/80"
-                )}>
-                    {isComplete ? "✓" : `${Math.round(caughtPercentage)}%`}
-                </div>
-            )}
-
-            {/* Premium shine sweep effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out pointer-events-none" />
-        </button>
+    {/* Premium shine sweep effect */ }
+    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out pointer-events-none" />
+        </button >
     );
 });
