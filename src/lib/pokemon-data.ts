@@ -341,9 +341,25 @@ export const getGenerationFromMethod = (methodId: string): number => {
 };
 
 // Helper to normalize Pokemon names for Showdown sprites
+// Helper to normalize Pokemon names for Showdown sprites
 export const toShowdownSlug = (name: string): string => {
   if (!name) return '';
-  let slug = name.toLowerCase()
+
+  let slug = name.toLowerCase();
+
+  // Handle Regional Prefixes: Move them to suffix
+  // e.g. "Alolan Rattata" -> "rattata-alola"
+  if (slug.startsWith('alolan ')) {
+    slug = slug.replace('alolan ', '') + '-alola';
+  } else if (slug.startsWith('galarian ')) {
+    slug = slug.replace('galarian ', '') + '-galar';
+  } else if (slug.startsWith('hisuian ')) {
+    slug = slug.replace('hisuian ', '') + '-hisui';
+  } else if (slug.startsWith('paldean ')) {
+    slug = slug.replace('paldean ', '') + '-paldea';
+  }
+
+  slug = slug
     .replace(/[’'%: .]/g, '')
     .replace(/♀/g, 'f')
     .replace(/♂/g, 'm')
