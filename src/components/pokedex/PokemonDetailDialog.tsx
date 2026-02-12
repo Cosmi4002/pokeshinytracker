@@ -111,10 +111,27 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
             // Skip ALL Pikachu cap forms — user only wants Male/Female + Partner Cap (separate entry)
             if (details.id === 25) continue;
 
+            // Skip ALL forms for Partner Cap Pikachu (it's a standalone form)
+            if (details.id === 10148) continue;
+
             const name = form.formName.toLowerCase();
 
             // Skip regional forms here - they are independent entries or handled elsewhere
-            if (name.includes('-alola') || name.includes('-galar') || name.includes('-hisui') || name.includes('-paldea')) continue;
+            // UNLESS the current pokemon is that regional form (e.g. darmanitan-galar should see darmanitan-galar-zen)
+            const isRegionalForm = name.includes('-alola') || name.includes('-galar') || name.includes('-hisui') || name.includes('-paldea');
+
+            if (isRegionalForm) {
+                const myName = details.name.toLowerCase();
+                // If I am NOT regional, filter out regional forms (they are separate entries)
+                if (!myName.includes('-alola') && !myName.includes('-galar') && !myName.includes('-hisui') && !myName.includes('-paldea')) {
+                    continue;
+                }
+                // If I AM regional, filter out OTHER regions
+                if (myName.includes('-galar') && !name.includes('-galar')) continue;
+                if (myName.includes('-alola') && !name.includes('-alola')) continue;
+                if (myName.includes('-hisui') && !name.includes('-hisui')) continue;
+                if (myName.includes('-paldea') && !name.includes('-paldea')) continue;
+            }
 
             // Skip redundant "normal" or "standard" forms (e.g. Silvally-Normal) which are same as base
             if (name === `${details.name}-normal` || name === `${details.name}-standard`) continue;

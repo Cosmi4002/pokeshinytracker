@@ -304,9 +304,26 @@ export function usePokemonDetails(pokemonId: number | null) {
           for (const form of data.forms) {
             if (form.name === data.name) continue;
 
-            // Skip regional forms here - they are independent entries
+            // Skip regional forms here unless they match the current base form's region
             const fn = form.name.toLowerCase();
-            if (fn.includes('-alola') || fn.includes('-galar') || fn.includes('-hisui') || fn.includes('-paldea')) continue;
+            const isRegional = fn.includes('-alola') || fn.includes('-galar') || fn.includes('-hisui') || fn.includes('-paldea');
+
+            // If the current pokemon IS a regional variant (e.g. meowth-galar), 
+            // we should allow forms that share that region (e.g. meowth-galar-something)
+            // But generally, regional forms are separate entries in our list.
+            if (isRegional) {
+              const myName = data.name.toLowerCase();
+              // If I am NOT a regional form, skip all regional forms
+              if (!myName.includes('-alola') && !myName.includes('-galar') && !myName.includes('-hisui') && !myName.includes('-paldea')) {
+                continue;
+              }
+              // If I AM a regional form, only skip forms from OTHER regions
+              // (e.g. if I am meowth-galar, skip meowth-alola)
+              if (myName.includes('-galar') && !fn.includes('-galar')) continue;
+              if (myName.includes('-alola') && !fn.includes('-alola')) continue;
+              if (myName.includes('-hisui') && !fn.includes('-hisui')) continue;
+              if (myName.includes('-paldea') && !fn.includes('-paldea')) continue;
+            }
 
             // Skip Minior Meteor forms
             if (fn.startsWith('minior-') && fn.includes('-meteor')) continue;
