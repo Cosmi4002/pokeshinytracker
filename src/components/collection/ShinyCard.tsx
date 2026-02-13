@@ -59,7 +59,7 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
 
                 <div className="absolute inset-0 flex items-center justify-center z-10 p-2 -translate-y-4">
                     <img
-                        src={getPokemonSpriteUrl(entry.pokemon_id, {
+                        src={entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, {
                             shiny: true,
                             name: entry.pokemon_name,
                             form: entry.form,

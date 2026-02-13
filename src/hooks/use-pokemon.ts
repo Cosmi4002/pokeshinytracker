@@ -364,21 +364,20 @@ export function usePokemonDetails(pokemonId: number | null) {
 
               const vn = variety.pokemon.name.toLowerCase();
 
-              // SKIP regional forms - they are handled as base pokemon now
-              // UNLESS they match the current pokemon's region (e.g. Zen Mode for Galarian Darmanitan)
-              const isRegional = vn.includes('-alola') || vn.includes('-galar') || vn.includes('-hisui') || vn.includes('-paldea');
+              // Determine if the current Pokemon (ME) is regional
+              const myName = data.name.toLowerCase();
+              const amIRegional = myName.includes('-alola') || myName.includes('-galar') || myName.includes('-hisui') || myName.includes('-paldea');
 
-              if (isRegional) {
-                const myName = data.name.toLowerCase();
-                // If I am NOT a regional form, skip all regional varieties (they are separate entries)
-                if (!myName.includes('-alola') && !myName.includes('-galar') && !myName.includes('-hisui') && !myName.includes('-paldea')) {
-                  continue;
-                }
-                // If I AM a regional form, filter out varieties from OTHER regions
+              if (amIRegional) {
+                // If I am regional, ONLY allow varieties from my own region
+                // This filters out standard/Unovan forms from Galarian pages, and other regions
                 if (myName.includes('-galar') && !vn.includes('-galar')) continue;
                 if (myName.includes('-alola') && !vn.includes('-alola')) continue;
                 if (myName.includes('-hisui') && !vn.includes('-hisui')) continue;
                 if (myName.includes('-paldea') && !vn.includes('-paldea')) continue;
+              } else {
+                // If I am NOT regional, skip all regional varieties (they are separate entries)
+                if (vn.includes('-alola') || vn.includes('-galar') || vn.includes('-hisui') || vn.includes('-paldea')) continue;
               }
 
               // Skip Minior Meteor forms
@@ -389,6 +388,8 @@ export function usePokemonDetails(pokemonId: number | null) {
 
               const varietyIdMatch = variety.pokemon.url.match(/\/pokemon\/(\d+)\/?$/);
               const varietyId = varietyIdMatch ? parseInt(varietyIdMatch[1]) : null;
+
+              if (varietyId === pokemonId) continue;
 
               if (varietyId && !forms.some(f => f.id === varietyId)) {
                 forms.push({
