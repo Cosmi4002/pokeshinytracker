@@ -154,18 +154,22 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
 
             // --- Custom Overrides & Cleanups ---
 
-            // Urshifu Rapid Strike: Move to Base, Remove Altre Forme
+            // Urshifu Single/Rapid Strike: Move to Base, Remove Altre Forme
             if (details.id === 892 || (details.baseId === 892)) {
                 if (name === 'urshifu-rapid-strike') {
                     category = 'base';
-                } else if (category === 'form') {
-                    continue; // Remove other forms
+                } else if (category === 'form' || category === 'gmax') {
+                    // Skip everything else (Gmax, etc.) as requested
+                    continue;
                 }
             }
 
             // Oinkologne Male/Female: Move to Base, Remove Altre Forme
             if (details.id === 916 || details.baseId === 916) {
-                if (name === 'oinkologne-male' || name === 'oinkologne-female') {
+                if (name === 'oinkologne-male') {
+                    continue; // Skip male variety to avoid duplication with species base
+                }
+                if (name === 'oinkologne-female') {
                     category = 'base';
                 } else if (category === 'form') {
                     continue;
@@ -213,9 +217,22 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
                 if (category === 'seasonal') continue;
             }
 
-            // Meowstic: Rename Male to "Meowstic", remove Altre
+            // Meowstic: Move female to Base, remove Altre
             if (details.id === 678 || details.baseId === 678) {
-                if (category === 'form') continue;
+                if (name === 'meowstic-female') {
+                    category = 'base';
+                } else if (category === 'form') {
+                    continue;
+                }
+            }
+
+            // Indeedee: Move female to Base, remove Altre
+            if (details.id === 876 || details.baseId === 876) {
+                if (name === 'indeedee-female') {
+                    category = 'base';
+                } else if (category === 'form') {
+                    continue;
+                }
             }
 
             // Xerneas: Remove Altre

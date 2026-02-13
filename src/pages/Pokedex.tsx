@@ -43,7 +43,7 @@ export default function Pokedex() {
         matchesGen = p.generation === genNum;
       }
 
-      return matchesSearch && matchesGen;
+      return matchesSearch && matchesGen && !p.hideFromPokedex;
     });
   }, [pokemon, search, generation]);
 

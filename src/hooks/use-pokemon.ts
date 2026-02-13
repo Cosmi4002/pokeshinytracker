@@ -7,6 +7,7 @@ export interface PokemonBasic {
   name: string;
   displayName: string;
   generation: number;
+  hideFromPokedex?: boolean;
 }
 
 export interface PokemonDetailed {
@@ -46,7 +47,7 @@ const POKEMON_WITH_GENDER_DIFF = [
   272, 274, 275, 307, 308, 315, 316, 317, 322, 323, 332, 350, 369, 396, 397,
   398, 399, 400, 401, 402, 403, 404, 405, 407, 415, 417, 418, 419, 424, 443,
   444, 445, 449, 450, 453, 454, 456, 457, 459, 460, 461, 464, 465, 473, 521,
-  592, 593, 668, 678, 876, 902, 916
+  592, 593, 902
 ];
 
 // Generation ranges
@@ -124,6 +125,14 @@ export function formatPokemonName(name: string, id: number, baseId?: number): st
   // Oinkologne name overrides
   if (name.toLowerCase().includes('oinkologne-male')) return 'Oinkologne';
   if (name.toLowerCase().includes('oinkologne-female')) return 'Oinkologne Femmina';
+
+  // Indeedee name overrides
+  if (name.toLowerCase().includes('indeedee-male')) return 'Indeedee';
+  if (name.toLowerCase().includes('indeedee-female')) return 'Indeedee Femmina';
+
+  // Urshifu name overrides
+  if (name.toLowerCase().includes('urshifu-single-strike')) return 'Urshifu';
+  if (name.toLowerCase().includes('urshifu-rapid-strike')) return 'Urshifu Rapid Strike';
 
   // Wishiwashi name overrides
   if (name.toLowerCase().includes('wishiwashi-solo')) return 'Wishiwashi';
@@ -215,8 +224,12 @@ export function usePokemonList() {
             id: p.id,
             baseId,
             name: p.name,
-            displayName: formatPokemonName(p.name, p.id, baseId),
             generation: getGeneration(p.id, p.name),
+            hideFromPokedex:
+              p.name.includes('oinkologne-female') ||
+              p.name.includes('urshifu-rapid-strike') ||
+              p.name.includes('meowstic-female') ||
+              p.name.includes('indeedee-female'),
           };
         }).filter((p: any) => {
           const n = p.name.toLowerCase();
@@ -268,7 +281,7 @@ export function usePokemonList() {
             return true;
           }
 
-          // Rule 7: Include significant varieties for Gen 9 (Ogerpon, Oinkologne, etc.)
+          // Rule 7: Include significant varieties (searchable in counter)
           const significantVarieties = [
             'oinkologne-female',
             'maushold-family-of-three',
@@ -276,7 +289,9 @@ export function usePokemonList() {
             'tatsugiri-droopy', 'tatsugiri-stretchy',
             'dudunsparce-three-segment',
             'ogerpon-wellspring-mask', 'ogerpon-hearthflame-mask', 'ogerpon-cornerstone-mask',
-            'urshifu-rapid-strike'
+            'urshifu-rapid-strike',
+            'meowstic-female',
+            'indeedee-female'
           ];
 
           if (significantVarieties.some(v => n.includes(v))) {
