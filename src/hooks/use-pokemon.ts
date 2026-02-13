@@ -6,6 +6,7 @@ export interface PokemonBasic {
   baseId: number;
   name: string;
   displayName: string;
+  generation: number;
 }
 
 export interface PokemonDetailed {
@@ -118,6 +119,11 @@ export function formatPokemonName(name: string, id: number, baseId?: number): st
 
   // Meowstic name overrides
   if (name.toLowerCase().includes('meowstic-male')) return 'Meowstic';
+  if (name.toLowerCase().includes('meowstic-female')) return 'Meowstic Femmina';
+
+  // Oinkologne name overrides
+  if (name.toLowerCase().includes('oinkologne-male')) return 'Oinkologne';
+  if (name.toLowerCase().includes('oinkologne-female')) return 'Oinkologne Femmina';
 
   // Wishiwashi name overrides
   if (name.toLowerCase().includes('wishiwashi-solo')) return 'Wishiwashi';
@@ -210,6 +216,7 @@ export function usePokemonList() {
             baseId,
             name: p.name,
             displayName: formatPokemonName(p.name, p.id, baseId),
+            generation: getGeneration(p.id, p.name),
           };
         }).filter((p: any) => {
           const n = p.name.toLowerCase();
@@ -241,7 +248,7 @@ export function usePokemonList() {
             return true;
           }
 
-          // Rule 4: Keep Regional forms (and their variants like Zen Mode)
+          // Rule 4: Keep Regional forms
           if (
             n.includes('-alola') ||
             n.includes('-galar') ||
@@ -261,11 +268,29 @@ export function usePokemonList() {
             return true;
           }
 
+          // Rule 7: Include significant varieties for Gen 9 (Ogerpon, Oinkologne, etc.)
+          const significantVarieties = [
+            'oinkologne-female',
+            'maushold-family-of-three',
+            'squawkabilly-white', 'squawkabilly-blue', 'squawkabilly-yellow',
+            'tatsugiri-droopy', 'tatsugiri-stretchy',
+            'dudunsparce-three-segment',
+            'ogerpon-wellspring-mask', 'ogerpon-hearthflame-mask', 'ogerpon-cornerstone-mask',
+            'urshifu-rapid-strike'
+          ];
 
+          if (significantVarieties.some(v => n.includes(v))) {
+            return true;
+          }
 
           // Rule 8: Exclude Minior Meteor forms (redundant with base)
           if (n.startsWith('minior-') && n.includes('-meteor')) {
             return false;
+          }
+
+          // Rule 9: Include Minior colors (user wants them selectable)
+          if (n.startsWith('minior-') && !n.includes('-meteor')) {
+            return true;
           }
 
           return false;

@@ -39,8 +39,8 @@ export default function Pokedex() {
 
       // Generation filter
       let matchesGen = true;
-      if (genRange) {
-        matchesGen = p.baseId >= genRange[0] && p.baseId <= genRange[1];
+      if (genNum !== null) {
+        matchesGen = p.generation === genNum;
       }
 
       return matchesSearch && matchesGen;
