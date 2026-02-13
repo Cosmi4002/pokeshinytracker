@@ -17,19 +17,21 @@ import { PokedexCard } from '@/components/pokedex/PokedexCard';
 import { PokemonBasic } from '@/hooks/use-pokemon';
 import { usePokedexCaught } from '@/hooks/use-pokedex-caught';
 import { useRandomColor } from '@/lib/random-color-context';
+import { useNavigate } from 'react-router-dom';
 
 export default function Pokedex() {
   const { pokemon, loading } = usePokemonList();
   const { accentColor } = useRandomColor();
   const { getCaughtCountForPokemon, isCaught, loading: caughtLoading } = usePokedexCaught();
   const [search, setSearch] = useState('');
-  const [generation, setGeneration] = useState<string>('all');
+  const [generationFilter, setGenerationFilter] = useState<string>('all');
   const [selectedPokemon, setSelectedPokemon] = useState<PokemonBasic | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const navigate = useNavigate();
 
   const filteredPokemon = useMemo(() => {
     const searchLower = search.toLowerCase();
-    const genNum = generation !== 'all' ? parseInt(generation) : null;
+    const genNum = generationFilter !== 'all' ? parseInt(generationFilter) : null;
     const genRange = genNum !== null ? GENERATION_RANGES[genNum] : null;
 
     return pokemon.filter((p) => {
@@ -39,13 +41,24 @@ export default function Pokedex() {
 
       // Generation filter
       let matchesGen = true;
-      if (genNum !== null) {
-        matchesGen = p.generation === genNum;
+      if (generationFilter !== 'all') {
+        if (generationFilter === 'Alola') {
+          matchesGen = p.generation === 7 && p.name.includes('-alola');
+        } else if (generationFilter === 'Galar') {
+          matchesGen = p.generation === 8 && p.name.includes('-galar');
+        } else if (generationFilter === 'Hisui') {
+          matchesGen = p.generation === 8 && p.name.includes('-hisui');
+        } else if (generationFilter === 'Paldea') {
+          // Paldea regional forms are gen 9, and some are high ID forms of earlier gen pokemon (e.g., Wooper Paldean)
+          matchesGen = p.generation === 9 && (p.name.includes('-paldea') || (p.id > 10000 && p.baseId >= 906));
+        } else {
+          matchesGen = p.generation === parseInt(generationFilter);
+        }
       }
 
       return matchesSearch && matchesGen && !p.hideFromPokedex;
     });
-  }, [pokemon, search, generation]);
+  }, [pokemon, search, generationFilter]); // Dependency changed to generationFilter
 
   // Calculate completion stats
   const completionStats = useMemo(() => {
@@ -94,7 +107,7 @@ export default function Pokedex() {
                 />
               </div>
 
-              <Select value={generation} onValueChange={setGeneration}>
+              <Select value={generationFilter} onValueChange={setGenerationFilter}>
                 <SelectTrigger className="w-full sm:w-[160px] h-11 bg-white/5 border-primary/20">
                   <SelectValue placeholder="Generazione" />
                 </SelectTrigger>
@@ -105,6 +118,10 @@ export default function Pokedex() {
                       Gen {gen}
                     </SelectItem>
                   ))}
+                  <SelectItem value="Alola">Alola Forms</SelectItem>
+                  <SelectItem value="Galar">Galar Forms</SelectItem>
+                  <SelectItem value="Hisui">Hisui Forms</SelectItem>
+                  <SelectItem value="Paldea">Paldea Forms</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -149,8 +166,8 @@ export default function Pokedex() {
                     caughtPercentage={caughtPct}
                     hasCaughtAny={caught > 0}
                     onClick={() => {
-                      setSelectedPokemon(p);
-                      setIsDialogOpen(true);
+                      // Navigate directly if desired, or open dialog
+                      navigate(`/counter?pokemon=${encodeURIComponent(p.name)}`);
                     }}
                   />
                 );

@@ -264,9 +264,9 @@ export const POKEBALLS = [
 ];
 
 export const GAMES = [
-  { id: 'gold', name: 'Gold', generation: 2 },
-  { id: 'silver', name: 'Silver', generation: 2 },
-  { id: 'crystal', name: 'Crystal', generation: 2 },
+  { id: 'gold', name: 'Gold', generation: 2, logo: '/img/game-logos/gold.png' },
+  { id: 'silver', name: 'Silver', generation: 2, logo: '/img/game-logos/silver.png' },
+  { id: 'crystal', name: 'Crystal', generation: 2, logo: '/img/game-logos/crystal.png' },
   { id: 'ruby', name: 'Ruby', generation: 3 },
   { id: 'sapphire', name: 'Sapphire', generation: 3 },
   { id: 'firered', name: 'FireRed', generation: 3 },
@@ -277,8 +277,8 @@ export const GAMES = [
   { id: 'platinum', name: 'Platinum', generation: 4 },
   { id: 'heartgold', name: 'HeartGold', generation: 4 },
   { id: 'soulsilver', name: 'SoulSilver', generation: 4 },
-  { id: 'black', name: 'Black', generation: 5 },
-  { id: 'white', name: 'White', generation: 5 },
+  { id: 'black', name: 'Black', generation: 5, logo: '/img/game-logos/black.png' },
+  { id: 'white', name: 'White', generation: 5, logo: '/img/game-logos/white.png' },
   { id: 'black2', name: 'Black 2', generation: 5 },
   { id: 'white2', name: 'White 2', generation: 5 },
   { id: 'x', name: 'X', generation: 6 },
@@ -389,11 +389,8 @@ export const toShowdownSlug = (name: string): string => {
   return slug;
 };
 
-import spriteMapping from './sprite-mapping.json';
-import shinyRemoteMapping from './shiny-remote-mapping.json';
 import showdownShinyMapping from './showdown-shiny-mapping.json';
 
-const MAPPING: Record<string, string> = spriteMapping;
 const SHOWDOWN_MAPPING: Record<string, string> = showdownShinyMapping as any;
 
 export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolean, name?: string, female?: boolean, form?: string, animated?: boolean } = {}): string {
@@ -476,12 +473,12 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
     // Base ID
     shinyKeys.push(pokemonId.toString());
 
+    // Try slugs from name or form if available
+    if (name) shinyKeys.push(toShowdownSlug(name));
+    if (form) shinyKeys.push(toShowdownSlug(form));
+
     for (const key of shinyKeys) {
       if (SHOWDOWN_MAPPING[key]) return SHOWDOWN_MAPPING[key];
-      // Fallback to secondary mapping
-      if ((shinyRemoteMapping as Record<string, string>)[key]) {
-        return (shinyRemoteMapping as Record<string, string>)[key];
-      }
     }
   }
 

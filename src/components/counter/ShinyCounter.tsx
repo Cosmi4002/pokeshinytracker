@@ -116,6 +116,17 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
     loadData();
   }, [user?.id, huntId]);
 
+  // Handle pre-selection from query params (e.g. ?pokemon=bulbasaur)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const pokemonName = params.get('pokemon');
+    if (pokemonName && !activeHuntIdRef.current) {
+      // We set the name, and PokemonSelector will likely need to resolve the ID
+      // or we can just hope the name is enough for initial display.
+      setSelectedPokemonName(pokemonName);
+    }
+  }, []);
+
   // Save to Supabase when state changes (debounced)
   useEffect(() => {
     if (!user) return;

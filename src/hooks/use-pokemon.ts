@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { toShowdownSlug, getPokemonSpriteUrl } from '@/lib/pokemon-data';
+export { toShowdownSlug, getPokemonSpriteUrl } from '@/lib/pokemon-data';
+import pokedexData from '@/lib/pokedex.json';
 
 export interface PokemonBasic {
   id: number;
@@ -40,7 +41,7 @@ export interface PokemonFormDetailed {
 const TOTAL_POKEMON = 2000;
 
 // Pokemon with visible gender differences
-const POKEMON_WITH_GENDER_DIFF = [
+export const POKEMON_WITH_GENDER_DIFF = [
   3, 12, 19, 20, 25, 26, 41, 42, 44, 45, 64, 65, 84, 85, 97, 111, 112, 118, 119,
   123, 129, 130, 154, 165, 166, 178, 185, 186, 190, 194, 195, 198, 202, 203,
   207, 208, 212, 214, 215, 217, 221, 224, 229, 232, 255, 256, 257, 267, 269,
@@ -51,7 +52,7 @@ const POKEMON_WITH_GENDER_DIFF = [
 ];
 
 // Generation ranges
-const GENERATION_RANGES: Record<number, [number, number]> = {
+export const GENERATION_RANGES: Record<number, [number, number]> = {
   1: [1, 151],
   2: [152, 251],
   3: [252, 386],
@@ -193,146 +194,28 @@ export function usePokemonList() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchPokemonList() {
+    function loadPokemonList() {
       try {
-        const response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${TOTAL_POKEMON}`);
-        const data = await response.json();
-
-        // Pass 1: Build base name map
-        const basePokemonMap = new Map<string, number>();
-        const allRaw = data.results.map((p: { name: string, url: string }) => {
-          const idMatch = p.url.match(/\/pokemon\/(\d+)\/?$/);
-          const id = idMatch ? parseInt(idMatch[1]) : 0;
-          if (id <= 1025) basePokemonMap.set(p.name, id);
-          return { id, name: p.name };
-        });
-
-        const list: PokemonBasic[] = allRaw.map((p: any) => {
-          let baseId = p.id;
-          if (p.id > 10000) {
-            const parts = p.name.split('-');
-            for (let i = parts.length - 1; i > 0; i--) {
-              const prefix = parts.slice(0, i).join('-');
-              if (basePokemonMap.has(prefix)) {
-                baseId = basePokemonMap.get(prefix)!;
-                break;
-              }
-            }
-          }
-
-          return {
-            id: p.id,
-            baseId,
-            name: p.name,
-            displayName: formatPokemonName(p.name, p.id, baseId),
-            generation: getGeneration(p.id, p.name),
-            hideFromPokedex:
-              p.name.includes('oinkologne-female') ||
-              p.name.includes('urshifu-rapid-strike') ||
-              p.name.includes('meowstic-female') ||
-              p.name.includes('indeedee-female'),
-          };
-        }).filter((p: any) => {
-          const n = p.name.toLowerCase();
-
-          // Rule 0: Explicitly exclude Galarian Darmanitan Zen Mode (ID 10178) from main list
-          // User wants it ONLY as a form of Galarian Darmanitan (ID 10177)
-          if (p.id === 10178) {
-            return false;
-          }
-
-          // Rule 1: Explicitly exclude categories requested by user (Mega, Totem, Gmax, Primal, etc.)
-          if (
-            n.includes('-mega') ||
-            n.includes('-totem') ||
-            n.includes('-gmax') ||
-            n.includes('-primal') ||
-            n.includes('-eternal')
-          ) {
-            return false;
-          }
-
-          // Rule 2: Exclude all Pikachu forms except Partner Cap (user request)
-          if (p.baseId === 25 && p.id > 10000 && n !== 'pikachu-partner-cap') {
-            return false;
-          }
-
-          // Rule 3: Keep all standard Pokemon (Gen 1-9)
-          if (p.id <= 1025) {
-            return true;
-          }
-
-          // Rule 4: Keep Regional forms
-          if (
-            n.includes('-alola') ||
-            n.includes('-galar') ||
-            n.includes('-hisui') ||
-            n.includes('-paldea')
-          ) {
-            return true;
-          }
-
-          // Rule 5: Keep seasonal forms (Deerling & Sawsbuck)
-          if (n.includes('deerling-') || n.includes('sawsbuck-')) {
-            return true;
-          }
-
-          // Rule 6: Special case for Pikachu Partner Cap
-          if (n === 'pikachu-partner-cap') {
-            return true;
-          }
-
-          // Rule 7: Include significant varieties (searchable in counter)
-          const significantVarieties = [
-            'oinkologne-female',
-            'maushold-family-of-three',
-            'squawkabilly-white', 'squawkabilly-blue', 'squawkabilly-yellow',
-            'tatsugiri-droopy', 'tatsugiri-stretchy',
-            'dudunsparce-three-segment',
-            'ogerpon-wellspring-mask', 'ogerpon-hearthflame-mask', 'ogerpon-cornerstone-mask',
-            'urshifu-rapid-strike',
-            'meowstic-female',
-            'indeedee-female'
-          ];
-
-          if (significantVarieties.some(v => n.includes(v))) {
-            return true;
-          }
-
-          // Rule 8: Exclude Minior Meteor forms (redundant with base)
-          if (n.startsWith('minior-') && n.includes('-meteor')) {
-            return false;
-          }
-
-          // Rule 9: Include Minior colors (user wants them selectable)
-          if (n.startsWith('minior-') && !n.includes('-meteor')) {
-            return true;
-          }
-
-          return false;
-        });
-
-        // Official order sorting
-        list.sort((a, b) => {
-          if (a.baseId !== b.baseId) return a.baseId - b.baseId;
-          const aName = a.name.toLowerCase();
-          const bName = b.name.toLowerCase();
-          // Put the base form first
-          if (aName === bName.split('-')[0]) return -1;
-          if (bName === aName.split('-')[0]) return 1;
-          return a.id - b.id;
-        });
+        const list: PokemonBasic[] = pokedexData.map((p: any) => ({
+          ...p,
+          displayName: formatPokemonName(p.name, p.id, p.baseId),
+          hideFromPokedex:
+            p.name.includes('oinkologne-female') ||
+            p.name.includes('urshifu-rapid-strike') ||
+            p.name.includes('meowstic-female') ||
+            p.name.includes('indeedee-female'),
+        }));
 
         setPokemon(list);
+        setLoading(false);
       } catch (err) {
-        setError('Failed to fetch Pokemon list');
-        console.error(err);
-      } finally {
+        console.error('Error loading pokedex data:', err);
+        setError('Failed to load Pokedex data');
         setLoading(false);
       }
     }
 
-    fetchPokemonList();
+    loadPokemonList();
   }, []);
 
   return { pokemon, loading, error };
