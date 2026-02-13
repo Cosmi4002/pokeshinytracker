@@ -224,6 +224,7 @@ export function usePokemonList() {
             id: p.id,
             baseId,
             name: p.name,
+            displayName: formatPokemonName(p.name, p.id, baseId),
             generation: getGeneration(p.id, p.name),
             hideFromPokedex:
               p.name.includes('oinkologne-female') ||
