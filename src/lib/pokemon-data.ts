@@ -366,12 +366,13 @@ export const toShowdownSlug = (name: string): string => {
     .replace(/é/g, 'e');
 
   // Handle specific PokeAPI -> Showdown name differences
-  if (slug === 'nidoran-f') return 'nidoranf';
-  if (slug === 'nidoran-m') return 'nidoranm';
-  if (slug === 'mr-mime') return 'mrmime';
-  if (slug === 'mime-jr') return 'mimejr';
-  if (slug === 'mr-rime') return 'mrrime';
-  if (slug === 'type-null') return 'typenull';
+  if (slug.startsWith('nidoran-f')) slug = slug.replace('nidoran-f', 'nidoranf');
+  if (slug.startsWith('nidoran-m')) slug = slug.replace('nidoran-m', 'nidoranm');
+
+  if (slug.startsWith('mr-mime')) slug = slug.replace('mr-mime', 'mrmime');
+  if (slug.startsWith('mime-jr')) slug = slug.replace('mime-jr', 'mimejr');
+  if (slug.startsWith('mr-rime')) slug = slug.replace('mr-rime', 'mrrime');
+  if (slug.startsWith('type-null')) slug = slug.replace('type-null', 'typenull');
 
   // Remove common PokeAPI standard suffixes that Showdown doesn't use
   slug = slug.replace(/-standard|-normal/g, '');

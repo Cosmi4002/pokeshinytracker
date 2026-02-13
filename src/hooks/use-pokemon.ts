@@ -215,12 +215,12 @@ export function usePokemonList() {
             return true;
           }
 
-          // Rule 4: Keep Regional forms
+          // Rule 4: Keep Regional forms (and their variants like Zen Mode)
           if (
-            n.endsWith('-alola') ||
-            n.endsWith('-galar') ||
-            n.endsWith('-hisui') ||
-            n.endsWith('-paldea')
+            n.includes('-alola') ||
+            n.includes('-galar') ||
+            n.includes('-hisui') ||
+            n.includes('-paldea')
           ) {
             return true;
           }
