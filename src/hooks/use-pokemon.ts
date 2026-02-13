@@ -194,6 +194,12 @@ export function usePokemonList() {
         }).filter((p: any) => {
           const n = p.name.toLowerCase();
 
+          // Rule 0: Explicitly exclude Galarian Darmanitan Zen Mode (ID 10178) from main list
+          // User wants it ONLY as a form of Galarian Darmanitan (ID 10177)
+          if (p.id === 10178) {
+            return false;
+          }
+
           // Rule 1: Explicitly exclude categories requested by user (Mega, Totem, Gmax, Primal, etc.)
           if (
             n.includes('-mega') ||
@@ -235,11 +241,7 @@ export function usePokemonList() {
             return true;
           }
 
-          // Rule 7: Explicitly exclude Galarian Darmanitan Zen Mode (ID 10178) from main list
-          // User wants it ONLY as a form of Galarian Darmanitan (ID 10177)
-          if (p.id === 10178) {
-            return false;
-          }
+
 
           // Rule 8: Exclude Minior Meteor forms (redundant with base)
           if (n.startsWith('minior-') && n.includes('-meteor')) {
