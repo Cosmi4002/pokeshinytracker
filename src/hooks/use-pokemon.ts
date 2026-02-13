@@ -61,10 +61,16 @@ const GENERATION_RANGES: Record<number, [number, number]> = {
   9: [906, 1025],
 };
 
-function getGeneration(id: number): number {
+function getGeneration(id: number, name?: string): number {
+  if (name) {
+    const slug = name.toLowerCase();
+    if (slug.includes('-alola')) return 7;
+    if (slug.includes('-galar')) return 8;
+    if (slug.includes('-hisui')) return 8; // Legends Arceus is considered Gen 8 technically, or proximity
+    if (slug.includes('-paldea')) return 9;
+  }
+
   if (id > 10000) {
-    // For regional forms, we'd ideally fetch species, but we can approximate
-    // or just default to a generation.
     return 9;
   }
   for (const [gen, [start, end]] of Object.entries(GENERATION_RANGES)) {
@@ -107,12 +113,21 @@ export function formatPokemonName(name: string, id: number, baseId?: number): st
     return 'Ogerpon Teal Mask';
   }
 
+  // Mimikyu name overrides
+  if (name.toLowerCase().includes('mimikyu-disguised')) return 'Mimikyu';
+
+  // Meowstic name overrides
+  if (name.toLowerCase().includes('meowstic-male')) return 'Meowstic';
+
+  // Wishiwashi name overrides
+  if (name.toLowerCase().includes('wishiwashi-solo')) return 'Wishiwashi';
+
   // Minior color naming
   if (name.toLowerCase().includes('minior')) {
     const colorMatch = name.toLowerCase().match(/red|orange|yellow|green|blue|indigo|violet/);
     if (colorMatch) {
       const color = colorMatch[0].charAt(0).toUpperCase() + colorMatch[0].slice(1);
-      return `Minior ${color}`;
+      return `Minior (${color})`;
     }
     return 'Minior';
   }
@@ -419,7 +434,7 @@ export function usePokemonDetails(pokemonId: number | null) {
           displayName: formatPokemonName(data.name, pokemonId),
           sprites,
           types: data.types.map((t: any) => t.type.name),
-          generation: getGeneration(pokemonId),
+          generation: getGeneration(pokemonId, data.name),
           forms,
           hasGenderDifference: hasGenderDiff,
         });

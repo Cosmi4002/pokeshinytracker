@@ -140,19 +140,98 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
             if (name.startsWith('minior-') && name.includes('-meteor')) continue;
 
             let category: FormVariant['category'] = 'form';
+            let variantDisplayName = form.displayName;
 
             if (name.includes('mega')) {
                 category = 'mega';
             } else if (name.includes('gmax')) {
                 category = 'gmax';
+            } else if (name.includes('-alola') || name.includes('-galar') || name.includes('-hisui') || name.includes('-paldea')) {
+                category = 'regional';
             } else if (SEASONAL_KEYWORDS.some(kw => name.includes(kw))) {
                 category = 'seasonal';
+            }
+
+            // --- Custom Overrides & Cleanups ---
+
+            // Urshifu Rapid Strike: Move to Base, Remove Altre Forme
+            if (details.id === 892 || (details.baseId === 892)) {
+                if (name === 'urshifu-rapid-strike') {
+                    category = 'base';
+                } else if (category === 'form') {
+                    continue; // Remove other forms
+                }
+            }
+
+            // Oinkologne Male/Female: Move to Base, Remove Altre Forme
+            if (details.id === 916 || details.baseId === 916) {
+                if (name === 'oinkologne-male' || name === 'oinkologne-female') {
+                    category = 'base';
+                } else if (category === 'form') {
+                    continue;
+                }
+            }
+
+            // Lycanroc Midnight: Move to Base
+            if (details.id === 745 || details.baseId === 745) {
+                if (name === 'lycanroc-midnight') {
+                    category = 'base';
+                }
+            }
+
+            // Poltchageist: Remove Altre Forme
+            if (details.id === 1012 || details.baseId === 1012) {
+                if (category === 'form') continue;
+            }
+
+            // Ogerpon: Wellspring to Altre, remove Seasonal category
+            if (details.id === 1017 || details.baseId === 1017) {
+                if (name === 'ogerpon-wellspring-mask') {
+                    category = 'form';
+                }
+                if (category === 'seasonal') category = 'form'; // Merge seasonal into forms
+            }
+
+            // Mimikyu: Rename Disguised to just "Mimikyu", remove Altre (Busted)
+            if (details.id === 778 || details.baseId === 778) {
+                if (name.includes('busted')) continue;
+            }
+
+            // Minior: Handle color naming in parens
+            if (details.name.includes('minior')) {
+                const colorMatch = name.match(/minior-(red|orange|yellow|green|blue|indigo|violet)/);
+                if (colorMatch) {
+                    const color = colorMatch[1].charAt(0).toUpperCase() + colorMatch[1].slice(1);
+                    variantDisplayName = `Minior (${color})`;
+                    category = 'base';
+                }
+            }
+
+            // Wishiwashi: Rename Solo to "Wishiwashi", remove School/Seasonal
+            if (details.id === 746 || details.baseId === 746) {
+                if (name.includes('school')) continue;
+                if (category === 'seasonal') continue;
+            }
+
+            // Meowstic: Rename Male to "Meowstic", remove Altre
+            if (details.id === 678 || details.baseId === 678) {
+                if (category === 'form') continue;
+            }
+
+            // Xerneas: Remove Altre
+            if (details.id === 716 || details.baseId === 716) {
+                if (category === 'form') continue;
+            }
+
+            // Greninja: Remove Battle Bond and Ash
+            if (details.id === 658 || details.baseId === 658) {
+                if (name.includes('battle-bond') || name.includes('ash')) continue;
             }
 
             variants.push({
                 id: form.id,
                 name: form.formName,
-                displayName: form.displayName,
+                displayName: variantDisplayName,
                 category,
                 gender: 'genderless',
                 spriteUrl: getPokemonSpriteUrl(form.id, { shiny: true, name: form.formName, animated: true }),
