@@ -80,7 +80,7 @@ export function PokemonSelector({ value, onChange }: PokemonSelectorProps) {
             value={searchTerm}
             onValueChange={setSearchTerm}
           />
-          <CommandList className="max-h-[50vh] overflow-y-auto overscroll-contain">
+          <CommandList className="max-h-[300px] overflow-y-auto">
             {loading && <div className="p-4 text-sm text-center text-muted-foreground">Loading...</div>}
             {!loading && filteredPokemon.length === 0 && (
               <div className="py-6 text-center text-sm text-muted-foreground">No Pokémon found.</div>

@@ -86,7 +86,7 @@ export function MethodSelector({ value, onChange }: MethodSelectorProps) {
             value={searchTerm}
             onValueChange={setSearchTerm}
           />
-          <CommandList className="max-h-[40vh] overflow-y-auto overscroll-contain">
+          <CommandList className="max-h-[300px] overflow-y-auto">
             <CommandEmpty>No method found.</CommandEmpty>
             {Object.entries(filteredMethodsByGen).map(([gen, methods]) => (
               <CommandGroup key={gen} heading={gen}>
