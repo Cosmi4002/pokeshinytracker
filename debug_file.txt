@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 export { toShowdownSlug, getPokemonSpriteUrl } from '@/lib/pokemon-data';
 import pokedexData from '@/lib/pokedex.json';
 
@@ -89,8 +89,8 @@ export function formatPokemonName(name: string, id: number, baseId?: number): st
   if (name.includes(' ')) return name;
 
   // Nidoran gender symbols
-  if (name === 'nidoran-f' || speciesId === 29) return 'Nidoran♀';
-  if (name === 'nidoran-m' || speciesId === 32) return 'Nidoran♂';
+  if (name === 'nidoran-f' || speciesId === 29) return 'Nidoranâ™€';
+  if (name === 'nidoran-m' || speciesId === 32) return 'Nidoranâ™‚';
 
   if (speciesId === 585 || speciesId === 586) {
     const baseName = speciesId === 585 ? 'Deerling' : 'Sawsbuck';
@@ -375,3 +375,6 @@ export function usePokemonDetails(pokemonId: number | null) {
 
   return { pokemon, loading, error };
 }
+
+
+
