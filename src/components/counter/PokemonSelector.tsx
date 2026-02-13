@@ -43,7 +43,7 @@ export function PokemonSelector({ value, onChange }: PokemonSelectorProps) {
   }, [pokemon, searchTerm]);
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={setOpen} modal={true}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"

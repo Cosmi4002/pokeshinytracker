@@ -58,7 +58,7 @@ export function MethodSelector({ value, onChange }: MethodSelectorProps) {
   }, [searchTerm, methodsByGen]);
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={setOpen} modal={true}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
