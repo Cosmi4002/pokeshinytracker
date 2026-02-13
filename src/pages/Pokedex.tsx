@@ -166,8 +166,8 @@ export default function Pokedex() {
                     caughtPercentage={caughtPct}
                     hasCaughtAny={caught > 0}
                     onClick={() => {
-                      // Navigate directly if desired, or open dialog
-                      navigate(`/counter?pokemon=${encodeURIComponent(p.name)}`);
+                      setSelectedPokemon(p);
+                      setIsDialogOpen(true);
                     }}
                   />
                 );

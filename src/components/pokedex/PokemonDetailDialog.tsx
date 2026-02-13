@@ -6,6 +6,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { ExternalLink } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface PokemonDetailDialogProps {
     pokemon: PokemonBasic | null;
@@ -33,6 +36,7 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
     const { pokemon: details, loading: detailsLoading } = usePokemonDetails(pokemon?.id || null);
     const { user } = useAuth();
     const { toast } = useToast();
+    const navigate = useNavigate();
     const [caughtForms, setCaughtForms] = useState<Set<string>>(new Set());
     const [loadingAction, setLoadingAction] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState('all');
@@ -365,11 +369,25 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
                         <span className="shiny-text capitalize">{pokemon.displayName}</span>
                         <span className="text-muted-foreground text-lg">#{pokemon.id.toString().padStart(4, '0')}</span>
                     </DialogTitle>
-                    <DialogDescription className="flex items-center gap-4">
-                        <span>Clicca su uno sprite per segnarlo come catturato.</span>
-                        <span className="text-primary font-semibold">
-                            {caughtCount}/{totalForms} ({completionPct}%)
-                        </span>
+                    <DialogDescription className="flex flex-col sm:flex-row sm:items-center gap-4">
+                        <div className="flex items-center gap-4">
+                            <span>Clicca su uno sprite per segnarlo come catturato.</span>
+                            <span className="text-primary font-semibold">
+                                {caughtCount}/{totalForms} ({completionPct}%)
+                            </span>
+                        </div>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 gap-2 ml-auto"
+                            onClick={() => {
+                                onOpenChange(false);
+                                navigate(`/counter?pokemon=${encodeURIComponent(pokemon.name)}`);
+                            }}
+                        >
+                            <ExternalLink className="h-3.5 w-3.5" />
+                            Vai al Counter
+                        </Button>
                     </DialogDescription>
                 </DialogHeader>
 
