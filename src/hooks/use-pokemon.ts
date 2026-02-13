@@ -235,7 +235,13 @@ export function usePokemonList() {
             return true;
           }
 
-          // Rule 7: Exclude Minior Meteor forms (redundant with base)
+          // Rule 7: Explicitly exclude Galarian Darmanitan Zen Mode (ID 10178) from main list
+          // User wants it ONLY as a form of Galarian Darmanitan (ID 10177)
+          if (p.id === 10178) {
+            return false;
+          }
+
+          // Rule 8: Exclude Minior Meteor forms (redundant with base)
           if (n.startsWith('minior-') && n.includes('-meteor')) {
             return false;
           }
@@ -357,7 +363,21 @@ export function usePokemonDetails(pokemonId: number | null) {
               const vn = variety.pokemon.name.toLowerCase();
 
               // SKIP regional forms - they are handled as base pokemon now
-              if (vn.includes('-alola') || vn.includes('-galar') || vn.includes('-hisui') || vn.includes('-paldea')) continue;
+              // UNLESS they match the current pokemon's region (e.g. Zen Mode for Galarian Darmanitan)
+              const isRegional = vn.includes('-alola') || vn.includes('-galar') || vn.includes('-hisui') || vn.includes('-paldea');
+
+              if (isRegional) {
+                const myName = data.name.toLowerCase();
+                // If I am NOT a regional form, skip all regional varieties (they are separate entries)
+                if (!myName.includes('-alola') && !myName.includes('-galar') && !myName.includes('-hisui') && !myName.includes('-paldea')) {
+                  continue;
+                }
+                // If I AM a regional form, filter out varieties from OTHER regions
+                if (myName.includes('-galar') && !vn.includes('-galar')) continue;
+                if (myName.includes('-alola') && !vn.includes('-alola')) continue;
+                if (myName.includes('-hisui') && !vn.includes('-hisui')) continue;
+                if (myName.includes('-paldea') && !vn.includes('-paldea')) continue;
+              }
 
               // Skip Minior Meteor forms
               if (vn.startsWith('minior-') && vn.includes('-meteor')) continue;
