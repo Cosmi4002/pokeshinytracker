@@ -102,6 +102,11 @@ export function formatPokemonName(name: string, id: number, baseId?: number): st
     return 'Oricorio';
   }
 
+  // Ogerpon Teal Mask name override
+  if (speciesId === 1017 || (id === 1017)) {
+    return 'Ogerpon Teal Mask';
+  }
+
   // Minior color naming
   if (name.toLowerCase().includes('minior')) {
     const colorMatch = name.toLowerCase().match(/red|orange|yellow|green|blue|indigo|violet/);
