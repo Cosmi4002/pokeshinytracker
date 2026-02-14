@@ -490,9 +490,25 @@ export default function PokemonDetails() {
                                             </div>
                                         </div>
 
-                                        {/* In-card elimination toggle */}
+                                        {/* In-card administrative controls */}
                                         {user && isEditorEnabled && (
-                                            <div className="absolute top-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                                            <div className="absolute top-3 left-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 rounded-lg bg-black/20 hover:bg-primary/20 text-white/50 hover:text-primary backdrop-blur-sm"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        const currentName = (overrides[`${variant.id}-${variant.name}`] as any)?.custom_display_name || variant.displayName;
+                                                        const newName = prompt(`Rinomina forma "${variant.displayName}":`, currentName);
+                                                        if (newName !== null) {
+                                                            saveOverride(variant.id, variant.name, { custom_display_name: newName });
+                                                        }
+                                                    }}
+                                                >
+                                                    <Edit3 className="h-4 w-4" />
+                                                </Button>
+
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
