@@ -162,51 +162,9 @@
     "generation": 1
   },
   {
-    "id": 10080,
-    "baseId": 25,
-    "name": "pikachu-rock-star",
-    "generation": 1
-  },
-  {
-    "id": 10081,
-    "baseId": 25,
-    "name": "pikachu-belle",
-    "generation": 1
-  },
-  {
-    "id": 10082,
-    "baseId": 25,
-    "name": "pikachu-pop-star",
-    "generation": 1
-  },
-  {
-    "id": 10083,
-    "baseId": 25,
-    "name": "pikachu-phd",
-    "generation": 1
-  },
-  {
-    "id": 10084,
-    "baseId": 25,
-    "name": "pikachu-libre",
-    "generation": 1
-  },
-  {
-    "id": 10085,
-    "baseId": 25,
-    "name": "pikachu-cosplay",
-    "generation": 1
-  },
-  {
     "id": 10148,
     "baseId": 25,
     "name": "pikachu-partner-cap",
-    "generation": 1
-  },
-  {
-    "id": 10158,
-    "baseId": 25,
-    "name": "pikachu-starter",
     "generation": 1
   },
   {
