@@ -24,6 +24,8 @@ export const BANNED_FORM_NAMES: string[] = [
  * Example: '-totem', '-starter', '-mega', '-gmax'
  */
 export const BANNED_FORM_KEYWORDS: string[] = [
+    '-galar',
+    '-paldea',
     '-hisui',   // Matching PokeAPI slug exactly
     '-alola',   // Matching PokeAPI slug exactly
     '-totem',
