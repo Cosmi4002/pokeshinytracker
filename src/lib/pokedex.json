@@ -3618,6 +3618,18 @@
     "generation": 5
   },
   {
+    "id": 10177,
+    "baseId": 555,
+    "name": "darmanitan-galar-standard",
+    "generation": 8
+  },
+  {
+    "id": 10178,
+    "baseId": 555,
+    "name": "darmanitan-galar-zen",
+    "generation": 8
+  },
+  {
     "id": 556,
     "baseId": 556,
     "name": "maractus",
@@ -6520,18 +6532,6 @@
     "baseId": 10025,
     "name": "meowstic-female",
     "generation": 9
-  },
-  {
-    "id": 10177,
-    "baseId": 10177,
-    "name": "darmanitan-galar-standard",
-    "generation": 8
-  },
-  {
-    "id": 10178,
-    "baseId": 10178,
-    "name": "darmanitan-galar-zen",
-    "generation": 8
   },
   {
     "id": 10186,

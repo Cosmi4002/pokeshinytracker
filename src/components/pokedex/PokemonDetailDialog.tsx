@@ -369,13 +369,13 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
                         <span className="shiny-text capitalize">{pokemon.displayName}</span>
                         <span className="text-muted-foreground text-lg">#{pokemon.id.toString().padStart(4, '0')}</span>
                     </DialogTitle>
-                    <DialogDescription className="flex flex-col sm:flex-row sm:items-center gap-4">
-                        <div className="flex items-center gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-4 mt-1">
+                        <DialogDescription className="flex items-center gap-4">
                             <span>Clicca su uno sprite per segnarlo come catturato.</span>
                             <span className="text-primary font-semibold">
                                 {caughtCount}/{totalForms} ({completionPct}%)
                             </span>
-                        </div>
+                        </DialogDescription>
                         <Button
                             variant="outline"
                             size="sm"
@@ -388,7 +388,7 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
                             <ExternalLink className="h-3.5 w-3.5" />
                             Vai al Counter
                         </Button>
-                    </DialogDescription>
+                    </div>
                 </DialogHeader>
 
                 <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar">
