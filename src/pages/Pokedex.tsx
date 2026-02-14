@@ -150,18 +150,30 @@ export default function Pokedex() {
                     ) : (
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
                             {filteredGroups.map(group => {
+                                // Sort to ensure base form is first (usually lower ID)
+                                group.sort((a, b) => a.id - b.id);
                                 const p = group[0];
+
                                 const isRegional = p.name.includes('-alola') || p.name.includes('-galar') || p.name.includes('-hisui') || p.name.includes('-paldea');
                                 const hasGenderDiff = !isRegional && POKEMON_WITH_GENDER_DIFF.includes(p.baseId);
 
-                                const caughtVal = caughtCounts[p.id] || 0;
-                                const isCaught = caughtVal > 0;
+                                // Check for specific female form in group (e.g. Meowstic-Female ID 10025)
+                                const femaleVariant = group.find(v => v.name.endsWith('-female') && v.id !== p.id);
+                                const femaleId = femaleVariant ? femaleVariant.id : undefined;
+
+                                // Calculate caught status for the whole group
+                                const groupCaught = group.reduce((acc, g) => acc + (caughtCounts[g.id] || 0), 0);
+                                const isCaught = groupCaught > 0;
 
                                 let totalVars = 1;
                                 if (hasGenderDiff) totalVars = 2;
                                 if (POKEMON_FORM_COUNTS[p.id]) totalVars = POKEMON_FORM_COUNTS[p.id];
 
-                                const pct = Math.min(100, (caughtVal / totalVars) * 100);
+                                // Use max caught count of group for progress? Or sum?
+                                // If group has multiple IDs (Male + Female), caught status tracks them individually?
+                                // Sync logic usually counts distinct forms.
+                                // Let's use simple logic: if any in group is caught, show as caught. Percentage is rough estimate.
+                                const pct = Math.min(100, (groupCaught / totalVars) * 100);
 
                                 return (
                                     <PokedexCard
@@ -170,7 +182,11 @@ export default function Pokedex() {
                                         baseId={p.baseId}
                                         displayName={p.displayName}
                                         spriteUrl={getPokemonSpriteUrl(p.id, { shiny: true, name: p.name })}
-                                        femaleSprite={hasGenderDiff ? getPokemonSpriteUrl(p.id, { shiny: true, female: true, name: p.name }) : undefined}
+                                        // Pass specific female ID if found (e.g. 10025), otherwise fallback to base ID + flag (e.g. 25 + female=true)
+                                        femaleSprite={hasGenderDiff
+                                            ? getPokemonSpriteUrl(femaleId || p.id, { shiny: true, female: !femaleId, name: p.name })
+                                            : undefined
+                                        }
                                         hasGenderDiff={hasGenderDiff}
                                         caughtPercentage={pct}
                                         hasCaughtAny={isCaught}

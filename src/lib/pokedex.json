@@ -162,10 +162,52 @@
     "generation": 1
   },
   {
+    "id": 10080,
+    "baseId": 25,
+    "name": "pikachu-rock-star",
+    "generation": 1
+  },
+  {
+    "id": 10081,
+    "baseId": 25,
+    "name": "pikachu-belle",
+    "generation": 1
+  },
+  {
+    "id": 10082,
+    "baseId": 25,
+    "name": "pikachu-pop-star",
+    "generation": 1
+  },
+  {
+    "id": 10083,
+    "baseId": 25,
+    "name": "pikachu-phd",
+    "generation": 1
+  },
+  {
+    "id": 10084,
+    "baseId": 25,
+    "name": "pikachu-libre",
+    "generation": 1
+  },
+  {
+    "id": 10085,
+    "baseId": 25,
+    "name": "pikachu-cosplay",
+    "generation": 1
+  },
+  {
     "id": 10148,
     "baseId": 25,
     "name": "pikachu-partner-cap",
-    "generation": 7
+    "generation": 1
+  },
+  {
+    "id": 10158,
+    "baseId": 25,
+    "name": "pikachu-starter",
+    "generation": 1
   },
   {
     "id": 26,
@@ -1002,6 +1044,12 @@
     "generation": 1
   },
   {
+    "id": 10159,
+    "baseId": 133,
+    "name": "eevee-starter",
+    "generation": 1
+  },
+  {
     "id": 134,
     "baseId": 134,
     "name": "vaporeon",
@@ -1023,6 +1071,12 @@
     "id": 137,
     "baseId": 137,
     "name": "porygon",
+    "generation": 1
+  },
+  {
+    "id": 474,
+    "baseId": 137,
+    "name": "porygon-z",
     "generation": 1
   },
   {
@@ -2376,6 +2430,24 @@
     "generation": 3
   },
   {
+    "id": 10013,
+    "baseId": 351,
+    "name": "castform-sunny",
+    "generation": 3
+  },
+  {
+    "id": 10014,
+    "baseId": 351,
+    "name": "castform-rainy",
+    "generation": 3
+  },
+  {
+    "id": 10015,
+    "baseId": 351,
+    "name": "castform-snowy",
+    "generation": 3
+  },
+  {
     "id": 352,
     "baseId": 352,
     "name": "kecleon",
@@ -2562,9 +2634,21 @@
     "generation": 3
   },
   {
+    "id": 10077,
+    "baseId": 382,
+    "name": "kyogre-primal",
+    "generation": 3
+  },
+  {
     "id": 383,
     "baseId": 383,
     "name": "groudon",
+    "generation": 3
+  },
+  {
+    "id": 10078,
+    "baseId": 383,
+    "name": "groudon-primal",
     "generation": 3
   },
   {
@@ -3108,12 +3192,6 @@
     "generation": 4
   },
   {
-    "id": 474,
-    "baseId": 474,
-    "name": "porygon-z",
-    "generation": 4
-  },
-  {
     "id": 475,
     "baseId": 475,
     "name": "gallade",
@@ -3144,6 +3222,36 @@
     "generation": 4
   },
   {
+    "id": 10008,
+    "baseId": 479,
+    "name": "rotom-heat",
+    "generation": 4
+  },
+  {
+    "id": 10009,
+    "baseId": 479,
+    "name": "rotom-wash",
+    "generation": 4
+  },
+  {
+    "id": 10010,
+    "baseId": 479,
+    "name": "rotom-frost",
+    "generation": 4
+  },
+  {
+    "id": 10011,
+    "baseId": 479,
+    "name": "rotom-fan",
+    "generation": 4
+  },
+  {
+    "id": 10012,
+    "baseId": 479,
+    "name": "rotom-mow",
+    "generation": 4
+  },
+  {
     "id": 480,
     "baseId": 480,
     "name": "uxie",
@@ -3168,9 +3276,21 @@
     "generation": 4
   },
   {
+    "id": 10245,
+    "baseId": 483,
+    "name": "dialga-origin",
+    "generation": 4
+  },
+  {
     "id": 484,
     "baseId": 484,
     "name": "palkia",
+    "generation": 4
+  },
+  {
+    "id": 10246,
+    "baseId": 484,
+    "name": "palkia-origin",
     "generation": 4
   },
   {
@@ -3621,12 +3741,6 @@
     "id": 10177,
     "baseId": 555,
     "name": "darmanitan-galar-standard",
-    "generation": 8
-  },
-  {
-    "id": 10178,
-    "baseId": 555,
-    "name": "darmanitan-galar-zen",
     "generation": 8
   },
   {
@@ -4206,6 +4320,18 @@
     "generation": 5
   },
   {
+    "id": 10022,
+    "baseId": 646,
+    "name": "kyurem-black",
+    "generation": 5
+  },
+  {
+    "id": 10023,
+    "baseId": 646,
+    "name": "kyurem-white",
+    "generation": 5
+  },
+  {
     "id": 647,
     "baseId": 647,
     "name": "keldeo-ordinary",
@@ -4278,6 +4404,18 @@
     "generation": 6
   },
   {
+    "id": 10116,
+    "baseId": 658,
+    "name": "greninja-battle-bond",
+    "generation": 6
+  },
+  {
+    "id": 10117,
+    "baseId": 658,
+    "name": "greninja-ash",
+    "generation": 6
+  },
+  {
     "id": 659,
     "baseId": 659,
     "name": "bunnelby",
@@ -4347,6 +4485,12 @@
     "id": 670,
     "baseId": 670,
     "name": "floette",
+    "generation": 6
+  },
+  {
+    "id": 10061,
+    "baseId": 670,
+    "name": "floette-eternal",
     "generation": 6
   },
   {
@@ -4668,6 +4812,12 @@
     "generation": 6
   },
   {
+    "id": 10086,
+    "baseId": 720,
+    "name": "hoopa-unbound",
+    "generation": 6
+  },
+  {
     "id": 721,
     "baseId": 721,
     "name": "volcanion",
@@ -4815,6 +4965,12 @@
     "id": 744,
     "baseId": 744,
     "name": "rockruff",
+    "generation": 7
+  },
+  {
+    "id": 10151,
+    "baseId": 744,
+    "name": "rockruff-own-tempo",
     "generation": 7
   },
   {
@@ -5154,9 +5310,33 @@
     "generation": 7
   },
   {
+    "id": 10155,
+    "baseId": 800,
+    "name": "necrozma-dusk",
+    "generation": 7
+  },
+  {
+    "id": 10156,
+    "baseId": 800,
+    "name": "necrozma-dawn",
+    "generation": 7
+  },
+  {
+    "id": 10157,
+    "baseId": 800,
+    "name": "necrozma-ultra",
+    "generation": 7
+  },
+  {
     "id": 801,
     "baseId": 801,
     "name": "magearna",
+    "generation": 7
+  },
+  {
+    "id": 10147,
+    "baseId": 801,
+    "name": "magearna-original",
     "generation": 7
   },
   {
@@ -5682,9 +5862,21 @@
     "generation": 8
   },
   {
+    "id": 10188,
+    "baseId": 888,
+    "name": "zacian-crowned",
+    "generation": 8
+  },
+  {
     "id": 889,
     "baseId": 889,
     "name": "zamazenta",
+    "generation": 8
+  },
+  {
+    "id": 10189,
+    "baseId": 889,
+    "name": "zamazenta-crowned",
     "generation": 8
   },
   {
@@ -5742,6 +5934,18 @@
     "generation": 8
   },
   {
+    "id": 10193,
+    "baseId": 898,
+    "name": "calyrex-ice",
+    "generation": 8
+  },
+  {
+    "id": 10194,
+    "baseId": 898,
+    "name": "calyrex-shadow",
+    "generation": 8
+  },
+  {
     "id": 899,
     "baseId": 899,
     "name": "wyrdeer",
@@ -5763,7 +5967,7 @@
     "id": 10272,
     "baseId": 901,
     "name": "ursaluna-bloodmoon",
-    "generation": 9
+    "generation": 8
   },
   {
     "id": 902,
@@ -6354,6 +6558,12 @@
     "generation": 9
   },
   {
+    "id": 10263,
+    "baseId": 999,
+    "name": "gimmighoul-roaming",
+    "generation": 9
+  },
+  {
     "id": 1000,
     "baseId": 1000,
     "name": "gholdengo",
@@ -6528,9 +6738,147 @@
     "generation": 9
   },
   {
+    "id": 10001,
+    "baseId": 10001,
+    "name": "deoxys-attack",
+    "generation": 9
+  },
+  {
+    "id": 10002,
+    "baseId": 10002,
+    "name": "deoxys-defense",
+    "generation": 9
+  },
+  {
+    "id": 10003,
+    "baseId": 10003,
+    "name": "deoxys-speed",
+    "generation": 9
+  },
+  {
+    "id": 10004,
+    "baseId": 10004,
+    "name": "wormadam-sandy",
+    "generation": 9
+  },
+  {
+    "id": 10005,
+    "baseId": 10005,
+    "name": "wormadam-trash",
+    "generation": 9
+  },
+  {
+    "id": 10006,
+    "baseId": 10006,
+    "name": "shaymin-sky",
+    "generation": 9
+  },
+  {
+    "id": 10007,
+    "baseId": 10007,
+    "name": "giratina-origin",
+    "generation": 9
+  },
+  {
+    "id": 10016,
+    "baseId": 10016,
+    "name": "basculin-blue-striped",
+    "generation": 9
+  },
+  {
+    "id": 10018,
+    "baseId": 10018,
+    "name": "meloetta-pirouette",
+    "generation": 9
+  },
+  {
+    "id": 10019,
+    "baseId": 10019,
+    "name": "tornadus-therian",
+    "generation": 9
+  },
+  {
+    "id": 10020,
+    "baseId": 10020,
+    "name": "thundurus-therian",
+    "generation": 9
+  },
+  {
+    "id": 10021,
+    "baseId": 10021,
+    "name": "landorus-therian",
+    "generation": 9
+  },
+  {
+    "id": 10024,
+    "baseId": 10024,
+    "name": "keldeo-resolute",
+    "generation": 9
+  },
+  {
     "id": 10025,
     "baseId": 10025,
     "name": "meowstic-female",
+    "generation": 9
+  },
+  {
+    "id": 10118,
+    "baseId": 10118,
+    "name": "zygarde-10-power-construct",
+    "generation": 9
+  },
+  {
+    "id": 10119,
+    "baseId": 10119,
+    "name": "zygarde-50-power-construct",
+    "generation": 9
+  },
+  {
+    "id": 10120,
+    "baseId": 10120,
+    "name": "zygarde-complete",
+    "generation": 9
+  },
+  {
+    "id": 10123,
+    "baseId": 10123,
+    "name": "oricorio-pom-pom",
+    "generation": 9
+  },
+  {
+    "id": 10124,
+    "baseId": 10124,
+    "name": "oricorio-pau",
+    "generation": 9
+  },
+  {
+    "id": 10125,
+    "baseId": 10125,
+    "name": "oricorio-sensu",
+    "generation": 9
+  },
+  {
+    "id": 10126,
+    "baseId": 10126,
+    "name": "lycanroc-midnight",
+    "generation": 9
+  },
+  {
+    "id": 10152,
+    "baseId": 10152,
+    "name": "lycanroc-dusk",
+    "generation": 9
+  },
+  {
+    "id": 10181,
+    "baseId": 10181,
+    "name": "zygarde-10",
+    "generation": 9
+  },
+  {
+    "id": 10184,
+    "baseId": 10184,
+    "name": "toxtricity-low-key",
     "generation": 9
   },
   {
@@ -6546,21 +6894,69 @@
     "generation": 9
   },
   {
+    "id": 10247,
+    "baseId": 10247,
+    "name": "basculin-white-striped",
+    "generation": 9
+  },
+  {
     "id": 10248,
-    "baseId": 902,
+    "baseId": 10248,
     "name": "basculegion-female",
     "generation": 9
   },
   {
     "id": 10249,
-    "baseId": 905,
+    "baseId": 10249,
     "name": "enamorus-therian",
     "generation": 9
   },
   {
     "id": 10254,
-    "baseId": 916,
+    "baseId": 10254,
     "name": "oinkologne-female",
+    "generation": 9
+  },
+  {
+    "id": 10255,
+    "baseId": 10255,
+    "name": "dudunsparce-three-segment",
+    "generation": 9
+  },
+  {
+    "id": 10257,
+    "baseId": 10257,
+    "name": "maushold-family-of-three",
+    "generation": 9
+  },
+  {
+    "id": 10258,
+    "baseId": 10258,
+    "name": "tatsugiri-droopy",
+    "generation": 9
+  },
+  {
+    "id": 10259,
+    "baseId": 10259,
+    "name": "tatsugiri-stretchy",
+    "generation": 9
+  },
+  {
+    "id": 10260,
+    "baseId": 10260,
+    "name": "squawkabilly-blue-plumage",
+    "generation": 9
+  },
+  {
+    "id": 10261,
+    "baseId": 10261,
+    "name": "squawkabilly-yellow-plumage",
+    "generation": 9
+  },
+  {
+    "id": 10262,
+    "baseId": 10262,
+    "name": "squawkabilly-white-plumage",
     "generation": 9
   }
 ]

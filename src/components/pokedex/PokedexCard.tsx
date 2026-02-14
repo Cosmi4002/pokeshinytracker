@@ -82,67 +82,47 @@ export const PokedexCard = memo(function PokedexCard({
             {/* Sprites container */}
             <div className="relative flex items-center justify-center z-10 h-44 w-full px-2">
                 <div className="flex items-center justify-center gap-1 w-full translate-y-2">
-                    {/* Oinkologne Special Case (Base ID 916) */}
-                    {baseId === 916 ? (
-                        <div className="relative w-28 h-28 mx-auto flex items-center justify-center">
+                    {/* Default/Male sprite */}
+                    {!imgError ? (
+                        <div className={cn(
+                            "relative flex items-center justify-center transition-all duration-500",
+                            hasGenderDiff ? "w-[48%]" : "w-full max-w-[180px]"
+                        )}>
                             <img
-                                src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/916.png`} // Male
-                                alt="Oinkologne Male"
-                                className="absolute left-0 top-0 w-20 h-20 object-contain pokemon-sprite group-hover:scale-110 transition-transform duration-500"
+                                src={spriteUrl}
+                                alt={`${displayName} shiny`}
+                                className={cn(
+                                    "h-full w-full pokemon-sprite transition-all duration-500 object-contain max-h-48",
+                                    hasCaughtAny
+                                        ? "drop-shadow-[0_0_12px_rgba(255,255,255,0.7)] scale-105"
+                                        : "opacity-60 group-hover:opacity-100 group-hover:scale-110"
+                                )}
                                 style={{ imageRendering: 'auto' }}
-                            />
-                            <img
-                                src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/10254.png`} // Female
-                                alt="Oinkologne Female"
-                                className="absolute right-0 bottom-0 w-20 h-20 object-contain pokemon-sprite group-hover:scale-110 transition-transform duration-500"
-                                style={{ imageRendering: 'auto' }}
+                                loading="lazy"
+                                onError={() => setImgError(true)}
                             />
                         </div>
                     ) : (
-                        <>
-                            {/* Default/Male sprite */}
-                            {!imgError ? (
-                                <div className={cn(
-                                    "relative flex items-center justify-center transition-all duration-500",
-                                    hasGenderDiff ? "w-[48%]" : "w-full max-w-[180px]"
-                                )}>
-                                    <img
-                                        src={spriteUrl}
-                                        alt={`${displayName} shiny`}
-                                        className={cn(
-                                            "h-full w-full pokemon-sprite transition-all duration-500 object-contain max-h-48",
-                                            hasCaughtAny
-                                                ? "drop-shadow-[0_0_12px_rgba(255,255,255,0.7)] scale-105"
-                                                : "opacity-60 group-hover:opacity-100 group-hover:scale-110"
-                                        )}
-                                        style={{ imageRendering: 'auto' }}
-                                        loading="lazy"
-                                        onError={() => setImgError(true)}
-                                    />
-                                </div>
-                            ) : (
-                                <div className="h-20 w-20" />
-                            )}
+                        <div className="h-20 w-20" />
+                    )}
 
-                            {/* Female sprite if applicable */}
-                            {hasGenderDiff && femaleSprite && !femaleImgError && (
-                                <div className="relative w-[48%] flex items-center justify-center transition-all duration-500">
-                                    <img
-                                        src={femaleSprite}
-                                        alt={`${displayName} shiny female`}
-                                        className={cn(
-                                            "h-full w-full pokemon-sprite transition-all duration-500 object-contain max-h-40",
-                                            hasCaughtAny
-                                                ? "drop-shadow-[0_0_12px_rgba(255,255,255,0.7)] scale-105"
-                                                : "opacity-60 group-hover:opacity-100 group-hover:scale-110"
-                                        )}
-                                        style={{ imageRendering: 'auto' }}
-                                        loading="lazy"
-                                        onError={() => setFemaleImgError(true)}
-                                    />
-                                </div>
-                            )}
-                        </>
+                    {/* Female sprite if applicable */}
+                    {hasGenderDiff && femaleSprite && !femaleImgError && (
+                        <div className="relative w-[48%] flex items-center justify-center transition-all duration-500">
+                            <img
+                                src={femaleSprite}
+                                alt={`${displayName} shiny female`}
+                                className={cn(
+                                    "h-full w-full pokemon-sprite transition-all duration-500 object-contain max-h-40",
+                                    hasCaughtAny
+                                        ? "drop-shadow-[0_0_12px_rgba(255,255,255,0.7)] scale-105"
+                                        : "opacity-60 group-hover:opacity-100 group-hover:scale-110"
+                                )}
+                                style={{ imageRendering: 'auto' }}
+                                loading="lazy"
+                                onError={() => setFemaleImgError(true)}
+                            />
+                        </div>
                     )}
                 </div>
             </div>

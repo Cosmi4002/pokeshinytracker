@@ -297,9 +297,9 @@ export const GAME_COVER_ART: Record<string, string> = {
 // High-quality game logos from Bulbagarden (Local Hosting)
 export const GAME_LOGOS: Record<string, string> = {
   // Gen 2
-  gold: 'https://upload.wikimedia.org/wikipedia/commons/2/2f/Pok%C3%A9mon_Gold_Logo.svg',
-  silver: 'https://upload.wikimedia.org/wikipedia/commons/9/93/Pok%C3%A9mon_Silver_Logo.svg',
-  crystal: 'https://upload.wikimedia.org/wikipedia/commons/1/1a/Pok%C3%A9mon_Crystal_Logo.svg',
+  gold: 'https://static.wikia.nocookie.net/logopedia/images/c/c9/PokemonGoldLogo.png/revision/latest?cb=20190526232149',
+  silver: 'https://static.wikia.nocookie.net/logopedia/images/d/d3/SilverLogo.png/revision/latest?cb=20190526233701',
+  crystal: 'https://static.wikia.nocookie.net/logopedia/images/a/a3/Pokemon_-_Crystal_Version_logo.png/revision/latest?cb=20190526234340',
   // Gen 3
   ruby: '/img/game-logos/ruby.png',
   sapphire: '/img/game-logos/sapphire.png',
@@ -313,8 +313,8 @@ export const GAME_LOGOS: Record<string, string> = {
   heartgold: '/img/game-logos/heartgold.png',
   soulsilver: '/img/game-logos/soulsilver.png',
   // Gen 5
-  black: 'https://upload.wikimedia.org/wikipedia/commons/d/d4/Pok%C3%A9mon_Black_Version_logo.png',
-  white: 'https://upload.wikimedia.org/wikipedia/commons/8/82/Pok%C3%A9mon_White_Version_logo.png',
+  black: 'https://archives.bulbagarden.net/wiki/Special:FilePath/Pok%C3%A9mon_Black_EN_logo.png',
+  white: 'https://m.archives.bulbagarden.net/media/upload/3/3e/Pok%C3%A9mon_White_EN_logo.png',
   black2: '/img/game-logos/black2.png',
   white2: '/img/game-logos/white2.png',
   // Gen 6
