@@ -12,19 +12,31 @@ export interface PokemonBasic {
   hideFromPokedex?: boolean;
 }
 
+export interface PokemonVariety {
+  isDefault: boolean;
+  pokemon: {
+    id: number;
+    name: string;
+    spriteUrl: string;
+  };
+}
+
 export interface PokemonDetailed {
   id: number;
+  baseId: number;
   name: string;
   displayName: string;
   sprites: {
     default: string;
     shiny: string;
-    femalDefault?: string;
+    frontShiny: string;
+    femaleDefault?: string;
     femaleShiny?: string;
   };
   types: string[];
   generation: number;
   forms: PokemonFormDetailed[];
+  varieties: PokemonVariety[];
   hasGenderDifference: boolean;
 }
 
@@ -241,16 +253,24 @@ export function usePokemonDetails(pokemonId: number | null) {
         const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`);
         const data = await response.json();
 
-        const hasGenderDiff = POKEMON_WITH_GENDER_DIFF.includes(pokemonId);
+        // For regional forms, don't show gender diff (e.g. Alolan Rattata has no visible gender difference)
+        const isRegionalForm = data.name && (
+          data.name.includes('-alola') || data.name.includes('-galar') ||
+          data.name.includes('-hisui') || data.name.includes('-paldea')
+        );
+        const hasGenderDiff = !isRegionalForm && POKEMON_WITH_GENDER_DIFF.includes(pokemonId);
 
+        const shinyUrl = getPokemonSpriteUrl(pokemonId, { shiny: true, name: data.name, animated: true });
         const sprites = {
           default: getPokemonSpriteUrl(pokemonId, { name: data.name, animated: true }),
-          shiny: getPokemonSpriteUrl(pokemonId, { shiny: true, name: data.name, animated: true }),
+          shiny: shinyUrl,
+          frontShiny: shinyUrl, // alias for PokemonDetailDialog compatibility
           femaleDefault: hasGenderDiff ? getPokemonSpriteUrl(pokemonId, { female: true, name: data.name, animated: true }) : undefined,
           femaleShiny: hasGenderDiff ? getPokemonSpriteUrl(pokemonId, { shiny: true, female: true, name: data.name, animated: true }) : undefined,
         };
 
         const forms: PokemonFormDetailed[] = [];
+        const varieties: PokemonVariety[] = [];
 
         // 1. Fetch form data
         if (data.forms && data.forms.length > 1) {
@@ -299,14 +319,16 @@ export function usePokemonDetails(pokemonId: number | null) {
         }
 
         // 2. Fetch species varieties (Megas, Regionals, etc.)
+        // Determine baseId from pokedex data
+        const pokedexEntry = pokedexData.find((p: any) => p.id === pokemonId);
+        const baseId = pokedexEntry?.baseId || pokemonId;
+
         try {
           const speciesResponse = await fetch(data.species.url);
           const speciesData = await speciesResponse.json();
 
           if (speciesData.varieties && speciesData.varieties.length > 1) {
             for (const variety of speciesData.varieties) {
-              if (variety.is_default) continue;
-
               const vn = variety.pokemon.name.toLowerCase();
 
               // Skip Mega and Gigamax forms (user requested removal)
@@ -315,17 +337,37 @@ export function usePokemonDetails(pokemonId: number | null) {
               // Skip Minior Meteor forms
               if (vn.startsWith('minior-') && vn.includes('-meteor')) continue;
 
-              // Skip mega (already above), totem, etc. here if they are handled by forms? 
-              // Actually, varieties is the best source for regional variants.
-              // We'll filter by category in the dialog instead of here.
+              // Skip totem, primal, etc.
               if (vn.includes('-totem') || vn.includes('-primal') || vn.includes('-eternal')) continue;
 
               const varietyIdMatch = variety.pokemon.url.match(/\/pokemon\/(\d+)\/?$/);
               const varietyId = varietyIdMatch ? parseInt(varietyIdMatch[1]) : null;
 
-              if (varietyId === pokemonId) continue;
+              if (varietyId === pokemonId) {
+                // This is the current pokemon, mark as default
+                varieties.push({
+                  isDefault: true,
+                  pokemon: {
+                    id: varietyId,
+                    name: vn,
+                    spriteUrl: getPokemonSpriteUrl(varietyId, { name: vn, shiny: true }),
+                  },
+                });
+                continue;
+              }
 
               if (varietyId && !forms.some(f => f.id === varietyId)) {
+                // Add to varieties for the dialog to process
+                varieties.push({
+                  isDefault: variety.is_default,
+                  pokemon: {
+                    id: varietyId,
+                    name: vn,
+                    spriteUrl: getPokemonSpriteUrl(varietyId, { name: vn, shiny: true }),
+                  },
+                });
+
+                // Also add to forms for backward compatibility
                 forms.push({
                   id: varietyId,
                   formName: variety.pokemon.name,
@@ -344,12 +386,14 @@ export function usePokemonDetails(pokemonId: number | null) {
 
         setPokemon({
           id: pokemonId,
+          baseId,
           name: data.name,
           displayName: formatPokemonName(data.name, pokemonId),
           sprites,
           types: data.types.map((t: any) => t.type.name),
           generation: getGeneration(pokemonId, data.name),
           forms,
+          varieties,
           hasGenderDifference: hasGenderDiff,
         });
       } catch (err) {

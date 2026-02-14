@@ -62,26 +62,25 @@ export default function Pokedex() {
         // Generation filter
         let matchesGen = true;
         if (generationFilter !== 'all') {
+          // Check if this is a regional form by specific suffix
+          const isAlolan = p.name.includes('-alola');
+          const isGalarian = p.name.includes('-galar');
+          const isHisuian = p.name.includes('-hisui');
+          const isPaldean = p.name.includes('-paldea');
+          const isRegionalForm = isAlolan || isGalarian || isHisuian || isPaldean;
+
           if (generationFilter === 'Alola') {
-            // Only show Alolan forms (must have '-alola' in name AND be from gen 7)
-            matchesGen = p.name.includes('-alola');
+            matchesGen = isAlolan;
           } else if (generationFilter === 'Galar') {
-            // Only show Galarian forms (must have '-galar' in name AND be from gen 8)
-            matchesGen = p.name.includes('-galar');
+            matchesGen = isGalarian;
           } else if (generationFilter === 'Hisui') {
-            // Only show Hisuian forms (must have '-hisui' in name AND be from gen 8)
-            matchesGen = p.name.includes('-hisui');
+            matchesGen = isHisuian;
           } else if (generationFilter === 'Paldea') {
-            // Only show Paldean forms (must have '-paldea' in name OR be gen 9 base forms)
-            matchesGen = p.name.includes('-paldea') || (p.generation === 9 && !p.name.includes('-'));
+            matchesGen = isPaldean;
           } else {
-            // For numbered generations, match ONLY base forms (no regional variants)
+            // For numbered generations, match by generation number but exclude regional variants
             const genNum = parseInt(generationFilter);
-            matchesGen = p.generation === genNum &&
-              !p.name.includes('-alola') &&
-              !p.name.includes('-galar') &&
-              !p.name.includes('-hisui') &&
-              !p.name.includes('-paldea');
+            matchesGen = p.generation === genNum && !isRegionalForm;
           }
         }
 
@@ -177,8 +176,10 @@ export default function Pokedex() {
                 const sortedGroup = [...group].sort((a, b) => a.id - b.id);
                 const p = sortedGroup[0];
 
-                // Show gender diff if the base species has it
-                const hasGenderDiff = POKEMON_WITH_GENDER_DIFF.includes(p.baseId);
+                // Show gender diff if the base species has it, BUT NOT for regional forms
+                const isRegionalForm = p.name.includes('-alola') || p.name.includes('-galar') ||
+                  p.name.includes('-hisui') || p.name.includes('-paldea');
+                const hasGenderDiff = !isRegionalForm && POKEMON_WITH_GENDER_DIFF.includes(p.baseId);
 
                 // Calculate percentage across ALL variants in the group
                 let totalSpeciesCaught = 0;
