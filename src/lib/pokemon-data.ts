@@ -589,6 +589,20 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
     return 'https://img.pokemondb.net/sprites/home/shiny/minior-core.png';
   }
 
+  // Furfrou overrides
+  if (name && name.toLowerCase().includes('furfrou')) {
+    const sName = name.toLowerCase();
+    if (sName.includes('heart') || sName.includes('cœur')) return 'https://www.pokepedia.fr/images/0/06/Sprite_0676_C%C5%93ur_chromatique_HOME-v1.png';
+    if (sName.includes('star') || sName.includes('étoile')) return 'https://www.pokepedia.fr/images/3/3f/Sprite_0676_%C3%89toile_chromatique_HOME-v1.png';
+    if (sName.includes('diamond') || sName.includes('diamant')) return 'https://www.pokepedia.fr/images/8/8a/Sprite_0676_Diamant_chromatique_HOME-v1.png';
+    if (sName.includes('debutante') || sName.includes('demoiselle')) return 'https://www.pokepedia.fr/images/b/b3/Sprite_0676_Demoiselle_chromatique_HOME-v1.png';
+    if (sName.includes('matron')) return 'https://img.pokemondb.net/sprites/home/shiny/furfrou-matron.png';
+    if (sName.includes('dandy')) return 'https://img.pokemondb.net/sprites/home/shiny/furfrou-dandy.png';
+    if (sName.includes('la-reine') || sName.includes('reine')) return 'https://www.pokepedia.fr/images/f/f5/Sprite_0676_Reine_chromatique_HOME-v1.png';
+    if (sName.includes('kabuki')) return 'https://www.pokepedia.fr/images/f/f2/Sprite_0676_Kabuki_chromatique_HOME-v1.png';
+    if (sName.includes('pharaoh') || sName.includes('pharaon')) return 'https://www.pokepedia.fr/images/5/52/Sprite_0676_Pharaon_chromatique_HOME-v1.png';
+  }
+
   // Use the ID directly. 
   // Note: HOME sprites don't have female-specific filenames in the same folder usually, 
   // but PokeAPI maps forms to IDs. 
