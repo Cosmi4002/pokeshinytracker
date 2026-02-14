@@ -99,7 +99,7 @@ export default function PokemonDetails() {
         items.push({
             id: details.id,
             name: details.name,
-            displayName: details.hasGenderDifference ? 'Maschio' : 'Standard',
+            displayName: details.hasGenderDifference ? 'Maschio' : details.displayName,
             category: 'base',
             gender: 'male',
             spriteUrl: details.sprites.shiny
