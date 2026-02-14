@@ -29,7 +29,6 @@ export interface PokemonDetailed {
   sprites: {
     default: string;
     shiny: string;
-    frontShiny: string;
     femaleDefault?: string;
     femaleShiny?: string;
   };
@@ -264,7 +263,6 @@ export function usePokemonDetails(pokemonId: number | null) {
         const sprites = {
           default: getPokemonSpriteUrl(pokemonId, { name: data.name, animated: true }),
           shiny: shinyUrl,
-          frontShiny: shinyUrl, // alias for PokemonDetailDialog compatibility
           femaleDefault: hasGenderDiff ? getPokemonSpriteUrl(pokemonId, { female: true, name: data.name, animated: true }) : undefined,
           femaleShiny: hasGenderDiff ? getPokemonSpriteUrl(pokemonId, { shiny: true, female: true, name: data.name, animated: true }) : undefined,
         };

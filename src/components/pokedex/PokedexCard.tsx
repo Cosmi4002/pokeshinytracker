@@ -9,7 +9,7 @@ interface PokedexCardProps {
     spriteUrl: string;
     femaleSprite?: string;
     hasGenderDiff: boolean;
-    caughtPercentage: number; // 0-100, for partial illumination
+    caughtPercentage: number; // 0-100
     hasCaughtAny: boolean;
     onClick: () => void;
 }
@@ -39,23 +39,16 @@ export const PokedexCard = memo(function PokedexCard({
             onClick={onClick}
             className={cn(
                 "relative group flex flex-col items-center justify-center p-3 rounded-2xl transition-all duration-500 border-2",
-                "backdrop-blur-sm overflow-hidden cursor-pointer w-full min-h-[210px]", // Increased for larger sprites
+                "backdrop-blur-sm overflow-hidden cursor-pointer w-full min-h-[210px]",
                 "hover:scale-105 active:scale-95",
-                // Base state
                 !hasCaughtAny && "border-white/5 grayscale hover:grayscale-0",
-                // Partial caught
-                // isPartial && "border-primary",
-                // Complete caught
-                // isComplete && "border-primary shadow-[0_0_25px_rgba(var(--primary),0.4)] ring-1 ring-primary"
             )}
             style={{
-                // Fix for dynamic opacity with hex vars
                 borderColor: hasCaughtAny ? accentColor : undefined,
                 boxShadow: isComplete ? `0 0 25px ${accentColor}60` : undefined,
                 backgroundColor: !hasCaughtAny
                     ? 'rgba(0, 0, 0, 0.6)'
                     : `color-mix(in srgb, ${accentColor}, black 80%)`,
-                // Dynamic partial glow using CSS variable
                 '--glow-opacity': glowIntensity,
             } as React.CSSProperties}
             onMouseEnter={(e) => {
@@ -87,19 +80,19 @@ export const PokedexCard = memo(function PokedexCard({
             )}
 
             {/* Sprites container */}
-            <div className="relative flex items-center justify-center z-10 h-44 w-full px-2"> {/* Increased height for larger sprites */}
-                {/* Wrapper for sprites to ensure balanced centering */}
+            <div className="relative flex items-center justify-center z-10 h-44 w-full px-2">
                 <div className="flex items-center justify-center gap-1 w-full translate-y-2">
+                    {/* Oinkologne Special Case (Base ID 916) */}
                     {baseId === 916 ? (
                         <div className="relative w-28 h-28 mx-auto flex items-center justify-center">
                             <img
-                                src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/916.png`} // Oinkologne Male
+                                src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/916.png`} // Male
                                 alt="Oinkologne Male"
                                 className="absolute left-0 top-0 w-20 h-20 object-contain pokemon-sprite group-hover:scale-110 transition-transform duration-500"
                                 style={{ imageRendering: 'auto' }}
                             />
                             <img
-                                src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/10254.png`} // Oinkologne Female (FIXED: was 10249)
+                                src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/10254.png`} // Female
                                 alt="Oinkologne Female"
                                 className="absolute right-0 bottom-0 w-20 h-20 object-contain pokemon-sprite group-hover:scale-110 transition-transform duration-500"
                                 style={{ imageRendering: 'auto' }}
@@ -168,18 +161,16 @@ export const PokedexCard = memo(function PokedexCard({
             </div>
 
             {/* Completion indicator */}
-            {
-                hasCaughtAny && (
-                    <div className={cn(
-                        "absolute top-1 right-1 flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold",
-                        isComplete
-                            ? "bg-primary/80 text-white"
-                            : "bg-primary/40 text-primary-foreground/80"
-                    )}>
-                        {isComplete ? "✓" : `${Math.round(caughtPercentage)}%`}
-                    </div>
-                )
-            }
+            {hasCaughtAny && (
+                <div className={cn(
+                    "absolute top-1 right-1 flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold",
+                    isComplete
+                        ? "bg-primary/80 text-white"
+                        : "bg-primary/40 text-primary-foreground/80"
+                )}>
+                    {isComplete ? "✓" : `${Math.round(caughtPercentage)}%`}
+                </div>
+            )}
 
             {/* Premium shine sweep effect */}
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out pointer-events-none" />

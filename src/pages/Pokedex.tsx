@@ -1,238 +1,196 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { Search } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { usePokemonList, getPokemonSpriteUrl, GENERATION_RANGES, POKEMON_WITH_GENDER_DIFF } from '@/hooks/use-pokemon';
-import { POKEMON_FORM_COUNTS } from '@/lib/pokemon-data';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { usePokemonList, getPokemonSpriteUrl, GENERATION_RANGES, POKEMON_WITH_GENDER_DIFF, PokemonBasic } from '@/hooks/use-pokemon';
 import { Skeleton } from '@/components/ui/skeleton';
-import { PokemonDetailDialog } from '@/components/pokedex/PokemonDetailDialog';
 import { PokedexCard } from '@/components/pokedex/PokedexCard';
-import { PokemonBasic } from '@/hooks/use-pokemon';
-import { usePokedexCaught } from '@/hooks/use-pokedex-caught';
+import { PokemonDetailDialog } from '@/components/pokedex/PokemonDetailDialog';
 import { useRandomColor } from '@/lib/random-color-context';
-import { useNavigate } from 'react-router-dom';
+import { POKEMON_FORM_COUNTS } from '@/lib/pokemon-data';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/lib/auth-context';
+import { useQuery } from '@tanstack/react-query';
 
 export default function Pokedex() {
-  const { pokemon, loading } = usePokemonList();
-  const { accentColor } = useRandomColor();
-  const { getCaughtCountForPokemon, isCaught, loading: caughtLoading } = usePokedexCaught();
-  const [search, setSearch] = useState('');
-  const [generationFilter, setGenerationFilter] = useState<string>('all');
-  const [selectedPokemon, setSelectedPokemon] = useState<PokemonBasic | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const navigate = useNavigate();
+    const { pokemon, loading: pokemonLoading } = usePokemonList();
+    const { accentColor } = useRandomColor();
+    const { user } = useAuth();
 
-  // Group all pokemon by species (baseId + name prefix for gender variants)
-  const speciesGroups = useMemo(() => {
-    const map = new Map<string, PokemonBasic[]>();
-    pokemon.forEach(p => {
-      // Strip gender suffixes to keep male/female together
-      // But keep regional suffixes (alola, galar, etc.) separate
-      const nameKey = p.name.replace(/-male$|-female$/, '');
-      const key = `${p.baseId}-${nameKey}`;
+    const [search, setSearch] = useState('');
+    const [generationFilter, setGenerationFilter] = useState('all');
+    const [selectedPokemon, setSelectedPokemon] = useState<PokemonBasic | null>(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-      const g = map.get(key) || [];
-      g.push(p);
-      map.set(key, g);
+    // Fetch caught counts
+    const { data: caughtCounts, isLoading: caughtLoading } = useQuery({
+        queryKey: ['caughtCounts', user?.id],
+        queryFn: async () => {
+            if (!user) return {};
+            const { data, error } = await supabase
+                .from('caught_shinies')
+                .select('pokemon_id');
+            if (error) throw error;
+
+            const counts: Record<number, number> = {};
+            data?.forEach(row => {
+                counts[row.pokemon_id] = (counts[row.pokemon_id] || 0) + 1;
+            });
+            return counts;
+        },
+        enabled: !!user,
+        initialData: {}
     });
-    // Sort by baseId first (National Dex order), then by nameKey
-    return Array.from(map.values()).sort((a, b) => {
-      if (a[0].baseId !== b[0].baseId) return a[0].baseId - b[0].baseId;
-      return a[0].name.localeCompare(b[0].name);
-    });
-  }, [pokemon]);
 
-  const filteredGroups = useMemo(() => {
-    const searchLower = search.toLowerCase();
+    // Grouping logic
+    const speciesGroups = useMemo(() => {
+        const map = new Map<string, PokemonBasic[]>();
+        pokemon.forEach(p => {
+            // Group by base ID AND name prefix (to group gender variants, but separate regional variants)
+            // Clean name key: remove gender suffixes
+            const nameKey = p.name.replace(/-male$|-female$/, '');
+            // Key includes baseId to sort by dex number, but nameKey to distinguish Alola/Galar etc.
+            const key = `${p.baseId}-${nameKey}`;
 
-    return speciesGroups.filter((group) => {
-      // Does ANY pokemon in this group match the filter?
-      return group.some(p => {
-        // Search filter
-        const matchesSearch = !search || p.displayName.toLowerCase().includes(searchLower) ||
-          p.id.toString().includes(search);
+            if (!map.has(key)) map.set(key, []);
+            map.get(key)?.push(p);
+        });
 
-        // Generation filter
-        let matchesGen = true;
-        if (generationFilter !== 'all') {
-          // Check if this is a regional form by specific suffix
-          const isAlolan = p.name.includes('-alola');
-          const isGalarian = p.name.includes('-galar');
-          const isHisuian = p.name.includes('-hisui');
-          const isPaldean = p.name.includes('-paldea');
-          const isRegionalForm = isAlolan || isGalarian || isHisuian || isPaldean;
+        // Sort groups by baseId
+        return Array.from(map.values()).sort((a, b) => a[0].baseId - b[0].baseId);
+    }, [pokemon]);
 
-          if (generationFilter === 'Alola') {
-            matchesGen = isAlolan;
-          } else if (generationFilter === 'Galar') {
-            matchesGen = isGalarian;
-          } else if (generationFilter === 'Hisui') {
-            matchesGen = isHisuian;
-          } else if (generationFilter === 'Paldea') {
-            matchesGen = isPaldean;
-          } else {
-            // For numbered generations, match by generation number but exclude regional variants
-            const genNum = parseInt(generationFilter);
-            matchesGen = p.generation === genNum && !isRegionalForm;
-          }
-        }
+    // Filtering logic
+    const filteredGroups = useMemo(() => {
+        const searchLower = search.toLowerCase();
 
-        return matchesSearch && matchesGen && !p.hideFromPokedex;
-      });
-    });
-  }, [speciesGroups, search, generationFilter]);
+        return speciesGroups.filter(group => {
+            const p = group[0]; // Representative
 
-  // Calculate completion stats
-  const completionStats = useMemo(() => {
-    let totalCaught = 0;
-    filteredGroups.forEach(group => {
-      // Any variant caught counts as species caught for the summary? 
-      // Or should it be 100% caught? Usually "At least one" is the Pokedex standard.
-      const hasAnyCaught = group.some(p => {
-        const { caught } = getCaughtCountForPokemon(p.id);
-        return caught > 0;
-      });
-      if (hasAnyCaught) totalCaught++;
-    });
-    return { caught: totalCaught, total: filteredGroups.length };
-  }, [filteredGroups, getCaughtCountForPokemon]);
+            // Search
+            const matchesSearch = !search || p.displayName.toLowerCase().includes(searchLower) || p.id.toString().includes(search);
+            if (!matchesSearch) return false;
 
-  return (
-    <div
-      className="min-h-screen bg-background transition-colors duration-1000"
-      style={{
-        backgroundImage: `radial-gradient(circle at 50% 0%, ${accentColor}15 0%, transparent 70%)`
-      }}
-    >
-      <Navbar />
-      <main className="container mx-auto py-8 px-4">
-        <div className="space-y-6 max-w-7xl mx-auto">
-          {/* Header & Filters */}
-          <div className="flex flex-col md:flex-row gap-6 items-center justify-between text-center md:text-left">
-            <div>
-              <h1
-                className="text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r"
-                style={{
-                  backgroundImage: `linear-gradient(to right, ${accentColor}, color-mix(in srgb, ${accentColor}, white 30%))`
-                }}
-              >
-                Shiny Pokédex
-              </h1>
-              <p className="text-muted-foreground mt-1 font-medium">
-                {completionStats.caught} / {completionStats.total} catturati
-              </p>
-            </div>
+            // Generation Filter
+            if (generationFilter !== 'all') {
+                const isAlolan = p.name.includes('-alola');
+                const isGalarian = p.name.includes('-galar');
+                const isHisuian = p.name.includes('-hisui');
+                const isPaldean = p.name.includes('-paldea');
+                const isRegional = isAlolan || isGalarian || isHisuian || isPaldean;
 
-            <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-center">
-              <div className="relative w-full sm:w-72">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Cerca Pokémon..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="pl-10 h-11 bg-white/5 border-primary/20 focus:border-primary transition-all text-foreground"
-                />
-              </div>
+                if (generationFilter === 'Alola') return isAlolan;
+                if (generationFilter === 'Galar') return isGalarian;
+                if (generationFilter === 'Hisui') return isHisuian;
+                if (generationFilter === 'Paldea') return isPaldean; // Only shows actual Paldean forms
 
-              <Select value={generationFilter} onValueChange={setGenerationFilter}>
-                <SelectTrigger className="w-full sm:w-[160px] h-11 bg-white/5 border-primary/20">
-                  <SelectValue placeholder="Generazione" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tutte Gen</SelectItem>
-                  {Object.keys(GENERATION_RANGES).map((gen) => (
-                    <SelectItem key={gen} value={gen}>
-                      Gen {gen}
-                    </SelectItem>
-                  ))}
-                  <SelectItem value="Alola">Alola Forms</SelectItem>
-                  <SelectItem value="Galar">Galar Forms</SelectItem>
-                  <SelectItem value="Hisui">Hisui Forms</SelectItem>
-                  <SelectItem value="Paldea">Paldea Forms</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+                // Numbered Gens: Exclude Regional forms
+                const genNum = parseInt(generationFilter);
+                if (p.generation !== genNum) return false;
+                if (isRegional) return false;
+            }
 
-          {/* Pokemon Grid */}
-          {loading || caughtLoading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-              {Array.from({ length: 24 }).map((_, i) => (
-                <Skeleton key={i} className="aspect-square rounded-lg" />
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-              {filteredGroups.map((group) => {
-                // Representatives: pick the one with lowest ID (usually the base form)
-                // We sort each group by ID to ensure consistency
-                const sortedGroup = [...group].sort((a, b) => a.id - b.id);
-                const p = sortedGroup[0];
+            return true;
+        });
+    }, [speciesGroups, search, generationFilter]);
 
-                // Show gender diff if the base species has it, BUT NOT for regional forms
-                const isRegionalForm = p.name.includes('-alola') || p.name.includes('-galar') ||
-                  p.name.includes('-hisui') || p.name.includes('-paldea');
-                const hasGenderDiff = !isRegionalForm && POKEMON_WITH_GENDER_DIFF.includes(p.baseId);
+    // Total caught count
+    const totalCaughtCount = Object.values(caughtCounts).reduce((a, b) => a + b, 0);
 
-                // Calculate percentage across ALL variants in the group
-                let totalSpeciesCaught = 0;
-                let totalPossibleVariants = 0;
+    return (
+        <div className="min-h-screen bg-background transition-colors duration-1000" style={{ backgroundImage: `radial-gradient(circle at 50% 0%, ${accentColor}15 0%, transparent 70%)` }}>
+            <Navbar />
+            <main className="container mx-auto py-8 px-4">
+                <div className="space-y-6 max-w-7xl mx-auto">
+                    {/* Header */}
+                    <div className="flex flex-col md:flex-row gap-6 items-center justify-between text-center md:text-left">
+                        <div>
+                            <h1 className="text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r" style={{ backgroundImage: `linear-gradient(to right, ${accentColor}, color-mix(in srgb, ${accentColor}, white 30%))` }}>
+                                Shiny Pokédex
+                            </h1>
+                            <p className="text-muted-foreground mt-1 font-medium">
+                                {totalCaughtCount} Pokémon catturati
+                            </p>
+                        </div>
 
-                group.forEach(variant => {
-                  const { caught } = getCaughtCountForPokemon(variant.id);
-                  totalSpeciesCaught += caught;
+                        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-center">
+                            <div className="relative w-full sm:w-72">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    placeholder="Cerca Pokémon..."
+                                    value={search}
+                                    onChange={e => setSearch(e.target.value)}
+                                    className="pl-10 h-11 bg-white/5 border-primary/20 focus:border-primary transition-all text-foreground"
+                                />
+                            </div>
+                            <Select value={generationFilter} onValueChange={setGenerationFilter}>
+                                <SelectTrigger className="w-full sm:w-[160px] h-11 bg-white/5 border-primary/20">
+                                    <SelectValue placeholder="Generazione" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">Tutti</SelectItem>
+                                    {Object.keys(GENERATION_RANGES).map(g => (
+                                        <SelectItem key={g} value={g}>Gen {g}</SelectItem>
+                                    ))}
+                                    <SelectItem value="Alola">Alola Forms</SelectItem>
+                                    <SelectItem value="Galar">Galar Forms</SelectItem>
+                                    <SelectItem value="Hisui">Hisui Forms</SelectItem>
+                                    <SelectItem value="Paldea">Paldea Forms</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
 
-                  // Basic form count
-                  let formsForVariant = 1;
-                  if (POKEMON_FORM_COUNTS[variant.id]) {
-                    formsForVariant = POKEMON_FORM_COUNTS[variant.id];
-                  } else if (variant.id === p.baseId && hasGenderDiff) {
-                    formsForVariant = 2; // Male + Female
-                  }
-                  totalPossibleVariants += formsForVariant;
-                });
+                    {/* Grid */}
+                    {pokemonLoading || caughtLoading ? (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+                            {Array.from({ length: 24 }).map((_, i) => <Skeleton key={i} className="aspect-square rounded-2xl" />)}
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+                            {filteredGroups.map(group => {
+                                const p = group[0];
+                                const isRegional = p.name.includes('-alola') || p.name.includes('-galar') || p.name.includes('-hisui') || p.name.includes('-paldea');
+                                const hasGenderDiff = !isRegional && POKEMON_WITH_GENDER_DIFF.includes(p.baseId);
 
-                const caughtPct = totalPossibleVariants > 0
-                  ? Math.min(100, (totalSpeciesCaught / totalPossibleVariants) * 100)
-                  : 0;
+                                const caughtVal = caughtCounts[p.id] || 0;
+                                const isCaught = caughtVal > 0;
 
-                const hasCaughtAny = totalSpeciesCaught > 0;
+                                let totalVars = 1;
+                                if (hasGenderDiff) totalVars = 2;
+                                if (POKEMON_FORM_COUNTS[p.id]) totalVars = POKEMON_FORM_COUNTS[p.id];
 
-                return (
-                  <PokedexCard
-                    key={p.baseId}
-                    pokemonId={p.id}
-                    baseId={p.baseId}
-                    displayName={p.displayName}
-                    spriteUrl={getPokemonSpriteUrl(p.id, { shiny: true, name: p.name })}
-                    femaleSprite={hasGenderDiff ? getPokemonSpriteUrl(p.id, { shiny: true, female: true, name: p.name }) : undefined}
-                    hasGenderDiff={hasGenderDiff}
-                    caughtPercentage={caughtPct}
-                    hasCaughtAny={hasCaughtAny}
-                    onClick={() => {
-                      setSelectedPokemon(p);
-                      setIsDialogOpen(true);
-                    }}
-                  />
-                );
-              })}
-            </div>
-          )}
+                                const pct = Math.min(100, (caughtVal / totalVars) * 100);
+
+                                return (
+                                    <PokedexCard
+                                        key={p.id}
+                                        pokemonId={p.id}
+                                        baseId={p.baseId}
+                                        displayName={p.displayName}
+                                        spriteUrl={getPokemonSpriteUrl(p.id, { shiny: true, name: p.name })}
+                                        femaleSprite={hasGenderDiff ? getPokemonSpriteUrl(p.id, { shiny: true, female: true, name: p.name }) : undefined}
+                                        hasGenderDiff={hasGenderDiff}
+                                        caughtPercentage={pct}
+                                        hasCaughtAny={isCaught}
+                                        onClick={() => {
+                                            setSelectedPokemon(p);
+                                            setIsDialogOpen(true);
+                                        }}
+                                    />
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+            </main>
+
+            <PokemonDetailDialog
+                pokemon={selectedPokemon}
+                open={isDialogOpen}
+                onOpenChange={setIsDialogOpen}
+            />
         </div>
-      </main>
-
-      <PokemonDetailDialog
-        pokemon={selectedPokemon}
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-      />
-    </div>
-  );
+    );
 }

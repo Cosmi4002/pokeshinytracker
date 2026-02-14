@@ -72,14 +72,14 @@ export function ShinyButton({
                 </span>
             </div>
 
-            {/* Premium indicator corner or Counter button */}
+            {/* Counter button */}
             {onCounterClick ? (
-                <button
+                <div
                     onClick={(e) => {
                         e.stopPropagation();
                         onCounterClick();
                     }}
-                    className="absolute top-0 right-0 w-10 h-10 flex items-start justify-end p-2 opacity-0 group-hover:opacity-100 transition-opacity z-20 hover:text-primary"
+                    className="absolute top-0 right-0 w-10 h-10 flex items-start justify-end p-2 opacity-0 group-hover:opacity-100 transition-opacity z-20 hover:text-primary cursor-pointer"
                     title="Vai al Counter"
                 >
                     <div className="bg-background/80 backdrop-blur-sm p-1 rounded-full border border-primary/20 hover:border-primary/50 transition-colors">
@@ -102,7 +102,7 @@ export function ShinyButton({
                             <line x1="20" y1="12" x2="22" y2="12" />
                         </svg>
                     </div>
-                </button>
+                </div>
             ) : isCaught && (
                 <div className="absolute top-0 right-0 w-12 h-12 bg-gradient-to-bl from-primary/20 to-transparent flex items-start justify-end p-2 transition-opacity duration-500">
                     <div className="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_currentColor]" />

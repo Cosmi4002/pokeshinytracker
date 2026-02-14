@@ -26,7 +26,7 @@ interface FormVariant {
     spriteUrl: string;
 }
 
-// Seasonal form keywords to detect from API form names
+// Seasonal form keywords
 const SEASONAL_KEYWORDS = ['spring', 'summer', 'autumn', 'winter', 'plant', 'sandy', 'trash',
     'west', 'east', 'heat', 'wash', 'frost', 'fan', 'mow', 'red-striped', 'blue-striped', 'white-striped',
     'meadow', 'icy-snow', 'polar', 'tundra', 'continental', 'garden', 'elegant', 'modern', 'marine',
@@ -51,7 +51,6 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
         if (!user || !pokemon) return;
 
         try {
-            // Query by pokemon_id first, then fallback to name-based search if needed
             const { data, error } = await supabase
                 .from('caught_shinies')
                 .select('pokemon_id, gender, pokemon_name, form')
@@ -60,52 +59,42 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
 
             if (error) {
                 console.error("Error fetching caught status:", error);
-                return; // Gracefully handle error without crashing
+                return;
             }
 
             if (data) {
                 const caughtSet = new Set<string>();
                 data.forEach(row => {
-                    // Use form if available, otherwise use pokemon_id + gender
                     const formKey = row.form || `${row.pokemon_id}-${row.gender || 'genderless'}`;
                     caughtSet.add(formKey);
-                    // Also add the standard key format
                     caughtSet.add(`${row.pokemon_id}-${row.gender || 'genderless'}`);
                 });
                 setCaughtForms(caughtSet);
             }
         } catch (err) {
             console.error("Error fetching status:", err);
-            // Don't throw - just log and continue
         }
     };
 
-    // Build all form variants from API data
+    // Build all form variants
     const allVariants = useMemo((): FormVariant[] => {
         if (!details) return [];
 
         const variants: FormVariant[] = [];
         const pokemonId = details.id;
 
-        // Base Male/Default
-        const isPartnerCap = details.id === 10148;
-        const showGenderLabels = details.hasGenderDifference && !isPartnerCap;
-
-        // Skip adding Base variant for Minior (it's the Meteor form, user wants only Cores)
-        const representativeNameKey = details.name.replace(/-male$|-female$/, '');
-
-        // Standard variety (Male or Genderless)
+        // Base/Male
         variants.push({
             id: pokemonId,
             name: details.name,
             displayName: 'Maschio / Standard',
             category: 'base',
             gender: 'male',
-            spriteUrl: details.sprites.frontShiny,
+            spriteUrl: details.sprites.shiny,
         });
 
-        // Female variant
-        if (details.hasGenderDifference && details.sprites.femaleShiny && !isPartnerCap) {
+        // Female
+        if (details.hasGenderDifference && details.sprites.femaleShiny) {
             variants.push({
                 id: pokemonId,
                 name: `${details.name}-female`,
@@ -116,230 +105,100 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
             });
         }
 
-        // Add variety forms that match our group (same nameKey, e.g. same regional form)
-        for (const variety of details.varieties) {
-            if (variety.isDefault) continue;
+        const representativeNameKey = details.name.replace(/-male$|-female$/, '');
 
-            const vn = variety.pokemon.name.toLowerCase();
-            const vnKey = vn.replace(/-male$|-female$/, '');
+        // Add Varieties (Regional, etc.)
+        if (details.varieties) {
+            for (const variety of details.varieties) {
+                if (variety.isDefault) continue; // Skip default as it's added above
 
-            // ONLY include forms that belong to this card's specific group
-            if (vnKey !== representativeNameKey) continue;
+                const vn = variety.pokemon.name.toLowerCase();
+                const vnKey = vn.replace(/-male$|-female$/, '');
 
-            // Female variants in varieties (sometimes handled here)
-            if (vn.includes('-female')) {
-                // Check if already added
-                if (!variants.find(v => v.name === vn)) {
-                    variants.push({
-                        id: variety.pokemon.id,
-                        name: vn,
-                        displayName: 'Femmina',
-                        category: 'gender',
-                        gender: 'female',
-                        spriteUrl: variety.pokemon.spriteUrl,
-                    });
+                // Only relevant forms
+                if (vnKey !== representativeNameKey) continue;
+
+                // Skip Mega/Gmax
+                if (vn.includes('-mega') || vn.includes('-gmax')) continue;
+
+                // Determine category
+                let category: FormVariant['category'] = 'form';
+                if (vn.includes('-alola') || vn.includes('-galar') || vn.includes('-hisui') || vn.includes('-paldea')) {
+                    category = 'regional';
                 }
-                continue;
-            }
 
-            // Other forms in this group (should only be gender variants if we grouped correctly, 
-            // but PokéAPI sometimes has weird variety structures)
-            variants.push({
-                id: variety.pokemon.id,
-                name: vn,
-                displayName: variety.pokemon.name,
-                category: 'form',
-                gender: 'male',
-                spriteUrl: variety.pokemon.spriteUrl,
-            });
+                variants.push({
+                    id: variety.pokemon.id,
+                    name: vn,
+                    displayName: variety.pokemon.name,
+                    category: category,
+                    gender: 'genderless', // Most varieties don't show gender diffs here
+                    spriteUrl: variety.pokemon.spriteUrl,
+                });
+            }
         }
 
-        // Add forms from API (includes seasonal, regional, mega, gmax, etc.)
-        for (const form of details.forms) {
-            // Skip ALL Pikachu cap forms — user only wants Male/Female + Partner Cap (separate entry)
-            if (details.id === 25) continue;
+        // Add Forms (Seasonal, etc.)
+        if (details.forms) {
+            for (const form of details.forms) {
+                if (form.formName === details.name) continue; // Skip base
+                // Skip Mega/Gmax/Regional (covered by varieties usually)
+                if (form.formName.includes('mega') || form.formName.includes('gmax')) continue;
+                // Skip redundant
+                if (form.formName === `${details.name}-normal` || form.formName === `${details.name}-standard`) continue;
 
-            // Skip ALL forms for Partner Cap Pikachu (it's a standalone form)
-            if (details.id === 10148) continue;
-
-            const name = form.formName.toLowerCase();
-
-            // Filter out Mega and Gmax forms
-            if (name.includes('mega') || name.includes('gmax')) {
-                continue;
-            }
-
-            // Skip regional forms logic removed to allow unified view
-            const isRegionalForm = name.includes('-alola') || name.includes('-galar') || name.includes('-hisui') || name.includes('-paldea');
-
-            // Skip redundant "normal" or "standard" forms (e.g. Silvally-Normal) which are same as base
-            if (name === `${details.name}-normal` || name === `${details.name}-standard`) continue;
-
-            // Skip Minior Meteor forms (redundant with Base)
-            if (name.startsWith('minior-') && name.includes('-meteor')) continue;
-
-            let category: FormVariant['category'] = 'form';
-            let variantDisplayName = form.displayName;
-
-            if (name.includes('-alola') || name.includes('-galar') || name.includes('-hisui') || name.includes('-paldea')) {
-                category = 'regional';
-            } else if (SEASONAL_KEYWORDS.some(kw => name.includes(kw))) {
-                category = 'seasonal';
-            }
-
-            // --- Custom Overrides & Cleanups ---
-
-            // Urshifu Single/Rapid Strike: Move to Base, Remove Altre Forme
-            if (details.id === 892 || (details.baseId === 892)) {
-                if (name === 'urshifu-rapid-strike') {
-                    category = 'base';
-                } else if (category === 'form' || category === 'gmax') {
-                    // Skip everything else (Gmax, etc.) as requested
-                    continue;
+                let category: FormVariant['category'] = 'form';
+                if (SEASONAL_KEYWORDS.some(kw => form.formName.includes(kw))) {
+                    category = 'seasonal';
                 }
-            }
 
-            // Oinkologne Male/Female: Move to Base, Remove Altre Forme
-            if (details.id === 916 || details.baseId === 916) {
-                if (name === 'oinkologne-male') {
-                    continue; // Skip male variety to avoid duplication with species base
-                }
-                if (name === 'oinkologne-female') {
-                    category = 'base';
-                } else if (category === 'form') {
-                    continue;
-                }
-            }
+                // Skip if already exists (check ID or Name)
+                if (variants.some(v => v.name === form.formName)) continue;
 
-            // Basculegion Male/Female: Move to Base
-            if (details.id === 902 || details.baseId === 902) {
-                if (name === 'basculegion-male') continue;
-                if (name === 'basculegion-female') {
-                    category = 'base';
-                }
-            }
 
-            // Enamorus Incarnate/Therian: Move to Base
-            if (details.id === 905 || details.baseId === 905) {
-                if (name === 'enamorus-incarnate') continue;
-                if (name === 'enamorus-therian') {
-                    category = 'base';
-                }
+                variants.push({
+                    id: form.id,
+                    name: form.formName,
+                    displayName: form.displayName,
+                    category: category,
+                    gender: 'genderless',
+                    spriteUrl: form.sprites.shiny
+                });
             }
-
-            // Lycanroc Midnight: Move to Base
-            if (details.id === 745 || details.baseId === 745) {
-                if (name === 'lycanroc-midnight') {
-                    category = 'base';
-                }
-            }
-
-            // Poltchageist: Remove Altre Forme
-            if (details.id === 1012 || details.baseId === 1012) {
-                if (category === 'form') continue;
-            }
-
-            // Ogerpon: Wellspring to Altre, remove Seasonal category
-            if (details.id === 1017 || details.baseId === 1017) {
-                if (name === 'ogerpon-wellspring-mask') {
-                    category = 'form';
-                }
-                if (category === 'seasonal') category = 'form'; // Merge seasonal into forms
-            }
-
-            // Mimikyu: Rename Disguised to just "Mimikyu", remove Altre (Busted)
-            if (details.id === 778 || details.baseId === 778) {
-                if (name.includes('busted')) continue;
-            }
-
-            // Minior: Handle color naming in parens
-            if (details.name.includes('minior')) {
-                const colorMatch = name.match(/minior-(red|orange|yellow|green|blue|indigo|violet)/);
-                if (colorMatch) {
-                    const color = colorMatch[1].charAt(0).toUpperCase() + colorMatch[1].slice(1);
-                    variantDisplayName = `Minior (${color})`;
-                    category = 'base';
-                }
-            }
-
-            // Wishiwashi: Rename Solo to "Wishiwashi", remove School/Seasonal
-            if (details.id === 746 || details.baseId === 746) {
-                if (name.includes('school')) continue;
-                if (category === 'seasonal') continue;
-            }
-
-            // Meowstic: Move female to Base, remove Altre
-            if (details.id === 678 || details.baseId === 678) {
-                if (name === 'meowstic-female') {
-                    category = 'base';
-                } else if (category === 'form') {
-                    continue;
-                }
-            }
-
-            // Indeedee: Move female to Base, remove Altre
-            if (details.id === 876 || details.baseId === 876) {
-                if (name === 'indeedee-female') {
-                    category = 'base';
-                } else if (category === 'form') {
-                    continue;
-                }
-            }
-
-            // Xerneas: Remove Altre
-            if (details.id === 716 || details.baseId === 716) {
-                if (category === 'form') continue;
-            }
-
-            // Greninja: Remove Battle Bond and Ash
-            if (details.id === 658 || details.baseId === 658) {
-                if (name.includes('battle-bond') || name.includes('ash')) continue;
-            }
-
-            variants.push({
-                id: form.id,
-                name: form.formName,
-                displayName: variantDisplayName,
-                category,
-                gender: 'genderless',
-                spriteUrl: getPokemonSpriteUrl(form.id, { shiny: true, name: form.formName, animated: true }),
-            });
         }
 
         return variants;
     }, [details]);
 
-    // Group variants by category
+    // Group variants
     const groupedVariants = useMemo(() => {
         const groups: Record<string, FormVariant[]> = {
             base: [],
-            gender: [],
+            gender: [], // merging gender into base usually, but let's keep separate tabs or merge?
             regional: [],
             seasonal: [],
-            mega: [],
-            gmax: [],
             form: [],
+            mega: [],
+            gmax: []
         };
 
         allVariants.forEach(v => {
             if (v.category === 'base' || v.category === 'gender') {
                 groups.base.push(v);
             } else {
-                groups[v.category].push(v);
+                groups[v.category]?.push(v);
             }
         });
-
         return groups;
     }, [allVariants]);
 
-    // Category labels
     const categoryLabels: Record<string, string> = {
         base: '🔹 Forme Base',
         regional: '🌍 Forme Regionali',
-        seasonal: pokemon?.name.toLowerCase().includes('oricorio') ? '💃 Dance Styles' : '🍂 Forme Stagionali',
-        mega: '⚡ Mega Evoluzioni',
-        gmax: '🌟 Gigantamax',
+        seasonal: '🍂 Forme Stagionali',
         form: '🔄 Altre Forme',
+        mega: '⚡ Mega',
+        gmax: '🌟 Gigamax'
     };
 
     const toggleCaught = async (variant: FormVariant) => {
@@ -354,21 +213,17 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
 
         try {
             if (isCaught) {
-                // Delete from DB
                 const { error } = await supabase
                     .from('caught_shinies')
                     .delete()
                     .eq('user_id', user.id)
                     .eq('pokemon_id', variant.id)
                     .eq('gender', variant.gender);
-
                 if (error) throw error;
-
                 const newSet = new Set(caughtForms);
                 newSet.delete(key);
                 setCaughtForms(newSet);
             } else {
-                // Insert
                 const { error } = await supabase
                     .from('caught_shinies')
                     .insert({
@@ -379,14 +234,12 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
                         form: variant.name,
                         sprite_url: variant.spriteUrl,
                         shiny_type: 'star',
-                        method: 'unknown',
+                        method: 'unknown', // Default
                         game: 'unknown',
                         pokeball: 'pokeball',
                         caught_date: new Date().toISOString()
                     });
-
                 if (error) throw error;
-
                 const newSet = new Set(caughtForms);
                 newSet.add(key);
                 setCaughtForms(newSet);
@@ -401,12 +254,11 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
     if (!pokemon) return null;
 
     const availableCategories = Object.entries(groupedVariants)
-        .filter(([_, variants]) => variants.length > 0)
+        .filter(([_, variants]) => variants && variants.length > 0)
         .map(([key]) => key);
 
     const totalForms = allVariants.length;
     const caughtCount = allVariants.filter(v => caughtForms.has(`${v.id}-${v.gender}`)).length;
-    const completionPct = totalForms > 0 ? Math.round((caughtCount / totalForms) * 100) : 0;
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -417,102 +269,69 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
                         <span className="text-muted-foreground text-lg">#{pokemon.id.toString().padStart(4, '0')}</span>
                     </DialogTitle>
                     <div className="flex flex-col sm:flex-row sm:items-center gap-4 mt-1">
-                        <DialogDescription className="flex items-center gap-4">
-                            <span>Clicca su uno sprite per segnarlo come catturato.</span>
-                            <span className="text-primary font-semibold">
-                                {caughtCount}/{totalForms} ({completionPct}%)
-                            </span>
+                        <DialogDescription>
+                            {caughtCount}/{totalForms} Catturati
                         </DialogDescription>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-8 gap-2 ml-auto"
-                            onClick={() => {
-                                onOpenChange(false);
-                                navigate(`/counter?pokemon=${encodeURIComponent(pokemon.name)}`);
-                            }}
-                        >
-                            <ExternalLink className="h-3.5 w-3.5" />
-                            Vai al Counter
+                        <Button variant="outline" size="sm" className="ml-auto" onClick={() => {
+                            onOpenChange(false);
+                            navigate(`/counter?pokemon=${encodeURIComponent(pokemon.name)}`);
+                        }}>
+                            <ExternalLink className="h-4 w-4 mr-2" />
+                            Counter
                         </Button>
                     </div>
                 </DialogHeader>
 
-                <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar">
-                    <div className="p-6 pt-2">
-                        {detailsLoading ? (
-                            <div className="flex items-center justify-center h-40">Caricamento dettagli...</div>
-                        ) : details ? (
-                            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                                <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7 mb-4">
-                                    <TabsTrigger value="all">Tutti</TabsTrigger>
-                                    {availableCategories.map(cat => (
-                                        <TabsTrigger key={cat} value={cat} className="text-xs">
-                                            {categoryLabels[cat].split(' ')[0]}
-                                        </TabsTrigger>
-                                    ))}
-                                </TabsList>
-
-                                <TabsContent value="all" className="space-y-6">
-                                    {availableCategories.map(category => (
-                                        <div key={category} className="space-y-3">
-                                            <h3 className="text-lg font-semibold border-b border-primary/20 pb-2 text-primary/80">
-                                                {categoryLabels[category]}
-                                            </h3>
-                                            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                                                {groupedVariants[category].map((variant) => {
-                                                    const key = `${variant.id}-${variant.gender}`;
-                                                    return (
-                                                        <ShinyButton
-                                                            key={variant.name + variant.gender}
-                                                            label={variant.displayName}
-                                                            spriteUrl={variant.spriteUrl}
-                                                            isCaught={caughtForms.has(key)}
-                                                            isLoading={loadingAction === key}
-                                                            onClick={() => toggleCaught(variant)}
-                                                            onCounterClick={() => {
-                                                                onOpenChange(false);
-                                                                navigate(`/counter?pokemon=${encodeURIComponent(variant.name)}`);
-                                                            }}
-                                                        />
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </TabsContent>
-
-                                {availableCategories.map(category => (
-                                    <TabsContent key={category} value={category}>
-                                        <div className="space-y-3">
-                                            <h3 className="text-lg font-semibold border-b border-primary/20 pb-2 text-primary/80">
-                                                {categoryLabels[category]}
-                                            </h3>
-                                            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                                                {groupedVariants[category].map((variant) => {
-                                                    const key = `${variant.id}-${variant.gender}`;
-                                                    return (
-                                                        <ShinyButton
-                                                            key={variant.name + variant.gender}
-                                                            label={variant.displayName}
-                                                            spriteUrl={variant.spriteUrl}
-                                                            isCaught={caughtForms.has(key)}
-                                                            isLoading={loadingAction === key}
-                                                            onClick={() => toggleCaught(variant)}
-                                                            onCounterClick={() => {
-                                                                onOpenChange(false);
-                                                                navigate(`/counter?pokemon=${encodeURIComponent(variant.name)}`);
-                                                            }}
-                                                        />
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-                                    </TabsContent>
+                <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-6">
+                    {detailsLoading ? (
+                        <div className="flex justify-center p-10">Caricamento...</div>
+                    ) : details ? (
+                        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                            <TabsList className="mb-4 flex flex-wrap h-auto gap-2">
+                                <TabsTrigger value="all">Tutti</TabsTrigger>
+                                {availableCategories.map(cat => (
+                                    <TabsTrigger key={cat} value={cat}>{categoryLabels[cat]}</TabsTrigger>
                                 ))}
-                            </Tabs>
-                        ) : null}
-                    </div>
+                            </TabsList>
+
+                            <TabsContent value="all" className="space-y-6">
+                                {availableCategories.map(category => (
+                                    <div key={category} className="space-y-3">
+                                        <h3 className="font-semibold text-primary">{categoryLabels[category]}</h3>
+                                        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                                            {groupedVariants[category].map(variant => (
+                                                <ShinyButton
+                                                    key={`${variant.id}-${variant.gender}`}
+                                                    label={variant.displayName}
+                                                    spriteUrl={variant.spriteUrl}
+                                                    isCaught={caughtForms.has(`${variant.id}-${variant.gender}`)}
+                                                    isLoading={loadingAction === `${variant.id}-${variant.gender}`}
+                                                    onClick={() => toggleCaught(variant)}
+                                                />
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+                            </TabsContent>
+
+                            {availableCategories.map(category => (
+                                <TabsContent key={category} value={category}>
+                                    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                                        {groupedVariants[category].map(variant => (
+                                            <ShinyButton
+                                                key={`${variant.id}-${variant.gender}`}
+                                                label={variant.displayName}
+                                                spriteUrl={variant.spriteUrl}
+                                                isCaught={caughtForms.has(`${variant.id}-${variant.gender}`)}
+                                                isLoading={loadingAction === `${variant.id}-${variant.gender}`}
+                                                onClick={() => toggleCaught(variant)}
+                                            />
+                                        ))}
+                                    </div>
+                                </TabsContent>
+                            ))}
+                        </Tabs>
+                    ) : null}
                 </div>
             </DialogContent>
         </Dialog>
