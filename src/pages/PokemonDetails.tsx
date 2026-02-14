@@ -9,7 +9,6 @@ import { Navbar } from "@/components/layout/Navbar";
 import { useRandomColor } from "@/lib/random-color-context";
 import {
     ArrowLeft,
-    ExternalLink,
     ChevronLeft,
     ChevronRight,
     Sparkles,
@@ -294,24 +293,9 @@ export default function PokemonDetails() {
                                 <Sparkles className="h-3.5 w-3.5 fill-current" />
                                 Shiny
                             </Badge>
-
-                            <div className="absolute bottom-6 left-6 text-5xl font-black text-white/5 select-none uppercase tracking-tighter">
-                                #{String(details.id).padStart(4, '0')}
-                            </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <Button
-                                className="w-full h-14 text-lg font-bold rounded-2xl group relative overflow-hidden active:scale-[0.98] transition-transform"
-                                onClick={() => navigate(`/counter?pokemon=${encodeURIComponent(details.name)}`)}
-                            >
-                                <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                <span className="relative flex items-center justify-center gap-2">
-                                    <ExternalLink className="h-5 w-5" />
-                                    Avvia Caccia
-                                </span>
-                            </Button>
-
+                        <div className="flex justify-center">
                             <Button
                                 variant="outline"
                                 className="w-full h-14 text-lg font-semibold rounded-2xl border-white/10 bg-white/5 hover:bg-white/10 backdrop-blur-sm"
@@ -328,7 +312,7 @@ export default function PokemonDetails() {
                     <div className="lg:col-span-7 space-y-10">
                         <div className="space-y-4">
                             <div className="flex items-center gap-4">
-                                <h1 className="text-5xl md:text-6xl font-black tracking-tight capitalize bg-clip-text text-transparent bg-gradient-to-b from-white to-white/70">
+                                <h1 className="text-6xl md:text-7xl font-black tracking-tight capitalize bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/40 drop-shadow-sm">
                                     {(overrides[`${details.id}-${details.name}`] as any)?.custom_display_name || details.displayName}
                                 </h1>
 
