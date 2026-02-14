@@ -29,26 +29,33 @@ export function usePokedexOverrides() {
         }
 
         async function fetchGlobalOverrides() {
-            // Everyone (including guest users) gets the global config
-            const { data, error } = await supabase
-                .from('pokedex_overrides' as any)
-                .select('*')
-                .eq('user_id', GLOBAL_CONFIG_ID);
+            try {
+                // Everyone (including guest users) gets the global config
+                const { data, error } = await supabase
+                    .from('pokedex_overrides' as any)
+                    .select('*')
+                    .eq('user_id', GLOBAL_CONFIG_ID);
 
-            if (data && !error) {
-                const formatted: Record<string, PokedexOverride> = {};
-                data.forEach((row: any) => {
-                    formatted[`${row.pokemon_id}-${row.pokemon_name}`] = {
-                        pokemon_id: row.pokemon_id,
-                        pokemon_name: row.pokemon_name,
-                        custom_display_name: row.custom_display_name,
-                        is_excluded: row.is_excluded
-                    };
-                });
-                setOverrides(formatted);
-                localStorage.setItem('pokedex_overrides', JSON.stringify(formatted));
+                if (error) {
+                    console.warn("Pokedex overrides table might be missing:", error.message);
+                } else if (data) {
+                    const formatted: Record<string, PokedexOverride> = {};
+                    data.forEach((row: any) => {
+                        formatted[`${row.pokemon_id}-${row.pokemon_name}`] = {
+                            pokemon_id: row.pokemon_id,
+                            pokemon_name: row.pokemon_name,
+                            custom_display_name: row.custom_display_name,
+                            is_excluded: row.is_excluded
+                        };
+                    });
+                    setOverrides(formatted);
+                    localStorage.setItem('pokedex_overrides', JSON.stringify(formatted));
+                }
+            } catch (err) {
+                console.error("Error fetching global overrides:", err);
+            } finally {
+                setLoading(false);
             }
-            setLoading(false);
         }
 
         fetchGlobalOverrides();
