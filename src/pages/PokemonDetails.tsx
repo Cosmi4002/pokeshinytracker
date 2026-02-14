@@ -247,6 +247,10 @@ export default function PokemonDetails() {
 
     if (!details) return null;
 
+    const currentId = details.id;
+    const prevId = currentId > 1 && currentId < 10000 ? currentId - 1 : null;
+    const nextId = currentId < 1025 ? currentId + 1 : null;
+
     const TYPE_COLORS: Record<string, string> = {
         normal: "#A8A77A",
         fire: "#EE8130",
