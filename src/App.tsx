@@ -11,6 +11,7 @@ import Counter from "./pages/Counter";
 import Hunts from "./pages/Hunts";
 import Pokedex from "./pages/Pokedex";
 import PokemonDetails from "./pages/PokemonDetails";
+import PokedexManager from "./pages/PokedexManager";
 import Collection from "./pages/Collection";
 import SpriteMapper from "./pages/SpriteMapper";
 
@@ -36,6 +37,7 @@ function AppContent() {
           <Route path="/hunts" element={<Hunts />} />
           <Route path="/pokedex" element={<Pokedex />} />
           <Route path="/pokedex/:pokemonId" element={<PokemonDetails />} />
+          <Route path="/pokedex/manage" element={<PokedexManager />} />
           <Route path="/collection" element={<Collection />} />
           <Route path="/sprite-mapper" element={<SpriteMapper />} />
 

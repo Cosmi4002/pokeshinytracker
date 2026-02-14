@@ -1,5 +1,5 @@
-import { Link, useLocation } from 'react-router-dom';
-import { Calculator, Search, Grid3X3, LogOut, User, Sparkles, Crosshair } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Calculator, Search, Grid3X3, LogOut, User, Sparkles, Crosshair, Settings2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { supabaseProjectRef } from '@/integrations/supabase/client';
@@ -9,12 +9,14 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { ThemeCustomizer } from '@/components/layout/ThemeCustomizer'; // Import ThemeCustomizer
 import { useRandomColor } from '@/lib/random-color-context';
 
 export function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { accentColor } = useRandomColor();
 
@@ -74,6 +76,19 @@ export function Navbar() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => navigate('/pokedex')}>
+                  <Search className="mr-2 h-4 w-4" />
+                  Pokédex
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/pokedex/manage')}>
+                  <Settings2 className="mr-2 h-4 w-4" />
+                  Gestione
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/collection')}>
+                  <Grid3X3 className="mr-2 h-4 w-4" />
+                  Collezione
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem className="text-muted-foreground text-xs flex flex-col items-start gap-1">
                   <span className="font-semibold text-foreground">{user.email}</span>
                   <span>ID: {user.id.slice(0, 8)}...</span>
