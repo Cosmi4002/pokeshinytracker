@@ -7,10 +7,10 @@ interface PokedexCardProps {
     baseId: number;
     displayName: string;
     spriteUrl: string;
-    femaleSprite?: string;
-    hasGenderDiff: boolean;
-    isMaleCaught?: boolean;
-    isFemaleCaught?: boolean;
+    secondarySprite?: string;
+    hasMultipleSprites: boolean;
+    isPrimaryCaught?: boolean;
+    isSecondaryCaught?: boolean;
     caughtPercentage: number; // 0-100
     hasCaughtAny: boolean;
     onClick: () => void;
@@ -21,17 +21,17 @@ export const PokedexCard = memo(function PokedexCard({
     baseId,
     displayName,
     spriteUrl,
-    femaleSprite,
-    hasGenderDiff,
-    isMaleCaught = false,
-    isFemaleCaught = false,
+    secondarySprite,
+    hasMultipleSprites,
+    isPrimaryCaught = false,
+    isSecondaryCaught = false,
     caughtPercentage,
     hasCaughtAny,
     onClick
 }: PokedexCardProps) {
     const { accentColor } = useRandomColor();
     const [imgError, setImgError] = useState(false);
-    const [femaleImgError, setFemaleImgError] = useState(false);
+    const [secondaryImgError, setSecondaryImgError] = useState(false);
 
     // Calculate glow intensity based on caught percentage
     const glowIntensity = caughtPercentage / 100;
@@ -83,18 +83,18 @@ export const PokedexCard = memo(function PokedexCard({
             {/* Sprites container */}
             <div className="relative flex items-center justify-center z-10 h-44 w-full px-2">
                 <div className="flex items-center justify-center gap-1 w-full translate-y-2">
-                    {/* Default/Male sprite */}
+                    {/* Primary sprite */}
                     {!imgError ? (
                         <div className={cn(
                             "relative flex items-center justify-center transition-all duration-500",
-                            hasGenderDiff ? "w-[48%]" : "w-full max-w-[180px]"
+                            hasMultipleSprites ? "w-[48%]" : "w-full max-w-[180px]"
                         )}>
                             <img
                                 src={spriteUrl}
                                 alt={`${displayName} shiny`}
                                 className={cn(
                                     "h-full w-full pokemon-sprite transition-all duration-500 object-contain max-h-48",
-                                    isMaleCaught
+                                    isPrimaryCaught
                                         ? "drop-shadow-[0_0_12px_rgba(255,255,255,0.8)] scale-105 brightness-110"
                                         : "opacity-40 grayscale group-hover:opacity-60"
                                 )}
@@ -107,21 +107,21 @@ export const PokedexCard = memo(function PokedexCard({
                         <div className="h-20 w-20" />
                     )}
 
-                    {/* Female sprite if applicable */}
-                    {hasGenderDiff && femaleSprite && !femaleImgError && (
+                    {/* Secondary sprite if applicable */}
+                    {hasMultipleSprites && secondarySprite && !secondaryImgError && (
                         <div className="relative w-[48%] flex items-center justify-center transition-all duration-500">
                             <img
-                                src={femaleSprite}
-                                alt={`${displayName} shiny female`}
+                                src={secondarySprite}
+                                alt={`${displayName} shiny secondary`}
                                 className={cn(
                                     "h-full w-full pokemon-sprite transition-all duration-500 object-contain max-h-40",
-                                    isFemaleCaught
+                                    isSecondaryCaught
                                         ? "drop-shadow-[0_0_12px_rgba(255,255,255,0.8)] scale-105 brightness-110"
                                         : "opacity-40 grayscale group-hover:opacity-60"
                                 )}
                                 style={{ imageRendering: 'auto' }}
                                 loading="lazy"
-                                onError={() => setFemaleImgError(true)}
+                                onError={() => setSecondaryImgError(true)}
                             />
                         </div>
                     )}

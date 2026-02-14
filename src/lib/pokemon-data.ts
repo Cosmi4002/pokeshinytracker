@@ -406,6 +406,10 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
     return 'https://img.pokemondb.net/sprites/home/normal/pikachu-partner-cap.png';
   }
 
+  if (name && name.toLowerCase() === 'urshifu-rapid-strike') {
+    return 'https://www.pokepedia.fr/images/8/80/Sprite_0892_Mille_Poings_chromatique_HOME.png';
+  }
+
   // Use the ID directly. 
   // Note: HOME sprites don't have female-specific filenames in the same folder usually, 
   // but PokeAPI maps forms to IDs. 

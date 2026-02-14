@@ -12,7 +12,6 @@
 export const BANNED_FORM_NAMES: string[] = [
     // Add specific forms to eliminate here
     'oinkologne-female',
-    'urshifu-rapid-strike',
     'meowstic-female',
     'indeedee-female',
 ];

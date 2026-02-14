@@ -183,38 +183,45 @@ export default function Pokedex() {
                                 </div>
                             )}
                             {filteredGroups.map(group => {
-                                // Sort to ensure base form is first (usually lower ID)
+                                // Sort to ensure base form or "Single Strike" is first
                                 group.sort((a, b) => a.id - b.id);
                                 const p = group[0];
 
                                 const isRegional = p.name.includes('-alola') || p.name.includes('-galar') || p.name.includes('-hisui') || p.name.includes('-paldea');
-                                // Special forms like Pikachu Partner Cap (10148) should NOT show gender differences even if base Pikachu does
-                                const hasGenderDiff = !isRegional && (p.id < 10000) && POKEMON_WITH_GENDER_DIFF.includes(p.baseId);
 
-                                // Check for specific female form in group (e.g. Meowstic-Female ID 10025)
+                                // Gender diff logic
+                                const hasGenderDiff = !isRegional && (p.id < 10000) && POKEMON_WITH_GENDER_DIFF.includes(p.baseId);
                                 const femaleVariant = group.find(v => v.name.endsWith('-female') && v.id !== p.id);
                                 const femaleId = femaleVariant ? femaleVariant.id : undefined;
 
+                                // Form diff logic (e.g. Urshifu 892)
+                                const hasFormDiff = p.baseId === 892 && group.length >= 2;
+                                const secondaryForm = hasFormDiff ? group.find(v => v.id !== p.id) : undefined;
+
+                                const hasMultipleSprites = hasGenderDiff || hasFormDiff;
+
                                 // Granular caught status
-                                // 1. Check if male (base) is caught
-                                const isMaleCaught = caughtData[p.id]?.count > 0 &&
+                                // 1. Primary sprite (Male or Single Strike)
+                                const isPrimaryCaught = caughtData[p.id]?.count > 0 &&
                                     (!hasGenderDiff || caughtData[p.id]?.genders.has('male') || caughtData[p.id]?.forms.has(p.name));
 
-                                // 2. Check if female is caught
-                                const fid = femaleId || p.id;
-                                const isFemaleCaught = hasGenderDiff && (
-                                    (femaleId && caughtData[femaleId]?.count > 0) ||
-                                    (!femaleId && caughtData[p.id]?.genders.has('female'))
-                                );
+                                // 2. Secondary sprite (Female or Rapid Strike)
+                                let isSecondaryCaught = false;
+                                if (hasGenderDiff) {
+                                    isSecondaryCaught = (femaleId && caughtData[femaleId]?.count > 0) ||
+                                        (!femaleId && caughtData[p.id]?.genders.has('female'));
+                                } else if (hasFormDiff && secondaryForm) {
+                                    isSecondaryCaught = caughtData[secondaryForm.id]?.count > 0 ||
+                                        caughtData[p.id]?.forms.has(secondaryForm.name);
+                                }
 
-                                // Group caught status for card visibility
-                                const isCaught = isMaleCaught || isFemaleCaught;
+                                const isCaught = isPrimaryCaught || isSecondaryCaught;
 
                                 let totalVars = 1;
-                                if (hasGenderDiff) totalVars = 2;
+                                if (hasMultipleSprites) totalVars = 2;
                                 if (POKEMON_FORM_COUNTS[p.id]) totalVars = POKEMON_FORM_COUNTS[p.id];
 
-                                const caughtCount = (isMaleCaught ? 1 : 0) + (isFemaleCaught ? 1 : 0);
+                                const caughtCount = (isPrimaryCaught ? 1 : 0) + (isSecondaryCaught ? 1 : 0);
                                 const pct = Math.min(100, (caughtCount / totalVars) * 100);
 
                                 return (
@@ -224,13 +231,17 @@ export default function Pokedex() {
                                         baseId={p.baseId}
                                         displayName={p.displayName}
                                         spriteUrl={getPokemonSpriteUrl(p.id, { shiny: true, name: p.name })}
-                                        femaleSprite={hasGenderDiff
-                                            ? getPokemonSpriteUrl(femaleId || p.id, { shiny: true, female: !femaleId, name: p.name })
+                                        secondarySprite={hasMultipleSprites
+                                            ? getPokemonSpriteUrl(secondaryForm?.id || femaleId || p.id, {
+                                                shiny: true,
+                                                female: hasGenderDiff && !femaleId,
+                                                name: secondaryForm?.name || p.name
+                                            })
                                             : undefined
                                         }
-                                        hasGenderDiff={hasGenderDiff}
-                                        isMaleCaught={isMaleCaught}
-                                        isFemaleCaught={isFemaleCaught}
+                                        hasMultipleSprites={hasMultipleSprites}
+                                        isPrimaryCaught={isPrimaryCaught}
+                                        isSecondaryCaught={isSecondaryCaught}
                                         caughtPercentage={pct}
                                         hasCaughtAny={isCaught}
                                         onClick={() => {
