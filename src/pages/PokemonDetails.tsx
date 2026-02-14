@@ -43,6 +43,21 @@ export default function PokemonDetails() {
     const { toast } = useToast();
     const { accentColor } = useRandomColor();
 
+    const [isEditorEnabled, setIsEditorEnabled] = useState(() => {
+        return localStorage.getItem('pokedex-editor-enabled') === 'true';
+    });
+
+    useEffect(() => {
+        const handleEditorChange = () => {
+            setIsEditorEnabled(localStorage.getItem('pokedex-editor-enabled') === 'true');
+        };
+        window.addEventListener('editor-mode-changed', handleEditorChange);
+        return () => window.removeEventListener('editor-mode-changed', handleEditorChange);
+    }, []);
+
+    const getTypeIconUrl = (type: string) => `https://raw.githubusercontent.com/duiker101/pokemon-type-svg-icons/master/icons/${type.toLowerCase()}.svg`;
+
+
     const [caughtForms, setCaughtForms] = useState<Set<string>>(new Set());
     const [actionLoading, setActionLoading] = useState<string | null>(null);
 
@@ -316,7 +331,7 @@ export default function PokemonDetails() {
                                     {(overrides[`${details.id}-${details.name}`] as any)?.custom_display_name || details.displayName}
                                 </h1>
 
-                                {user && (
+                                {user && isEditorEnabled && (
                                     <div className="flex items-center gap-2 mt-2">
                                         <TooltipProvider>
                                             <Tooltip>
@@ -368,16 +383,23 @@ export default function PokemonDetails() {
 
                             <div className="flex flex-wrap gap-3">
                                 {details.types.map(type => (
-                                    <Badge
-                                        key={type}
-                                        variant="secondary"
-                                        className={cn(
-                                            "px-5 py-2 text-sm font-bold rounded-full uppercase tracking-wider backdrop-blur-xl border border-white/10 shadow-lg",
-                                            `type-${type.toLowerCase()}`
-                                        )}
-                                    >
-                                        {type}
-                                    </Badge>
+                                    <TooltipProvider key={type}>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <div className={cn(
+                                                    "h-10 w-10 p-2 rounded-full backdrop-blur-xl border border-white/10 shadow-lg flex items-center justify-center transition-transform hover:scale-110 cursor-help",
+                                                    `type-${type.toLowerCase()}`
+                                                )}>
+                                                    <img
+                                                        src={getTypeIconUrl(type)}
+                                                        alt={type}
+                                                        className="w-full h-full object-contain brightness-0 invert"
+                                                    />
+                                                </div>
+                                            </TooltipTrigger>
+                                            <TooltipContent className="capitalize font-bold">{type}</TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
                                 ))}
                                 <Badge variant="outline" className="px-5 py-2 text-sm font-semibold rounded-full border-white/10 text-muted-foreground uppercase">
                                     Gen {details.generation}
@@ -448,7 +470,7 @@ export default function PokemonDetails() {
                                             </div>
 
                                             {/* In-card elimination toggle */}
-                                            {user && (
+                                            {user && isEditorEnabled && (
                                                 <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                                     <Button
                                                         variant="ghost"

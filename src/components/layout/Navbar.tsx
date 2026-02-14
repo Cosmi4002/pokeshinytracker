@@ -80,10 +80,12 @@ export function Navbar() {
                   <Search className="mr-2 h-4 w-4" />
                   Pokédex
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/pokedex/manage')}>
-                  <Settings2 className="mr-2 h-4 w-4" />
-                  Gestione
-                </DropdownMenuItem>
+                {user.email === 'chritel04@gmail.com' && (
+                  <DropdownMenuItem onClick={() => navigate('/pokedex/manage')}>
+                    <Settings2 className="mr-2 h-4 w-4" />
+                    Gestione
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onClick={() => navigate('/collection')}>
                   <Grid3X3 className="mr-2 h-4 w-4" />
                   Collezione

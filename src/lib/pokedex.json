@@ -1026,12 +1026,6 @@
     "generation": 1
   },
   {
-    "id": 474,
-    "baseId": 137,
-    "name": "porygon-z",
-    "generation": 1
-  },
-  {
     "id": 138,
     "baseId": 138,
     "name": "omanyte",
@@ -3105,6 +3099,12 @@
     "id": 473,
     "baseId": 473,
     "name": "mamoswine",
+    "generation": 4
+  },
+  {
+    "id": 474,
+    "baseId": 474,
+    "name": "porygon-z",
     "generation": 4
   },
   {
