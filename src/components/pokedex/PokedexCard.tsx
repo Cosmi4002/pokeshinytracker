@@ -99,7 +99,7 @@ export const PokedexCard = memo(function PokedexCard({
                                 style={{ imageRendering: 'auto' }}
                             />
                             <img
-                                src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/10249.png`} // Oinkologne Female
+                                src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/10254.png`} // Oinkologne Female (FIXED: was 10249)
                                 alt="Oinkologne Female"
                                 className="absolute right-0 bottom-0 w-20 h-20 object-contain pokemon-sprite group-hover:scale-110 transition-transform duration-500"
                                 style={{ imageRendering: 'auto' }}

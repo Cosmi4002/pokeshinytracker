@@ -51,13 +51,17 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
         if (!user || !pokemon) return;
 
         try {
+            // Query by pokemon_id first, then fallback to name-based search if needed
             const { data, error } = await supabase
                 .from('caught_shinies')
                 .select('pokemon_id, gender, pokemon_name, form')
                 .eq('user_id', user.id)
-                .or(`pokemon_id.eq.${pokemon.id},pokemon_name.ilike.${pokemon.name}%`);
+                .eq('pokemon_id', pokemon.id);
 
-            if (error) throw error;
+            if (error) {
+                console.error("Error fetching caught status:", error);
+                return; // Gracefully handle error without crashing
+            }
 
             if (data) {
                 const caughtSet = new Set<string>();
@@ -72,6 +76,7 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
             }
         } catch (err) {
             console.error("Error fetching status:", err);
+            // Don't throw - just log and continue
         }
     };
 

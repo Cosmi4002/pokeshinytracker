@@ -63,15 +63,25 @@ export default function Pokedex() {
         let matchesGen = true;
         if (generationFilter !== 'all') {
           if (generationFilter === 'Alola') {
-            matchesGen = p.generation === 7 && p.name.includes('-alola');
+            // Only show Alolan forms (must have '-alola' in name AND be from gen 7)
+            matchesGen = p.name.includes('-alola');
           } else if (generationFilter === 'Galar') {
-            matchesGen = p.generation === 8 && p.name.includes('-galar');
+            // Only show Galarian forms (must have '-galar' in name AND be from gen 8)
+            matchesGen = p.name.includes('-galar');
           } else if (generationFilter === 'Hisui') {
-            matchesGen = p.generation === 8 && p.name.includes('-hisui');
+            // Only show Hisuian forms (must have '-hisui' in name AND be from gen 8)
+            matchesGen = p.name.includes('-hisui');
           } else if (generationFilter === 'Paldea') {
-            matchesGen = p.generation === 9 && (p.name.includes('-paldea') || (p.id > 10000 && p.baseId >= 906));
+            // Only show Paldean forms (must have '-paldea' in name OR be gen 9 base forms)
+            matchesGen = p.name.includes('-paldea') || (p.generation === 9 && !p.name.includes('-'));
           } else {
-            matchesGen = p.generation === parseInt(generationFilter);
+            // For numbered generations, match ONLY base forms (no regional variants)
+            const genNum = parseInt(generationFilter);
+            matchesGen = p.generation === genNum &&
+              !p.name.includes('-alola') &&
+              !p.name.includes('-galar') &&
+              !p.name.includes('-hisui') &&
+              !p.name.includes('-paldea');
           }
         }
 
