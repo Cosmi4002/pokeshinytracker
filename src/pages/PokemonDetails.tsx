@@ -247,257 +247,265 @@ export default function PokemonDetails() {
 
     if (!details) return null;
 
-    const currentId = details.id;
-    const prevId = currentId > 1 && currentId < 10000 ? currentId - 1 : null;
-    const nextId = currentId < 1025 ? currentId + 1 : null;
+    const TYPE_COLORS: Record<string, string> = {
+        normal: "#A8A77A",
+        fire: "#EE8130",
+        water: "#6390F0",
+        electric: "#F7D02C",
+        grass: "#7AC74C",
+        ice: "#96D9D6",
+        fighting: "#C22E28",
+        poison: "#A33EA1",
+        ground: "#E2BF65",
+        flying: "#A98FF3",
+        psychic: "#F95587",
+        bug: "#A6B91A",
+        rock: "#B6A136",
+        ghost: "#735797",
+        dragon: "#6F35FC",
+        dark: "#705746",
+        steel: "#B7B7CE",
+        fairy: "#D685AD",
+    };
 
     return (
         <div className="min-h-screen bg-background selection:bg-primary/20">
             {/* Ambient Background */}
             <div
-                className="fixed inset-0 pointer-events-none opacity-[0.03] transition-colors duration-1000"
+                className="fixed inset-0 pointer-events-none opacity-[0.05] transition-colors duration-1000"
                 style={{
-                    background: `radial-gradient(circle at 50% -20%, ${accentColor} 0%, transparent 70%)`
+                    background: `radial-gradient(circle at 50% 20%, ${accentColor} 0%, transparent 60%)`
                 }}
             />
 
             <Navbar />
 
-            <main className="container mx-auto py-8 px-4 relative z-10">
-                {/* Back & Navigation Header */}
-                <div className="flex items-center justify-between mb-8">
+            <main className="container mx-auto py-8 px-4 relative z-10 max-w-5xl">
+                {/* Back Navigation */}
+                <div className="flex items-center justify-between mb-12">
                     <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => navigate('/pokedex')}
-                        className="group text-muted-foreground hover:text-foreground font-medium"
+                        className="group text-muted-foreground hover:text-foreground font-medium bg-white/5 hover:bg-white/10 rounded-xl px-4"
                     >
                         <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
                         Pokedex
                     </Button>
 
-                    <div className="flex gap-2">
+                    <div className="flex gap-3">
                         {prevId && (
-                            <Button variant="outline" size="icon" onClick={() => navigate(`/pokedex/${prevId}`)}>
-                                <ChevronLeft className="h-4 w-4" />
+                            <Button variant="outline" size="sm" onClick={() => navigate(`/pokedex/${prevId}`)} className="rounded-xl border-white/10 bg-white/5 hover:bg-white/10">
+                                <ChevronLeft className="h-4 w-4 mr-1" />
+                                Precedente
                             </Button>
                         )}
                         {nextId && (
-                            <Button variant="outline" size="icon" onClick={() => navigate(`/pokedex/${nextId}`)}>
-                                <ChevronRight className="h-4 w-4" />
+                            <Button variant="outline" size="sm" onClick={() => navigate(`/pokedex/${nextId}`)} className="rounded-xl border-white/10 bg-white/5 hover:bg-white/10">
+                                Successivo
+                                <ChevronRight className="h-4 w-4 ml-1" />
                             </Button>
                         )}
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-                    {/* Left Column: Visuals */}
-                    <div className="lg:col-span-5 space-y-8">
-                        <div className="relative aspect-square rounded-[2rem] bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10 flex items-center justify-center group overflow-hidden shadow-2xl">
-                            {/* Decorative elements */}
-                            <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-primary/10 rounded-full blur-[100px] opacity-20 pointer-events-none" />
+                <div className="flex flex-col items-center text-center space-y-10">
+                    {/* Centered Header */}
+                    <div className="space-y-6 w-full max-w-3xl">
+                        <div className="flex flex-col items-center gap-4">
+                            <h1 className="text-7xl md:text-8xl font-black tracking-tighter capitalize bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/30 drop-shadow-2xl py-2">
+                                {(overrides[`${details.id}-${details.name}`] as any)?.custom_display_name || details.displayName}
+                            </h1>
 
-                            <img
-                                src={details.sprites.shiny}
-                                alt={details.displayName}
-                                className="w-[85%] h-[85%] object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)] transform transition-all duration-700 group-hover:scale-110 group-hover:rotate-2 relative z-10"
-                            />
+                            {user && isEditorEnabled && (
+                                <div className="flex items-center gap-2">
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-white/5"
+                                                    onClick={() => {
+                                                        const currentName = (overrides[`${details.id}-${details.name}`] as any)?.custom_display_name || details.displayName;
+                                                        const newName = prompt("Personalizza nome display:", currentName);
+                                                        if (newName !== null) {
+                                                            saveOverride(details.id, details.name, { custom_display_name: newName });
+                                                        }
+                                                    }}
+                                                >
+                                                    <Edit3 className="h-5 w-5" />
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>Rinomina Pokémon</TooltipContent>
+                                        </Tooltip>
 
-                            <Badge className="absolute top-6 right-6 px-4 py-1.5 bg-primary/20 backdrop-blur-md text-primary-foreground border-primary/30 flex items-center gap-2">
-                                <Sparkles className="h-3.5 w-3.5 fill-current" />
-                                Shiny
-                            </Badge>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-10 w-10 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                                                    onClick={() => {
+                                                        if (confirm(`Sei sicuro di voler eliminare ${details.displayName} dal Pokédex?`)) {
+                                                            saveOverride(details.id, details.name, { is_excluded: true });
+                                                            navigate('/pokedex');
+                                                            toast({
+                                                                title: "Pokemon eliminato",
+                                                                description: `${details.displayName} è stato rimosso dalla visualizzazione.`
+                                                            });
+                                                        }
+                                                    }}
+                                                >
+                                                    <EyeOff className="h-5 w-5" />
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>Elimina dal Pokédex</TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
+                            )}
                         </div>
 
-                        <div className="flex justify-center">
+                        {/* Official-style Type Badges */}
+                        <div className="flex justify-center flex-wrap gap-4">
+                            {details.types.map(type => (
+                                <div
+                                    key={type}
+                                    style={{ backgroundColor: TYPE_COLORS[type.toLowerCase()] || '#777' }}
+                                    className="px-6 py-2 rounded-lg shadow-[0_4px_15px_rgba(0,0,0,0.3)] flex items-center gap-3 transition-transform hover:scale-105 border border-white/20"
+                                >
+                                    <div className="w-5 h-5 flex items-center justify-center brightness-0 invert opacity-90">
+                                        <img
+                                            src={getTypeIconUrl(type)}
+                                            alt=""
+                                            className="w-full h-full object-contain"
+                                        />
+                                    </div>
+                                    <span className="text-sm font-black text-white uppercase tracking-widest drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
+                                        {type}
+                                    </span>
+                                </div>
+                            ))}
+                            <div className="px-6 py-2 rounded-lg bg-white/5 border border-white/10 text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center">
+                                Gen {details.generation}
+                            </div>
+                        </div>
+
+                        <div className="pt-4">
                             <Button
                                 variant="outline"
-                                className="w-full h-14 text-lg font-semibold rounded-2xl border-white/10 bg-white/5 hover:bg-white/10 backdrop-blur-sm"
+                                size="sm"
+                                className="h-10 rounded-xl border-white/5 bg-white/5 hover:bg-white/10 text-muted-foreground hover:text-foreground text-xs font-bold uppercase tracking-widest"
                                 onClick={() => window.open(`https://www.serebii.net/pokedex-sv/${details.name.toLowerCase()}`, '_blank')}
                             >
-                                <span className="flex items-center gap-2">
-                                    Info Serebii
-                                </span>
+                                Info Serebii
                             </Button>
                         </div>
                     </div>
 
-                    {/* Right Column: Info & Variants */}
-                    <div className="lg:col-span-7 space-y-10">
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-4">
-                                <h1 className="text-6xl md:text-7xl font-black tracking-tight capitalize bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/40 drop-shadow-sm">
-                                    {(overrides[`${details.id}-${details.name}`] as any)?.custom_display_name || details.displayName}
-                                </h1>
-
-                                {user && isEditorEnabled && (
-                                    <div className="flex items-center gap-2 mt-2">
-                                        <TooltipProvider>
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-white/5"
-                                                        onClick={() => {
-                                                            const currentName = (overrides[`${details.id}-${details.name}`] as any)?.custom_display_name || details.displayName;
-                                                            const newName = prompt("Personalizza nome display:", currentName);
-                                                            if (newName !== null) {
-                                                                saveOverride(details.id, details.name, { custom_display_name: newName });
-                                                            }
-                                                        }}
-                                                    >
-                                                        <Edit3 className="h-5 w-5" />
-                                                    </Button>
-                                                </TooltipTrigger>
-                                                <TooltipContent>Rinomina Pokémon</TooltipContent>
-                                            </Tooltip>
-
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-10 w-10 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                                                        onClick={() => {
-                                                            if (confirm(`Sei sicuro di voler eliminare ${details.displayName} dal Pokédex?`)) {
-                                                                saveOverride(details.id, details.name, { is_excluded: true });
-                                                                navigate('/pokedex');
-                                                                toast({
-                                                                    title: "Pokemon eliminato",
-                                                                    description: `${details.displayName} è stato rimosso dalla visualizzazione.`
-                                                                });
-                                                            }
-                                                        }}
-                                                    >
-                                                        <EyeOff className="h-5 w-5" />
-                                                    </Button>
-                                                </TooltipTrigger>
-                                                <TooltipContent>Elimina dal Pokédex</TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
-                                    </div>
-                                )}
+                    {/* Form Collection Section - Main Focus */}
+                    <div className="w-full space-y-8 pt-6">
+                        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-white/10">
+                            <div className="text-left">
+                                <h2 className="text-3xl font-black tracking-tight flex items-center gap-3">
+                                    <span className="w-2 h-8 bg-primary rounded-full shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
+                                    Collezione Forme
+                                </h2>
+                                <p className="text-muted-foreground mt-1 font-medium">Visualizza e segna le varianti cromatiche catturate.</p>
                             </div>
-
-                            <div className="flex flex-wrap gap-3">
-                                {details.types.map(type => (
-                                    <TooltipProvider key={type}>
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <div className={cn(
-                                                    "h-10 w-10 p-2 rounded-full backdrop-blur-xl border border-white/10 shadow-lg flex items-center justify-center transition-transform hover:scale-110 cursor-help",
-                                                    `type-${type.toLowerCase()}`
-                                                )}>
-                                                    <img
-                                                        src={getTypeIconUrl(type)}
-                                                        alt={type}
-                                                        className="w-full h-full object-contain brightness-0 invert"
-                                                    />
-                                                </div>
-                                            </TooltipTrigger>
-                                            <TooltipContent className="capitalize font-bold">{type}</TooltipContent>
-                                        </Tooltip>
-                                    </TooltipProvider>
-                                ))}
-                                <Badge variant="outline" className="px-5 py-2 text-sm font-semibold rounded-full border-white/10 text-muted-foreground uppercase">
-                                    Gen {details.generation}
-                                </Badge>
+                            <div className="flex items-center gap-3 bg-white/5 px-5 py-2.5 rounded-2xl border border-white/10 backdrop-blur-md">
+                                <Sparkles className="h-4 w-4 text-primary" />
+                                <span className="text-sm font-bold text-foreground">
+                                    {caughtForms.size} <span className="text-muted-foreground mx-1">/</span> {variants.length}
+                                </span>
+                                <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest ml-2">completato</span>
                             </div>
                         </div>
 
-                        <div className="space-y-6">
-                            <div className="flex items-center justify-between pb-4 border-b border-white/5">
-                                <h2 className="text-2xl font-bold flex items-center gap-3">
-                                    <span className="w-2 h-8 bg-primary rounded-full" />
-                                    Collezione Forme
-                                </h2>
-                                <span className="text-sm font-medium text-muted-foreground bg-white/5 px-3 py-1 rounded-full border border-white/5">
-                                    {caughtForms.size} / {variants.length} completato
-                                </span>
-                            </div>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                            {variants.map(variant => {
+                                const isCaught = caughtForms.has(variant.name);
+                                const isLoading = actionLoading === variant.name;
 
-                            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
-                                {variants.map(variant => {
-                                    const isCaught = caughtForms.has(variant.name);
-                                    const isLoading = actionLoading === variant.name;
-
-                                    return (
-                                        <button
-                                            key={variant.name}
-                                            disabled={isLoading}
-                                            onClick={() => toggleCaught(variant)}
-                                            className={cn(
-                                                "group relative flex flex-col items-center justify-center p-4 rounded-[1.5rem] transition-all duration-500 transform active:scale-95",
-                                                "border outline-none focus:ring-2 ring-primary/40 focus:ring-offset-4 ring-offset-background",
-                                                isCaught
-                                                    ? "bg-primary/5 border-primary/30 shadow-[0_0_30px_-10px_rgba(var(--primary),0.3)]"
-                                                    : "bg-white/[0.02] border-white/10 hover:border-white/20 hover:bg-white/[0.04]"
+                                return (
+                                    <button
+                                        key={variant.name}
+                                        disabled={isLoading}
+                                        onClick={() => toggleCaught(variant)}
+                                        className={cn(
+                                            "group relative flex flex-col items-center p-5 rounded-[2rem] transition-all duration-500",
+                                            "border outline-none focus:ring-2 ring-primary/40 focus:ring-offset-8 ring-offset-background",
+                                            isCaught
+                                                ? "bg-primary/10 border-primary/40 shadow-[0_15px_30px_-10px_rgba(var(--primary),0.4)] scale-100"
+                                                : "bg-white/[0.03] border-white/5 hover:border-white/20 hover:bg-white/[0.06] hover:-translate-y-2"
+                                        )}
+                                    >
+                                        <div className="relative w-full aspect-square mb-4 flex items-center justify-center">
+                                            {/* Glow behind caught pokemon */}
+                                            {isCaught && (
+                                                <div className="absolute inset-0 bg-primary/20 blur-[40px] rounded-full animate-pulse" />
                                             )}
-                                        >
-                                            <div className="relative w-full aspect-square mb-3 flex items-center justify-center">
-                                                <img
-                                                    src={variant.spriteUrl}
-                                                    alt={variant.displayName}
-                                                    className={cn(
-                                                        "w-full h-full object-contain transition-all duration-700",
-                                                        isCaught ? "drop-shadow-[0_10px_20px_rgba(var(--primary),0.2)]" : "opacity-40 grayscale group-hover:opacity-100 group-hover:grayscale-0"
-                                                    )}
-                                                />
-                                                {isCaught && (
-                                                    <div className="absolute top-0 right-0 p-1 bg-primary rounded-full shadow-lg transform translate-x-1/4 -translate-y-1/4 animate-in zoom-in-50 duration-300">
-                                                        <CheckCircle2 className="w-4 h-4 text-primary-foreground font-bold" />
-                                                    </div>
+                                            <img
+                                                src={variant.spriteUrl}
+                                                alt={variant.displayName}
+                                                className={cn(
+                                                    "w-[90%] h-[90%] object-contain transition-all duration-700 relative z-10",
+                                                    isCaught ? "drop-shadow-[0_10px_20px_rgba(0,0,0,0.3)] scale-110" : "opacity-30 grayscale group-hover:opacity-100 group-hover:grayscale-0 group-hover:scale-110"
                                                 )}
-                                                {isLoading && (
-                                                    <div className="absolute inset-0 flex items-center justify-center bg-background/40 backdrop-blur-[2px] rounded-full">
-                                                        <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            <div className="text-center w-full">
-                                                <div className={cn(
-                                                    "text-sm font-bold truncate transition-colors",
-                                                    isCaught ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
-                                                )}>
-                                                    {(overrides[`${variant.id}-${variant.name}`] as any)?.custom_display_name || variant.displayName}
-                                                </div>
-                                                <div className="text-[10px] font-medium opacity-50 uppercase tracking-widest mt-0.5">
-                                                    {variant.category}
-                                                </div>
-                                            </div>
-
-                                            {/* In-card elimination toggle */}
-                                            {user && isEditorEnabled && (
-                                                <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-8 w-8 hover:bg-destructive/20 text-muted-foreground hover:text-destructive"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            if (confirm(`Eliminare la forma ${variant.displayName}?`)) {
-                                                                saveOverride(variant.id, variant.name, { is_excluded: true });
-                                                                toast({ title: "Forma eliminata", description: `${variant.displayName} rimossa.` });
-                                                            }
-                                                        }}
-                                                    >
-                                                        <EyeOff className="h-3 w-3" />
-                                                    </Button>
+                                            />
+                                            {isCaught && (
+                                                <div className="absolute -top-1 -right-1 p-1.5 bg-primary rounded-xl shadow-xl transform animate-in zoom-in-50 duration-500 z-20">
+                                                    <CheckCircle2 className="w-4 h-4 text-primary-foreground font-black" />
                                                 </div>
                                             )}
-
-                                            {!user && (
-                                                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-background/60 backdrop-blur-[1px] rounded-[1.5rem]">
-                                                    <Lock className="w-6 h-6 text-muted-foreground" />
+                                            {isLoading && (
+                                                <div className="absolute inset-0 flex items-center justify-center bg-background/60 backdrop-blur-sm rounded-full z-30">
+                                                    <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
                                                 </div>
                                             )}
-                                        </button>
-                                    );
-                                })}
-                            </div>
+                                        </div>
+
+                                        <div className="text-center w-full relative z-10 space-y-1">
+                                            <div className={cn(
+                                                "text-xs font-black uppercase tracking-widest transition-colors",
+                                                isCaught ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
+                                            )}>
+                                                {(overrides[`${variant.id}-${variant.name}`] as any)?.custom_display_name || variant.displayName}
+                                            </div>
+                                            <div className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-[0.2em]">
+                                                {variant.category}
+                                            </div>
+                                        </div>
+
+                                        {/* In-card elimination toggle */}
+                                        {user && isEditorEnabled && (
+                                            <div className="absolute top-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 rounded-lg bg-black/20 hover:bg-destructive/20 text-white/50 hover:text-destructive backdrop-blur-sm"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        if (confirm(`Eliminare la forma ${variant.displayName}?`)) {
+                                                            saveOverride(variant.id, variant.name, { is_excluded: true });
+                                                            toast({ title: "Forma eliminata", description: `${variant.displayName} rimossa.` });
+                                                        }
+                                                    }}
+                                                >
+                                                    <EyeOff className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        )}
+
+                                        {!user && (
+                                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-background/40 backdrop-blur-sm rounded-[2rem] z-20">
+                                                <Lock className="w-8 h-8 text-muted-foreground" />
+                                            </div>
+                                        )}
+                                    </button>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
@@ -505,3 +513,4 @@ export default function PokemonDetails() {
         </div>
     );
 }
+
