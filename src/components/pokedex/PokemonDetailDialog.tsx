@@ -148,7 +148,12 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
                 if (form.formName === `${details.name}-normal` || form.formName === `${details.name}-standard`) continue;
 
                 let category: FormVariant['category'] = 'form';
-                if (SEASONAL_KEYWORDS.some(kw => form.formName.includes(kw))) {
+
+                // Check if it's a regional form (e.g. totem-alola)
+                if (form.formName.includes('-alola') || form.formName.includes('-galar') ||
+                    form.formName.includes('-hisui') || form.formName.includes('-paldea')) {
+                    category = 'regional';
+                } else if (SEASONAL_KEYWORDS.some(kw => form.formName.includes(kw))) {
                     category = 'seasonal';
                 }
 
