@@ -14,12 +14,17 @@ import {
     ChevronRight,
     Sparkles,
     CheckCircle2,
-    Lock
+    Lock,
+    Edit3,
+    EyeOff,
+    Trash2
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { isFormEliminated } from "@/lib/form-filters";
+import { isFormEliminated, POKEMON_DATA_OVERRIDES } from "@/lib/form-filters";
+import { usePokedexOverrides } from "@/hooks/use-pokedex-overrides";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface FormVariant {
     id: number;
@@ -34,6 +39,7 @@ export default function PokemonDetails() {
     const { pokemonId } = useParams();
     const navigate = useNavigate();
     const { pokemon: details, loading } = usePokemonDetails(Number(pokemonId));
+    const { overrides, saveOverride } = usePokedexOverrides();
     const { user } = useAuth();
     const { toast } = useToast();
     const { accentColor } = useRandomColor();
@@ -100,7 +106,10 @@ export default function PokemonDetails() {
         // Add Forms (avoid redundant ones)
         details.forms.forEach(f => {
             if (f.formName === details.name) return;
-            if (isFormEliminated(f.formName)) return;
+
+            // Inclusion check: static filters + dynamic user overrides
+            const isExcluded = isFormEliminated(f.formName) || (overrides[`${f.id}-${f.formName}`] as any)?.is_excluded;
+            if (isExcluded) return;
 
             // Basic categorization
             let category: FormVariant['category'] = 'form';
@@ -122,14 +131,17 @@ export default function PokemonDetails() {
         // Add Varieties (Regionals usually)
         details.varieties.forEach(v => {
             if (v.isDefault) return;
-            if (isFormEliminated(v.pokemon.name)) return;
+
+            const isExcluded = isFormEliminated(v.pokemon.name) || (overrides[`${v.pokemon.id}-${v.pokemon.name}`] as any)?.is_excluded;
+            if (isExcluded) return;
+
             if (items.some(i => i.id === v.pokemon.id)) return;
 
             let category: FormVariant['category'] = 'regional';
             items.push({
                 id: v.pokemon.id,
                 name: v.pokemon.name,
-                displayName: v.pokemon.name, // Will be formatted by hook ideally or CSS
+                displayName: v.pokemon.name,
                 category,
                 gender: 'genderless',
                 spriteUrl: v.pokemon.spriteUrl
@@ -317,8 +329,57 @@ export default function PokemonDetails() {
                         <div className="space-y-4">
                             <div className="flex items-center gap-4">
                                 <h1 className="text-5xl md:text-6xl font-black tracking-tight capitalize bg-clip-text text-transparent bg-gradient-to-b from-white to-white/70">
-                                    {details.displayName}
+                                    {(overrides[`${details.id}-${details.name}`] as any)?.custom_display_name || details.displayName}
                                 </h1>
+
+                                {user && (
+                                    <div className="flex items-center gap-2 mt-2">
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-white/5"
+                                                        onClick={() => {
+                                                            const currentName = (overrides[`${details.id}-${details.name}`] as any)?.custom_display_name || details.displayName;
+                                                            const newName = prompt("Personalizza nome display:", currentName);
+                                                            if (newName !== null) {
+                                                                saveOverride(details.id, details.name, { custom_display_name: newName });
+                                                            }
+                                                        }}
+                                                    >
+                                                        <Edit3 className="h-5 w-5" />
+                                                    </Button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>Rinomina Pokémon</TooltipContent>
+                                            </Tooltip>
+
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-10 w-10 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                                                        onClick={() => {
+                                                            if (confirm(`Sei sicuro di voler eliminare ${details.displayName} dal Pokédex?`)) {
+                                                                saveOverride(details.id, details.name, { is_excluded: true });
+                                                                navigate('/pokedex');
+                                                                toast({
+                                                                    title: "Pokemon eliminato",
+                                                                    description: `${details.displayName} è stato rimosso dalla visualizzazione.`
+                                                                });
+                                                            }
+                                                        }}
+                                                    >
+                                                        <EyeOff className="h-5 w-5" />
+                                                    </Button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>Elimina dal Pokédex</TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="flex flex-wrap gap-3">
@@ -395,12 +456,32 @@ export default function PokemonDetails() {
                                                     "text-sm font-bold truncate transition-colors",
                                                     isCaught ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
                                                 )}>
-                                                    {variant.displayName}
+                                                    {(overrides[`${variant.id}-${variant.name}`] as any)?.custom_display_name || variant.displayName}
                                                 </div>
                                                 <div className="text-[10px] font-medium opacity-50 uppercase tracking-widest mt-0.5">
                                                     {variant.category}
                                                 </div>
                                             </div>
+
+                                            {/* In-card elimination toggle */}
+                                            {user && (
+                                                <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8 hover:bg-destructive/20 text-muted-foreground hover:text-destructive"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            if (confirm(`Eliminare la forma ${variant.displayName}?`)) {
+                                                                saveOverride(variant.id, variant.name, { is_excluded: true });
+                                                                toast({ title: "Forma eliminata", description: `${variant.displayName} rimossa.` });
+                                                            }
+                                                        }}
+                                                    >
+                                                        <EyeOff className="h-3 w-3" />
+                                                    </Button>
+                                                </div>
+                                            )}
 
                                             {!user && (
                                                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-background/60 backdrop-blur-[1px] rounded-[1.5rem]">

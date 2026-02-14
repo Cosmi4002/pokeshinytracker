@@ -23,9 +23,11 @@ import { usePokemonList } from "@/hooks/use-pokemon";
 import { usePokedexOverrides } from "@/hooks/use-pokedex-overrides";
 import { Navbar } from "@/components/layout/Navbar";
 import { getPokemonSpriteUrl } from "@/lib/pokemon-data";
+import { useAuth } from "@/lib/auth-context";
 
 export default function PokedexManager() {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const { pokemon: allPokemon, loading: listLoading } = usePokemonList();
     const { overrides, saveOverride, deleteOverride, loading: overridesLoading } = usePokedexOverrides();
     const [search, setSearch] = useState("");
@@ -123,39 +125,58 @@ export default function PokedexManager() {
                                                 )}
                                             </div>
                                             <p className="text-sm text-muted-foreground mt-1 capitalize">{p.name}</p>
+                                            {user && (
+                                                <div className="flex gap-1 ml-auto">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            const newName = prompt("Personalizza nome display:", p.displayName);
+                                                            if (newName !== null) {
+                                                                saveOverride(p.id, p.name, { custom_display_name: newName });
+                                                            }
+                                                        }}
+                                                    >
+                                                        <Edit3 className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8 text-destructive hover:text-destructive/80 hover:bg-destructive/10"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            if (confirm(`Nascondere definitivamente ${p.displayName}?`)) {
+                                                                saveOverride(p.id, p.name, { is_excluded: true });
+                                                            }
+                                                        }}
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
 
                                     <div className="flex items-center gap-2">
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => {
-                                                const newName = prompt("Inserisci nuovo nome display:", override?.custom_display_name || p.displayName);
-                                                if (newName !== null) {
-                                                    saveOverride(p.id, p.name, { custom_display_name: newName });
-                                                }
-                                            }}
-                                            className="h-9 w-9 p-0"
-                                        >
-                                            <Edit3 className="h-4 w-4" />
-                                        </Button>
-
-                                        <Button
-                                            variant={isExcluded ? "default" : "secondary"}
-                                            size="sm"
-                                            onClick={() => saveOverride(p.id, p.name, { is_excluded: !isExcluded })}
-                                            className={cn(
-                                                "gap-2",
-                                                isExcluded ? "bg-primary hover:bg-primary/90" : "bg-muted/50 text-muted-foreground"
-                                            )}
-                                        >
-                                            {isExcluded ? (
-                                                <><Eye className="h-4 w-4" /> Ripristina</>
-                                            ) : (
-                                                <><EyeOff className="h-4 w-4" /> Elimina</>
-                                            )}
-                                        </Button>
+                                        {user && (
+                                            <Button
+                                                variant={isExcluded ? "default" : "secondary"}
+                                                size="sm"
+                                                onClick={() => saveOverride(p.id, p.name, { is_excluded: !isExcluded })}
+                                                className={cn(
+                                                    "gap-2",
+                                                    isExcluded ? "bg-primary hover:bg-primary/90" : "bg-muted/50 text-muted-foreground"
+                                                )}
+                                            >
+                                                {isExcluded ? (
+                                                    <><Eye className="h-4 w-4" /> Ripristina</>
+                                                ) : (
+                                                    <><EyeOff className="h-4 w-4" /> Elimina</>
+                                                )}
+                                            </Button>
+                                        )}
                                     </div>
                                 </div>
                             </Card>

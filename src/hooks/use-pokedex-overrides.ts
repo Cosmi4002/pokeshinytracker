@@ -10,14 +10,15 @@ export interface PokedexOverride {
     is_excluded?: boolean;
 }
 
+const GLOBAL_CONFIG_ID = 'global';
+
 export function usePokedexOverrides() {
     const { user } = useAuth();
     const [overrides, setOverrides] = useState<Record<string, PokedexOverride>>({});
     const [loading, setLoading] = useState(true);
 
-    // Initial load from LocalStorage (for instant feedback) 
-    // and then fetch from Supabase if authenticated
     useEffect(() => {
+        // Load from LocalStorage for instant perceived performance
         const localData = localStorage.getItem('pokedex_overrides');
         if (localData) {
             try {
@@ -27,18 +28,12 @@ export function usePokedexOverrides() {
             }
         }
 
-        async function fetchSupabaseOverrides() {
-            if (!user) {
-                setLoading(false);
-                return;
-            }
-
-            // Note: This relies on the table 'pokedex_overrides' existing.
-            // If it doesn't, we'll just stick to localStorage as a fallback.
+        async function fetchGlobalOverrides() {
+            // Everyone (including guest users) gets the global config
             const { data, error } = await supabase
                 .from('pokedex_overrides' as any)
                 .select('*')
-                .eq('user_id', user.id);
+                .eq('user_id', GLOBAL_CONFIG_ID);
 
             if (data && !error) {
                 const formatted: Record<string, PokedexOverride> = {};
@@ -56,8 +51,8 @@ export function usePokedexOverrides() {
             setLoading(false);
         }
 
-        fetchSupabaseOverrides();
-    }, [user?.id]);
+        fetchGlobalOverrides();
+    }, []);
 
     const saveOverride = async (pokemon_id: number, pokemon_name: string, update: Partial<PokedexOverride>) => {
         const key = `${pokemon_id}-${pokemon_name}`;
@@ -72,13 +67,13 @@ export function usePokedexOverrides() {
         setOverrides(newOverrides);
         localStorage.setItem('pokedex_overrides', JSON.stringify(newOverrides));
 
+        // Only authenticated users can save to the global config
         if (user) {
             try {
-                // Upsert to Supabase
                 const { error } = await supabase
                     .from('pokedex_overrides' as any)
                     .upsert({
-                        user_id: user.id,
+                        user_id: GLOBAL_CONFIG_ID,
                         pokemon_id,
                         pokemon_name,
                         ...update,
@@ -103,7 +98,7 @@ export function usePokedexOverrides() {
             await supabase
                 .from('pokedex_overrides' as any)
                 .delete()
-                .eq('user_id', user.id)
+                .eq('user_id', GLOBAL_CONFIG_ID)
                 .eq('pokemon_id', pokemon_id)
                 .eq('pokemon_name', pokemon_name);
         }
