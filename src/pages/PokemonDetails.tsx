@@ -19,6 +19,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { isFormEliminated } from "@/lib/form-filters";
 
 interface FormVariant {
     id: number;
@@ -99,7 +100,7 @@ export default function PokemonDetails() {
         // Add Forms (avoid redundant ones)
         details.forms.forEach(f => {
             if (f.formName === details.name) return;
-            if (f.formName.includes('-normal') || f.formName.includes('-standard')) return;
+            if (isFormEliminated(f.formName)) return;
 
             // Basic categorization
             let category: FormVariant['category'] = 'form';
@@ -121,6 +122,7 @@ export default function PokemonDetails() {
         // Add Varieties (Regionals usually)
         details.varieties.forEach(v => {
             if (v.isDefault) return;
+            if (isFormEliminated(v.pokemon.name)) return;
             if (items.some(i => i.id === v.pokemon.id)) return;
 
             let category: FormVariant['category'] = 'regional';

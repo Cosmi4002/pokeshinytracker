@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { toShowdownSlug, getPokemonSpriteUrl } from '@/lib/pokemon-data';
 export { toShowdownSlug, getPokemonSpriteUrl } from '@/lib/pokemon-data';
 import pokedexData from '@/lib/pokedex.json';
+import { isFormEliminated } from '@/lib/form-filters';
 
 export interface PokemonBasic {
   id: number;
@@ -211,11 +212,7 @@ export function usePokemonList() {
         const list: PokemonBasic[] = pokedexData.map((p: any) => ({
           ...p,
           displayName: formatPokemonName(p.name, p.id, p.baseId),
-          hideFromPokedex:
-            p.name.includes('oinkologne-female') ||
-            p.name.includes('urshifu-rapid-strike') ||
-            p.name.includes('meowstic-female') ||
-            p.name.includes('indeedee-female'),
+          hideFromPokedex: isFormEliminated(p.name),
         }));
 
         setPokemon(list);
@@ -274,6 +271,9 @@ export function usePokemonDetails(pokemonId: number | null) {
         if (data.forms && data.forms.length > 1) {
           for (const form of data.forms) {
             if (form.name === data.name) continue;
+
+            // Permanent form elimination
+            if (isFormEliminated(form.name)) continue;
 
             // Skip regional forms here unless they match the current base form's region
             const fn = form.name.toLowerCase();
@@ -337,6 +337,9 @@ export function usePokemonDetails(pokemonId: number | null) {
 
               // Skip totem, primal, etc.
               if (vn.includes('-totem') || vn.includes('-primal') || vn.includes('-eternal')) continue;
+
+              // Permanent form elimination
+              if (isFormEliminated(vn)) continue;
 
               const varietyIdMatch = variety.pokemon.url.match(/\/pokemon\/(\d+)\/?$/);
               const varietyId = varietyIdMatch ? parseInt(varietyIdMatch[1]) : null;
