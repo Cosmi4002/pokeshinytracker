@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useMemo, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
     ArrowLeft,
     Search,
@@ -28,10 +28,23 @@ import { useAuth } from "@/lib/auth-context";
 export default function PokedexManager() {
     const navigate = useNavigate();
     const { user } = useAuth();
+    const { pathname } = useLocation();
     const { pokemon: allPokemon, loading: listLoading } = usePokemonList();
     const { overrides, saveOverride, deleteOverride, loading: overridesLoading } = usePokedexOverrides();
     const [search, setSearch] = useState("");
     const [expandedIds, setExpandedIds] = useState<number[]>([]);
+
+    // Restore scroll position after data is loaded
+    useEffect(() => {
+        if (!listLoading && !overridesLoading) {
+            const savedPosition = sessionStorage.getItem(`scroll-${pathname}`);
+            if (savedPosition) {
+                setTimeout(() => {
+                    window.scrollTo(0, parseInt(savedPosition));
+                }, 100);
+            }
+        }
+    }, [listLoading, overridesLoading, pathname]);
 
     const filteredPokemon = useMemo(() => {
         if (!allPokemon) return [];

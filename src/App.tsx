@@ -14,6 +14,7 @@ import PokemonDetails from "./pages/PokemonDetails";
 import PokedexManager from "./pages/PokedexManager";
 import Collection from "./pages/Collection";
 import SpriteMapper from "./pages/SpriteMapper";
+import { ScrollRestoration } from "@/components/layout/ScrollRestoration";
 
 import NotFound from "./pages/NotFound";
 import { useUserPreferences } from "@/hooks/use-user-preferences";
@@ -29,6 +30,7 @@ function AppContent() {
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <ScrollRestoration />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />

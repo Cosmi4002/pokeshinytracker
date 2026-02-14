@@ -3,7 +3,7 @@ import { Search } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { usePokemonList, getPokemonSpriteUrl, GENERATION_RANGES, POKEMON_WITH_GENDER_DIFF, PokemonBasic } from '@/hooks/use-pokemon';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PokedexCard } from '@/components/pokedex/PokedexCard';
@@ -12,15 +12,30 @@ import { POKEMON_FORM_COUNTS } from '@/lib/pokemon-data';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth-context';
 import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
 
 export default function Pokedex() {
     const { pokemon, loading: pokemonLoading } = usePokemonList();
     const { accentColor } = useRandomColor();
     const { user } = useAuth();
     const navigate = useNavigate();
+    const { pathname } = useLocation();
 
     const [search, setSearch] = useState('');
     const [generationFilter, setGenerationFilter] = useState('all');
+
+    // Restore scroll position after data is loaded
+    useEffect(() => {
+        if (!pokemonLoading && !caughtLoading) {
+            const savedPosition = sessionStorage.getItem(`scroll-${pathname}`);
+            if (savedPosition) {
+                // Use a small timeout to ensure DOM is fully rendered
+                setTimeout(() => {
+                    window.scrollTo(0, parseInt(savedPosition));
+                }, 100);
+            }
+        }
+    }, [pokemonLoading, caughtLoading, pathname]);
 
     // Fetch caught counts
     const { data: caughtCounts, isLoading: caughtLoading } = useQuery({
