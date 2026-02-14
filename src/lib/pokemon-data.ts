@@ -494,14 +494,7 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
     }
   }
 
-  // 3. Prefer Showdown for animated sprites (non-shiny or as fallback)
-  if (name) {
-    const slug = toShowdownSlug(name);
-    const prefix = shiny ? 'ani-shiny' : 'ani';
-    return `https://play.pokemonshowdown.com/sprites/${prefix}/${slug}.gif`;
-  }
-
-  // 3. Last fallback: static sprites from PokeAPI
+  // 3. Fallback to static sprites from PokeAPI (Showdown animated GIFs disabled as requested)
   const path = shiny ? '/shiny' : '';
   const genderPath = female ? '/female' : '';
 

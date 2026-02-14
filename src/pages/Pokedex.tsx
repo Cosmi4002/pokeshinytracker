@@ -29,15 +29,24 @@ export default function Pokedex() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const navigate = useNavigate();
 
-  // Group all pokemon by species (baseId)
+  // Group all pokemon by species (baseId + name prefix for gender variants)
   const speciesGroups = useMemo(() => {
-    const map = new Map<number, PokemonBasic[]>();
+    const map = new Map<string, PokemonBasic[]>();
     pokemon.forEach(p => {
-      const g = map.get(p.baseId) || [];
+      // Strip gender suffixes to keep male/female together
+      // But keep regional suffixes (alola, galar, etc.) separate
+      const nameKey = p.name.replace(/-male$|-female$/, '');
+      const key = `${p.baseId}-${nameKey}`;
+
+      const g = map.get(key) || [];
       g.push(p);
-      map.set(p.baseId, g);
+      map.set(key, g);
     });
-    return Array.from(map.values()).sort((a, b) => a[0].baseId - b[0].baseId);
+    // Sort by baseId first (National Dex order), then by nameKey
+    return Array.from(map.values()).sort((a, b) => {
+      if (a[0].baseId !== b[0].baseId) return a[0].baseId - b[0].baseId;
+      return a[0].name.localeCompare(b[0].name);
+    });
   }, [pokemon]);
 
   const filteredGroups = useMemo(() => {
@@ -159,7 +168,7 @@ export default function Pokedex() {
                 const p = sortedGroup[0];
 
                 // Show gender diff if the base species has it
-                const hasGenderDiff = (POKEMON_WITH_GENDER_DIFF.includes(p.baseId) || p.baseId === 916) && p.id !== 10148;
+                const hasGenderDiff = POKEMON_WITH_GENDER_DIFF.includes(p.baseId);
 
                 // Calculate percentage across ALL variants in the group
                 let totalSpeciesCaught = 0;

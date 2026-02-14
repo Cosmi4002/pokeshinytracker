@@ -49,7 +49,7 @@ export const POKEMON_WITH_GENDER_DIFF = [
   272, 274, 275, 307, 308, 315, 316, 317, 322, 323, 332, 350, 369, 396, 397,
   398, 399, 400, 401, 402, 403, 404, 405, 407, 415, 417, 418, 419, 424, 443,
   444, 445, 449, 450, 453, 454, 456, 457, 459, 460, 461, 464, 465, 473, 521,
-  592, 593, 902
+  592, 593, 667, 668, 678, 768, 876, 902, 916
 ];
 
 // Generation ranges
@@ -309,10 +309,13 @@ export function usePokemonDetails(pokemonId: number | null) {
 
               const vn = variety.pokemon.name.toLowerCase();
 
+              // Skip Mega and Gigamax forms (user requested removal)
+              if (vn.includes('-mega') || vn.includes('-gmax')) continue;
+
               // Skip Minior Meteor forms
               if (vn.startsWith('minior-') && vn.includes('-meteor')) continue;
 
-              // Skip mega, totem, etc. here if they are handled by forms? 
+              // Skip mega (already above), totem, etc. here if they are handled by forms? 
               // Actually, varieties is the best source for regional variants.
               // We'll filter by category in the dialog instead of here.
               if (vn.includes('-totem') || vn.includes('-primal') || vn.includes('-eternal')) continue;

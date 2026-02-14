@@ -87,16 +87,17 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
         const showGenderLabels = details.hasGenderDifference && !isPartnerCap;
 
         // Skip adding Base variant for Minior (it's the Meteor form, user wants only Cores)
-        if (details.name !== 'minior') {
-            variants.push({
-                id: pokemonId,
-                name: details.name,
-                displayName: showGenderLabels ? 'Maschio' : 'Default',
-                category: showGenderLabels ? 'gender' : 'base',
-                gender: showGenderLabels ? 'male' : 'genderless',
-                spriteUrl: details.sprites.shiny,
-            });
-        }
+        const representativeNameKey = details.name.replace(/-male$|-female$/, '');
+
+        // Standard variety (Male or Genderless)
+        variants.push({
+            id: pokemonId,
+            name: details.name,
+            displayName: 'Maschio / Standard',
+            category: 'base',
+            gender: 'male',
+            spriteUrl: details.sprites.frontShiny,
+        });
 
         // Female variant
         if (details.hasGenderDifference && details.sprites.femaleShiny && !isPartnerCap) {
@@ -110,6 +111,44 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
             });
         }
 
+        // Add variety forms that match our group (same nameKey, e.g. same regional form)
+        for (const variety of details.varieties) {
+            if (variety.isDefault) continue;
+
+            const vn = variety.pokemon.name.toLowerCase();
+            const vnKey = vn.replace(/-male$|-female$/, '');
+
+            // ONLY include forms that belong to this card's specific group
+            if (vnKey !== representativeNameKey) continue;
+
+            // Female variants in varieties (sometimes handled here)
+            if (vn.includes('-female')) {
+                // Check if already added
+                if (!variants.find(v => v.name === vn)) {
+                    variants.push({
+                        id: variety.pokemon.id,
+                        name: vn,
+                        displayName: 'Femmina',
+                        category: 'gender',
+                        gender: 'female',
+                        spriteUrl: variety.pokemon.spriteUrl,
+                    });
+                }
+                continue;
+            }
+
+            // Other forms in this group (should only be gender variants if we grouped correctly, 
+            // but PokéAPI sometimes has weird variety structures)
+            variants.push({
+                id: variety.pokemon.id,
+                name: vn,
+                displayName: variety.pokemon.name,
+                category: 'form',
+                gender: 'male',
+                spriteUrl: variety.pokemon.spriteUrl,
+            });
+        }
+
         // Add forms from API (includes seasonal, regional, mega, gmax, etc.)
         for (const form of details.forms) {
             // Skip ALL Pikachu cap forms — user only wants Male/Female + Partner Cap (separate entry)
@@ -119,6 +158,11 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
             if (details.id === 10148) continue;
 
             const name = form.formName.toLowerCase();
+
+            // Filter out Mega and Gmax forms
+            if (name.includes('mega') || name.includes('gmax')) {
+                continue;
+            }
 
             // Skip regional forms logic removed to allow unified view
             const isRegionalForm = name.includes('-alola') || name.includes('-galar') || name.includes('-hisui') || name.includes('-paldea');
@@ -132,11 +176,7 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
             let category: FormVariant['category'] = 'form';
             let variantDisplayName = form.displayName;
 
-            if (name.includes('mega')) {
-                category = 'mega';
-            } else if (name.includes('gmax')) {
-                category = 'gmax';
-            } else if (name.includes('-alola') || name.includes('-galar') || name.includes('-hisui') || name.includes('-paldea')) {
+            if (name.includes('-alola') || name.includes('-galar') || name.includes('-hisui') || name.includes('-paldea')) {
                 category = 'regional';
             } else if (SEASONAL_KEYWORDS.some(kw => name.includes(kw))) {
                 category = 'seasonal';

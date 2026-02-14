@@ -168,6 +168,12 @@
     "generation": 7
   },
   {
+    "id": 10148,
+    "baseId": 25,
+    "name": "pikachu-partner-cap",
+    "generation": 7
+  },
+  {
     "id": 26,
     "baseId": 26,
     "name": "raichu",
