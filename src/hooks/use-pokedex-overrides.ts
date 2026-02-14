@@ -19,13 +19,13 @@ export function usePokedexOverrides() {
 
     useEffect(() => {
         // Load from LocalStorage for instant perceived performance
-        const localData = localStorage.getItem('pokedex_overrides');
-        if (localData) {
-            try {
+        try {
+            const localData = localStorage.getItem('pokedex_overrides');
+            if (localData) {
                 setOverrides(JSON.parse(localData));
-            } catch (e) {
-                console.error("Failed to parse local overrides", e);
             }
+        } catch (e) {
+            console.error("Failed to parse local overrides", e);
         }
 
         async function fetchGlobalOverrides() {
@@ -49,7 +49,9 @@ export function usePokedexOverrides() {
                         };
                     });
                     setOverrides(formatted);
-                    localStorage.setItem('pokedex_overrides', JSON.stringify(formatted));
+                    try {
+                        localStorage.setItem('pokedex_overrides', JSON.stringify(formatted));
+                    } catch (e) { /* ignored - storage full or private mode */ }
                 }
             } catch (err) {
                 console.error("Error fetching global overrides:", err);
@@ -72,7 +74,9 @@ export function usePokedexOverrides() {
         };
 
         setOverrides(newOverrides);
-        localStorage.setItem('pokedex_overrides', JSON.stringify(newOverrides));
+        try {
+            localStorage.setItem('pokedex_overrides', JSON.stringify(newOverrides));
+        } catch (e) { /* ignored */ }
 
         // Only authenticated users can save to the global config
         if (user) {

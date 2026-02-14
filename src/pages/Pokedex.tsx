@@ -15,7 +15,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
 export default function Pokedex() {
-    const { pokemon, loading: pokemonLoading } = usePokemonList();
+    const { pokemon, loading: pokemonLoading, error: pokemonError } = usePokemonList();
     const { accentColor } = useRandomColor();
     const { user } = useAuth();
     const navigate = useNavigate();
@@ -23,19 +23,6 @@ export default function Pokedex() {
 
     const [search, setSearch] = useState('');
     const [generationFilter, setGenerationFilter] = useState('all');
-
-    // Restore scroll position after data is loaded
-    useEffect(() => {
-        if (!pokemonLoading && !caughtLoading) {
-            const savedPosition = sessionStorage.getItem(`scroll-${pathname}`);
-            if (savedPosition) {
-                // Use a small timeout to ensure DOM is fully rendered
-                setTimeout(() => {
-                    window.scrollTo(0, parseInt(savedPosition));
-                }, 100);
-            }
-        }
-    }, [pokemonLoading, caughtLoading, pathname]);
 
     // Fetch caught counts
     const { data: caughtCounts, isLoading: caughtLoading } = useQuery({
@@ -57,8 +44,22 @@ export default function Pokedex() {
         initialData: {}
     });
 
+    // Restore scroll position after data is loaded
+    useEffect(() => {
+        if (!pokemonLoading && !caughtLoading) {
+            const savedPosition = sessionStorage.getItem(`scroll-${pathname}`);
+            if (savedPosition) {
+                // Use a small timeout to ensure DOM is fully rendered
+                setTimeout(() => {
+                    window.scrollTo(0, parseInt(savedPosition));
+                }, 100);
+            }
+        }
+    }, [pokemonLoading, caughtLoading, pathname]);
+
     // Grouping logic
     const speciesGroups = useMemo(() => {
+        if (!pokemon || !Array.isArray(pokemon)) return [];
         const map = new Map<string, PokemonBasic[]>();
         pokemon.forEach(p => {
             // Group by base ID AND name prefix (to group gender variants, but separate regional variants)
@@ -110,7 +111,7 @@ export default function Pokedex() {
     }, [speciesGroups, search, generationFilter]);
 
     // Total caught count
-    const totalCaughtCount = Object.values(caughtCounts).reduce((a, b) => a + b, 0);
+    const totalCaughtCount = Object.values(caughtCounts || {}).reduce((a, b) => (Number(a) || 0) + (Number(b) || 0), 0);
 
     return (
         <div className="min-h-screen bg-background transition-colors duration-1000" style={{ backgroundImage: `radial-gradient(circle at 50% 0%, ${accentColor}15 0%, transparent 70%)` }}>
@@ -156,6 +157,13 @@ export default function Pokedex() {
                         </div>
                     </div>
 
+                    {/* Errors */}
+                    {pokemonError && (
+                        <div className="bg-destructive/10 border border-destructive/20 p-4 rounded-xl text-destructive text-center">
+                            Errore: {pokemonError}
+                        </div>
+                    )}
+
                     {/* Grid */}
                     {pokemonLoading || caughtLoading ? (
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
@@ -163,6 +171,11 @@ export default function Pokedex() {
                         </div>
                     ) : (
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+                            {filteredGroups.length === 0 && !pokemonError && (
+                                <div className="col-span-full py-20 text-center text-muted-foreground">
+                                    Nessun Pokémon trovato.
+                                </div>
+                            )}
                             {filteredGroups.map(group => {
                                 // Sort to ensure base form is first (usually lower ID)
                                 group.sort((a, b) => a.id - b.id);
