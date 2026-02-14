@@ -445,8 +445,20 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
     }
 
     // FORCE HD SPRITE FOR PIKACHU PARTNER CAP (User Request)
-    if (name && name.toLowerCase() === 'pikachu-partner-cap') {
-      return '/img/pokemon/pikachu-partner-cap.png';
+    if (name && (name.toLowerCase() === 'pikachu-partner-cap' || name.toLowerCase() === 'pikachu-partner')) {
+      return 'https://img.pokemondb.net/sprites/home/normal/pikachu-partner-cap.png';
+    }
+
+    // FORCE SHINY SPRITES FOR PALDEAN TAUROS BREEDS (User Request)
+    if (name && name.toLowerCase().includes('tauros-paldea')) {
+      if (name.toLowerCase().includes('combat')) return 'https://img.pokemondb.net/sprites/home/shiny/tauros-paldean-combat.png';
+      if (name.toLowerCase().includes('blaze')) return 'https://img.pokemondb.net/sprites/home/shiny/tauros-paldean-blaze.png';
+      if (name.toLowerCase().includes('aqua')) return 'https://img.pokemondb.net/sprites/home/shiny/tauros-paldean-aqua.png';
+    }
+
+    // FORCE SHINY SPRITE FOR OINKOLOGNE FEMALE (User Request)
+    if (name && name.toLowerCase() === 'oinkologne-female') {
+      return 'https://img.pokemondb.net/sprites/home/shiny/oinkologne-female.png';
     }
 
     const shinyKeys: string[] = [];

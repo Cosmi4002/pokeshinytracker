@@ -29,46 +29,62 @@ export default function Pokedex() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const navigate = useNavigate();
 
-  const filteredPokemon = useMemo(() => {
-    const searchLower = search.toLowerCase();
-    const genNum = generationFilter !== 'all' ? parseInt(generationFilter) : null;
-    const genRange = genNum !== null ? GENERATION_RANGES[genNum] : null;
-
-    return pokemon.filter((p) => {
-      // Search filter
-      const matchesSearch = !search || p.displayName.toLowerCase().includes(searchLower) ||
-        p.id.toString().includes(search);
-
-      // Generation filter
-      let matchesGen = true;
-      if (generationFilter !== 'all') {
-        if (generationFilter === 'Alola') {
-          matchesGen = p.generation === 7 && p.name.includes('-alola');
-        } else if (generationFilter === 'Galar') {
-          matchesGen = p.generation === 8 && p.name.includes('-galar');
-        } else if (generationFilter === 'Hisui') {
-          matchesGen = p.generation === 8 && p.name.includes('-hisui');
-        } else if (generationFilter === 'Paldea') {
-          // Paldea regional forms are gen 9, and some are high ID forms of earlier gen pokemon (e.g., Wooper Paldean)
-          matchesGen = p.generation === 9 && (p.name.includes('-paldea') || (p.id > 10000 && p.baseId >= 906));
-        } else {
-          matchesGen = p.generation === parseInt(generationFilter);
-        }
-      }
-
-      return matchesSearch && matchesGen && !p.hideFromPokedex;
+  // Group all pokemon by species (baseId)
+  const speciesGroups = useMemo(() => {
+    const map = new Map<number, PokemonBasic[]>();
+    pokemon.forEach(p => {
+      const g = map.get(p.baseId) || [];
+      g.push(p);
+      map.set(p.baseId, g);
     });
-  }, [pokemon, search, generationFilter]); // Dependency changed to generationFilter
+    return Array.from(map.values()).sort((a, b) => a[0].baseId - b[0].baseId);
+  }, [pokemon]);
+
+  const filteredGroups = useMemo(() => {
+    const searchLower = search.toLowerCase();
+
+    return speciesGroups.filter((group) => {
+      // Does ANY pokemon in this group match the filter?
+      return group.some(p => {
+        // Search filter
+        const matchesSearch = !search || p.displayName.toLowerCase().includes(searchLower) ||
+          p.id.toString().includes(search);
+
+        // Generation filter
+        let matchesGen = true;
+        if (generationFilter !== 'all') {
+          if (generationFilter === 'Alola') {
+            matchesGen = p.generation === 7 && p.name.includes('-alola');
+          } else if (generationFilter === 'Galar') {
+            matchesGen = p.generation === 8 && p.name.includes('-galar');
+          } else if (generationFilter === 'Hisui') {
+            matchesGen = p.generation === 8 && p.name.includes('-hisui');
+          } else if (generationFilter === 'Paldea') {
+            matchesGen = p.generation === 9 && (p.name.includes('-paldea') || (p.id > 10000 && p.baseId >= 906));
+          } else {
+            matchesGen = p.generation === parseInt(generationFilter);
+          }
+        }
+
+        return matchesSearch && matchesGen && !p.hideFromPokedex;
+      });
+    });
+  }, [speciesGroups, search, generationFilter]);
 
   // Calculate completion stats
   const completionStats = useMemo(() => {
     let totalCaught = 0;
-    filteredPokemon.forEach(p => {
-      const { caught } = getCaughtCountForPokemon(p.id);
-      if (caught > 0) totalCaught++;
+    filteredGroups.forEach(group => {
+      // Any variant caught counts as species caught for the summary? 
+      // Or should it be 100% caught? Usually "At least one" is the Pokedex standard.
+      const hasAnyCaught = group.some(p => {
+        const { caught } = getCaughtCountForPokemon(p.id);
+        return caught > 0;
+      });
+      if (hasAnyCaught) totalCaught++;
     });
-    return { caught: totalCaught, total: filteredPokemon.length };
-  }, [filteredPokemon, getCaughtCountForPokemon]);
+    return { caught: totalCaught, total: filteredGroups.length };
+  }, [filteredGroups, getCaughtCountForPokemon]);
 
   return (
     <div
@@ -136,27 +152,42 @@ export default function Pokedex() {
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-              {filteredPokemon.map((p) => {
-                // Show gender diff if the species has it, but hide for Partner Cap form specifically AND exclude Regional forms (Alola, Galar, Hisui, Paldea)
-                const isRegional = p.name.includes('-alola') || p.name.includes('-galar') || p.name.includes('-hisui') || p.name.includes('-paldea');
-                const hasGenderDiff = POKEMON_WITH_GENDER_DIFF.includes(p.baseId) && p.id !== 10148 && !isRegional;
-                const { caught } = getCaughtCountForPokemon(p.id);
+              {filteredGroups.map((group) => {
+                // Representatives: pick the one with lowest ID (usually the base form)
+                // We sort each group by ID to ensure consistency
+                const sortedGroup = [...group].sort((a, b) => a.id - b.id);
+                const p = sortedGroup[0];
 
-                // For percentage, we need to know total forms
-                let totalForms = 1;
-                if (POKEMON_FORM_COUNTS[p.baseId]) {
-                  totalForms = POKEMON_FORM_COUNTS[p.baseId];
-                } else if (hasGenderDiff) {
-                  totalForms = 2;
-                }
+                // Show gender diff if the base species has it
+                const hasGenderDiff = (POKEMON_WITH_GENDER_DIFF.includes(p.baseId) || p.baseId === 916) && p.id !== 10148;
 
-                const caughtPct = totalForms > 0
-                  ? Math.min(100, (caught / totalForms) * 100)
+                // Calculate percentage across ALL variants in the group
+                let totalSpeciesCaught = 0;
+                let totalPossibleVariants = 0;
+
+                group.forEach(variant => {
+                  const { caught } = getCaughtCountForPokemon(variant.id);
+                  totalSpeciesCaught += caught;
+
+                  // Basic form count
+                  let formsForVariant = 1;
+                  if (POKEMON_FORM_COUNTS[variant.id]) {
+                    formsForVariant = POKEMON_FORM_COUNTS[variant.id];
+                  } else if (variant.id === p.baseId && hasGenderDiff) {
+                    formsForVariant = 2; // Male + Female
+                  }
+                  totalPossibleVariants += formsForVariant;
+                });
+
+                const caughtPct = totalPossibleVariants > 0
+                  ? Math.min(100, (totalSpeciesCaught / totalPossibleVariants) * 100)
                   : 0;
+
+                const hasCaughtAny = totalSpeciesCaught > 0;
 
                 return (
                   <PokedexCard
-                    key={p.id}
+                    key={p.baseId}
                     pokemonId={p.id}
                     baseId={p.baseId}
                     displayName={p.displayName}
@@ -164,7 +195,7 @@ export default function Pokedex() {
                     femaleSprite={hasGenderDiff ? getPokemonSpriteUrl(p.id, { shiny: true, female: true, name: p.name }) : undefined}
                     hasGenderDiff={hasGenderDiff}
                     caughtPercentage={caughtPct}
-                    hasCaughtAny={caught > 0}
+                    hasCaughtAny={hasCaughtAny}
                     onClick={() => {
                       setSelectedPokemon(p);
                       setIsDialogOpen(true);

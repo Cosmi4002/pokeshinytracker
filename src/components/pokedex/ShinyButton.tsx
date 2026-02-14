@@ -5,6 +5,7 @@ interface ShinyButtonProps {
     label: string;
     isCaught: boolean;
     onClick: () => void;
+    onCounterClick?: () => void;
     isLoading?: boolean;
 }
 
@@ -13,6 +14,7 @@ export function ShinyButton({
     label,
     isCaught,
     onClick,
+    onCounterClick,
     isLoading = false
 }: ShinyButtonProps) {
     return (
@@ -70,13 +72,42 @@ export function ShinyButton({
                 </span>
             </div>
 
-            {/* Premium indicator corner */}
-            <div className={cn(
-                "absolute top-0 right-0 w-12 h-12 bg-gradient-to-bl from-primary/20 to-transparent flex items-start justify-end p-2 transition-opacity duration-500",
-                isCaught ? "opacity-100" : "opacity-0"
-            )}>
-                <div className="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_currentColor]" />
-            </div>
+            {/* Premium indicator corner or Counter button */}
+            {onCounterClick ? (
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onCounterClick();
+                    }}
+                    className="absolute top-0 right-0 w-10 h-10 flex items-start justify-end p-2 opacity-0 group-hover:opacity-100 transition-opacity z-20 hover:text-primary"
+                    title="Vai al Counter"
+                >
+                    <div className="bg-background/80 backdrop-blur-sm p-1 rounded-full border border-primary/20 hover:border-primary/50 transition-colors">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        >
+                            <circle cx="12" cy="12" r="10" />
+                            <circle cx="12" cy="12" r="3" />
+                            <line x1="12" y1="2" x2="12" y2="4" />
+                            <line x1="12" y1="20" x2="12" y2="22" />
+                            <line x1="2" y1="12" x2="4" y2="12" />
+                            <line x1="20" y1="12" x2="22" y2="12" />
+                        </svg>
+                    </div>
+                </button>
+            ) : isCaught && (
+                <div className="absolute top-0 right-0 w-12 h-12 bg-gradient-to-bl from-primary/20 to-transparent flex items-start justify-end p-2 transition-opacity duration-500">
+                    <div className="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_currentColor]" />
+                </div>
+            )}
 
             {/* Sweep effect on hover */}
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out pointer-events-none" />

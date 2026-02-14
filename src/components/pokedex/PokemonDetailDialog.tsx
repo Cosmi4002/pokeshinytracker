@@ -120,22 +120,8 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
 
             const name = form.formName.toLowerCase();
 
-            // Skip regional forms here - they are independent entries or handled elsewhere
-            // UNLESS the current pokemon is that regional form (e.g. darmanitan-galar should see darmanitan-galar-zen)
+            // Skip regional forms logic removed to allow unified view
             const isRegionalForm = name.includes('-alola') || name.includes('-galar') || name.includes('-hisui') || name.includes('-paldea');
-
-            if (isRegionalForm) {
-                const myName = details.name.toLowerCase();
-                // If I am NOT regional, filter out regional forms (they are separate entries)
-                if (!myName.includes('-alola') && !myName.includes('-galar') && !myName.includes('-hisui') && !myName.includes('-paldea')) {
-                    continue;
-                }
-                // If I AM regional, filter out OTHER regions
-                if (myName.includes('-galar') && !name.includes('-galar')) continue;
-                if (myName.includes('-alola') && !name.includes('-alola')) continue;
-                if (myName.includes('-hisui') && !name.includes('-hisui')) continue;
-                if (myName.includes('-paldea') && !name.includes('-paldea')) continue;
-            }
 
             // Skip redundant "normal" or "standard" forms (e.g. Silvally-Normal) which are same as base
             if (name === `${details.name}-normal` || name === `${details.name}-standard`) continue;
@@ -177,6 +163,22 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
                     category = 'base';
                 } else if (category === 'form') {
                     continue;
+                }
+            }
+
+            // Basculegion Male/Female: Move to Base
+            if (details.id === 902 || details.baseId === 902) {
+                if (name === 'basculegion-male') continue;
+                if (name === 'basculegion-female') {
+                    category = 'base';
+                }
+            }
+
+            // Enamorus Incarnate/Therian: Move to Base
+            if (details.id === 905 || details.baseId === 905) {
+                if (name === 'enamorus-incarnate') continue;
+                if (name === 'enamorus-therian') {
+                    category = 'base';
                 }
             }
 
@@ -423,6 +425,10 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
                                                             isCaught={caughtForms.has(key)}
                                                             isLoading={loadingAction === key}
                                                             onClick={() => toggleCaught(variant)}
+                                                            onCounterClick={() => {
+                                                                onOpenChange(false);
+                                                                navigate(`/counter?pokemon=${encodeURIComponent(variant.name)}`);
+                                                            }}
                                                         />
                                                     );
                                                 })}
@@ -448,6 +454,10 @@ export function PokemonDetailDialog({ pokemon, open, onOpenChange }: PokemonDeta
                                                             isCaught={caughtForms.has(key)}
                                                             isLoading={loadingAction === key}
                                                             onClick={() => toggleCaught(variant)}
+                                                            onCounterClick={() => {
+                                                                onOpenChange(false);
+                                                                navigate(`/counter?pokemon=${encodeURIComponent(variant.name)}`);
+                                                            }}
                                                         />
                                                     );
                                                 })}
