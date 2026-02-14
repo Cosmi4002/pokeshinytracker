@@ -3,10 +3,10 @@ import { Search } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useNavigate } from 'react-router-dom';
 import { usePokemonList, getPokemonSpriteUrl, GENERATION_RANGES, POKEMON_WITH_GENDER_DIFF, PokemonBasic } from '@/hooks/use-pokemon';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PokedexCard } from '@/components/pokedex/PokedexCard';
-import { PokemonDetailDialog } from '@/components/pokedex/PokemonDetailDialog';
 import { useRandomColor } from '@/lib/random-color-context';
 import { POKEMON_FORM_COUNTS } from '@/lib/pokemon-data';
 import { supabase } from '@/integrations/supabase/client';
@@ -17,11 +17,10 @@ export default function Pokedex() {
     const { pokemon, loading: pokemonLoading } = usePokemonList();
     const { accentColor } = useRandomColor();
     const { user } = useAuth();
+    const navigate = useNavigate();
 
     const [search, setSearch] = useState('');
     const [generationFilter, setGenerationFilter] = useState('all');
-    const [selectedPokemon, setSelectedPokemon] = useState<PokemonBasic | null>(null);
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     // Fetch caught counts
     const { data: caughtCounts, isLoading: caughtLoading } = useQuery({
@@ -191,8 +190,7 @@ export default function Pokedex() {
                                         caughtPercentage={pct}
                                         hasCaughtAny={isCaught}
                                         onClick={() => {
-                                            setSelectedPokemon(p);
-                                            setIsDialogOpen(true);
+                                            navigate(`/pokedex/${p.id}`);
                                         }}
                                     />
                                 );
@@ -201,12 +199,6 @@ export default function Pokedex() {
                     )}
                 </div>
             </main>
-
-            <PokemonDetailDialog
-                pokemon={selectedPokemon}
-                open={isDialogOpen}
-                onOpenChange={setIsDialogOpen}
-            />
         </div>
     );
 }
