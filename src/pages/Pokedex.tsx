@@ -24,21 +24,27 @@ export default function Pokedex() {
     const [search, setSearch] = useState('');
     const [generationFilter, setGenerationFilter] = useState('all');
 
-    // Fetch caught counts
-    const { data: caughtCounts, isLoading: caughtLoading } = useQuery({
-        queryKey: ['caughtCounts', user?.id],
+    // Fetch caught counts/data
+    const { data: caughtData, isLoading: caughtLoading } = useQuery({
+        queryKey: ['caughtData', user?.id],
         queryFn: async () => {
             if (!user) return {};
             const { data, error } = await supabase
                 .from('caught_shinies')
-                .select('pokemon_id');
+                .select('pokemon_id, gender, form');
             if (error) throw error;
 
-            const counts: Record<number, number> = {};
+            const caught: Record<number, { count: number, genders: Set<string>, forms: Set<string> }> = {};
             data?.forEach(row => {
-                counts[row.pokemon_id] = (counts[row.pokemon_id] || 0) + 1;
+                const id = row.pokemon_id;
+                if (!caught[id]) {
+                    caught[id] = { count: 0, genders: new Set(), forms: new Set() };
+                }
+                caught[id].count++;
+                if (row.gender) caught[id].genders.add(row.gender);
+                if (row.form) caught[id].forms.add(row.form);
             });
-            return counts;
+            return caught;
         },
         enabled: !!user,
         initialData: {}
@@ -111,7 +117,7 @@ export default function Pokedex() {
     }, [speciesGroups, search, generationFilter]);
 
     // Total caught count
-    const totalCaughtCount = Object.values(caughtCounts || {}).reduce((a, b) => (Number(a) || 0) + (Number(b) || 0), 0);
+    const totalCaughtCount = Object.values(caughtData || {}).reduce((a, b) => (Number(a.count) || 0) + (Number(b) || 0), 0);
 
     return (
         <div className="min-h-screen bg-background transition-colors duration-1000" style={{ backgroundImage: `radial-gradient(circle at 50% 0%, ${accentColor}15 0%, transparent 70%)` }}>
@@ -182,25 +188,34 @@ export default function Pokedex() {
                                 const p = group[0];
 
                                 const isRegional = p.name.includes('-alola') || p.name.includes('-galar') || p.name.includes('-hisui') || p.name.includes('-paldea');
-                                const hasGenderDiff = !isRegional && POKEMON_WITH_GENDER_DIFF.includes(p.baseId);
+                                // Special forms like Pikachu Partner Cap (10148) should NOT show gender differences even if base Pikachu does
+                                const hasGenderDiff = !isRegional && (p.id < 10000) && POKEMON_WITH_GENDER_DIFF.includes(p.baseId);
 
                                 // Check for specific female form in group (e.g. Meowstic-Female ID 10025)
                                 const femaleVariant = group.find(v => v.name.endsWith('-female') && v.id !== p.id);
                                 const femaleId = femaleVariant ? femaleVariant.id : undefined;
 
-                                // Calculate caught status for the whole group
-                                const groupCaught = group.reduce((acc, g) => acc + (caughtCounts[g.id] || 0), 0);
-                                const isCaught = groupCaught > 0;
+                                // Granular caught status
+                                // 1. Check if male (base) is caught
+                                const isMaleCaught = caughtData[p.id]?.count > 0 &&
+                                    (!hasGenderDiff || caughtData[p.id]?.genders.has('male') || caughtData[p.id]?.forms.has(p.name));
+
+                                // 2. Check if female is caught
+                                const fid = femaleId || p.id;
+                                const isFemaleCaught = hasGenderDiff && (
+                                    (femaleId && caughtData[femaleId]?.count > 0) ||
+                                    (!femaleId && caughtData[p.id]?.genders.has('female'))
+                                );
+
+                                // Group caught status for card visibility
+                                const isCaught = isMaleCaught || isFemaleCaught;
 
                                 let totalVars = 1;
                                 if (hasGenderDiff) totalVars = 2;
                                 if (POKEMON_FORM_COUNTS[p.id]) totalVars = POKEMON_FORM_COUNTS[p.id];
 
-                                // Use max caught count of group for progress? Or sum?
-                                // If group has multiple IDs (Male + Female), caught status tracks them individually?
-                                // Sync logic usually counts distinct forms.
-                                // Let's use simple logic: if any in group is caught, show as caught. Percentage is rough estimate.
-                                const pct = Math.min(100, (groupCaught / totalVars) * 100);
+                                const caughtCount = (isMaleCaught ? 1 : 0) + (isFemaleCaught ? 1 : 0);
+                                const pct = Math.min(100, (caughtCount / totalVars) * 100);
 
                                 return (
                                     <PokedexCard
@@ -209,12 +224,13 @@ export default function Pokedex() {
                                         baseId={p.baseId}
                                         displayName={p.displayName}
                                         spriteUrl={getPokemonSpriteUrl(p.id, { shiny: true, name: p.name })}
-                                        // Pass specific female ID if found (e.g. 10025), otherwise fallback to base ID + flag (e.g. 25 + female=true)
                                         femaleSprite={hasGenderDiff
                                             ? getPokemonSpriteUrl(femaleId || p.id, { shiny: true, female: !femaleId, name: p.name })
                                             : undefined
                                         }
                                         hasGenderDiff={hasGenderDiff}
+                                        isMaleCaught={isMaleCaught}
+                                        isFemaleCaught={isFemaleCaught}
                                         caughtPercentage={pct}
                                         hasCaughtAny={isCaught}
                                         onClick={() => {

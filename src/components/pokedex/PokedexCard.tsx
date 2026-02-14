@@ -9,6 +9,8 @@ interface PokedexCardProps {
     spriteUrl: string;
     femaleSprite?: string;
     hasGenderDiff: boolean;
+    isMaleCaught?: boolean;
+    isFemaleCaught?: boolean;
     caughtPercentage: number; // 0-100
     hasCaughtAny: boolean;
     onClick: () => void;
@@ -21,6 +23,8 @@ export const PokedexCard = memo(function PokedexCard({
     spriteUrl,
     femaleSprite,
     hasGenderDiff,
+    isMaleCaught = false,
+    isFemaleCaught = false,
     caughtPercentage,
     hasCaughtAny,
     onClick
@@ -44,11 +48,11 @@ export const PokedexCard = memo(function PokedexCard({
                 !hasCaughtAny && "border-white/5 grayscale hover:grayscale-0",
             )}
             style={{
-                borderColor: hasCaughtAny ? accentColor : undefined,
+                borderColor: hasCaughtAny ? `color-mix(in srgb, ${accentColor}, transparent ${isComplete ? 0 : 40}%)` : undefined,
                 boxShadow: isComplete ? `0 0 25px ${accentColor}60` : undefined,
                 backgroundColor: !hasCaughtAny
                     ? 'rgba(0, 0, 0, 0.6)'
-                    : `color-mix(in srgb, ${accentColor}, black 80%)`,
+                    : `color-mix(in srgb, ${accentColor}, black 85%)`,
                 '--glow-opacity': glowIntensity,
             } as React.CSSProperties}
             onMouseEnter={(e) => {
@@ -61,12 +65,9 @@ export const PokedexCard = memo(function PokedexCard({
             {/* Background gradient for partial completion */}
             {isPartial && (
                 <div
-                    className="absolute inset-0"
+                    className="absolute inset-0 z-0"
                     style={{
-                        height: `${caughtPercentage}%`,
-                        bottom: 0,
-                        top: 'auto',
-                        background: 'linear-gradient(to top, color-mix(in srgb, var(--primary), transparent 70%), transparent)'
+                        background: `linear-gradient(to right, ${accentColor}10, transparent)`
                     }}
                 />
             )}
@@ -93,9 +94,9 @@ export const PokedexCard = memo(function PokedexCard({
                                 alt={`${displayName} shiny`}
                                 className={cn(
                                     "h-full w-full pokemon-sprite transition-all duration-500 object-contain max-h-48",
-                                    hasCaughtAny
-                                        ? "drop-shadow-[0_0_12px_rgba(255,255,255,0.7)] scale-105"
-                                        : "opacity-60 group-hover:opacity-100 group-hover:scale-110"
+                                    isMaleCaught
+                                        ? "drop-shadow-[0_0_12px_rgba(255,255,255,0.8)] scale-105 brightness-110"
+                                        : "opacity-40 grayscale group-hover:opacity-60"
                                 )}
                                 style={{ imageRendering: 'auto' }}
                                 loading="lazy"
@@ -114,9 +115,9 @@ export const PokedexCard = memo(function PokedexCard({
                                 alt={`${displayName} shiny female`}
                                 className={cn(
                                     "h-full w-full pokemon-sprite transition-all duration-500 object-contain max-h-40",
-                                    hasCaughtAny
-                                        ? "drop-shadow-[0_0_12px_rgba(255,255,255,0.7)] scale-105"
-                                        : "opacity-60 group-hover:opacity-100 group-hover:scale-110"
+                                    isFemaleCaught
+                                        ? "drop-shadow-[0_0_12px_rgba(255,255,255,0.8)] scale-105 brightness-110"
+                                        : "opacity-40 grayscale group-hover:opacity-60"
                                 )}
                                 style={{ imageRendering: 'auto' }}
                                 loading="lazy"
@@ -134,7 +135,7 @@ export const PokedexCard = memo(function PokedexCard({
                 </p>
                 <p className={cn(
                     "text-sm font-medium truncate max-w-full transition-colors",
-                    hasCaughtAny && "text-white drop-shadow-[0_0_5px_rgba(var(--primary),0.8)]"
+                    isComplete ? "text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.5)]" : "text-muted-foreground"
                 )}>
                     {displayName}
                 </p>
@@ -143,10 +144,10 @@ export const PokedexCard = memo(function PokedexCard({
             {/* Completion indicator */}
             {hasCaughtAny && (
                 <div className={cn(
-                    "absolute top-1 right-1 flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold",
+                    "absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold shadow-sm",
                     isComplete
-                        ? "bg-primary/80 text-white"
-                        : "bg-primary/40 text-primary-foreground/80"
+                        ? "bg-primary text-white"
+                        : "bg-white/10 text-white/80"
                 )}>
                     {isComplete ? "✓" : `${Math.round(caughtPercentage)}%`}
                 </div>
