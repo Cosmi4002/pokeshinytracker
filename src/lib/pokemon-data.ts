@@ -402,6 +402,10 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
     return `${baseUrl}/shiny/10254.png`; // Hardcoded ID for Oinkologne Female form if needed, or rely on passed ID
   }
 
+  if (name && name.toLowerCase() === 'pikachu-partner-cap') {
+    return 'https://img.pokemondb.net/sprites/home/normal/pikachu-partner-cap.png';
+  }
+
   // Use the ID directly. 
   // Note: HOME sprites don't have female-specific filenames in the same folder usually, 
   // but PokeAPI maps forms to IDs. 

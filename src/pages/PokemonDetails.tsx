@@ -69,20 +69,38 @@ export default function PokemonDetails() {
     }, [user, pokemonId, details]);
 
     const fetchCaughtStatus = async () => {
-        if (!user || !pokemonId) return;
+        if (!user || !details) return;
         try {
+            // Fetch all IDs present in our variants list
+            const variantIds = Array.from(new Set(variants.map(v => v.id)));
+
             const { data, error } = await supabase
                 .from('caught_shinies')
                 .select('pokemon_id, gender, form')
                 .eq('user_id', user.id)
-                .eq('pokemon_id', Number(pokemonId));
+                .in('pokemon_id', variantIds);
 
             if (error) throw error;
 
             const caughtSet = new Set<string>();
             data?.forEach(row => {
-                const key = row.form || `${row.pokemon_id}-${row.gender || 'genderless'}`;
-                caughtSet.add(key);
+                // Priority 1: Exact form name match (new standard)
+                if (row.form) {
+                    caughtSet.add(row.form);
+                } else {
+                    // Priority 2: Legacy fallback using ID and gender
+                    const g = row.gender || 'genderless';
+                    let matchedVariant = variants.find(v => v.id === row.pokemon_id && v.gender === g);
+
+                    // Second-chance fallback for base forms (often saved as genderless)
+                    if (!matchedVariant && g === 'genderless') {
+                        matchedVariant = variants.find(v => v.id === row.pokemon_id && v.category === 'base');
+                    }
+
+                    if (matchedVariant) {
+                        caughtSet.add(matchedVariant.name);
+                    }
+                }
             });
             setCaughtForms(caughtSet);
         } catch (err) {
@@ -298,18 +316,6 @@ export default function PokemonDetails() {
                     </Button>
 
                     <div className="flex gap-3">
-                        {prevId && (
-                            <Button variant="outline" size="sm" onClick={() => navigate(`/pokedex/${prevId}`)} className="rounded-xl border-white/10 bg-white/5 hover:bg-white/10">
-                                <ChevronLeft className="h-4 w-4 mr-1" />
-                                Precedente
-                            </Button>
-                        )}
-                        {nextId && (
-                            <Button variant="outline" size="sm" onClick={() => navigate(`/pokedex/${nextId}`)} className="rounded-xl border-white/10 bg-white/5 hover:bg-white/10">
-                                Successivo
-                                <ChevronRight className="h-4 w-4 ml-1" />
-                            </Button>
-                        )}
                     </div>
                 </div>
 
@@ -435,32 +441,34 @@ export default function PokemonDetails() {
                                 return (
                                     <button
                                         key={variant.name}
-                                        disabled={isLoading}
                                         onClick={() => toggleCaught(variant)}
                                         className={cn(
-                                            "group relative flex flex-col items-center p-5 rounded-[2rem] transition-all duration-500",
-                                            "border outline-none focus:ring-2 ring-primary/40 focus:ring-offset-8 ring-offset-background",
+                                            "group relative flex flex-col items-center justify-center p-4 rounded-[1.5rem] transition-all duration-500 transform active:scale-95",
                                             isCaught
-                                                ? "bg-primary/10 border-primary/40 shadow-[0_15px_30px_-10px_rgba(var(--primary),0.4)] scale-100"
-                                                : "bg-white/[0.03] border-white/5 hover:border-white/20 hover:bg-white/[0.06] hover:-translate-y-2"
+                                                ? "bg-white/5 border-2 shadow-lg"
+                                                : "bg-white/[0.02] border border-white/10 hover:border-white/20 hover:bg-white/[0.04]"
                                         )}
+                                        style={{
+                                            borderColor: isCaught ? accentColor : undefined,
+                                            boxShadow: isCaught ? `0 0 20px ${accentColor}40` : undefined
+                                        }}
                                     >
-                                        <div className="relative w-full aspect-square mb-4 flex items-center justify-center">
-                                            {/* Glow behind caught pokemon */}
-                                            {isCaught && (
-                                                <div className="absolute inset-0 bg-primary/20 blur-[40px] rounded-full animate-pulse" />
-                                            )}
+                                        <div className="relative w-full aspect-square mb-3 flex items-center justify-center">
                                             <img
                                                 src={variant.spriteUrl}
                                                 alt={variant.displayName}
                                                 className={cn(
-                                                    "w-[90%] h-[90%] object-contain transition-all duration-700 relative z-10",
-                                                    isCaught ? "drop-shadow-[0_10px_20px_rgba(0,0,0,0.3)] scale-110" : "opacity-30 grayscale group-hover:opacity-100 group-hover:grayscale-0 group-hover:scale-110"
+                                                    "w-full h-full object-contain pokemon-sprite transition-all duration-500",
+                                                    isCaught ? "scale-110 drop-shadow-lg" : "brightness-[0.3] grayscale group-hover:brightness-100 group-hover:grayscale-0"
                                                 )}
                                             />
+
                                             {isCaught && (
-                                                <div className="absolute -top-1 -right-1 p-1.5 bg-primary rounded-xl shadow-xl transform animate-in zoom-in-50 duration-500 z-20">
-                                                    <CheckCircle2 className="w-4 h-4 text-primary-foreground font-black" />
+                                                <div
+                                                    className="absolute -top-2 -right-2 p-1.5 rounded-full shadow-lg z-30 animate-in zoom-in-50 duration-300"
+                                                    style={{ backgroundColor: accentColor }}
+                                                >
+                                                    <CheckCircle2 className="w-4 h-4 text-white font-bold" />
                                                 </div>
                                             )}
                                             {isLoading && (

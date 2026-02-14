@@ -11,7 +11,6 @@
  */
 export const BANNED_FORM_NAMES: string[] = [
     // Add specific forms to eliminate here
-    'pikachu-partner-cap',
     'oinkologne-female',
     'urshifu-rapid-strike',
     'meowstic-female',
