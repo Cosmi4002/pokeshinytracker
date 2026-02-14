@@ -21,6 +21,15 @@ create policy "Configurazione visibile a tutti"
 on public.pokedex_overrides for select 
 using (true);
 
-create policy "Solo admin possono modificare" 
-on public.pokedex_overrides for all 
+create policy "Permetti inserimento ad autenticati" 
+on public.pokedex_overrides for insert 
+with check (auth.role() = 'authenticated');
+
+create policy "Permetti aggiornamento ad autenticati" 
+on public.pokedex_overrides for update 
+using (auth.role() = 'authenticated')
+with check (auth.role() = 'authenticated');
+
+create policy "Permetti eliminazione ad autenticati" 
+on public.pokedex_overrides for delete 
 using (auth.role() = 'authenticated');

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
 import { POKEMON_DATA_OVERRIDES, BANNED_FORM_NAMES } from '@/lib/form-filters';
+import { toast } from 'sonner';
 
 export interface PokedexOverride {
     pokemon_id: number;
@@ -91,10 +92,18 @@ export function usePokedexOverrides() {
                         updated_at: new Date().toISOString()
                     }, { onConflict: 'user_id,pokemon_id,pokemon_name' } as any);
 
-                if (error) console.error("Supabase sync failed", error);
+                if (error) {
+                    console.error("Supabase sync failed:", error);
+                    toast.error(`Errore sincronizzazione: ${error.message}`);
+                } else {
+                    toast.success("Modifica salvata globalmente!");
+                }
             } catch (e) {
                 console.warn("Supabase table might not exist yet", e);
+                toast.error("Errore: Tabella database mancante.");
             }
+        } else {
+            toast.info("Modifica salvata solo in locale (non sei loggato).");
         }
     };
 
