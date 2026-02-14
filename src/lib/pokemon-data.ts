@@ -410,6 +410,29 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
     return 'https://www.pokepedia.fr/images/8/80/Sprite_0892_Mille_Poings_chromatique_HOME.png';
   }
 
+  // Silvally overrides
+  if (name && name.toLowerCase().includes('silvally')) {
+    const sName = name.toLowerCase();
+    if (sName === 'silvally') return 'https://www.pokepedia.fr/images/3/30/Sprite_0773_chromatique_HOME-v1.png';
+    if (sName.includes('fighting')) return 'https://www.pokepedia.fr/images/d/de/Sprite_0773_Combat_chromatique_HOME-v1.png';
+    if (sName.includes('flying')) return 'https://www.pokepedia.fr/images/1/15/Sprite_0773_Vol_chromatique_HOME-v1.png';
+    if (sName.includes('poison')) return 'https://www.pokepedia.fr/images/2/20/Sprite_0773_Poison_chromatique_HOME-v1.png';
+    if (sName.includes('ground')) return 'https://www.pokepedia.fr/images/e/e8/Sprite_0773_Sol_chromatique_HOME-v1.png';
+    if (sName.includes('rock')) return 'https://www.pokepedia.fr/images/3/31/Sprite_0773_Roche_chromatique_HOME-v1.png';
+    if (sName.includes('bug')) return 'https://www.pokepedia.fr/images/c/c5/Sprite_0773_Insecte_chromatique_HOME-v1.png';
+    if (sName.includes('ghost')) return 'https://www.pokepedia.fr/images/4/48/Sprite_0773_Spectre_chromatique_HOME-v1.png';
+    if (sName.includes('steel')) return 'https://www.pokepedia.fr/images/7/7a/Sprite_0773_Acier_chromatique_HOME-v1.png';
+    if (sName.includes('fire')) return 'https://www.pokepedia.fr/images/4/4f/Sprite_0773_Feu_chromatique_HOME-v1.png';
+    if (sName.includes('water')) return 'https://www.pokepedia.fr/images/4/4c/Sprite_0773_Eau_chromatique_HOME-v1.png';
+    if (sName.includes('grass')) return 'https://www.pokepedia.fr/images/7/7e/Sprite_0773_Plante_chromatique_HOME-v1.png';
+    if (sName.includes('electric')) return 'https://www.pokepedia.fr/images/3/32/Sprite_0773_%C3%89lectrik_chromatique_HOME-v1.png';
+    if (sName.includes('psychic')) return 'https://www.pokepedia.fr/images/0/02/Sprite_0773_Psy_chromatique_HOME-v1.png';
+    if (sName.includes('ice')) return 'https://www.pokepedia.fr/images/4/4a/Sprite_0773_Glace_chromatique_HOME-v1.png';
+    if (sName.includes('dragon')) return 'https://www.pokepedia.fr/images/1/16/Sprite_0773_Dragon_chromatique_HOME-v1.png';
+    if (sName.includes('dark')) return 'https://www.pokepedia.fr/images/0/0e/Sprite_0773_T%C3%A9n%C3%A8bres_chromatique_HOME-v1.png';
+    if (sName.includes('fairy')) return 'https://www.pokepedia.fr/images/7/70/Sprite_0773_F%C3%A9e_chromatique_HOME-v1.png';
+  }
+
   // Use the ID directly. 
   // Note: HOME sprites don't have female-specific filenames in the same folder usually, 
   // but PokeAPI maps forms to IDs. 
