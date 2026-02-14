@@ -6508,5 +6508,11 @@
     "baseId": 892,
     "name": "urshifu-rapid-strike",
     "generation": 8
+  },
+  {
+    "id": 10001,
+    "baseId": 386,
+    "name": "deoxys-attack",
+    "generation": 3
   }
 ]

@@ -433,6 +433,162 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
     if (sName.includes('fairy')) return 'https://www.pokepedia.fr/images/7/70/Sprite_0773_F%C3%A9e_chromatique_HOME-v1.png';
   }
 
+  // Deerling seasonal overrides
+  if (name && name.toLowerCase().includes('deerling')) {
+    const sName = name.toLowerCase();
+    if (sName.includes('summer')) return 'https://www.pokepedia.fr/images/c/c8/Sprite_0585_%C3%89t%C3%A9_chromatique_HOME-v1.png';
+    if (sName.includes('autumn')) return 'https://www.pokepedia.fr/images/8/84/Sprite_0585_Automne_chromatique_HOME-v1.png';
+    if (sName.includes('winter')) return 'https://www.pokepedia.fr/images/d/d0/Sprite_0585_Hiver_chromatique_HOME-v1.png';
+  }
+
+  // Sawsbuck seasonal overrides
+  if (name && name.toLowerCase().includes('sawsbuck')) {
+    const sName = name.toLowerCase();
+    if (sName.includes('summer')) return 'https://www.pokepedia.fr/images/b/ba/Sprite_0586_%C3%89t%C3%A9_chromatique_HOME-v1.png';
+    if (sName.includes('autumn')) return 'https://www.pokepedia.fr/images/3/3c/Sprite_0586_Automne_chromatique_HOME-v1.png';
+    if (sName.includes('winter')) return 'https://www.pokepedia.fr/images/a/a6/Sprite_0586_Hiver_chromatique_HOME-v1.png';
+  }
+
+  // Arceus type overrides
+  if (name && name.toLowerCase().includes('arceus-')) {
+    const sName = name.toLowerCase();
+    if (sName.includes('bug')) return 'https://img.pokemondb.net/sprites/home/shiny/arceus-bug.png';
+    if (sName.includes('dark')) return 'https://img.pokemondb.net/sprites/home/shiny/arceus-dark.png';
+    if (sName.includes('dragon')) return 'https://img.pokemondb.net/sprites/home/shiny/arceus-dragon.png';
+    if (sName.includes('electric')) return 'https://img.pokemondb.net/sprites/home/shiny/arceus-electric.png';
+    if (sName.includes('fighting')) return 'https://img.pokemondb.net/sprites/home/shiny/arceus-fighting.png';
+    if (sName.includes('fire')) return 'https://img.pokemondb.net/sprites/home/shiny/arceus-fire.png';
+    if (sName.includes('flying')) return 'https://img.pokemondb.net/sprites/home/shiny/arceus-flying.png';
+    if (sName.includes('ghost')) return 'https://img.pokemondb.net/sprites/home/shiny/arceus-ghost.png';
+    if (sName.includes('grass')) return 'https://img.pokemondb.net/sprites/home/shiny/arceus-grass.png';
+    if (sName.includes('ground')) return 'https://img.pokemondb.net/sprites/home/shiny/arceus-ground.png';
+    if (sName.includes('ice')) return 'https://img.pokemondb.net/sprites/home/shiny/arceus-ice.png';
+    if (sName.includes('poison')) return 'https://img.pokemondb.net/sprites/home/shiny/arceus-poison.png';
+    if (sName.includes('psychic')) return 'https://img.pokemondb.net/sprites/home/shiny/arceus-psychic.png';
+    if (sName.includes('rock')) return 'https://img.pokemondb.net/sprites/home/shiny/arceus-rock.png';
+    if (sName.includes('steel')) return 'https://img.pokemondb.net/sprites/home/shiny/arceus-steel.png';
+    if (sName.includes('water')) return 'https://img.pokemondb.net/sprites/home/shiny/arceus-water.png';
+    if (sName.includes('fairy')) return 'https://img.pokemondb.net/sprites/home/shiny/arceus-fairy.png';
+  }
+
+  // Shellos & Gastrodon East overrides
+  if (name && name.toLowerCase().includes('shellos-east')) {
+    return 'https://img.pokemondb.net/sprites/home/shiny/shellos-east.png';
+  }
+  if (name && name.toLowerCase().includes('gastrodon-east')) {
+    return 'https://www.pokepedia.fr/images/6/60/Sprite_0423_Orient_chromatique_HOME-v1.png';
+  }
+
+  // Unown overrides
+  if (name && name.toLowerCase().startsWith('unown-')) {
+    const sName = name.toLowerCase();
+    if (sName === 'unown-b') return 'https://img.pokemondb.net/sprites/home/shiny/unown-b.png';
+    if (sName === 'unown-c') return 'https://img.pokemondb.net/sprites/home/shiny/unown-c.png';
+    if (sName === 'unown-d') return 'https://img.pokemondb.net/sprites/home/shiny/unown-d.png';
+    if (sName === 'unown-e') return 'https://img.pokemondb.net/sprites/home/shiny/unown-e.png';
+    if (sName === 'unown-f') return 'https://img.pokemondb.net/sprites/home/shiny/unown-f.png';
+    if (sName === 'unown-g') return 'https://img.pokemondb.net/sprites/home/shiny/unown-g.png';
+    if (sName === 'unown-h') return 'https://img.pokemondb.net/sprites/home/shiny/unown-h.png';
+    if (sName === 'unown-i') return 'https://img.pokemondb.net/sprites/home/shiny/unown-i.png';
+    if (sName === 'unown-j') return 'https://img.pokemondb.net/sprites/home/shiny/unown-j.png';
+    if (sName === 'unown-k') return 'https://img.pokemondb.net/sprites/home/shiny/unown-k.png';
+    if (sName === 'unown-l') return 'https://img.pokemondb.net/sprites/home/shiny/unown-l.png';
+    if (sName === 'unown-m') return 'https://img.pokemondb.net/sprites/home/shiny/unown-m.png';
+    if (sName === 'unown-n') return 'https://img.pokemondb.net/sprites/home/shiny/unown-n.png';
+    if (sName === 'unown-o') return 'https://img.pokemondb.net/sprites/home/shiny/unown-o.png';
+    if (sName === 'unown-p') return 'https://img.pokemondb.net/sprites/home/shiny/unown-p.png';
+    if (sName === 'unown-q') return 'https://img.pokemondb.net/sprites/home/shiny/unown-q.png';
+    if (sName === 'unown-r') return 'https://img.pokemondb.net/sprites/home/shiny/unown-r.png';
+    if (sName === 'unown-s') return 'https://img.pokemondb.net/sprites/home/shiny/unown-s.png';
+    if (sName === 'unown-t') return 'https://img.pokemondb.net/sprites/home/shiny/unown-t.png';
+    if (sName === 'unown-u') return 'https://img.pokemondb.net/sprites/home/shiny/unown-u.png';
+    if (sName === 'unown-v') return 'https://img.pokemondb.net/sprites/home/shiny/unown-v.png';
+    if (sName === 'unown-w') return 'https://img.pokemondb.net/sprites/home/shiny/unown-w.png';
+    if (sName === 'unown-x') return 'https://img.pokemondb.net/sprites/home/shiny/unown-x.png';
+    if (sName === 'unown-y') return 'https://img.pokemondb.net/sprites/home/shiny/unown-y.png';
+    if (sName === 'unown-z') return 'https://img.pokemondb.net/sprites/home/shiny/unown-z.png';
+    if (sName === 'unown-exclamation' || sName.includes('!')) return 'https://img.pokemondb.net/sprites/home/shiny/unown-em.png';
+    if (sName === 'unown-question' || sName.includes('?')) return 'https://img.pokemondb.net/sprites/home/shiny/unown-qm.png';
+  }
+
+  // Deoxys Attack override
+  if (name && name.toLowerCase().includes('deoxys-attack')) {
+    return 'https://img.pokemondb.net/sprites/home/shiny/deoxys-attack.png';
+  }
+
+  // Burmy overrides
+  if (name && name.toLowerCase().includes('burmy')) {
+    const sName = name.toLowerCase();
+    if (sName.includes('trash')) return 'https://img.pokemondb.net/sprites/home/shiny/burmy-trash.png';
+    if (sName.includes('sandy')) return 'https://img.pokemondb.net/sprites/home/shiny/burmy-sandy.png';
+  }
+
+  // Flabébé line overrides
+  if (name && (name.toLowerCase().includes('flabebe') || name.toLowerCase().includes('floette') || name.toLowerCase().includes('florges'))) {
+    const sName = name.toLowerCase();
+    if (sName.includes('yellow') || sName.includes('jaune')) {
+      if (sName.includes('flabebe')) return 'https://www.pokepedia.fr/images/6/68/Sprite_0669_Jaune_chromatique_HOME-v1.png';
+      if (sName.includes('floette')) return 'https://www.pokepedia.fr/images/3/38/Sprite_0670_Jaune_chromatique_HOME-v1.png';
+      if (sName.includes('florges')) return 'https://img.pokemondb.net/sprites/home/shiny/florges-yellow.png';
+    }
+    if (sName.includes('orange')) {
+      if (sName.includes('flabebe')) return 'https://www.pokepedia.fr/images/3/35/Sprite_0669_Orange_chromatique_HOME-v1.png';
+      if (sName.includes('floette')) return 'https://www.pokepedia.fr/images/1/16/Sprite_0670_Orange_chromatique_HOME-v1.png';
+      if (sName.includes('florges')) return 'https://img.pokemondb.net/sprites/home/shiny/florges-orange.png';
+    }
+    if (sName.includes('blue') || sName.includes('bleue')) {
+      if (sName.includes('flabebe')) return 'https://www.pokepedia.fr/images/e/ee/Sprite_0669_Bleue_chromatique_HOME-v1.png';
+      if (sName.includes('floette')) return 'https://www.pokepedia.fr/images/c/c8/Sprite_0670_Bleue_chromatique_HOME-v1.png';
+      if (sName.includes('florges')) return 'https://img.pokemondb.net/sprites/home/shiny/florges-blue.png';
+    }
+    if (sName.includes('white') || sName.includes('blanche')) {
+      if (sName.includes('flabebe')) return 'https://www.pokepedia.fr/images/a/a4/Sprite_0669_Blanche_chromatique_HOME-v1.png';
+      if (sName.includes('floette')) return 'https://www.pokepedia.fr/images/d/d1/Sprite_0670_Blanche_chromatique_HOME-v1.png';
+      if (sName.includes('florges')) return 'https://img.pokemondb.net/sprites/home/shiny/florges-white.png';
+    }
+  }
+
+  // Vivillon overrides
+  if (name && name.toLowerCase().includes('vivillon')) {
+    const sName = name.toLowerCase();
+    if (sName.includes('meadow')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-meadow.png';
+    if (sName.includes('icy-snow')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-icy-snow.png';
+    if (sName.includes('polar')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-polar.png';
+    if (sName.includes('tundra')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-tundra.png';
+    if (sName.includes('continental')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-continental.png';
+    if (sName.includes('garden')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-garden.png';
+    if (sName.includes('elegant')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-elegant.png';
+    if (sName.includes('modern')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-modern.png';
+    if (sName.includes('marine')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-marine.png';
+    if (sName.includes('fancy')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-fancy.png';
+    if (sName.includes('archipelago')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-archipelago.png';
+    if (sName.includes('high-plains')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-high-plains.png';
+    if (sName.includes('sandstorm')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-sandstorm.png';
+    if (sName.includes('river')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-river.png';
+    if (sName.includes('monsoon')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-monsoon.png';
+    if (sName.includes('savanna')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-savanna.png';
+    if (sName.includes('sun')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-sun.png';
+    if (sName.includes('ocean')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-ocean.png';
+    if (sName.includes('jungle')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-jungle.png';
+  }
+
+  // Alcremie overrides based on Sweet type
+  if (name && name.toLowerCase().includes('alcremie')) {
+    const sName = name.toLowerCase();
+    if (sName.includes('strawberry')) return 'https://img.pokemondb.net/sprites/home/shiny/alcremie-rainbow-swirl-strawberry.png';
+    if (sName.includes('ribbon')) return 'https://img.pokemondb.net/sprites/home/shiny/alcremie-ruby-cream-ribbon.png';
+    if (sName.includes('flower')) return 'https://img.pokemondb.net/sprites/home/shiny/alcremie-ruby-cream-flower.png';
+    if (sName.includes('love')) return 'https://img.pokemondb.net/sprites/home/shiny/alcremie-ruby-cream-love.png';
+    if (sName.includes('clover')) return 'https://img.pokemondb.net/sprites/home/shiny/alcremie-ruby-cream-clover.png';
+    if (sName.includes('berry')) return 'https://img.pokemondb.net/sprites/home/shiny/alcremie-ruby-cream-berry.png';
+    if (sName.includes('star')) return 'https://img.pokemondb.net/sprites/home/shiny/alcremie-salted-cream-star.png';
+  }
+
+  // Minior (Red) override
+  if (name && name.toLowerCase().includes('minior') && name.toLowerCase().includes('red')) {
+    return 'https://img.pokemondb.net/sprites/home/shiny/minior-core.png';
+  }
+
   // Use the ID directly. 
   // Note: HOME sprites don't have female-specific filenames in the same folder usually, 
   // but PokeAPI maps forms to IDs. 
