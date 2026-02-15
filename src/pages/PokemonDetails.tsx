@@ -111,6 +111,8 @@ export default function PokemonDetails() {
     // Flatten all variants from the hook data
     const variants = useMemo((): FormVariant[] => {
         if (!details) return [];
+        console.log('[DETAILS-DEBUG] details.forms=', details.forms?.map(f => f.formName));
+        console.log('[DETAILS-DEBUG] details.varieties=', details.varieties?.map(v => v.pokemon.name));
         const items: FormVariant[] = [];
 
         // Base/Male

@@ -2580,6 +2580,24 @@
     "generation": 3
   },
   {
+    "id": 10001,
+    "baseId": 386,
+    "name": "deoxys-attack",
+    "generation": 3
+  },
+  {
+    "id": 10002,
+    "baseId": 386,
+    "name": "deoxys-defense",
+    "generation": 3
+  },
+  {
+    "id": 10003,
+    "baseId": 386,
+    "name": "deoxys-speed",
+    "generation": 3
+  },
+  {
     "id": 387,
     "baseId": 387,
     "name": "turtwig",

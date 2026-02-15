@@ -410,6 +410,14 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
     return 'https://www.pokepedia.fr/images/8/80/Sprite_0892_Mille_Poings_chromatique_HOME.png';
   }
 
+  // Deoxys form overrides
+  if (name && name.toLowerCase().includes('deoxys')) {
+    const sName = name.toLowerCase();
+    if (sName === 'deoxys-attack') return 'https://img.pokemondb.net/sprites/home/shiny/deoxys-attack.png';
+    if (sName === 'deoxys-defense') return `${baseUrl}/shiny/10002.png`;
+    if (sName === 'deoxys-speed') return `${baseUrl}/shiny/10003.png`;
+  }
+
   // Silvally overrides
   if (name && name.toLowerCase().includes('silvally')) {
     const sName = name.toLowerCase();

@@ -67,11 +67,7 @@ export const POKEMON_WITH_GENDER_DIFF = [
 
 // Manual Varieties to force inclusion for specific species
 export const MANUAL_VARIETIES: Record<number, { id: number, name: string }[]> = {
-  386: [
-    { id: 10001, name: 'deoxys-attack' },
-    { id: 10002, name: 'deoxys-defense' },
-    { id: 10003, name: 'deoxys-speed' }
-  ]
+  // 386: Deoxys removed, to be handled via standard API/JSON
 };
 
 // Generation ranges
@@ -222,16 +218,17 @@ export function usePokemonList() {
 
     function loadPokemonList() {
       try {
-        const list: PokemonBasic[] = pokedexData.map((p: any) => {
-          const override = (overrides[`${p.id}-${p.name}`] || POKEMON_DATA_OVERRIDES[p.id]) as any;
-          const isExcluded = override?.is_excluded || isFormEliminated(p.name);
+        const list: PokemonBasic[] = pokedexData
+          .map((p: any) => {
+            const override = (overrides[`${p.id}-${p.name}`] || POKEMON_DATA_OVERRIDES[p.id]) as any;
+            const isExcluded = override?.is_excluded || isFormEliminated(p.name);
 
-          return {
-            ...p,
-            displayName: override?.custom_display_name || formatPokemonName(p.name, p.id, p.baseId),
-            hideFromPokedex: isExcluded,
-          };
-        });
+            return {
+              ...p,
+              displayName: override?.custom_display_name || formatPokemonName(p.name, p.id, p.baseId),
+              hideFromPokedex: isExcluded,
+            };
+          });
 
         setPokemon(list);
         setLoading(false);
@@ -330,6 +327,7 @@ export function usePokemonDetails(pokemonId: number | null) {
         // 2. Fetch species varieties
         const pokedexEntry = pokedexData.find((p: any) => p.id === pokemonId);
         const baseId = pokedexEntry?.baseId || pokemonId!;
+        console.log('[DEOXYS-DEBUG] Step 1: pokemonId=', pokemonId, 'baseId=', baseId);
 
         try {
           const speciesResponse = await fetch(data.species.url);
@@ -359,7 +357,11 @@ export function usePokemonDetails(pokemonId: number | null) {
               const varietyId = varietyIdMatch ? parseInt(varietyIdMatch[1]) : null;
 
               const isExcluded = isFormEliminated(vn) || (overrides[`${varietyId}-${vn}`] as any)?.is_excluded;
-              if (isExcluded) continue;
+
+              // FORCE VISIBLE for Deoxys forms (ignore editor overrides)
+              if (varietyId && [10001, 10002, 10003].includes(varietyId)) {
+                // isExcluded = false; // logic below uses const, so we handle it by not skipping
+              } else if (isExcluded) continue;
 
               if (varietyId === pokemonId) {
                 varieties.push({
@@ -383,7 +385,7 @@ export function usePokemonDetails(pokemonId: number | null) {
               }
             }
           }
-        } catch (e) { /* ignore */ }
+        } catch (e) { console.error(e); }
 
         // Final result with overrides
         const override = (overrides[`${pokemonId}-${data.name}`] || POKEMON_DATA_OVERRIDES[pokemonId!]) as any;
