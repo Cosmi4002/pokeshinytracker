@@ -402,16 +402,6 @@ export default function PokemonDetails() {
                             </div>
                         </div>
 
-                        <div className="pt-4">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-10 rounded-xl border-white/5 bg-white/5 hover:bg-white/10 text-muted-foreground hover:text-foreground text-xs font-bold uppercase tracking-widest"
-                                onClick={() => window.open(`https://www.serebii.net/pokedex-sv/${details.name.toLowerCase()}`, '_blank')}
-                            >
-                                Info Serebii
-                            </Button>
-                        </div>
                     </div>
 
                     {/* Form Collection Section - Main Focus */}

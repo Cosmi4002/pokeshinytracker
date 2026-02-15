@@ -14,7 +14,6 @@ export const BANNED_FORM_NAMES: string[] = [
     'oinkologne-female',
     'meowstic-female',
     'indeedee-female',
-    'deoxys-attack',
 ];
 
 /**

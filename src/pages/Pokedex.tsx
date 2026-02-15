@@ -70,7 +70,11 @@ export default function Pokedex() {
         pokemon.forEach(p => {
             // Group by base ID AND name prefix (to group gender variants, but separate regional variants)
             // Clean name key: remove gender suffixes
-            const nameKey = p.name.replace(/-male$|-female$/, '');
+            let nameKey = p.name.replace(/-male$|-female$/, '');
+
+            // Special grouping for species with major form differences we want on one card
+            if (p.baseId === 892) nameKey = 'urshifu';
+
             // Key includes baseId to sort by dex number, but nameKey to distinguish Alola/Galar etc.
             const key = `${p.baseId}-${nameKey}`;
 
