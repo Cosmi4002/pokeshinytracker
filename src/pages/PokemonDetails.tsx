@@ -173,7 +173,7 @@ export default function PokemonDetails() {
             items.push({
                 id: v.pokemon.id,
                 name: v.pokemon.name,
-                displayName: v.pokemon.name,
+                displayName: (overrides[`${v.pokemon.id}-${v.pokemon.name}`] as any)?.custom_display_name || formatPokemonName(v.pokemon.name, v.pokemon.id),
                 category,
                 gender: 'genderless',
                 spriteUrl: v.pokemon.spriteUrl

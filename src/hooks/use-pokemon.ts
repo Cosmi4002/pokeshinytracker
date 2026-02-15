@@ -65,6 +65,15 @@ export const POKEMON_WITH_GENDER_DIFF = [
   592, 593, 667, 668, 678, 876, 902, 916
 ];
 
+// Manual Varieties to force inclusion for specific species
+export const MANUAL_VARIETIES: Record<number, { id: number, name: string }[]> = {
+  386: [
+    { id: 10001, name: 'deoxys-attack' },
+    { id: 10002, name: 'deoxys-defense' },
+    { id: 10003, name: 'deoxys-speed' }
+  ]
+};
+
 // Generation ranges
 export const GENERATION_RANGES: Record<number, [number, number]> = {
   1: [1, 151],
@@ -147,7 +156,7 @@ export function formatPokemonName(name: string, id: number, baseId?: number): st
 
   // Urshifu name overrides
   if (name.toLowerCase().includes('urshifu-single-strike')) return 'Urshifu';
-  if (name.toLowerCase().includes('urshifu-rapid-strike')) return 'Urshifu Rapid Strike';
+  if (name.toLowerCase().includes('urshifu-rapid-strike')) return 'Urshifu';
 
   // Wishiwashi name overrides
   if (name.toLowerCase().includes('wishiwashi-solo')) return 'Wishiwashi';
@@ -326,8 +335,21 @@ export function usePokemonDetails(pokemonId: number | null) {
           const speciesResponse = await fetch(data.species.url);
           const speciesData = await speciesResponse.json();
 
-          if (speciesData.varieties) {
-            for (const variety of speciesData.varieties) {
+          // Combine API varieties with manual overrides
+          const allVarieties = [...(speciesData.varieties || [])];
+          const manuals = MANUAL_VARIETIES[baseId] || [];
+
+          manuals.forEach(m => {
+            if (!allVarieties.some(v => v.pokemon.name === m.name)) {
+              allVarieties.push({
+                is_default: false,
+                pokemon: { name: m.name, url: `https://pokeapi.co/api/v2/pokemon/${m.id}/` }
+              });
+            }
+          });
+
+          if (allVarieties) {
+            for (const variety of allVarieties) {
               const vn = variety.pokemon.name.toLowerCase();
               if (vn.includes('-mega') || vn.includes('-gmax')) continue;
               if (vn.startsWith('minior-') && vn.includes('-meteor')) continue;
