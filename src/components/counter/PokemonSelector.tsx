@@ -42,11 +42,6 @@ export function PokemonSelector({ value, onChange }: PokemonSelectorProps) {
       );
   }, [pokemon, searchTerm]);
 
-  const [imgError, setImgError] = useState(false);
-  useEffect(() => {
-    setImgError(false);
-  }, [value]);
-
   return (
     <Popover open={open} onOpenChange={setOpen} modal={true}>
       <PopoverTrigger asChild>
@@ -59,10 +54,13 @@ export function PokemonSelector({ value, onChange }: PokemonSelectorProps) {
           {selectedPokemon ? (
             <div className="flex items-center gap-2">
               <img
-                src={imgError ? '/placeholder.svg' : getPokemonSpriteUrl(selectedPokemon.id, { shiny: true, name: selectedPokemon.name })}
+                key={getPokemonSpriteUrl(selectedPokemon.id, { shiny: true, name: selectedPokemon.name })}
+                src={getPokemonSpriteUrl(selectedPokemon.id, { shiny: true, name: selectedPokemon.name })}
                 alt={selectedPokemon.displayName}
                 className="h-8 w-8 pokemon-sprite object-contain"
-                onError={() => setImgError(true)}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/placeholder.svg';
+                }}
               />
               <span>#{selectedPokemon.baseId.toString().padStart(4, '0')} {selectedPokemon.displayName}</span>
             </div>
@@ -101,6 +99,7 @@ export function PokemonSelector({ value, onChange }: PokemonSelectorProps) {
                   className="flex items-center gap-2"
                 >
                   <img
+                    key={getPokemonSpriteUrl(p.id, { shiny: true, name: p.name })}
                     src={getPokemonSpriteUrl(p.id, { shiny: true, name: p.name })}
                     alt={p.displayName}
                     className="h-8 w-8 pokemon-sprite object-contain"

@@ -560,54 +560,57 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
   // Vivillon overrides
   if (name && name.toLowerCase().includes('vivillon')) {
     const sName = name.toLowerCase();
-    if (sName.includes('meadow')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-meadow.png';
-    if (sName.includes('icy-snow')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-icy-snow.png';
-    if (sName.includes('polar')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-polar.png';
-    if (sName.includes('tundra')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-tundra.png';
-    if (sName.includes('continental')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-continental.png';
-    if (sName.includes('garden')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-garden.png';
-    if (sName.includes('elegant')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-elegant.png';
-    if (sName.includes('modern')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-modern.png';
-    if (sName.includes('marine')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-marine.png';
-    if (sName.includes('fancy')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-fancy.png';
-    if (sName.includes('archipelago')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-archipelago.png';
-    if (sName.includes('high-plains')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-high-plains.png';
-    if (sName.includes('sandstorm')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-sandstorm.png';
-    if (sName.includes('river')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-river.png';
-    if (sName.includes('monsoon')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-monsoon.png';
-    if (sName.includes('savanna')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-savanna.png';
-    if (sName.includes('sun')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-sun.png';
-    if (sName.includes('ocean')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-ocean.png';
-    if (sName.includes('jungle')) return 'https://img.pokemondb.net/sprites/home/shiny/vivillon-jungle.png';
+    const subPath = shiny ? 'shiny' : 'normal';
+
+    // Check for specific patterns
+    const patterns = [
+      'meadow', 'icy-snow', 'polar', 'tundra', 'continental', 'garden',
+      'elegant', 'modern', 'marine', 'fancy', 'archipelago', 'high-plains',
+      'sandstorm', 'river', 'monsoon', 'savanna', 'sun', 'ocean', 'jungle'
+    ];
+
+    for (const pattern of patterns) {
+      if (sName.includes(pattern)) {
+        return `https://img.pokemondb.net/sprites/home/${subPath}/vivillon-${pattern}.png`;
+      }
+    }
+
+    // Poke-ball pattern is special
+    if (sName.includes('poke-ball')) {
+      return `https://img.pokemondb.net/sprites/home/${subPath}/vivillon-pokeball.png`;
+    }
   }
 
   // Alcremie overrides based on Sweet type
   if (name && name.toLowerCase().includes('alcremie')) {
     const sName = name.toLowerCase();
-    if (sName.includes('strawberry')) return 'https://img.pokemondb.net/sprites/home/shiny/alcremie-rainbow-swirl-strawberry.png';
-    if (sName.includes('ribbon')) return 'https://img.pokemondb.net/sprites/home/shiny/alcremie-ruby-cream-ribbon.png';
-    if (sName.includes('flower')) return 'https://img.pokemondb.net/sprites/home/shiny/alcremie-ruby-cream-flower.png';
-    if (sName.includes('love')) return 'https://img.pokemondb.net/sprites/home/shiny/alcremie-ruby-cream-love.png';
-    if (sName.includes('clover')) return 'https://img.pokemondb.net/sprites/home/shiny/alcremie-ruby-cream-clover.png';
-    if (sName.includes('berry')) return 'https://img.pokemondb.net/sprites/home/shiny/alcremie-ruby-cream-berry.png';
-    if (sName.includes('star')) return 'https://img.pokemondb.net/sprites/home/shiny/alcremie-salted-cream-star.png';
+    const subPath = shiny ? 'shiny' : 'normal';
+    if (sName.includes('strawberry')) return `https://img.pokemondb.net/sprites/home/${subPath}/alcremie-rainbow-swirl-strawberry.png`;
+    if (sName.includes('ribbon')) return `https://img.pokemondb.net/sprites/home/${subPath}/alcremie-ruby-cream-ribbon.png`;
+    if (sName.includes('flower')) return `https://img.pokemondb.net/sprites/home/${subPath}/alcremie-ruby-cream-flower.png`;
+    if (sName.includes('love')) return `https://img.pokemondb.net/sprites/home/${subPath}/alcremie-ruby-cream-love.png`;
+    if (sName.includes('clover')) return `https://img.pokemondb.net/sprites/home/${subPath}/alcremie-ruby-cream-clover.png`;
+    if (sName.includes('berry')) return `https://img.pokemondb.net/sprites/home/${subPath}/alcremie-ruby-cream-berry.png`;
+    if (sName.includes('star')) return `https://img.pokemondb.net/sprites/home/${subPath}/alcremie-salted-cream-star.png`;
   }
 
   // Minior (Red) override
   if (name && name.toLowerCase().includes('minior') && name.toLowerCase().includes('red')) {
-    return 'https://img.pokemondb.net/sprites/home/shiny/minior-core.png';
+    const subPath = shiny ? 'shiny' : 'normal';
+    return `https://img.pokemondb.net/sprites/home/${subPath}/minior-core.png`;
   }
 
   // Furfrou overrides
   if (name && name.toLowerCase().includes('furfrou')) {
     const sName = name.toLowerCase();
-    if (sName.includes('heart') || sName.includes('cœur')) return 'https://www.pokepedia.fr/images/0/06/Sprite_0676_C%C5%93ur_chromatique_HOME-v1.png';
-    if (sName.includes('star') || sName.includes('étoile')) return 'https://www.pokepedia.fr/images/3/3f/Sprite_0676_%C3%89toile_chromatique_HOME-v1.png';
-    if (sName.includes('diamond') || sName.includes('diamant')) return 'https://www.pokepedia.fr/images/8/8a/Sprite_0676_Diamant_chromatique_HOME-v1.png';
-    if (sName.includes('debutante') || sName.includes('demoiselle')) return 'https://www.pokepedia.fr/images/b/b3/Sprite_0676_Demoiselle_chromatique_HOME-v1.png';
-    if (sName.includes('matron')) return 'https://img.pokemondb.net/sprites/home/shiny/furfrou-matron.png';
-    if (sName.includes('dandy')) return 'https://img.pokemondb.net/sprites/home/shiny/furfrou-dandy.png';
-    if (sName.includes('la-reine') || sName.includes('reine')) return 'https://www.pokepedia.fr/images/f/f5/Sprite_0676_Reine_chromatique_HOME-v1.png';
+    const subPath = shiny ? 'shiny' : 'normal';
+    if (sName.includes('heart') || sName.includes('cœur')) return `https://www.pokepedia.fr/images/0/06/Sprite_0676_C%C5%93ur_${shiny ? 'chromatique_' : ''}HOME-v1.png`;
+    if (sName.includes('star') || sName.includes('étoile')) return `https://www.pokepedia.fr/images/3/3f/Sprite_0676_%C3%89toile_${shiny ? 'chromatique_' : ''}HOME-v1.png`;
+    if (sName.includes('diamond') || sName.includes('diamant')) return `https://www.pokepedia.fr/images/8/8a/Sprite_0676_Diamant_${shiny ? 'chromatique_' : ''}HOME-v1.png`;
+    if (sName.includes('debutante') || sName.includes('demoiselle')) return `https://www.pokepedia.fr/images/b/b3/Sprite_0676_Demoiselle_${shiny ? 'chromatique_' : ''}HOME-v1.png`;
+    if (sName.includes('matron')) return `https://img.pokemondb.net/sprites/home/${subPath}/furfrou-matron.png`;
+    if (sName.includes('dandy')) return `https://img.pokemondb.net/sprites/home/${subPath}/furfrou-dandy.png`;
+    if (sName.includes('la-reine') || sName.includes('reine')) return `https://www.pokepedia.fr/images/f/f5/Sprite_0676_Reine_${shiny ? 'chromatique_' : ''}HOME-v1.png`;
     if (sName.includes('kabuki')) return 'https://www.pokepedia.fr/images/f/f2/Sprite_0676_Kabuki_chromatique_HOME-v1.png';
     if (sName.includes('pharaoh') || sName.includes('pharaon')) return 'https://www.pokepedia.fr/images/5/52/Sprite_0676_Pharaon_chromatique_HOME-v1.png';
   }

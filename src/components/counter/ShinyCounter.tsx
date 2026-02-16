@@ -61,13 +61,9 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
   const [playlists, setPlaylists] = useState<{ id: string; name: string }[]>([]);
   const [huntCreatedAt, setHuntCreatedAt] = useState<string | null>(null);
   const isInitialLoadRef = useRef(true);
-  const [imgError, setImgError] = useState(false);
 
   const { pokemon: pokemonDetails } = usePokemonDetails(selectedPokemonId || 0);
 
-  useEffect(() => {
-    setImgError(false);
-  }, [selectedPokemonId, selectedForm, selectedGender]);
   // Flatten forms and varieties similar to PokemonDetails
   const formOptions = useMemo(() => {
     if (!pokemonDetails) return [];
@@ -182,6 +178,19 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
 
     loadData();
   }, [user?.id, huntId]);
+
+  // Sync state and clear variants when Pokémon changes
+  useEffect(() => {
+    if (selectedPokemonId) {
+      const isInitial = isInitialLoadRef.current;
+      // If we're not in the initial load of a hunt (which sets its own variants),
+      // reset form/gender to avoid stale variant data from the previous Pokemon
+      if (!isInitial) {
+        setSelectedForm(null);
+        setSelectedGender(null);
+      }
+    }
+  }, [selectedPokemonId]);
 
   // Handle pre-selection from query params (e.g. ?pokemon=bulbasaur)
   useEffect(() => {
@@ -324,19 +333,26 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
         <div className="text-center space-y-4">
           {/* Pokemon Sprite */}
           {selectedPokemonId && (
-            <div className="relative group/sprite flex justify-center mb-4">
+            <div key={`sprite-container-${selectedPokemonId}`} className="relative group/sprite flex justify-center mb-4">
               {(() => {
                 const currentVariant = formOptions.find(f => f.name === selectedForm);
                 const displayId = currentVariant ? currentVariant.id : selectedPokemonId;
 
+                const spriteUrl = getGameSpecificSpriteUrl(displayId, safeSelectedMethod.id, selectedPokemonName, selectedForm, selectedGender);
+
                 return (
                   <div className="flex flex-col items-center gap-2">
                     <img
-                      src={imgError ? '/placeholder.svg' : getGameSpecificSpriteUrl(displayId, safeSelectedMethod.id, selectedPokemonName, selectedForm, selectedGender)}
+                      key={spriteUrl}
+                      src={spriteUrl}
                       alt={selectedPokemonName}
                       className="w-40 h-40 object-contain pokemon-sprite animate-in fade-in zoom-in duration-500"
                       style={{ imageRendering: 'auto' }}
-                      onError={() => setImgError(true)}
+                      loading="eager"
+                      decoding="async"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/placeholder.svg';
+                      }}
                     />
 
                     {/* Variant/Gender Selectors Row */}

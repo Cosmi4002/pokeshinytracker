@@ -138,11 +138,6 @@ export function FinishHuntDialog({
     });
   }, [pokemonId, gender, form, pokemonName, formOptions, pokemonDetails]);
 
-  const [imgError, setImgError] = useState(false);
-  useEffect(() => {
-    setImgError(false);
-  }, [pokemonId, form, gender]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -233,10 +228,13 @@ export function FinishHuntDialog({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex items-center gap-4 p-4 bg-muted rounded-lg">
             <img
-              src={imgError ? '/placeholder.svg' : spriteUrl}
+              key={spriteUrl}
+              src={spriteUrl}
               alt={pokemonName}
               className="w-20 h-20 pokemon-sprite object-contain"
-              onError={() => setImgError(true)}
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/placeholder.svg';
+              }}
             />
             <div>
               <h3 className="font-bold text-lg">{formatPokemonName(pokemonName, pokemonId)}</h3>

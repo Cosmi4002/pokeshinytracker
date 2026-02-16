@@ -122,11 +122,6 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
     });
   }, [pokemonId, gender, form, pokemonName, formOptions, pokemonDetails]);
 
-  const [imgError, setImgError] = useState(false);
-  useEffect(() => {
-    setImgError(false);
-  }, [pokemonId, form, gender]);
-
   useEffect(() => {
     if (open && entry) {
       setPokemonId(entry.pokemon_id);
@@ -169,10 +164,13 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
         ? formOptions.find(f => f.name === form)?.displayName || formatPokemonName(pokemonName, pokemonId)
         : formatPokemonName(pokemonName, pokemonId);
 
+      const currentVariant = formOptions.find(f => f.name === form);
+      const displayId = currentVariant ? currentVariant.id : pokemonId;
+
       const { error } = await supabase
         .from('caught_shinies')
         .update({
-          pokemon_id: pokemonId,
+          pokemon_id: displayId,
           pokemon_name: finalDisplayName,
           sprite_url: finalSpriteUrl,
           form: form || null,
@@ -225,10 +223,13 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
           {pokemonId && (
             <div className="flex flex-col items-center gap-4 p-4 bg-muted rounded-lg">
               <img
-                src={imgError ? '/placeholder.svg' : spriteUrl}
+                key={spriteUrl}
+                src={spriteUrl}
                 alt={pokemonName}
                 className="h-28 w-28 pokemon-sprite object-contain drop-shadow-md"
-                onError={() => setImgError(true)}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/placeholder.svg';
+                }}
               />
 
               <div className="flex items-center gap-2 w-full justify-center">

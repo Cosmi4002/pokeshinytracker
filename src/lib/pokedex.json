@@ -4326,9 +4326,123 @@
     "generation": 6
   },
   {
-    "id": 666,
+    "id": 10046,
     "baseId": 666,
     "name": "vivillon-meadow",
+    "generation": 6
+  },
+  {
+    "id": 10047,
+    "baseId": 666,
+    "name": "vivillon-polar",
+    "generation": 6
+  },
+  {
+    "id": 10048,
+    "baseId": 666,
+    "name": "vivillon-tundra",
+    "generation": 6
+  },
+  {
+    "id": 10049,
+    "baseId": 666,
+    "name": "vivillon-continental",
+    "generation": 6
+  },
+  {
+    "id": 10050,
+    "baseId": 666,
+    "name": "vivillon-garden",
+    "generation": 6
+  },
+  {
+    "id": 10051,
+    "baseId": 666,
+    "name": "vivillon-elegant",
+    "generation": 6
+  },
+  {
+    "id": 10052,
+    "baseId": 666,
+    "name": "vivillon-icy-snow",
+    "generation": 6
+  },
+  {
+    "id": 10053,
+    "baseId": 666,
+    "name": "vivillon-modern",
+    "generation": 6
+  },
+  {
+    "id": 10054,
+    "baseId": 666,
+    "name": "vivillon-marine",
+    "generation": 6
+  },
+  {
+    "id": 10055,
+    "baseId": 666,
+    "name": "vivillon-archipelago",
+    "generation": 6
+  },
+  {
+    "id": 10056,
+    "baseId": 666,
+    "name": "vivillon-high-plains",
+    "generation": 6
+  },
+  {
+    "id": 10057,
+    "baseId": 666,
+    "name": "vivillon-sandstorm",
+    "generation": 6
+  },
+  {
+    "id": 10058,
+    "baseId": 666,
+    "name": "vivillon-river",
+    "generation": 6
+  },
+  {
+    "id": 10059,
+    "baseId": 666,
+    "name": "vivillon-monsoon",
+    "generation": 6
+  },
+  {
+    "id": 10060,
+    "baseId": 666,
+    "name": "vivillon-savanna",
+    "generation": 6
+  },
+  {
+    "id": 10061,
+    "baseId": 666,
+    "name": "vivillon-sun",
+    "generation": 6
+  },
+  {
+    "id": 10062,
+    "baseId": 666,
+    "name": "vivillon-ocean",
+    "generation": 6
+  },
+  {
+    "id": 10063,
+    "baseId": 666,
+    "name": "vivillon-jungle",
+    "generation": 6
+  },
+  {
+    "id": 10064,
+    "baseId": 666,
+    "name": "vivillon-fancy",
+    "generation": 6
+  },
+  {
+    "id": 10065,
+    "baseId": 666,
+    "name": "vivillon-poke-ball",
     "generation": 6
   },
   {

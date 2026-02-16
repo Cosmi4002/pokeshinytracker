@@ -1,12 +1,23 @@
-import { Pencil, Trash2, Calendar, Hash } from 'lucide-react';
+import { Pencil, Trash2, Calendar } from 'lucide-react';
 import { useRandomColor } from '@/lib/random-color-context';
 import { Button } from '@/components/ui/button';
 import { getGameTheme, GAME_ICONS, GAME_COVER_ART, GAME_LOGOS } from '@/lib/game-themes';
 import { POKEBALLS, HUNTING_METHODS, getPokemonSpriteUrl } from '@/lib/pokemon-data';
 import { formatPokemonName } from '@/hooks/use-pokemon';
 import type { Tables } from '@/integrations/supabase/types';
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useMemo, useCallback } from 'react';
 import { cn } from '@/lib/utils';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 type CaughtShinyRow = Tables<'caught_shinies'>;
 
@@ -30,19 +41,13 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
         female: entry.gender === 'female'
     }), [entry.pokemon_id, entry.pokemon_name, entry.form, entry.gender]);
 
-    const displayName = useMemo(() => formatPokemonName(entry.pokemon_name, entry.pokemon_id), [entry.pokemon_name, entry.pokemon_id]);
-
-    const [imgError, setImgError] = useState(false);
+    const displayName = entry.pokemon_name;
 
     const formatDate = useCallback((dateString: string) => {
         if (!dateString) return 'Unknown';
         const date = new Date(dateString);
         return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
     }, []);
-
-    useEffect(() => {
-        setImgError(false);
-    }, [entry.pokemon_id, entry.form, entry.gender]);
 
     return (
         <div
@@ -76,14 +81,24 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
                 )}
 
                 <div className="absolute inset-0 flex items-center justify-center z-10 p-2 -translate-y-4">
+                    {/* Character Platform/Grounding */}
+                    <div
+                        className="absolute bottom-1/4 w-32 h-8 blur-xl opacity-60 rounded-[100%]"
+                        style={{
+                            background: `radial-gradient(ellipse at center, ${theme.primary}, transparent 70%)`,
+                        }}
+                    />
                     <img
+                        key={spriteUrl}
                         src={spriteUrl}
                         loading="lazy"
                         decoding="async"
                         alt={entry.pokemon_name}
-                        className="w-32 h-32 lg:w-40 lg:h-40 object-contain pokemon-sprite drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] transition-all duration-500 group-hover:scale-110"
+                        className="w-32 h-32 lg:w-40 lg:h-40 object-contain pokemon-sprite drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] transition-all duration-500 group-hover:scale-110 relative z-10"
                         style={{ imageRendering: 'auto' }}
-                        onError={() => setImgError(true)}
+                        onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/placeholder.svg';
+                        }}
                     />
                 </div>
 
@@ -98,14 +113,36 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
                         >
                             <Pencil className="h-4 w-4" />
                         </Button>
-                        <Button
-                            variant="secondary"
-                            size="icon"
-                            onClick={onDelete}
-                            className="h-8 w-8 rounded-full bg-black/50 hover:bg-destructive text-white border border-white/10 backdrop-blur-md shadow-lg"
-                        >
-                            <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button
+                                    variant="secondary"
+                                    size="icon"
+                                    className="h-8 w-8 rounded-full bg-black/50 hover:bg-destructive text-white border border-white/10 backdrop-blur-md shadow-lg"
+                                >
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent className="bg-[#1a1a1a] border-white/10 text-white">
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle className="text-xl font-bold">Delete {displayName}?</AlertDialogTitle>
+                                    <AlertDialogDescription className="text-white/60">
+                                        Sei sicuro di voler eliminare questo Pokémon dalla tua collezione? Questa azione non può essere annullata.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel className="bg-white/5 hover:bg-white/10 border-white/10 text-white">
+                                        Annulla
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction
+                                        onClick={onDelete}
+                                        className="bg-destructive hover:bg-destructive/90 text-white"
+                                    >
+                                        Elimina
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
                     </div>
                 </div>
 
@@ -211,12 +248,11 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
                                 borderColor: `${theme.primary}40`
                             }}
                         >
-                            <span className="text-[10px] font-bold text-white/50 uppercase tracking-wider block mb-1">Encounters</span>
-                            <div className="flex items-end gap-1.5 mt-auto">
-                                <span className="text-2xl font-black tabular-nums tracking-tighter text-white drop-shadow-md">
+                            <span className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] block mb-1.5">Encounters</span>
+                            <div className="flex items-center gap-2 mt-auto">
+                                <span className="text-3xl font-black tabular-nums tracking-tighter text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] leading-none">
                                     {entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-'}
                                 </span>
-                                <Hash className="w-5 h-5 mb-1 opacity-50" style={{ color: theme.primary }} />
                             </div>
                             {entry.phase_number && (
                                 <div className="mt-1 pt-1 border-t border-white/10">

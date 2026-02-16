@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { useState, memo, useEffect } from "react";
+import { memo } from "react";
 import { useRandomColor } from '@/lib/random-color-context';
 
 interface PokedexCardProps {
@@ -30,16 +30,6 @@ export const PokedexCard = memo(function PokedexCard({
     onClick
 }: PokedexCardProps) {
     const { accentColor } = useRandomColor();
-    const [imgError, setImgError] = useState(false);
-    const [secondaryImgError, setSecondaryImgError] = useState(false);
-
-    useEffect(() => {
-        setImgError(false);
-    }, [spriteUrl]);
-
-    useEffect(() => {
-        setSecondaryImgError(false);
-    }, [secondarySprite]);
 
     // Calculate glow intensity based on caught percentage
     const glowIntensity = caughtPercentage / 100;
@@ -92,33 +82,33 @@ export const PokedexCard = memo(function PokedexCard({
             <div className="relative flex items-center justify-center z-10 h-44 w-full px-2">
                 <div className="flex items-center justify-center gap-1 w-full translate-y-2">
                     {/* Primary sprite */}
-                    {!imgError ? (
-                        <div className={cn(
-                            "relative flex items-center justify-center transition-all duration-500",
-                            hasMultipleSprites ? "w-[48%]" : "w-full max-w-[180px]"
-                        )}>
-                            <img
-                                src={spriteUrl}
-                                alt={`${displayName} shiny`}
-                                className={cn(
-                                    "h-full w-full pokemon-sprite transition-all duration-500 object-contain max-h-48",
-                                    isPrimaryCaught
-                                        ? "drop-shadow-[0_0_12px_rgba(255,255,255,0.8)] scale-105 brightness-110"
-                                        : "opacity-40 grayscale group-hover:opacity-60"
-                                )}
-                                style={{ imageRendering: 'auto' }}
-                                loading="lazy"
-                                onError={() => setImgError(true)}
-                            />
-                        </div>
-                    ) : (
-                        <div className="h-20 w-20" />
-                    )}
+                    <div className={cn(
+                        "relative flex items-center justify-center transition-all duration-500",
+                        hasMultipleSprites ? "w-[48%]" : "w-full max-w-[180px]"
+                    )}>
+                        <img
+                            key={spriteUrl}
+                            src={spriteUrl}
+                            alt={`${displayName} shiny`}
+                            className={cn(
+                                "h-full w-full pokemon-sprite transition-all duration-500 object-contain max-h-48",
+                                isPrimaryCaught
+                                    ? "drop-shadow-[0_0_12px_rgba(255,255,255,0.8)] scale-105 brightness-110"
+                                    : "opacity-40 grayscale group-hover:opacity-60"
+                            )}
+                            style={{ imageRendering: 'auto' }}
+                            loading="lazy"
+                            onError={(e) => {
+                                (e.target as HTMLImageElement).src = '/placeholder.svg';
+                            }}
+                        />
+                    </div>
 
                     {/* Secondary sprite if applicable */}
-                    {hasMultipleSprites && secondarySprite && !secondaryImgError && (
+                    {hasMultipleSprites && secondarySprite && (
                         <div className="relative w-[48%] flex items-center justify-center transition-all duration-500">
                             <img
+                                key={secondarySprite}
                                 src={secondarySprite}
                                 alt={`${displayName} shiny secondary`}
                                 className={cn(
@@ -129,7 +119,9 @@ export const PokedexCard = memo(function PokedexCard({
                                 )}
                                 style={{ imageRendering: 'auto' }}
                                 loading="lazy"
-                                onError={() => setSecondaryImgError(true)}
+                                onError={(e) => {
+                                    (e.target as HTMLImageElement).src = '/placeholder.svg';
+                                }}
                             />
                         </div>
                     )}
