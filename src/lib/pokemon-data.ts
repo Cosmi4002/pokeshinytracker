@@ -501,36 +501,23 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
     return 'https://www.pokepedia.fr/images/6/60/Sprite_0423_Orient_chromatique_HOME-v1.png';
   }
 
-  // Unown overrides
-  if (name && name.toLowerCase().startsWith('unown-')) {
-    const sName = name.toLowerCase();
-    if (sName === 'unown-b') return 'https://img.pokemondb.net/sprites/home/shiny/unown-b.png';
-    if (sName === 'unown-c') return 'https://img.pokemondb.net/sprites/home/shiny/unown-c.png';
-    if (sName === 'unown-d') return 'https://img.pokemondb.net/sprites/home/shiny/unown-d.png';
-    if (sName === 'unown-e') return 'https://img.pokemondb.net/sprites/home/shiny/unown-e.png';
-    if (sName === 'unown-f') return 'https://img.pokemondb.net/sprites/home/shiny/unown-f.png';
-    if (sName === 'unown-g') return 'https://img.pokemondb.net/sprites/home/shiny/unown-g.png';
-    if (sName === 'unown-h') return 'https://img.pokemondb.net/sprites/home/shiny/unown-h.png';
-    if (sName === 'unown-i') return 'https://img.pokemondb.net/sprites/home/shiny/unown-i.png';
-    if (sName === 'unown-j') return 'https://img.pokemondb.net/sprites/home/shiny/unown-j.png';
-    if (sName === 'unown-k') return 'https://img.pokemondb.net/sprites/home/shiny/unown-k.png';
-    if (sName === 'unown-l') return 'https://img.pokemondb.net/sprites/home/shiny/unown-l.png';
-    if (sName === 'unown-m') return 'https://img.pokemondb.net/sprites/home/shiny/unown-m.png';
-    if (sName === 'unown-n') return 'https://img.pokemondb.net/sprites/home/shiny/unown-n.png';
-    if (sName === 'unown-o') return 'https://img.pokemondb.net/sprites/home/shiny/unown-o.png';
-    if (sName === 'unown-p') return 'https://img.pokemondb.net/sprites/home/shiny/unown-p.png';
-    if (sName === 'unown-q') return 'https://img.pokemondb.net/sprites/home/shiny/unown-q.png';
-    if (sName === 'unown-r') return 'https://img.pokemondb.net/sprites/home/shiny/unown-r.png';
-    if (sName === 'unown-s') return 'https://img.pokemondb.net/sprites/home/shiny/unown-s.png';
-    if (sName === 'unown-t') return 'https://img.pokemondb.net/sprites/home/shiny/unown-t.png';
-    if (sName === 'unown-u') return 'https://img.pokemondb.net/sprites/home/shiny/unown-u.png';
-    if (sName === 'unown-v') return 'https://img.pokemondb.net/sprites/home/shiny/unown-v.png';
-    if (sName === 'unown-w') return 'https://img.pokemondb.net/sprites/home/shiny/unown-w.png';
-    if (sName === 'unown-x') return 'https://img.pokemondb.net/sprites/home/shiny/unown-x.png';
-    if (sName === 'unown-y') return 'https://img.pokemondb.net/sprites/home/shiny/unown-y.png';
-    if (sName === 'unown-z') return 'https://img.pokemondb.net/sprites/home/shiny/unown-z.png';
-    if (sName === 'unown-exclamation' || sName.includes('!')) return 'https://img.pokemondb.net/sprites/home/shiny/unown-em.png';
-    if (sName === 'unown-question' || sName.includes('?')) return 'https://img.pokemondb.net/sprites/home/shiny/unown-qm.png';
+  // Unown overrides (Using ID 201)
+  if (pokemonId === 201 || (name && name.toLowerCase().includes('unown'))) {
+    const sName = (form || name || 'a').toLowerCase();
+    let letter = 'a';
+
+    if (sName.startsWith('unown-')) letter = sName.replace('unown-', '');
+    else if (sName === 'unown') letter = 'a';
+    else if (sName.length === 1) letter = sName;
+    else if (sName === 'exclamation' || sName === '!') letter = 'em';
+    else if (sName === 'question' || sName === '?') letter = 'qm';
+    else letter = sName;
+
+    // Normalizing letter for pokemondb URL naming
+    if (letter === 'exclamation' || letter === '!') letter = 'em';
+    if (letter === 'question' || letter === '?') letter = 'qm';
+
+    return `https://img.pokemondb.net/sprites/home/shiny/unown-${letter}.png`;
   }
 
   // Deoxys Attack override

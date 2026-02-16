@@ -5,7 +5,7 @@ import { getGameTheme, GAME_ICONS, GAME_COVER_ART, GAME_LOGOS } from '@/lib/game
 import { POKEBALLS, HUNTING_METHODS, getPokemonSpriteUrl } from '@/lib/pokemon-data';
 import { formatPokemonName } from '@/hooks/use-pokemon';
 import type { Tables } from '@/integrations/supabase/types';
-import { useState } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 type CaughtShinyRow = Tables<'caught_shinies'>;
@@ -18,15 +18,31 @@ interface ShinyCardProps {
 
 export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
     const { accentColor } = useRandomColor();
-    const theme = getGameTheme(entry.game);
-    const pokeball = POKEBALLS.find((b) => b.id === entry.pokeball);
-    const method = HUNTING_METHODS.find((m) => m.id === entry.method);
+
+    const theme = useMemo(() => getGameTheme(entry.game), [entry.game]);
+    const pokeball = useMemo(() => POKEBALLS.find((b) => b.id === entry.pokeball), [entry.pokeball]);
+    const method = useMemo(() => HUNTING_METHODS.find((m) => m.id === entry.method), [entry.method]);
+
+    const spriteUrl = useMemo(() => getPokemonSpriteUrl(entry.pokemon_id, {
+        shiny: true,
+        name: entry.pokemon_name,
+        form: entry.form || undefined,
+        female: entry.gender === 'female'
+    }), [entry.pokemon_id, entry.pokemon_name, entry.form, entry.gender]);
+
+    const displayName = useMemo(() => formatPokemonName(entry.pokemon_name, entry.pokemon_id), [entry.pokemon_name, entry.pokemon_id]);
+
     const [imgError, setImgError] = useState(false);
 
-    const formatDate = (dateString: string) => {
+    const formatDate = useCallback((dateString: string) => {
+        if (!dateString) return 'Unknown';
         const date = new Date(dateString);
         return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-    };
+    }, []);
+
+    useEffect(() => {
+        setImgError(false);
+    }, [entry.pokemon_id, entry.form, entry.gender]);
 
     return (
         <div
@@ -45,7 +61,9 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
                     <div className="absolute inset-0 z-0 overflow-hidden">
                         <img
                             src={GAME_COVER_ART[entry.game]}
-                            className="w-full h-full object-contain opacity-40 blur-[1px] transform transition-transform duration-700 group-hover:scale-105 group-hover:blur-0"
+                            loading="lazy"
+                            decoding="async"
+                            className="w-full h-full object-contain opacity-40 transform transition-transform duration-700 group-hover:scale-105"
                             alt="background"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f0f] to-transparent opacity-80" />
@@ -59,12 +77,9 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
 
                 <div className="absolute inset-0 flex items-center justify-center z-10 p-2 -translate-y-4">
                     <img
-                        src={entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, {
-                            shiny: true,
-                            name: entry.pokemon_name,
-                            form: entry.form,
-                            female: entry.gender === 'female'
-                        })}
+                        src={spriteUrl}
+                        loading="lazy"
+                        decoding="async"
                         alt={entry.pokemon_name}
                         className="w-32 h-32 lg:w-40 lg:h-40 object-contain pokemon-sprite drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] transition-all duration-500 group-hover:scale-110"
                         style={{ imageRendering: 'auto' }}
@@ -112,7 +127,7 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
                         {/* Name and Gender Row - Centered */}
                         <div className="flex items-center justify-center gap-2 min-w-0">
                             <h3 className="text-xl lg:text-2xl font-black text-white tracking-tight capitalize leading-none">
-                                {formatPokemonName(entry.pokemon_name, entry.pokemon_id)}
+                                {displayName}
                             </h3>
                             {entry.gender && (entry.gender === 'male' || entry.gender === 'female') && (
                                 <span className={cn(
@@ -131,6 +146,8 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
                                 {GAME_LOGOS[entry.game] && (
                                     <img
                                         src={GAME_LOGOS[entry.game]}
+                                        loading="lazy"
+                                        decoding="async"
                                         alt={entry.game}
                                         className="h-16 lg:h-20 w-auto max-w-[120px] object-contain brightness-110 drop-shadow-lg"
                                     />
@@ -235,7 +252,13 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
                                     </div>
                                 ) : (
                                     <>
-                                        <img src={pokeball.sprite} className="w-5 h-5 object-contain" alt="pokeball" />
+                                        <img
+                                            src={pokeball.sprite}
+                                            loading="lazy"
+                                            decoding="async"
+                                            className="w-5 h-5 object-contain"
+                                            alt="pokeball"
+                                        />
                                         <span className="text-[10px] text-white/50 font-semibold uppercase tracking-wide">{pokeball.name}</span>
                                     </>
                                 )}
@@ -244,6 +267,8 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
                                 <div className="flex items-center" title="Shiny Charm Active">
                                     <img
                                         src="/img/items/shiny-charm.png"
+                                        loading="lazy"
+                                        decoding="async"
                                         className="w-6 h-6 object-contain animate-pulse drop-shadow-[0_0_8px_rgba(234,179,8,0.6)]"
                                         alt="Shiny Charm"
                                     />

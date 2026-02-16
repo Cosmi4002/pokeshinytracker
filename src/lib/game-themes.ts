@@ -313,8 +313,8 @@ export const GAME_LOGOS: Record<string, string> = {
   heartgold: '/img/game-logos/heartgold.png',
   soulsilver: '/img/game-logos/soulsilver.png',
   // Gen 5
-  black: 'https://m.archives.bulbagarden.net/media/upload/a/ae/Pok%C3%A9mon_Black_EN_logo.png',
-  white: 'https://m.archives.bulbagarden.net/media/upload/3/3e/Pok%C3%A9mon_White_EN_logo.png',
+  black: 'https://img.pokemondb.net/logos/pokemon-black-logo.png',
+  white: 'https://img.pokemondb.net/logos/pokemon-white-logo.png',
   black2: '/img/game-logos/black2.png',
   white2: '/img/game-logos/white2.png',
   // Gen 6

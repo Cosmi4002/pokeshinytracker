@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Check, ChevronsUpDown, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -42,6 +42,11 @@ export function PokemonSelector({ value, onChange }: PokemonSelectorProps) {
       );
   }, [pokemon, searchTerm]);
 
+  const [imgError, setImgError] = useState(false);
+  useEffect(() => {
+    setImgError(false);
+  }, [value]);
+
   return (
     <Popover open={open} onOpenChange={setOpen} modal={true}>
       <PopoverTrigger asChild>
@@ -54,12 +59,10 @@ export function PokemonSelector({ value, onChange }: PokemonSelectorProps) {
           {selectedPokemon ? (
             <div className="flex items-center gap-2">
               <img
-                src={getPokemonSpriteUrl(selectedPokemon.id, { shiny: true, name: selectedPokemon.name })}
+                src={imgError ? '/placeholder.svg' : getPokemonSpriteUrl(selectedPokemon.id, { shiny: true, name: selectedPokemon.name })}
                 alt={selectedPokemon.displayName}
                 className="h-8 w-8 pokemon-sprite object-contain"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/placeholder.svg';
-                }}
+                onError={() => setImgError(true)}
               />
               <span>#{selectedPokemon.baseId.toString().padStart(4, '0')} {selectedPokemon.displayName}</span>
             </div>
@@ -101,7 +104,7 @@ export function PokemonSelector({ value, onChange }: PokemonSelectorProps) {
                     src={getPokemonSpriteUrl(p.id, { shiny: true, name: p.name })}
                     alt={p.displayName}
                     className="h-8 w-8 pokemon-sprite object-contain"
-                    loading="lazy"
+                    decoding="async"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = '/placeholder.svg';
                     }}

@@ -107,11 +107,18 @@ export default function Collection() {
     return m;
   }, [playlists]);
 
+  const pokemonMap = useMemo(() => {
+    const m = new Map<number, any>();
+    pokemon.forEach((p) => m.set(p.id, p));
+    return m;
+  }, [pokemon]);
+
   const filteredEntries = useMemo(() => {
+    const query = searchQuery.toLowerCase().trim();
     return entries.filter((entry) => {
-      if (searchQuery && !entry.pokemon_name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+      if (query && !entry.pokemon_name.toLowerCase().includes(query)) return false;
       if (filterGen !== 'all') {
-        const poke = pokemon.find((p) => p.id === entry.pokemon_id);
+        const poke = pokemonMap.get(entry.pokemon_id);
         if (poke && poke.generation.toString() !== filterGen) return false;
       }
       if (filterGame !== 'all' && entry.game !== filterGame) return false;
@@ -121,7 +128,7 @@ export default function Collection() {
       }
       return true;
     });
-  }, [entries, searchQuery, filterGen, filterGame, filterPlaylist, pokemon, playlistMap]);
+  }, [entries, searchQuery, filterGen, filterGame, filterPlaylist, pokemonMap, playlistMap]);
 
   if (authLoading || (user && loading)) {
     return (

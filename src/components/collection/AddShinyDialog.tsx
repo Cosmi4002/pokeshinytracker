@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import { GenderSelector } from '@/components/ui/GenderSelector';
 import { Button } from '@/components/ui/button';
@@ -118,6 +118,11 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
     });
   }, [pokemonId, gender, form, pokemonName, formOptions, pokemonDetails]);
 
+  const [imgError, setImgError] = useState(false);
+  useEffect(() => {
+    setImgError(false);
+  }, [pokemonId, form, gender]);
+
   const resetFormState = () => {
     setPokemonId(null);
     setPokemonName('');
@@ -208,12 +213,10 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
           {pokemonId && (
             <div className="flex flex-col items-center gap-4 p-4 bg-muted rounded-lg border border-primary/10 shadow-inner">
               <img
-                src={spriteUrl}
+                src={imgError ? '/placeholder.svg' : spriteUrl}
                 alt={pokemonName}
                 className="h-28 w-28 pokemon-sprite object-contain drop-shadow-md"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/placeholder.svg';
-                }}
+                onError={() => setImgError(true)}
               />
 
               <div className="flex items-center gap-2 w-full justify-center">

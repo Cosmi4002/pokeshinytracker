@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { useState, memo } from "react";
+import { useState, memo, useEffect } from "react";
 import { useRandomColor } from '@/lib/random-color-context';
 
 interface PokedexCardProps {
@@ -32,6 +32,14 @@ export const PokedexCard = memo(function PokedexCard({
     const { accentColor } = useRandomColor();
     const [imgError, setImgError] = useState(false);
     const [secondaryImgError, setSecondaryImgError] = useState(false);
+
+    useEffect(() => {
+        setImgError(false);
+    }, [spriteUrl]);
+
+    useEffect(() => {
+        setSecondaryImgError(false);
+    }, [secondarySprite]);
 
     // Calculate glow intensity based on caught percentage
     const glowIntensity = caughtPercentage / 100;

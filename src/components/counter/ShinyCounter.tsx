@@ -61,8 +61,13 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
   const [playlists, setPlaylists] = useState<{ id: string; name: string }[]>([]);
   const [huntCreatedAt, setHuntCreatedAt] = useState<string | null>(null);
   const isInitialLoadRef = useRef(true);
+  const [imgError, setImgError] = useState(false);
 
   const { pokemon: pokemonDetails } = usePokemonDetails(selectedPokemonId || 0);
+
+  useEffect(() => {
+    setImgError(false);
+  }, [selectedPokemonId, selectedForm, selectedGender]);
   // Flatten forms and varieties similar to PokemonDetails
   const formOptions = useMemo(() => {
     if (!pokemonDetails) return [];
@@ -327,13 +332,11 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
                 return (
                   <div className="flex flex-col items-center gap-2">
                     <img
-                      src={getGameSpecificSpriteUrl(displayId, safeSelectedMethod.id, selectedPokemonName, selectedForm, selectedGender)}
+                      src={imgError ? '/placeholder.svg' : getGameSpecificSpriteUrl(displayId, safeSelectedMethod.id, selectedPokemonName, selectedForm, selectedGender)}
                       alt={selectedPokemonName}
                       className="w-40 h-40 object-contain pokemon-sprite animate-in fade-in zoom-in duration-500"
                       style={{ imageRendering: 'auto' }}
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/placeholder.svg';
-                      }}
+                      onError={() => setImgError(true)}
                     />
 
                     {/* Variant/Gender Selectors Row */}
