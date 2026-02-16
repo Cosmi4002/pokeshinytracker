@@ -432,12 +432,49 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
     if (sName === 'deoxys-speed') return `${baseUrl}/shiny/10003.png`;
   }
 
-  // Giratina overrides
-  if (name && name.toLowerCase().includes('giratina-origin')) {
-    return `https://img.pokemondb.net/sprites/home/shiny/giratina-origin.png`;
+  // Giratina, Dialga, Palkia overrides
+  if (name && (name.toLowerCase().includes('giratina-origin') || name.toLowerCase().includes('dialga-origin') || name.toLowerCase().includes('palkia-origin'))) {
+    const sName = name.toLowerCase();
+    if (sName.includes('giratina')) return `https://img.pokemondb.net/sprites/home/shiny/giratina-origin.png`;
+    if (sName.includes('dialga')) return `https://img.pokemondb.net/sprites/home/shiny/dialga-origin.png`;
+    if (sName.includes('palkia')) return `https://img.pokemondb.net/sprites/home/shiny/palkia-origin.png`;
   }
 
-  // Silvally overrides
+  // Enamorus Therian override
+  if (name && name.toLowerCase().includes('enamorus-therian')) {
+    return `https://img.pokemondb.net/sprites/home/shiny/enamorus-therian.png`;
+  }
+
+  // Gen 9 Form Overrides
+  if (name && name.toLowerCase().includes('maushold-family-of-three')) {
+    return `${baseUrl}/shiny/10243.png`;
+  }
+  if (name && name.toLowerCase().includes('dudunsparce-three-segment')) {
+    return `${baseUrl}/shiny/10253.png`;
+  }
+  if (name && name.toLowerCase().includes('squawkabilly-')) {
+    const sName = name.toLowerCase();
+    if (sName.includes('blue')) return `${baseUrl}/shiny/10247.png`;
+    if (sName.includes('yellow')) return `${baseUrl}/shiny/10248.png`;
+    if (sName.includes('white')) return `${baseUrl}/shiny/10249.png`;
+  }
+  if (name && name.toLowerCase().includes('tatsugiri-')) {
+    const sName = name.toLowerCase();
+    if (sName.includes('droopy')) return `${baseUrl}/shiny/10251.png`;
+    if (sName.includes('stretchy')) return `${baseUrl}/shiny/10252.png`;
+  }
+
+  // Minior Core overrides
+  if (name && name.toLowerCase().includes('minior') && !name.toLowerCase().includes('meteor')) {
+    const sName = name.toLowerCase();
+    const subPath = shiny ? 'shiny' : 'normal';
+    const colors = ['orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
+    for (const color of colors) {
+      if (sName.includes(color)) return `https://img.pokemondb.net/sprites/home/${subPath}/minior-${color}.png`;
+    }
+  }
+
+  // Furfrou overrides
   if (name && name.toLowerCase().includes('silvally')) {
     const sName = name.toLowerCase();
     if (sName === 'silvally') return 'https://www.pokepedia.fr/images/3/30/Sprite_0773_chromatique_HOME-v1.png';

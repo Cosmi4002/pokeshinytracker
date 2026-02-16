@@ -67,10 +67,35 @@ export const POKEMON_WITH_GENDER_DIFF = [
 
 // Manual Varieties to force inclusion for specific species that aren't fully listed in pokedex.json
 export const MANUAL_VARIETIES: Record<number, { id: number, name: string }[]> = {
+  201: [ // Unown
+    { id: 10001, name: 'unown-b' }, { id: 10002, name: 'unown-c' }, { id: 10003, name: 'unown-d' },
+    { id: 10004, name: 'unown-e' }, { id: 10005, name: 'unown-f' }, { id: 10006, name: 'unown-g' },
+    { id: 10007, name: 'unown-h' }, { id: 10008, name: 'unown-i' }, { id: 10009, name: 'unown-j' },
+    { id: 10010, name: 'unown-k' }, { id: 10011, name: 'unown-l' }, { id: 10012, name: 'unown-m' },
+    { id: 10013, name: 'unown-n' }, { id: 10014, name: 'unown-o' }, { id: 10015, name: 'unown-p' },
+    { id: 10016, name: 'unown-q' }, { id: 10017, name: 'unown-r' }, { id: 10018, name: 'unown-s' },
+    { id: 10019, name: 'unown-t' }, { id: 10020, name: 'unown-u' }, { id: 10021, name: 'unown-v' },
+    { id: 10022, name: 'unown-w' }, { id: 10023, name: 'unown-x' }, { id: 10024, name: 'unown-y' },
+    { id: 10025, name: 'unown-z' }, { id: 10026, name: 'unown-exclamation' }, { id: 10027, name: 'unown-question' }
+  ],
   386: [ // Deoxys
     { id: 10001, name: 'deoxys-attack' },
     { id: 10002, name: 'deoxys-defense' },
     { id: 10003, name: 'deoxys-speed' },
+  ],
+  412: [ // Burmy
+    { id: 10004, name: 'burmy-sandy' },
+    { id: 10005, name: 'burmy-trash' }
+  ],
+  413: [ // Wormadam
+    { id: 10014, name: 'wormadam-sandy' },
+    { id: 10015, name: 'wormadam-trash' }
+  ],
+  422: [ // Shellos
+    { id: 10026, name: 'shellos-east' }
+  ],
+  423: [ // Gastrodon
+    { id: 10027, name: 'gastrodon-east' }
   ],
   479: [ // Rotom
     { id: 10008, name: 'rotom-heat' },
@@ -78,6 +103,15 @@ export const MANUAL_VARIETIES: Record<number, { id: number, name: string }[]> = 
     { id: 10010, name: 'rotom-frost' },
     { id: 10011, name: 'rotom-fan' },
     { id: 10012, name: 'rotom-mow' },
+  ],
+  483: [ // Dialga
+    { id: 10243, name: 'dialga-origin' }
+  ],
+  484: [ // Palkia
+    { id: 10244, name: 'palkia-origin' }
+  ],
+  487: [ // Giratina
+    { id: 10007, name: 'giratina-origin' },
   ],
   492: [ // Shaymin
     { id: 10006, name: 'shaymin-sky' },
@@ -96,6 +130,16 @@ export const MANUAL_VARIETIES: Record<number, { id: number, name: string }[]> = 
   550: [ // Basculin
     { id: 10016, name: 'basculin-blue-striped' },
     { id: 10247, name: 'basculin-white-striped' }
+  ],
+  585: [ // Deerling
+    { id: 10051, name: 'deerling-summer' },
+    { id: 10052, name: 'deerling-autumn' },
+    { id: 10053, name: 'deerling-winter' }
+  ],
+  586: [ // Sawsbuck
+    { id: 10054, name: 'sawsbuck-summer' },
+    { id: 10055, name: 'sawsbuck-autumn' },
+    { id: 10056, name: 'sawsbuck-winter' }
   ],
   641: [ // Tornadus
     { id: 10019, name: 'tornadus-therian' }
@@ -116,6 +160,36 @@ export const MANUAL_VARIETIES: Record<number, { id: number, name: string }[]> = 
   648: [ // Meloetta
     { id: 10025, name: 'meloetta-pirouette' }
   ],
+  669: [ // Flabébé
+    { id: 10064, name: 'flabebe-yellow' }, { id: 10065, name: 'flabebe-orange' },
+    { id: 10066, name: 'flabebe-blue' }, { id: 10067, name: 'flabebe-white' }
+  ],
+  670: [ // Floette
+    { id: 10068, name: 'floette-yellow' }, { id: 10069, name: 'floette-orange' },
+    { id: 10070, name: 'floette-blue' }, { id: 10071, name: 'floette-white' },
+    { id: 10072, name: 'floette-eternal' }
+  ],
+  671: [ // Florges
+    { id: 10073, name: 'florges-yellow' }, { id: 10074, name: 'florges-orange' },
+    { id: 10075, name: 'florges-blue' }, { id: 10076, name: 'florges-white' }
+  ],
+  676: [ // Furfrou
+    { id: 10077, name: 'furfrou-heart' }, { id: 10078, name: 'furfrou-star' },
+    { id: 10079, name: 'furfrou-diamond' }, { id: 10080, name: 'furfrou-debutante' },
+    { id: 10081, name: 'furfrou-matron' }, { id: 10082, name: 'furfrou-dandy' },
+    { id: 10083, name: 'furfrou-la-reine' }, { id: 10084, name: 'furfrou-kabuki' },
+    { id: 10085, name: 'furfrou-pharaoh' }
+  ],
+  710: [ // Pumpkaboo
+    { id: 10086, name: 'pumpkaboo-small' },
+    { id: 10087, name: 'pumpkaboo-large' },
+    { id: 10088, name: 'pumpkaboo-super' }
+  ],
+  711: [ // Gourgeist
+    { id: 10089, name: 'gourgeist-small' },
+    { id: 10090, name: 'gourgeist-large' },
+    { id: 10091, name: 'gourgeist-super' }
+  ],
   718: [ // Zygarde
     { id: 10118, name: 'zygarde-10' },
     { id: 10120, name: 'zygarde-complete' }
@@ -135,13 +209,49 @@ export const MANUAL_VARIETIES: Record<number, { id: number, name: string }[]> = 
     { id: 10124, name: 'silvally-dragon' }, { id: 10125, name: 'silvally-dark' },
     { id: 10126, name: 'silvally-fairy' }
   ],
+  774: [ // Minior
+    { id: 10130, name: 'minior-red' }, { id: 10131, name: 'minior-orange' },
+    { id: 10132, name: 'minior-yellow' }, { id: 10133, name: 'minior-green' },
+    { id: 10134, name: 'minior-blue' }, { id: 10135, name: 'minior-indigo' },
+    { id: 10136, name: 'minior-violet' },
+    { id: 10137, name: 'minior-orange-meteor' }, { id: 10138, name: 'minior-yellow-meteor' },
+    { id: 10139, name: 'minior-green-meteor' }, { id: 10140, name: 'minior-blue-meteor' },
+    { id: 10141, name: 'minior-indigo-meteor' }, { id: 10142, name: 'minior-violet-meteor' }
+  ],
   800: [ // Necrozma
     { id: 10155, name: 'necrozma-dusk' },
     { id: 10156, name: 'necrozma-dawn' },
     { id: 10157, name: 'necrozma-ultra' }
   ],
+  849: [ // Toxtricity
+    { id: 10184, name: 'toxtricity-low-key' }
+  ],
+  869: [ // Alcremie
+    { id: 10158, name: 'alcremie-strawberry' }, { id: 10159, name: 'alcremie-berry' },
+    { id: 10160, name: 'alcremie-love' }, { id: 10161, name: 'alcremie-star' },
+    { id: 10162, name: 'alcremie-clover' }, { id: 10163, name: 'alcremie-flower' },
+    { id: 10164, name: 'alcremie-ribbon' }
+  ],
+  905: [ // Enamorus
+    { id: 10249, name: 'enamorus-therian' }
+  ],
   916: [ // Oinkologne
     { id: 10254, name: 'oinkologne-female' }
+  ],
+  925: [ // Maushold
+    { id: 10255, name: 'maushold-family-of-three' }
+  ],
+  931: [ // Squawkabilly
+    { id: 10256, name: 'squawkabilly-blue' },
+    { id: 10257, name: 'squawkabilly-yellow' },
+    { id: 10258, name: 'squawkabilly-white' }
+  ],
+  978: [ // Tatsugiri
+    { id: 10259, name: 'tatsugiri-droopy' },
+    { id: 10260, name: 'tatsugiri-stretchy' }
+  ],
+  982: [ // Dudunsparce
+    { id: 10261, name: 'dudunsparce-three-segment' }
   ],
   1017: [ // Ogerpon
     { id: 10273, name: 'ogerpon-wellspring-mask' },
@@ -251,10 +361,11 @@ export function formatPokemonName(name: string, id: number, baseId?: number): st
     return 'Minior';
   }
 
-  // Giratina naming
-  if (name.toLowerCase().includes('giratina')) {
-    if (name.toLowerCase().includes('origin')) return 'Giratina (Originale)';
-    return 'Giratina (Altera)';
+  // Giratina, Dialga, Palkia naming
+  if (name.toLowerCase().includes('giratina') || name.toLowerCase().includes('dialga') || name.toLowerCase().includes('palkia')) {
+    if (name.toLowerCase().includes('origin')) return `${name.split('-')[0].charAt(0).toUpperCase() + name.split('-')[0].slice(1)} (Originale)`;
+    if (name.toLowerCase().includes('altered')) return 'Giratina (Altera)';
+    return name.charAt(0).toUpperCase() + name.slice(1);
   }
 
   // Silvally type naming
@@ -287,6 +398,124 @@ export function formatPokemonName(name: string, id: number, baseId?: number): st
       return `Arceus (${typeTranslations[type] || parts[1].charAt(0).toUpperCase() + parts[1].slice(1)})`;
     }
     return 'Arceus';
+  }
+
+  // Unown naming
+  if (name.toLowerCase().includes('unown-')) {
+    const letter = name.split('-')[1].toLowerCase();
+    if (letter === 'exclamation') return 'Unown (!)';
+    if (letter === 'question') return 'Unown (?)';
+    return `Unown (${letter.toUpperCase()})`;
+  }
+
+  // Burmy & Wormadam naming
+  if (name.toLowerCase().includes('burmy') || name.toLowerCase().includes('wormadam')) {
+    const parts = name.split('-');
+    const base = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
+    if (parts.includes('sandy')) return `${base} (Mantello Sabbia)`;
+    if (parts.includes('trash')) return `${base} (Mantello Scarti)`;
+    if (parts.includes('plant')) return `${base} (Mantello Pianta)`;
+    return base;
+  }
+
+  // Shellos & Gastrodon naming
+  if (name.toLowerCase().includes('shellos') || name.toLowerCase().includes('gastrodon')) {
+    const base = name.split('-')[0].charAt(0).toUpperCase() + name.split('-')[0].slice(1);
+    if (name.includes('east')) return `${base} (Mare Est)`;
+    if (name.includes('west')) return `${base} (Mare Ovest)`;
+    return base;
+  }
+
+  // Deerling & Sawsbuck naming
+  if (name.toLowerCase().includes('deerling') || name.toLowerCase().includes('sawsbuck')) {
+    const base = name.split('-')[0].charAt(0).toUpperCase() + name.split('-')[0].slice(1);
+    if (name.includes('summer')) return `${base} (Estate)`;
+    if (name.includes('autumn')) return `${base} (Autunno)`;
+    if (name.includes('winter')) return `${base} (Inverno)`;
+    if (name.includes('spring')) return `${base} (Primavera)`;
+    return base;
+  }
+
+  // Flabébé line naming
+  if (name.toLowerCase().includes('flabebe') || name.toLowerCase().includes('floette') || name.toLowerCase().includes('florges')) {
+    const base = name.toLowerCase().includes('flabebe') ? 'Flabébé' : (name.toLowerCase().includes('floette') ? 'Floette' : 'Florges');
+    if (name.includes('yellow')) return `${base} (Fiore Giallo)`;
+    if (name.includes('orange')) return `${base} (Fiore Arancione)`;
+    if (name.includes('blue')) return `${base} (Fiore Blu)`;
+    if (name.includes('white')) return `${base} (Fiore Bianco)`;
+    if (name.includes('red')) return `${base} (Fiore Rosso)`;
+    return base;
+  }
+
+  // Furfrou naming
+  if (name.toLowerCase().includes('furfrou-')) {
+    const trim = name.split('-')[1].toLowerCase();
+    const trims: Record<string, string> = {
+      'heart': 'Cuore', 'star': 'Stella', 'diamond': 'Diamante', 'debutante': 'Demoiselle',
+      'matron': 'Matrona', 'dandy': 'Dandy', 'la-reine': 'Regina', 'kabuki': 'Kabuki', 'pharaoh': 'Faraone'
+    };
+    return `Furfrou (${trims[trim] || trim.charAt(0).toUpperCase() + trim.slice(1)})`;
+  }
+
+  // Pumpkaboo & Gourgeist naming
+  if (name.toLowerCase().includes('pumpkaboo') || name.toLowerCase().includes('gourgeist')) {
+    const base = name.split('-')[0].charAt(0).toUpperCase() + name.split('-')[0].slice(1);
+    if (name.includes('small')) return `${base} (Piccolo)`;
+    if (name.includes('large')) return `${base} (Grande)`;
+    if (name.includes('super')) return `${base} (Maxi)`;
+    if (name.includes('average')) return `${base} (Medio)`;
+    return base;
+  }
+
+  // Toxtricity naming
+  if (name.toLowerCase().includes('toxtricity')) {
+    if (name.includes('low-key')) return 'Toxtricity (Basso)';
+    if (name.includes('amped')) return 'Toxtricity (Melodia)';
+    return 'Toxtricity';
+  }
+
+  // Enamorus naming
+  if (name.toLowerCase().includes('enamorus')) {
+    if (name.includes('therian')) return 'Enamorus (Totem)';
+    return 'Enamorus (Incarnazione)';
+  }
+
+  // Maushold naming
+  if (name.toLowerCase().includes('maushold')) {
+    if (name.includes('family-of-three')) return 'Maushold (Famiglia da tre)';
+    return 'Maushold (Famiglia da quattro)';
+  }
+
+  // Squawkabilly naming
+  if (name.toLowerCase().includes('squawkabilly')) {
+    if (name.includes('blue')) return 'Squawkabilly (Blu)';
+    if (name.includes('yellow')) return 'Squawkabilly (Giallo)';
+    if (name.includes('white')) return 'Squawkabilly (Bianco)';
+    return 'Squawkabilly (Verde)';
+  }
+
+  // Tatsugiri naming
+  if (name.toLowerCase().includes('tatsugiri')) {
+    if (name.includes('droopy')) return 'Tatsugiri (Adagiata)';
+    if (name.includes('stretchy')) return 'Tatsugiri (Tesa)';
+    return 'Tatsugiri (Arcurata)';
+  }
+
+  // Dudunsparce naming
+  if (name.toLowerCase().includes('dudunsparce')) {
+    if (name.includes('three-segment')) return 'Dudunsparce (Trisegmento)';
+    return 'Dudunsparce (Bisegmento)';
+  }
+
+  // Minior naming
+  if (name.toLowerCase().includes('minior')) {
+    if (name.includes('meteor')) return 'Minior (Meteora)';
+    const colors: Record<string, string> = {
+      'red': 'Rosso', 'orange': 'Arancione', 'yellow': 'Giallo',
+      'green': 'Verde', 'blue': 'Blu', 'indigo': 'Indaco', 'violet': 'Violetto'
+    };
+    const color = name.split('-').find(p => colors[p]);
+    return `Minior (${colors[color || ''] || 'Nucleo'})`;
   }
 
   // Vivillon pattern naming
