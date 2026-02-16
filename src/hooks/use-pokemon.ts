@@ -177,6 +177,43 @@ export function formatPokemonName(name: string, id: number, baseId?: number): st
     return 'Silvally';
   }
 
+  // Vivillon pattern naming
+  if (name.toLowerCase().includes('vivillon')) {
+    const sName = name.toLowerCase();
+
+    // Check for patterns and return "Vivillon (Pattern)"
+    const patterns: Record<string, string> = {
+      'meadow': 'Prato',
+      'icy-snow': 'Innevato',
+      'polar': 'Polare',
+      'tundra': 'Tundra',
+      'continental': 'Continentale',
+      'garden': 'Giardino',
+      'elegant': 'Elegante',
+      'modern': 'Moderno',
+      'marine': 'Marino',
+      'fancy': 'Sbarazzino',
+      'archipelago': 'Arcipelago',
+      'high-plains': 'Montana',
+      'sandstorm': 'Sabbia',
+      'river': 'Fluviale',
+      'monsoon': 'Monsone',
+      'savanna': 'Savana',
+      'sun': 'Solare',
+      'ocean': 'Oceanico',
+      'jungle': 'Giungla',
+      'pokeball': 'Poké Ball',
+      'poke-ball': 'Poké Ball'
+    };
+
+    for (const [key, label] of Object.entries(patterns)) {
+      if (sName.includes(key)) return `Vivillon (${label})`;
+    }
+
+    if (sName === 'vivillon') return 'Vivillon (Prato)';
+    return 'Vivillon';
+  }
+
   const regions: Record<string, string> = {
     'alola': 'Alolan',
     'galar': 'Galarian',
@@ -257,160 +294,84 @@ export function usePokemonDetails(pokemonId: number | null) {
       return;
     }
 
-    async function fetchPokemonDetails() {
+    function getLocalDetails() {
       setLoading(true);
       setError(null);
 
       try {
-        const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`);
-        const data = await response.json();
-
-        const isRegionalForm = data.name && (
-          data.name.includes('-alola') || data.name.includes('-galar') ||
-          data.name.includes('-hisui') || data.name.includes('-paldea')
-        );
-        const hasGenderDiff = !isRegionalForm && POKEMON_WITH_GENDER_DIFF.includes(pokemonId!);
-
-        const sprites = {
-          default: getPokemonSpriteUrl(pokemonId!, { name: data.name, animated: true }),
-          shiny: getPokemonSpriteUrl(pokemonId!, { shiny: true, name: data.name, animated: true }),
-          femaleDefault: hasGenderDiff ? getPokemonSpriteUrl(pokemonId!, { female: true, name: data.name, animated: true }) : undefined,
-          femaleShiny: hasGenderDiff ? getPokemonSpriteUrl(pokemonId!, { shiny: true, female: true, name: data.name, animated: true }) : undefined,
-        };
-
-        const forms: PokemonFormDetailed[] = [];
-        const varieties: PokemonVariety[] = [];
-
-        // 1. Fetch form data
-        if (data.forms && data.forms.length > 1) {
-          for (const form of data.forms) {
-            const fn = form.name.toLowerCase();
-            const formIdMatch = form.url.match(/\/pokemon-form\/(\d+)\/?$/);
-            const formId = formIdMatch ? parseInt(formIdMatch[1]) : null;
-
-            if (formId) {
-              // Permanent form elimination & user overrides
-              const isExcluded = isFormEliminated(form.name) || (overrides[`${formId}-${form.name}`] as any)?.is_excluded;
-              if (isExcluded) continue;
-
-              // If the current pokemon IS a regional variant, handle logic
-              const isRegional = fn.includes('-alola') || fn.includes('-galar') || fn.includes('-hisui') || fn.includes('-paldea');
-              if (isRegional) {
-                const myName = data.name.toLowerCase();
-                if (!myName.includes('-alola') && !myName.includes('-galar') && !myName.includes('-hisui') && !myName.includes('-paldea')) {
-                  continue;
-                }
-                if (myName.includes('-galar') && !fn.includes('-galar')) continue;
-                if (myName.includes('-alola') && !fn.includes('-alola')) continue;
-                if (myName.includes('-hisui') && !fn.includes('-hisui')) continue;
-                if (myName.includes('-paldea') && !fn.includes('-paldea')) continue;
-              }
-
-              // Skip Minior Meteor forms
-              if (fn.startsWith('minior-') && fn.includes('-meteor')) continue;
-
-              if (formId !== pokemonId) {
-                forms.push({
-                  id: formId,
-                  formName: form.name,
-                  displayName: formatPokemonName(form.name, formId),
-                  sprites: {
-                    default: getPokemonSpriteUrl(formId, { name: form.name }),
-                    shiny: getPokemonSpriteUrl(formId, { shiny: true, name: form.name }),
-                  },
-                });
-              }
-            }
-          }
+        const entry = pokedexData.find((p: any) => p.id === pokemonId);
+        if (!entry) {
+          setError('Pokemon not found in local pokedex');
+          setLoading(false);
+          return;
         }
 
-        // 2. Fetch species varieties
-        const pokedexEntry = pokedexData.find((p: any) => p.id === pokemonId);
-        const baseId = pokedexEntry?.baseId || pokemonId!;
+        const baseId = entry.baseId || entry.id;
+        const name = entry.name;
 
+        // Find all local relatives (varieties/forms) sharing the same baseId
+        const relatives = pokedexData.filter((p: any) => p.baseId === baseId);
 
-        try {
-          const speciesResponse = await fetch(data.species.url);
-          const speciesData = await speciesResponse.json();
+        const isRegionalForm = name && (
+          name.includes('-alola') || name.includes('-galar') ||
+          name.includes('-hisui') || name.includes('-paldea')
+        );
+        const hasGenderDiff = !isRegionalForm && POKEMON_WITH_GENDER_DIFF.includes(baseId);
 
-          // Combine API varieties with manual overrides
-          const allVarieties = [...(speciesData.varieties || [])];
-          const manuals = MANUAL_VARIETIES[baseId] || [];
+        const sprites = {
+          default: getPokemonSpriteUrl(pokemonId!, { name: name, animated: true }),
+          shiny: getPokemonSpriteUrl(pokemonId!, { shiny: true, name: name, animated: true }),
+          femaleDefault: hasGenderDiff ? getPokemonSpriteUrl(pokemonId!, { female: true, name: name, animated: true }) : undefined,
+          femaleShiny: hasGenderDiff ? getPokemonSpriteUrl(pokemonId!, { shiny: true, female: true, name: name, animated: true }) : undefined,
+        };
 
-          manuals.forEach(m => {
-            if (!allVarieties.some(v => v.pokemon.name === m.name)) {
-              allVarieties.push({
-                is_default: false,
-                pokemon: { name: m.name, url: `https://pokeapi.co/api/v2/pokemon/${m.id}/` }
-              });
-            }
-          });
+        const forms: PokemonFormDetailed[] = relatives
+          .filter(r => r.id !== pokemonId)
+          .map(r => ({
+            id: r.id,
+            formName: r.name,
+            displayName: formatPokemonName(r.name, r.id, baseId),
+            sprites: {
+              default: getPokemonSpriteUrl(r.id, { name: r.name }),
+              shiny: getPokemonSpriteUrl(r.id, { name: r.name, shiny: true }),
+            },
+          }));
 
-          if (allVarieties) {
-            for (const variety of allVarieties) {
-              const vn = variety.pokemon.name.toLowerCase();
-              if (vn.includes('-mega') || vn.includes('-gmax')) continue;
-              if (vn.startsWith('minior-') && vn.includes('-meteor')) continue;
-              if (vn.includes('-totem') || vn.includes('-primal') || vn.includes('-eternal')) continue;
-
-              const varietyIdMatch = variety.pokemon.url.match(/\/pokemon\/(\d+)\/?$/);
-              const varietyId = varietyIdMatch ? parseInt(varietyIdMatch[1]) : null;
-
-              const isExcluded = isFormEliminated(vn) || (overrides[`${varietyId}-${vn}`] as any)?.is_excluded;
-
-              // FORCE VISIBLE for Deoxys forms (ignore editor overrides)
-              if (varietyId && [10001, 10002, 10003].includes(varietyId)) {
-                // isExcluded = false; // logic below uses const, so we handle it by not skipping
-              } else if (isExcluded) continue;
-
-              if (varietyId === pokemonId) {
-                varieties.push({
-                  isDefault: true,
-                  pokemon: { id: varietyId, name: vn, spriteUrl: getPokemonSpriteUrl(varietyId, { name: vn, shiny: true }) },
-                });
-              } else if (varietyId && !forms.some(f => f.id === varietyId)) {
-                varieties.push({
-                  isDefault: variety.is_default,
-                  pokemon: { id: varietyId, name: vn, spriteUrl: getPokemonSpriteUrl(varietyId, { name: vn, shiny: true }) },
-                });
-                forms.push({
-                  id: varietyId,
-                  formName: vn,
-                  displayName: formatPokemonName(vn, varietyId),
-                  sprites: {
-                    default: getPokemonSpriteUrl(varietyId, { name: vn }),
-                    shiny: getPokemonSpriteUrl(varietyId, { name: vn, shiny: true }),
-                  },
-                });
-              }
-            }
+        // In our purely local system, Varieties and Forms are essentially the same relatives
+        const varieties: PokemonVariety[] = relatives.map(r => ({
+          isDefault: r.id === baseId,
+          pokemon: {
+            id: r.id,
+            name: r.name,
+            spriteUrl: getPokemonSpriteUrl(r.id, { name: r.name, shiny: true })
           }
-        } catch (e) { console.error(e); }
+        }));
 
         // Final result with overrides
-        const override = (overrides[`${pokemonId}-${data.name}`] || POKEMON_DATA_OVERRIDES[pokemonId!]) as any;
+        const override = (overrides[`${pokemonId}-${name}`] || POKEMON_DATA_OVERRIDES[pokemonId!]) as any;
+
         setPokemon({
           id: pokemonId!,
           baseId,
-          name: data.name,
-          displayName: override?.custom_display_name || override?.displayName || formatPokemonName(data.name, pokemonId!),
+          name: name,
+          displayName: override?.custom_display_name || override?.displayName || formatPokemonName(name, pokemonId!, baseId),
           sprites,
-          types: override?.types || data.types.map((t: any) => t.type.name),
-          generation: getGeneration(pokemonId!, data.name),
+          types: override?.types || [], // PokeAPI types removed as requested
+          generation: entry.generation || getGeneration(pokemonId!, name),
           forms,
           varieties,
           hasGenderDifference: hasGenderDiff,
         });
 
       } catch (err) {
-        setError('Failed to fetch Pokemon details');
+        setError('Failed to load local details');
         console.error(err);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchPokemonDetails();
+    getLocalDetails();
   }, [pokemonId, overridesLoading, overrides]);
 
   return { pokemon, loading: loading || overridesLoading, error };

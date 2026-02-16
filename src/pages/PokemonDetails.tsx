@@ -55,7 +55,6 @@ export default function PokemonDetails() {
         return () => window.removeEventListener('editor-mode-changed', handleEditorChange);
     }, []);
 
-    const getTypeIconUrl = (type: string) => `https://raw.githubusercontent.com/duiker101/pokemon-type-svg-icons/master/icons/${type.toLowerCase()}.svg`;
 
 
     const [caughtForms, setCaughtForms] = useState<Set<string>>(new Set());
@@ -111,21 +110,19 @@ export default function PokemonDetails() {
     // Flatten all variants from the hook data
     const variants = useMemo((): FormVariant[] => {
         if (!details) return [];
-        console.log('[DETAILS-DEBUG] details.forms=', details.forms?.map(f => f.formName));
-        console.log('[DETAILS-DEBUG] details.varieties=', details.varieties?.map(v => v.pokemon.name));
         const items: FormVariant[] = [];
 
-        // Base/Male
-        items.push({
+        // Add Base + Gender variants if applicable
+        const baseVariant: FormVariant = {
             id: details.id,
             name: details.name,
             displayName: details.hasGenderDifference ? 'Maschio' : details.displayName,
             category: 'base',
             gender: 'male',
             spriteUrl: details.sprites.shiny
-        });
+        };
+        items.push(baseVariant);
 
-        // Female diff
         if (details.hasGenderDifference && details.sprites.femaleShiny) {
             items.push({
                 id: details.id,
@@ -137,10 +134,8 @@ export default function PokemonDetails() {
             });
         }
 
-        // Add Forms (avoid redundant ones)
+        // Add all other local forms/varieties (relatives sharing same baseId)
         details.forms.forEach(f => {
-            if (f.formName === details.name) return;
-
             // Inclusion check: static filters + dynamic user overrides
             const isExcluded = isFormEliminated(f.formName) || (overrides[`${f.id}-${f.formName}`] as any)?.is_excluded;
             if (isExcluded) return;
@@ -162,28 +157,8 @@ export default function PokemonDetails() {
             });
         });
 
-        // Add Varieties (Regionals usually)
-        details.varieties.forEach(v => {
-            if (v.isDefault) return;
-
-            const isExcluded = isFormEliminated(v.pokemon.name) || (overrides[`${v.pokemon.id}-${v.pokemon.name}`] as any)?.is_excluded;
-            if (isExcluded) return;
-
-            if (items.some(i => i.id === v.pokemon.id)) return;
-
-            let category: FormVariant['category'] = 'regional';
-            items.push({
-                id: v.pokemon.id,
-                name: v.pokemon.name,
-                displayName: (overrides[`${v.pokemon.id}-${v.pokemon.name}`] as any)?.custom_display_name || formatPokemonName(v.pokemon.name, v.pokemon.id),
-                category,
-                gender: 'genderless',
-                spriteUrl: v.pokemon.spriteUrl
-            });
-        });
-
         return items;
-    }, [details]);
+    }, [details, overrides]);
 
     const toggleCaught = async (variant: FormVariant) => {
         if (!user) {
@@ -270,27 +245,6 @@ export default function PokemonDetails() {
     const currentId = details.id;
     const prevId = currentId > 1 && currentId < 10000 ? currentId - 1 : null;
     const nextId = currentId < 1025 ? currentId + 1 : null;
-
-    const TYPE_COLORS: Record<string, string> = {
-        normal: "#A8A77A",
-        fire: "#EE8130",
-        water: "#6390F0",
-        electric: "#F7D02C",
-        grass: "#7AC74C",
-        ice: "#96D9D6",
-        fighting: "#C22E28",
-        poison: "#A33EA1",
-        ground: "#E2BF65",
-        flying: "#A98FF3",
-        psychic: "#F95587",
-        bug: "#A6B91A",
-        rock: "#B6A136",
-        ghost: "#735797",
-        dragon: "#6F35FC",
-        dark: "#705746",
-        steel: "#B7B7CE",
-        fairy: "#D685AD",
-    };
 
     return (
         <div className="min-h-screen bg-background selection:bg-primary/20">
@@ -379,26 +333,8 @@ export default function PokemonDetails() {
                             )}
                         </div>
 
-                        {/* Official-style Type Badges */}
+                        {/* Generation Badge */}
                         <div className="flex justify-center flex-wrap gap-4">
-                            {details.types.map(type => (
-                                <div
-                                    key={type}
-                                    style={{ backgroundColor: TYPE_COLORS[type.toLowerCase()] || '#777' }}
-                                    className="px-6 py-2 rounded-lg shadow-[0_4px_15px_rgba(0,0,0,0.3)] flex items-center gap-3 transition-transform hover:scale-105 border border-white/20"
-                                >
-                                    <div className="w-5 h-5 flex items-center justify-center brightness-0 invert opacity-90">
-                                        <img
-                                            src={getTypeIconUrl(type)}
-                                            alt=""
-                                            className="w-full h-full object-contain"
-                                        />
-                                    </div>
-                                    <span className="text-sm font-black text-white uppercase tracking-widest drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
-                                        {type}
-                                    </span>
-                                </div>
-                            ))}
                             <div className="px-6 py-2 rounded-lg bg-white/5 border border-white/10 text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center">
                                 Gen {details.generation}
                             </div>

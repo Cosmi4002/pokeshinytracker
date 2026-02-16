@@ -575,9 +575,17 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
       }
     }
 
-    // Poke-ball pattern is special
-    if (sName.includes('poke-ball')) {
+    // Special patterns (Pokeball / Fancy can have different slugs in different sources)
+    if (sName.includes('pokeball') || sName.includes('poke-ball')) {
       return `https://img.pokemondb.net/sprites/home/${subPath}/vivillon-pokeball.png`;
+    }
+    if (sName.includes('fancy')) {
+      return `https://img.pokemondb.net/sprites/home/${subPath}/vivillon-fancy.png`;
+    }
+
+    // Fallback for base Vivillon (ID 666) - usually defaults to Meadow in many sources
+    if (pokemonId === 666 || sName === 'vivillon') {
+      return `https://img.pokemondb.net/sprites/home/${subPath}/vivillon-meadow.png`;
     }
   }
 
