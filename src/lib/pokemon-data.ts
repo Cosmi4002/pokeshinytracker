@@ -432,6 +432,11 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
     if (sName === 'deoxys-speed') return `${baseUrl}/shiny/10003.png`;
   }
 
+  // Giratina overrides
+  if (name && name.toLowerCase().includes('giratina-origin')) {
+    return `https://img.pokemondb.net/sprites/home/shiny/giratina-origin.png`;
+  }
+
   // Silvally overrides
   if (name && name.toLowerCase().includes('silvally')) {
     const sName = name.toLowerCase();

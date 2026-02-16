@@ -65,9 +65,93 @@ export const POKEMON_WITH_GENDER_DIFF = [
   592, 593, 667, 668, 678, 876, 902, 916
 ];
 
-// Manual Varieties to force inclusion for specific species
+// Manual Varieties to force inclusion for specific species that aren't fully listed in pokedex.json
 export const MANUAL_VARIETIES: Record<number, { id: number, name: string }[]> = {
-  // 386: Deoxys removed, to be handled via standard API/JSON
+  386: [ // Deoxys
+    { id: 10001, name: 'deoxys-attack' },
+    { id: 10002, name: 'deoxys-defense' },
+    { id: 10003, name: 'deoxys-speed' },
+  ],
+  479: [ // Rotom
+    { id: 10008, name: 'rotom-heat' },
+    { id: 10009, name: 'rotom-wash' },
+    { id: 10010, name: 'rotom-frost' },
+    { id: 10011, name: 'rotom-fan' },
+    { id: 10012, name: 'rotom-mow' },
+  ],
+  492: [ // Shaymin
+    { id: 10006, name: 'shaymin-sky' },
+  ],
+  493: [ // Arceus
+    { id: 10047, name: 'arceus-fighting' }, { id: 10048, name: 'arceus-flying' },
+    { id: 10049, name: 'arceus-poison' }, { id: 10050, name: 'arceus-ground' },
+    { id: 10051, name: 'arceus-rock' }, { id: 10052, name: 'arceus-bug' },
+    { id: 10053, name: 'arceus-ghost' }, { id: 10054, name: 'arceus-steel' },
+    { id: 10055, name: 'arceus-fire' }, { id: 10056, name: 'arceus-water' },
+    { id: 10057, name: 'arceus-grass' }, { id: 10058, name: 'arceus-electric' },
+    { id: 10059, name: 'arceus-psychic' }, { id: 10060, name: 'arceus-ice' },
+    { id: 10061, name: 'arceus-dragon' }, { id: 10062, name: 'arceus-dark' },
+    { id: 10063, name: 'arceus-fairy' }
+  ],
+  550: [ // Basculin
+    { id: 10016, name: 'basculin-blue-striped' },
+    { id: 10247, name: 'basculin-white-striped' }
+  ],
+  641: [ // Tornadus
+    { id: 10019, name: 'tornadus-therian' }
+  ],
+  642: [ // Thundurus
+    { id: 10020, name: 'thundurus-therian' }
+  ],
+  645: [ // Landorus
+    { id: 10021, name: 'landorus-therian' }
+  ],
+  646: [ // Kyurem
+    { id: 10022, name: 'kyurem-black' },
+    { id: 10023, name: 'kyurem-white' }
+  ],
+  647: [ // Keldeo
+    { id: 10024, name: 'keldeo-resolute' }
+  ],
+  648: [ // Meloetta
+    { id: 10025, name: 'meloetta-pirouette' }
+  ],
+  718: [ // Zygarde
+    { id: 10118, name: 'zygarde-10' },
+    { id: 10120, name: 'zygarde-complete' }
+  ],
+  745: [ // Lycanroc
+    { id: 10126, name: 'lycanroc-midnight' },
+    { id: 10152, name: 'lycanroc-dusk' }
+  ],
+  773: [ // Silvally
+    { id: 10110, name: 'silvally-fighting' }, { id: 10111, name: 'silvally-flying' },
+    { id: 10112, name: 'silvally-poison' }, { id: 10113, name: 'silvally-ground' },
+    { id: 10114, name: 'silvally-rock' }, { id: 10115, name: 'silvally-bug' },
+    { id: 10116, name: 'silvally-ghost' }, { id: 10117, name: 'silvally-steel' },
+    { id: 10118, name: 'silvally-fire' }, { id: 10119, name: 'silvally-water' },
+    { id: 10120, name: 'silvally-grass' }, { id: 10121, name: 'silvally-electric' },
+    { id: 10122, name: 'silvally-psychic' }, { id: 10123, name: 'silvally-ice' },
+    { id: 10124, name: 'silvally-dragon' }, { id: 10125, name: 'silvally-dark' },
+    { id: 10126, name: 'silvally-fairy' }
+  ],
+  800: [ // Necrozma
+    { id: 10155, name: 'necrozma-dusk' },
+    { id: 10156, name: 'necrozma-dawn' },
+    { id: 10157, name: 'necrozma-ultra' }
+  ],
+  916: [ // Oinkologne
+    { id: 10254, name: 'oinkologne-female' }
+  ],
+  1017: [ // Ogerpon
+    { id: 10273, name: 'ogerpon-wellspring-mask' },
+    { id: 10274, name: 'ogerpon-hearthflame-mask' },
+    { id: 10275, name: 'ogerpon-cornerstone-mask' }
+  ],
+  1024: [ // Terapagos
+    { id: 10276, name: 'terapagos-terastal' },
+    { id: 10277, name: 'terapagos-stellar' }
+  ],
 };
 
 // Generation ranges
@@ -167,14 +251,42 @@ export function formatPokemonName(name: string, id: number, baseId?: number): st
     return 'Minior';
   }
 
+  // Giratina naming
+  if (name.toLowerCase().includes('giratina')) {
+    if (name.toLowerCase().includes('origin')) return 'Giratina (Originale)';
+    return 'Giratina (Altera)';
+  }
+
   // Silvally type naming
   if (name.toLowerCase().includes('silvally')) {
     const parts = name.split('-');
     if (parts.length > 1) {
-      const type = parts[1].charAt(0).toUpperCase() + parts[1].slice(1);
-      return `Silvally ${type}`;
+      const type = parts[1].toLowerCase();
+      const typeTranslations: Record<string, string> = {
+        'fighting': 'Lotta', 'flying': 'Volante', 'poison': 'Veleno', 'ground': 'Terra',
+        'rock': 'Roccia', 'bug': 'Coleottero', 'ghost': 'Spettro', 'steel': 'Acciaio',
+        'fire': 'Fuoco', 'water': 'Acqua', 'grass': 'Erba', 'electric': 'Elettro',
+        'psychic': 'Psico', 'ice': 'Ghiaccio', 'dragon': 'Drago', 'dark': 'Buio', 'fairy': 'Folletto'
+      };
+      return `Silvally (${typeTranslations[type] || parts[1].charAt(0).toUpperCase() + parts[1].slice(1)})`;
     }
     return 'Silvally';
+  }
+
+  // Arceus type naming
+  if (name.toLowerCase().includes('arceus-')) {
+    const parts = name.split('-');
+    if (parts.length > 1) {
+      const type = parts[1].toLowerCase();
+      const typeTranslations: Record<string, string> = {
+        'fighting': 'Lotta', 'flying': 'Volante', 'poison': 'Veleno', 'ground': 'Terra',
+        'rock': 'Roccia', 'bug': 'Coleottero', 'ghost': 'Spettro', 'steel': 'Acciaio',
+        'fire': 'Fuoco', 'water': 'Acqua', 'grass': 'Erba', 'electric': 'Elettro',
+        'psychic': 'Psico', 'ice': 'Ghiaccio', 'dragon': 'Drago', 'dark': 'Buio', 'fairy': 'Folletto'
+      };
+      return `Arceus (${typeTranslations[type] || parts[1].charAt(0).toUpperCase() + parts[1].slice(1)})`;
+    }
+    return 'Arceus';
   }
 
   // Vivillon pattern naming
@@ -310,7 +422,20 @@ export function usePokemonDetails(pokemonId: number | null) {
         const name = entry.name;
 
         // Find all local relatives (varieties/forms) sharing the same baseId
-        const relatives = pokedexData.filter((p: any) => p.baseId === baseId);
+        let relatives = pokedexData.filter((p: any) => p.baseId === baseId);
+
+        // Merge with manual varieties (discovery for purely local system)
+        const manuals = MANUAL_VARIETIES[baseId] || [];
+        manuals.forEach(m => {
+          if (!relatives.some(r => r.id === m.id)) {
+            relatives.push({
+              id: m.id,
+              baseId: baseId,
+              name: m.name,
+              generation: entry.generation
+            });
+          }
+        });
 
         const isRegionalForm = name && (
           name.includes('-alola') || name.includes('-galar') ||
