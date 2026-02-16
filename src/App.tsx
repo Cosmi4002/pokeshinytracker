@@ -17,6 +17,7 @@ import SpriteMapper from "./pages/SpriteMapper";
 import { ScrollRestoration } from "@/components/layout/ScrollRestoration";
 
 import NotFound from "./pages/NotFound";
+import Debug from "./pages/Debug";
 import { useUserPreferences } from "@/hooks/use-user-preferences";
 
 const queryClient = new QueryClient();
@@ -42,6 +43,7 @@ function AppContent() {
           <Route path="/pokedex/manage" element={<PokedexManager />} />
           <Route path="/collection" element={<Collection />} />
           <Route path="/sprite-mapper" element={<SpriteMapper />} />
+          <Route path="/debug" element={<Debug />} />
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

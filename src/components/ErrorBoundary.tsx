@@ -6,31 +6,38 @@ interface Props {
 
 interface State {
   hasError: boolean;
+  error?: Error;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
   state: State = { hasError: false };
 
-  static getDerivedStateFromError(): State {
-    return { hasError: true };
+  static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error };
   }
 
   render() {
     if (this.state.hasError) {
       return (
         <div className="min-h-screen bg-background flex items-center justify-center p-4">
-          <div className="text-center space-y-4 max-w-md">
-            <p className="text-2xl">✨</p>
-            <h1 className="text-xl font-bold">Qualcosa è andato storto</h1>
+          <div className="text-center space-y-4 max-w-2xl">
+            <p className="text-2xl">🚨</p>
+            <h1 className="text-xl font-bold text-destructive">Errore Applicazione</h1>
+
+            <div className="text-left bg-muted/50 p-4 rounded-lg overflow-auto max-h-[60vh] text-xs font-mono border border-border">
+              <p className="font-bold mb-2 text-foreground">{this.state.error?.message || 'Errore sconosciuto'}</p>
+              <pre className="opacity-70 whitespace-pre-wrap">{this.state.error?.stack}</pre>
+            </div>
+
             <p className="text-muted-foreground text-sm">
-              Controlla che le variabili d&apos;ambiente VITE_SUPABASE_URL e VITE_SUPABASE_PUBLISHABLE_KEY (o VITE_SUPABASE_ANON_KEY)
-              siano configurate in Vercel (Project Settings → Environment Variables).
+              Prova a ricaricare la pagina. Se l&apos;errore persiste, copia questo messaggio e invialo allo sviluppatore.
             </p>
+
             <button
               onClick={() => window.location.reload()}
               className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-90"
             >
-              Ricarica
+              Ricarica Pagina
             </button>
           </div>
         </div>

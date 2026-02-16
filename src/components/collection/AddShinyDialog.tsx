@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { Loader2 } from 'lucide-react';
 import { GenderSelector } from '@/components/ui/GenderSelector';
 import { Button } from '@/components/ui/button';
+import { Sparkles } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -25,8 +26,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { PokemonSelector } from '@/components/counter/PokemonSelector';
 import { MethodSelector } from '@/components/counter/MethodSelector';
 import { POKEBALLS, GAMES, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON } from '@/lib/pokemon-data';
-import { getPokemonSpriteUrl, formatPokemonName } from '@/hooks/use-pokemon';
-import { usePokemonDetails } from '@/hooks/use-pokemon';
+import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
+import { usePokedexOverrides } from '@/hooks/use-pokedex-overrides';
+import { isFormEliminated } from '@/lib/form-filters';
+import { getPokemonSpriteUrl } from '@/lib/pokemon-data';
 
 interface AddShinyDialogProps {
   open: boolean;
@@ -56,19 +59,64 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
   const [playlistId, setPlaylistId] = useState<string>('');
   const [notes, setNotes] = useState('');
 
+  const { overrides } = usePokedexOverrides();
   const { pokemon: pokemonDetails } = usePokemonDetails(pokemonId);
-  const formOptions = useMemo(() => pokemonDetails?.forms ?? [], [pokemonDetails]);
+
+  // Flatten forms and varieties similar to ShinyCounter
+  const formOptions = useMemo(() => {
+    if (!pokemonDetails) return [];
+
+    const items: { id: number, name: string, displayName: string }[] = [];
+
+    // Add Forms
+    pokemonDetails.forms.forEach(f => {
+      if (f.formName === pokemonDetails.name) return;
+
+      const isExcluded = isFormEliminated(f.formName) || (overrides[`${f.id}-${f.formName}`] as any)?.is_excluded;
+      if (isExcluded) return;
+
+      items.push({
+        id: f.id,
+        name: f.formName,
+        displayName: f.displayName
+      });
+    });
+
+    // Add Varieties
+    pokemonDetails.varieties.forEach(v => {
+      if (v.isDefault) return;
+
+      const isExcluded = isFormEliminated(v.pokemon.name) || (overrides[`${v.pokemon.id}-${v.pokemon.name}`] as any)?.is_excluded;
+      if (isExcluded) return;
+
+      if (items.some(i => i.id === v.pokemon.id)) return;
+
+      items.push({
+        id: v.pokemon.id,
+        name: v.pokemon.name,
+        displayName: (overrides[`${v.pokemon.id}-${v.pokemon.name}`] as any)?.custom_display_name || formatPokemonName(v.pokemon.name, v.pokemon.id)
+      });
+    });
+
+    return items.sort((a, b) => a.displayName.localeCompare(b.displayName));
+  }, [pokemonDetails, overrides]);
 
   const spriteUrl = useMemo(() => {
     if (!pokemonId) return '';
-    const formSuffix = form ? `${pokemonId}-${form}` : undefined;
-    return getPokemonSpriteUrl(pokemonId, {
+    const currentVariant = formOptions.find(f => f.name === form);
+    const displayId = currentVariant ? currentVariant.id : pokemonId;
+
+    // Gender Fallback: Only try to load female sprite if the Pokemon actually has gender differences.
+    // Otherwise, always use default (male) sprite to avoid 404/white square.
+    const showFemaleSprite = gender === 'female' && pokemonDetails?.hasGenderDifference;
+
+    return getPokemonSpriteUrl(displayId, {
       shiny: true,
-      female: gender === 'female',
-      form: formSuffix,
+      female: showFemaleSprite,
+      form: form || undefined,
       name: pokemonName,
     });
-  }, [pokemonId, gender, form, pokemonName]);
+  }, [pokemonId, gender, form, pokemonName, formOptions, pokemonDetails]);
 
   const resetFormState = () => {
     setPokemonId(null);
@@ -101,18 +149,11 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
 
     setLoading(true);
     try {
-      const finalSpriteUrl =
-        spriteUrl ||
-        getPokemonSpriteUrl(pokemonId, {
-          shiny: true,
-          female: gender === 'female',
-          form: form ? `${pokemonId}-${form}` : undefined,
-          name: pokemonName,
-        });
+      const finalSpriteUrl = spriteUrl;
 
       // Calculate the final display name (e.g. "Silvally Bug")
       const finalDisplayName = form
-        ? formOptions.find(f => f.formName.replace(/^[^-]+-/, '') === form)?.displayName || formatPokemonName(pokemonName, pokemonId)
+        ? formOptions.find(f => f.name === form)?.displayName || formatPokemonName(pokemonName, pokemonId)
         : formatPokemonName(pokemonName, pokemonId);
 
       const { error } = await supabase.from('caught_shinies').insert({
@@ -163,21 +204,44 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* 1. Sprite preview (cambia con sesso/form) */}
+          {/* 1. Sprite & Quick Selectors */}
           {pokemonId && (
-            <div className="flex justify-center p-4 bg-muted rounded-lg">
+            <div className="flex flex-col items-center gap-4 p-4 bg-muted rounded-lg border border-primary/10 shadow-inner">
               <img
                 src={spriteUrl}
                 alt={pokemonName}
-                className="h-24 w-24 pokemon-sprite object-contain"
+                className="h-28 w-28 pokemon-sprite object-contain drop-shadow-md"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = '/placeholder.svg';
                 }}
               />
+
+              <div className="flex items-center gap-2 w-full justify-center">
+                {/* Form Selector (Compact) */}
+                {formOptions.length > 0 && (
+                  <Select value={form || 'default'} onValueChange={(v) => setForm(v === 'default' ? '' : v)}>
+                    <SelectTrigger className="h-10 w-[180px] bg-background/50 backdrop-blur-sm border-primary/20 hover:border-primary/50 transition-colors">
+                      <Sparkles className="mr-2 h-4 w-4 text-amber-400 fill-amber-400/20" />
+                      <SelectValue placeholder="Forma base" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="default">Forma base</SelectItem>
+                      {formOptions.map((f) => (
+                        <SelectItem key={f.id} value={f.name}>
+                          {f.displayName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+
+                {/* Gender Toggle */}
+                <GenderSelector value={gender} onChange={setGender} />
+              </div>
             </div>
           )}
 
-          {/* 2. Pokémon con nome */}
+          {/* 2. Pokémon Auswahl */}
           <div className="space-y-2">
             <Label>Pokémon *</Label>
             <PokemonSelector
@@ -190,33 +254,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
             />
           </div>
 
-          {/* 3. Form (opzionale, per Deerling, Pikachu, ecc.) */}
-          {formOptions.length > 0 && (
-            <div className="space-y-2">
-              <Label>Forma / variante</Label>
-              <Select value={form || 'default'} onValueChange={(v) => setForm(v === 'default' ? '' : v)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Forma base" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="default">Forma base</SelectItem>
-                  {formOptions.map((f) => (
-                    <SelectItem key={f.id} value={f.formName.replace(/^[^-]+-/, '')}>
-                      {f.displayName}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-
-          {/* 4. Sesso */}
-          <div className="space-y-2">
-            <Label>Sesso</Label>
-            <GenderSelector value={gender} onChange={setGender} />
-          </div>
-
-          {/* 5. Shiny Charm */}
+          {/* 3. Shiny Charm */}
           <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
             <div className="flex items-center gap-2">
               <img src={SHINY_CHARM_ICON} alt="Shiny Charm" className="h-6 w-6 pokemon-sprite" />
@@ -225,7 +263,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
             <Switch checked={hasShinyCharm} onCheckedChange={setHasShinyCharm} />
           </div>
 
-          {/* 6. Poké Ball */}
+          {/* 4. Poké Ball */}
           <div className="space-y-2">
             <Label>Poké Ball</Label>
             <Select value={pokeball} onValueChange={setPokeball}>
@@ -245,7 +283,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
             </Select>
           </div>
 
-          {/* 7. Gioco */}
+          {/* 5. Gioco */}
           <div className="space-y-2">
             <Label>Gioco</Label>
             <Select value={game} onValueChange={setGame}>
@@ -262,13 +300,13 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
             </Select>
           </div>
 
-          {/* 8. Metodo */}
+          {/* 6. Metodo */}
           <div className="space-y-2">
             <Label>Metodo *</Label>
             <MethodSelector value={method.id} onChange={setMethod} />
           </div>
 
-          {/* 9. Counter and Phase Number - Grid Layout */}
+          {/* 7. Counter and Phase Number - Grid Layout */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Numero tentativi (counter)</Label>
@@ -291,7 +329,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
             </div>
           </div>
 
-          {/* 10. Data inizio e fine */}
+          {/* 8. Data inizio e fine */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Data inizio caccia</Label>
@@ -307,13 +345,13 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
             </div>
           </div>
 
-          {/* 11. FAIL - Separated from Phase */}
+          {/* 9. FAIL - Separated from Phase */}
           <div className="flex items-center justify-between p-3 rounded-lg border border-destructive/30 bg-destructive/5">
             <Label>FAIL (caccia fallita)</Label>
             <Switch checked={isFail} onCheckedChange={setIsFail} />
           </div>
 
-          {/* 12. Playlist */}
+          {/* 10. Playlist */}
           {playlists.length > 0 && (
             <div className="space-y-2">
               <Label>Playlist (opzionale)</Label>
@@ -333,7 +371,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
             </div>
           )}
 
-          {/* 13. Note */}
+          {/* 11. Note */}
           <div className="space-y-2">
             <Label>Note (opzionale)</Label>
             <Textarea
@@ -349,6 +387,6 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
           </Button>
         </form>
       </DialogContent>
-    </Dialog>
+    </Dialog >
   );
 }

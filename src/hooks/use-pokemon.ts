@@ -327,7 +327,7 @@ export function usePokemonDetails(pokemonId: number | null) {
         // 2. Fetch species varieties
         const pokedexEntry = pokedexData.find((p: any) => p.id === pokemonId);
         const baseId = pokedexEntry?.baseId || pokemonId!;
-        console.log('[DEOXYS-DEBUG] Step 1: pokemonId=', pokemonId, 'baseId=', baseId);
+
 
         try {
           const speciesResponse = await fetch(data.species.url);

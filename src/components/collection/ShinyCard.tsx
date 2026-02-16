@@ -45,7 +45,7 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
                     <div className="absolute inset-0 z-0 overflow-hidden">
                         <img
                             src={GAME_COVER_ART[entry.game]}
-                            className="w-full h-full object-cover opacity-30 blur-[2px] scale-110 transition-transform duration-700 group-hover:scale-100 group-hover:blur-0 group-hover:opacity-40"
+                            className="w-full h-full object-contain opacity-40 blur-[1px] transform transition-transform duration-700 group-hover:scale-105 group-hover:blur-0"
                             alt="background"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f0f] to-transparent opacity-80" />
@@ -114,7 +114,7 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
                             <h3 className="text-xl lg:text-2xl font-black text-white tracking-tight capitalize leading-none">
                                 {formatPokemonName(entry.pokemon_name, entry.pokemon_id)}
                             </h3>
-                            {(entry.gender === 'male' || entry.gender === 'female') && (
+                            {entry.gender && (entry.gender === 'male' || entry.gender === 'female') && (
                                 <span className={cn(
                                     "text-xl font-bold drop-shadow-sm flex-shrink-0 leading-none",
                                     entry.gender === 'male' ? "text-blue-400" : "text-pink-400"
@@ -156,52 +156,58 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
                         </div>
                     )}
 
-                    {/* Info Grid - With subtle boxes */}
-                    <div className="grid grid-cols-2 gap-2.5 mt-3">
+                    {/* Info Grid - Darker boxes and better alignment */}
+                    <div className="grid grid-cols-2 gap-3 mt-4">
                         <div
-                            className="rounded-lg p-2.5 border border-white/5"
+                            className="rounded-xl p-3 border border-white/10 shadow-lg"
                             style={{
-                                backgroundColor: `${theme.primary}08`
+                                backgroundColor: `${theme.primary}25`,
+                                borderColor: `${theme.primary}40`
                             }}
                         >
-                            <span className="text-[10px] font-bold text-white/50 uppercase tracking-wider block mb-1.5">
-                                {entry.is_fail ? 'Duration' : 'Hunt Dates'}
-                            </span>
-                            <div className="flex flex-col gap-0.5 text-white/95">
-                                <div className="flex items-center gap-1.5">
-                                    <span className="text-[11px] text-white/40 font-mono">Start:</span>
-                                    <span className="text-xs font-semibold">
+                            <div className="flex items-center gap-1.5 mb-2">
+                                <Calendar className="w-3.5 h-3.5 text-white/60" />
+                                <span className="text-[10px] font-bold text-white/50 uppercase tracking-wider">
+                                    {entry.is_fail ? 'Duration' : 'Hunt Dates'}
+                                </span>
+                            </div>
+                            <div className="space-y-1.5">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-[10px] text-white/40 font-bold uppercase w-8">Start</span>
+                                    <span className="text-[11px] font-bold text-white/90 tabular-nums">
                                         {entry.hunt_start_date ? formatDate(entry.hunt_start_date) : 'Unknown'}
                                     </span>
                                 </div>
-                                <div className="flex items-center gap-1.5">
-                                    <span className="text-[11px] text-white/40 font-mono">End:</span>
-                                    <span className="text-xs font-semibold">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-[10px] text-white/40 font-bold uppercase w-8">End</span>
+                                    <span className="text-[11px] font-bold text-white/90 tabular-nums">
                                         {formatDate(entry.caught_date)}
                                     </span>
                                 </div>
                             </div>
                         </div>
+
                         <div
-                            className="rounded-lg p-2.5 border border-white/5"
+                            className="rounded-xl p-3 border border-white/10 shadow-lg flex flex-col justify-between"
                             style={{
-                                backgroundColor: `${theme.primary}08`
+                                backgroundColor: `${theme.primary}25`,
+                                borderColor: `${theme.primary}40`
                             }}
                         >
-                            <span className="text-[10px] font-bold text-white/50 uppercase tracking-wider block mb-1.5">Encounters</span>
-                            <div className="flex items-center gap-1.5 text-white/95">
-                                <Hash className="w-4 h-4 flex-shrink-0" style={{ color: theme.primary }} />
-                                <span className="text-sm font-bold tabular-nums">
+                            <span className="text-[10px] font-bold text-white/50 uppercase tracking-wider block mb-1">Encounters</span>
+                            <div className="flex items-end gap-1.5 mt-auto">
+                                <span className="text-2xl font-black tabular-nums tracking-tighter text-white drop-shadow-md">
                                     {entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-'}
                                 </span>
+                                <Hash className="w-5 h-5 mb-1 opacity-50" style={{ color: theme.primary }} />
                             </div>
                             {entry.phase_number && (
-                                <div className="mt-1.5 pt-1.5 border-t border-white/5">
+                                <div className="mt-1 pt-1 border-t border-white/10">
                                     <span
-                                        className="text-[10px] font-bold uppercase tracking-wider"
+                                        className="text-[10px] font-black uppercase tracking-widest bg-white/10 px-1.5 py-0.5 rounded"
                                         style={{ color: theme.primary }}
                                     >
-                                        Phase #{entry.phase_number}
+                                        PHASE #{entry.phase_number}
                                     </span>
                                 </div>
                             )}

@@ -392,7 +392,21 @@ export const toShowdownSlug = (name: string): string => {
 export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolean, name?: string, female?: boolean, form?: string, animated?: boolean } = {}): string {
   if (!pokemonId) return '';
 
-  const { shiny = false, female = false, name } = options;
+  let { shiny = false, female = false, name, form } = options;
+
+  // Combine name and form for overrides check
+  if (name && form) {
+    const sName = name.toLowerCase();
+    const sForm = form.toLowerCase();
+
+    if (sForm.startsWith(sName + '-')) {
+      // Form is already the full slug (e.g. name="vivillon", form="vivillon-meadow")
+      name = form;
+    } else if (!sName.includes(sForm)) {
+      // Form is a suffix (e.g. name="vivillon", form="meadow")
+      name = `${name}-${form}`;
+    }
+  }
   const baseUrl = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home';
   const shinyPath = shiny ? '/shiny' : '';
   const genderPath = female ? '/female' : '';
@@ -629,8 +643,8 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
 }
 
 // Alias for transition compatibility
-export const getGameSpecificSpriteUrl = (id: number, methodId: string, name?: string) =>
-  getPokemonSpriteUrl(id, { shiny: true, name });
+export const getGameSpecificSpriteUrl = (id: number, methodId: string, name?: string, form?: string, gender?: string) =>
+  getPokemonSpriteUrl(id, { shiny: true, name, form: form || undefined, female: gender === 'female' });
 
 export function getShinyCharmIcon(): string {
   return '/img/items/shiny-charm.png';

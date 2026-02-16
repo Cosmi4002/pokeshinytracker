@@ -1,10 +1,18 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { Minus, Plus, RotateCcw, Cloud, CloudOff, Loader2, Check } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { Minus, Plus, RotateCcw, Cloud, CloudOff, Loader2, Check, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent } from '@/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { GenderSelector } from '@/components/ui/GenderSelector';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,6 +30,9 @@ import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
 import { FinishHuntDialog } from './FinishHuntDialog';
 import { useRandomColor } from '@/lib/random-color-context';
+import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
+import { isFormEliminated, POKEMON_DATA_OVERRIDES } from '@/lib/form-filters';
+import { usePokedexOverrides } from '@/hooks/use-pokedex-overrides';
 
 interface ShinyCounterProps {
   huntId?: string;
@@ -29,6 +40,7 @@ interface ShinyCounterProps {
 
 export function ShinyCounter({ huntId }: ShinyCounterProps) {
   const { user } = useAuth();
+  const { overrides } = usePokedexOverrides();
   const { accentColor } = useRandomColor();
   const [counter, setCounter] = useState(0);
   const [incrementAmount, setIncrementAmount] = useState(1);
@@ -36,6 +48,8 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
   const [selectedPokemonName, setSelectedPokemonName] = useState<string>('');
   const [selectedMethod, setSelectedMethod] = useState<HuntingMethod>(HUNTING_METHODS[0]);
   const [hasShinyCharm, setHasShinyCharm] = useState(false);
+  const [selectedForm, setSelectedForm] = useState<string>('');
+  const [selectedGender, setSelectedGender] = useState<string>('');
   const [customOdds, setCustomOdds] = useState(4096);
   const [loading, setLoading] = useState(!!user);
   const activeHuntIdRef = useRef<string | null>(null);
@@ -47,6 +61,50 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
   const [playlists, setPlaylists] = useState<{ id: string; name: string }[]>([]);
   const [huntCreatedAt, setHuntCreatedAt] = useState<string | null>(null);
   const isInitialLoadRef = useRef(true);
+
+  const { pokemon: pokemonDetails } = usePokemonDetails(selectedPokemonId || 0);
+  // Flatten forms and varieties similar to PokemonDetails
+  const formOptions = useMemo(() => {
+    if (!pokemonDetails) return [];
+
+    const items: { id: number, name: string, displayName: string }[] = [];
+
+    // Add Forms
+    pokemonDetails.forms.forEach(f => {
+      // Skip if it's the base form (we handle base separately or as empty string, 
+      // but if we want to list it as an option, we can. 
+      // ShinyCounter logic uses '' as base.
+      if (f.formName === pokemonDetails.name) return;
+
+      const isExcluded = isFormEliminated(f.formName) || (overrides[`${f.id}-${f.formName}`] as any)?.is_excluded;
+      if (isExcluded) return;
+
+      items.push({
+        id: f.id,
+        name: f.formName, // Store full name
+        displayName: f.displayName
+      });
+    });
+
+    // Add Varieties (Regionals, etc)
+    pokemonDetails.varieties.forEach(v => {
+      if (v.isDefault) return; // Base handled elsewhere or implicitly
+
+      const isExcluded = isFormEliminated(v.pokemon.name) || (overrides[`${v.pokemon.id}-${v.pokemon.name}`] as any)?.is_excluded;
+      if (isExcluded) return;
+
+      // Avoid duplicates from forms array
+      if (items.some(i => i.id === v.pokemon.id)) return;
+
+      items.push({
+        id: v.pokemon.id,
+        name: v.pokemon.name,
+        displayName: (overrides[`${v.pokemon.id}-${v.pokemon.name}`] as any)?.custom_display_name || formatPokemonName(v.pokemon.name, v.pokemon.id)
+      });
+    });
+
+    return items.sort((a, b) => a.displayName.localeCompare(b.displayName));
+  }, [pokemonDetails, overrides]);
 
   // Load active hunt and playlists from Supabase when user is logged in
   useEffect(() => {
@@ -90,6 +148,8 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
           setSelectedPokemonName(data.pokemon_name ?? '');
           setSelectedMethod(HUNTING_METHODS.find((m) => m.id === data.method) ?? HUNTING_METHODS[0]);
           setHasShinyCharm(data.has_shiny_charm ?? false);
+          setSelectedForm(data.form ?? '');
+          setSelectedGender(data.gender ?? '');
           setHuntCreatedAt(data.created_at);
         } else {
           // No hunt found for ID or no recent hunt. Reset to default new hunt state.
@@ -100,6 +160,8 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
           setSelectedPokemonName('');
           setSelectedMethod(HUNTING_METHODS[0]);
           setHasShinyCharm(false);
+          setSelectedForm('');
+          setSelectedGender('');
           setHuntCreatedAt(null);
         }
       } catch {
@@ -155,6 +217,8 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
           counter,
           has_shiny_charm: hasShinyCharm,
           increment_amount: incrementAmount,
+          form: selectedForm || null,
+          gender: selectedGender || null,
           updated_at: new Date().toISOString(),
         };
 
@@ -180,13 +244,19 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [user?.id, loading, counter, incrementAmount, selectedPokemonId, selectedPokemonName, selectedMethod, hasShinyCharm]);
+  }, [user?.id, loading, counter, incrementAmount, selectedPokemonId, selectedPokemonName, selectedMethod, hasShinyCharm, selectedForm, selectedGender]);
 
   // Calculate stats based on current counter and method
-  const stats = calculateShinyStats(counter, selectedMethod.id, hasShinyCharm, selectedMethod.id === 'custom' ? customOdds : undefined);
+  const stats = useMemo(() => {
+    if (!selectedMethod) return calculateShinyStats(0, HUNTING_METHODS[0].id, false);
+    return calculateShinyStats(counter, selectedMethod.id, hasShinyCharm, selectedMethod.id === 'custom' ? customOdds : undefined);
+  }, [counter, selectedMethod, hasShinyCharm, customOdds]);
 
   const increment = () => setCounter((prev) => prev + incrementAmount);
   const decrement = () => setCounter((prev) => Math.max(0, prev - incrementAmount));
+
+  // Ensure selectedMethod is never null in render
+  const safeSelectedMethod = selectedMethod || HUNTING_METHODS[0];
 
   const handleCounterClick = () => {
     setTempCounterValue(counter.toString());
@@ -242,259 +312,333 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
     );
   }
 
-  return (
-    <div className="w-full h-full space-y-3">
-      {/* Counter Display */}
-      <div className="text-center space-y-4">
-        {/* Pokemon Sprite */}
-        {selectedPokemonId && (
-          <div className="flex justify-center mb-4">
-            <img
-              src={getGameSpecificSpriteUrl(selectedPokemonId, selectedMethod.id, selectedPokemonName)}
-              alt={selectedPokemonName}
-              className="w-40 h-40 object-contain pokemon-sprite animate-in fade-in zoom-in duration-500"
-              style={{ imageRendering: 'auto' }}
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = '/placeholder.svg';
-              }}
-            />
-          </div>
-        )}
+  try {
+    return (
+      <div className="w-full h-full space-y-3">
+        {/* Counter Display */}
+        <div className="text-center space-y-4">
+          {/* Pokemon Sprite */}
+          {selectedPokemonId && (
+            <div className="relative group/sprite flex justify-center mb-4">
+              {(() => {
+                const currentVariant = formOptions.find(f => f.name === selectedForm);
+                const displayId = currentVariant ? currentVariant.id : selectedPokemonId;
 
-        {/* Counter Number - Editable */}
-        {isEditingCounter ? (
-          <Input
-            type="number"
-            value={tempCounterValue}
-            onChange={(e) => setTempCounterValue(e.target.value)}
-            onBlur={handleCounterBlur}
-            onKeyDown={handleCounterKeyDown}
-            autoFocus
-            className="text-6xl font-bold tabular-nums text-center h-24 border-2 bg-background focus:ring-0"
-            style={{
-              fontSize: '4rem',
-              color: accentColor,
-              borderColor: accentColor,
-              backgroundColor: 'var(--background)' // Force background color
-            }}
-          />
-        ) : (
-          <div
-            onClick={handleCounterClick}
-            className="text-6xl font-bold tabular-nums cursor-pointer hover:scale-105 transition-transform duration-200 text-center flex justify-center items-center h-24"
-            title="Click to edit counter"
-          >
-            <span
+                return (
+                  <div className="flex flex-col items-center gap-2">
+                    <img
+                      src={getGameSpecificSpriteUrl(displayId, safeSelectedMethod.id, selectedPokemonName, selectedForm, selectedGender)}
+                      alt={selectedPokemonName}
+                      className="w-40 h-40 object-contain pokemon-sprite animate-in fade-in zoom-in duration-500"
+                      style={{ imageRendering: 'auto' }}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/placeholder.svg';
+                      }}
+                    />
+
+                    {/* Variant/Gender Selectors Row */}
+                    <div className="flex items-center gap-3 mt-2 h-9">
+                      {/* Form Selector */}
+                      {formOptions.length > 0 && (
+                        <Select value={selectedForm || 'default'} onValueChange={(v) => setSelectedForm(v === 'default' ? '' : v)}>
+                          <SelectTrigger
+                            className="h-8 min-w-[120px] px-3 rounded-full border bg-background/50 backdrop-blur-sm text-xs font-medium"
+                            style={{ borderColor: accentColor }}
+                          >
+                            <div className="flex items-center gap-2">
+                              <Sparkles className="h-3 w-3" style={{ color: accentColor }} />
+                              <span className="truncate max-w-[100px]">
+                                {selectedForm
+                                  ? formOptions.find(f => f.name === selectedForm)?.displayName
+                                  : "Forma base"}
+                              </span>
+                            </div>
+                          </SelectTrigger>
+                          <SelectContent align="center">
+                            <SelectItem value="default" className="text-xs">Forma base</SelectItem>
+                            {formOptions.map((f) => (
+                              <SelectItem key={f.id} value={f.name} className="text-xs">
+                                {f.displayName}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+
+                      {/* Gender Toggle */}
+                      {pokemonDetails?.hasGenderDifference && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8 px-3 rounded-full border bg-background/50 backdrop-blur-sm gap-2 text-xs font-medium"
+                          style={{ borderColor: accentColor }}
+                          onClick={() => setSelectedGender(prev => prev === 'female' ? '' : 'female')}
+                        >
+                          {selectedGender === 'female' ? (
+                            <>
+                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3 text-pink-500"><path d="M12 15v7" /><path d="M9 19h6" /><circle cx="12" cy="9" r="6" /></svg>
+                              <span>Femmina</span>
+                            </>
+                          ) : (
+                            <>
+                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3 text-blue-500"><path d="M16 3h5v5" /><path d="m21 3-6.75 6.75" /><circle cx="10" cy="14" r="6" /></svg>
+                              <span>Maschio</span>
+                            </>
+                          )}
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          )}
+
+          {/* Counter Number - Editable */}
+          {isEditingCounter ? (
+            <Input
+              type="number"
+              value={tempCounterValue}
+              onChange={(e) => setTempCounterValue(e.target.value)}
+              onBlur={handleCounterBlur}
+              onKeyDown={handleCounterKeyDown}
+              autoFocus
+              className="text-6xl font-bold tabular-nums text-center h-24 border-2 bg-background focus:ring-0"
               style={{
+                fontSize: '4rem',
                 color: accentColor,
-                filter: `drop-shadow(0 0 15px ${accentColor}60)`
-              }}
-              className="transition-all duration-300"
-            >
-              {counter.toLocaleString()}
-            </span>
-          </div>
-        )}
-
-        {/* Counter Buttons */}
-        <div className="flex justify-center gap-2">
-          <Button
-            size="lg"
-            onClick={decrement}
-            variant="outline"
-            className="h-12 px-6 text-xl hover:bg-background"
-            style={{ borderColor: accentColor, color: accentColor }}
-          >
-            <Minus className="h-5 w-5" />
-          </Button>
-          <Button
-            size="lg"
-            onClick={increment}
-            className="h-12 px-6 text-xl"
-            style={{
-              backgroundColor: accentColor,
-              boxShadow: `0 0 20px ${accentColor}40`
-            }}
-          >
-            <Plus className="h-5 w-5" />
-          </Button>
-        </div>
-
-        {/* Increment Amount */}
-        <div className="flex items-center justify-center gap-2">
-          <Label htmlFor="increment" className="text-xs text-muted-foreground">
-            Step:
-          </Label>
-          <Input
-            id="increment"
-            type="number"
-            min={1}
-            value={incrementAmount}
-            onChange={(e) => setIncrementAmount(Math.max(1, parseInt(e.target.value) || 1))}
-            className="w-16 h-8 text-center bg-white text-black border-2 border-input"
-          />
-        </div>
-
-        {user && (
-          <div className="flex justify-center items-center gap-2 text-sm text-muted-foreground h-6">
-            {saveStatus === 'saving' ? (
-              <>
-                <Loader2 className="h-3 w-3 animate-spin" />
-                <span>Salvataggio...</span>
-              </>
-            ) : saveStatus === 'saved' ? (
-              <>
-                <Cloud className="h-3 w-3" />
-                <span>Salvato</span>
-              </>
-            ) : (
-              <>
-                <CloudOff className="h-3 w-3 text-destructive" />
-                <span className="text-destructive">Errore</span>
-              </>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Stats Card */}
-      <Card>
-        <CardContent className="pt-4 grid grid-cols-2 gap-4 text-center">
-          <div>
-            <div className="text-sm text-muted-foreground mb-1">Odds Correnti</div>
-            <div className="font-mono font-bold text-base sm:text-lg text-primary break-all">
-              1 / {stats.currentOdds.toLocaleString()}
-            </div>
-            <div className="text-xs text-muted-foreground">
-              {stats.percentage}%
-            </div>
-          </div>
-          <div>
-            <div className="text-sm text-muted-foreground mb-1">Prob. Totale</div>
-            <span className="font-mono font-bold text-base sm:text-lg text-primary">{stats.binomialProbability}%</span>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Setup Section */}
-      <Card>
-        <CardContent className="pt-4 space-y-4">
-          <h3 className="font-semibold text-lg">Setup</h3>
-
-          {/* Pokemon Selector */}
-          <div className="space-y-2">
-            <Label>Pokémon</Label>
-            <PokemonSelector
-              value={selectedPokemonId}
-              onChange={(id, name) => {
-                setSelectedPokemonId(id);
-                setSelectedPokemonName(name);
+                borderColor: accentColor,
+                backgroundColor: 'var(--background)' // Force background color
               }}
             />
-          </div>
-
-          {/* Method Selector */}
-          <div className="space-y-2">
-            <Label>Method</Label>
-            <MethodSelector
-              value={selectedMethod.id}
-              onChange={setSelectedMethod}
-            />
-          </div>
-
-          {/* Custom Odds (only if custom method selected) */}
-          {selectedMethod.id === 'custom' && (
-            <div className="space-y-2">
-              <Label>Custom Odds (1 out of)</Label>
-              <Input
-                type="number"
-                min={1}
-                value={customOdds}
-                onChange={(e) => setCustomOdds(Math.max(1, parseInt(e.target.value) || 1))}
-              />
-            </div>
-          )}
-
-          {/* Shiny Charm Toggle */}
-          {selectedMethod.supportsShinyCharm && (
+          ) : (
             <div
-              className="flex items-center justify-between p-3 rounded-lg"
-              style={{ backgroundColor: 'color-mix(in srgb, var(--muted), transparent 50%)' }}
+              onClick={handleCounterClick}
+              className="text-6xl font-bold tabular-nums cursor-pointer hover:scale-105 transition-transform duration-200 text-center flex justify-center items-center h-24"
+              title="Click to edit counter"
             >
-              <div className="flex items-center gap-2">
-                <img
-                  src={SHINY_CHARM_ICON}
-                  alt="Shiny Charm"
-                  className="h-6 w-6 pokemon-sprite"
-                />
-                <Label htmlFor="shiny-charm">Shiny Charm</Label>
-              </div>
-              <Switch
-                id="shiny-charm"
-                checked={hasShinyCharm}
-                onCheckedChange={setHasShinyCharm}
-              />
+              <span
+                style={{
+                  color: accentColor,
+                  filter: `drop-shadow(0 0 15px ${accentColor}60)`
+                }}
+                className="transition-all duration-300"
+              >
+                {counter.toLocaleString()}
+              </span>
             </div>
           )}
 
-          {/* Finish Hunt Button - only show if user is logged in and hunt exists */}
-          {user && activeHuntIdRef.current && selectedPokemonId && (
+          {/* Counter Buttons */}
+          <div className="flex justify-center gap-2">
             <Button
-              variant="default"
-              onClick={() => setIsFinishDialogOpen(true)}
-              className="w-full shiny-glow"
+              size="lg"
+              onClick={decrement}
+              variant="outline"
+              className="h-12 px-6 text-xl hover:bg-background"
+              style={{ borderColor: accentColor, color: accentColor }}
             >
-              <Check className="mr-2 h-4 w-4" />
-              Termina caccia e salva
+              <Minus className="h-5 w-5" />
             </Button>
+            <Button
+              size="lg"
+              onClick={increment}
+              className="h-12 px-6 text-xl"
+              style={{
+                backgroundColor: accentColor,
+                boxShadow: `0 0 20px ${accentColor}40`
+              }}
+            >
+              <Plus className="h-5 w-5" />
+            </Button>
+          </div>
+
+          {/* Increment Amount */}
+          <div className="flex items-center justify-center gap-2">
+            <Label htmlFor="increment" className="text-xs text-muted-foreground">
+              Step:
+            </Label>
+            <Input
+              id="increment"
+              type="number"
+              min={1}
+              value={incrementAmount}
+              onChange={(e) => setIncrementAmount(Math.max(1, parseInt(e.target.value) || 1))}
+              className="w-16 h-8 text-center bg-white text-black border-2 border-input"
+            />
+          </div>
+
+          {user && (
+            <div className="flex justify-center items-center gap-2 text-sm text-muted-foreground h-6">
+              {saveStatus === 'saving' ? (
+                <>
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  <span>Salvataggio...</span>
+                </>
+              ) : saveStatus === 'saved' ? (
+                <>
+                  <Cloud className="h-3 w-3" />
+                  <span>Salvato</span>
+                </>
+              ) : (
+                <>
+                  <CloudOff className="h-3 w-3 text-destructive" />
+                  <span className="text-destructive">Errore</span>
+                </>
+              )}
+            </div>
           )}
+        </div>
 
-          {/* Reset Button */}
-          <Button
-            variant="secondary"
-            onClick={() => setIsResetDialogOpen(true)}
-            className="w-full transition-all duration-300 hover:scale-[1.02]"
-            style={{
-              boxShadow: `0 0 15px ${accentColor}40`,
-              border: `1px solid ${accentColor}60`
-            }}
-          >
-            <RotateCcw className="mr-2 h-4 w-4" style={{ color: accentColor }} />
-            Reset Counter
-          </Button>
-        </CardContent>
-      </Card>
+        {/* Stats Card */}
+        <Card>
+          <CardContent className="pt-4 grid grid-cols-2 gap-4 text-center">
+            <div>
+              <div className="text-sm text-muted-foreground mb-1">Odds Correnti</div>
+              <div className="font-mono font-bold text-base sm:text-lg text-primary break-all">
+                1 / {stats.currentOdds.toLocaleString()}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {stats.percentage}%
+              </div>
+            </div>
+            <div>
+              <div className="text-sm text-muted-foreground mb-1">Prob. Totale</div>
+              <span className="font-mono font-bold text-base sm:text-lg text-primary">{stats.binomialProbability}%</span>
+            </div>
+          </CardContent>
+        </Card>
 
-      <AlertDialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Sei sicuro?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Questa azione riporterà il counter a 0. I dati salvati verranno aggiornati.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Annulla</AlertDialogCancel>
-            <AlertDialogAction onClick={() => {
-              reset();
-              setIsResetDialogOpen(false);
-            }}>Conferma</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        {/* Setup Section */}
+        <Card>
+          <CardContent className="pt-4 space-y-4">
+            <h3 className="font-semibold text-lg">Setup</h3>
 
-      <FinishHuntDialog
-        open={isFinishDialogOpen}
-        onOpenChange={setIsFinishDialogOpen}
-        huntId={activeHuntIdRef.current || ''}
-        pokemonId={selectedPokemonId || 0}
-        pokemonName={selectedPokemonName}
-        counter={counter}
-        method={selectedMethod.id}
-        hasShinyCharm={hasShinyCharm}
-        playlists={playlists}
-        startDate={huntCreatedAt}
-      />
-    </div>
-  );
+            {/* Pokemon Selector */}
+            <div className="space-y-2">
+              <Label>Pokémon</Label>
+              <PokemonSelector
+                value={selectedPokemonId}
+                onChange={(id, name) => {
+                  setSelectedPokemonId(id);
+                  setSelectedPokemonName(name);
+                }}
+              />
+            </div>
+
+            {/* Method Selector */}
+            <div className="space-y-2">
+              <Label>Method</Label>
+              <MethodSelector
+                value={safeSelectedMethod.id}
+                onChange={setSelectedMethod}
+              />
+            </div>
+
+            {/* Custom Odds (only if custom method selected) */}
+            {safeSelectedMethod.id === 'custom' && (
+              <div className="space-y-2">
+                <Label>Custom Odds (1 out of)</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  value={customOdds}
+                  onChange={(e) => setCustomOdds(Math.max(1, parseInt(e.target.value) || 1))}
+                />
+              </div>
+            )}
+
+            {/* Shiny Charm Toggle */}
+            {safeSelectedMethod.supportsShinyCharm && (
+              <div
+                className="flex items-center justify-between p-3 rounded-lg"
+                style={{ backgroundColor: 'color-mix(in srgb, var(--muted), transparent 50%)' }}
+              >
+                <div className="flex items-center gap-2">
+                  <img
+                    src={SHINY_CHARM_ICON}
+                    alt="Shiny Charm"
+                    className="h-6 w-6 pokemon-sprite"
+                  />
+                  <Label htmlFor="shiny-charm">Shiny Charm</Label>
+                </div>
+                <Switch
+                  id="shiny-charm"
+                  checked={hasShinyCharm}
+                  onCheckedChange={setHasShinyCharm}
+                />
+              </div>
+            )}
+
+            {/* Finish Hunt Button - only show if user is logged in and hunt exists */}
+            {user && activeHuntIdRef.current && selectedPokemonId && (
+              <Button
+                variant="default"
+                onClick={() => setIsFinishDialogOpen(true)}
+                className="w-full shiny-glow"
+              >
+                <Check className="mr-2 h-4 w-4" />
+                Termina caccia e salva
+              </Button>
+            )}
+
+            {/* Reset Button */}
+            <Button
+              variant="secondary"
+              onClick={() => setIsResetDialogOpen(true)}
+              className="w-full transition-all duration-300 hover:scale-[1.02]"
+              style={{
+                boxShadow: `0 0 15px ${accentColor}40`,
+                border: `1px solid ${accentColor}60`
+              }}
+            >
+              <RotateCcw className="mr-2 h-4 w-4" style={{ color: accentColor }} />
+              Reset Counter
+            </Button>
+          </CardContent>
+        </Card>
+
+        <AlertDialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Sei sicuro?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Questa azione riporterà il counter a 0. I dati salvati verranno aggiornati.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Annulla</AlertDialogCancel>
+              <AlertDialogAction onClick={() => {
+                reset();
+                setIsResetDialogOpen(false);
+              }}>Conferma</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        <FinishHuntDialog
+          open={isFinishDialogOpen}
+          onOpenChange={setIsFinishDialogOpen}
+          huntId={activeHuntIdRef.current || ''}
+          pokemonId={selectedPokemonId || 0}
+          pokemonName={selectedPokemonName}
+          counter={counter}
+          method={safeSelectedMethod.id}
+          hasShinyCharm={hasShinyCharm}
+          playlists={playlists}
+          startDate={huntCreatedAt}
+          initialForm={selectedForm}
+          initialGender={selectedGender}
+        />
+      </div>
+    );
+  } catch (err: any) {
+    return (
+      <div className="p-4 border-2 border-destructive bg-destructive/10 rounded-lg text-destructive">
+        <h3 className="font-bold mb-2">Errore di rendering</h3>
+        <pre className="text-xs overflow-auto max-h-40">{err.message}</pre>
+        <pre className="text-[10px] mt-2 opacity-50 overflow-auto">{err.stack}</pre>
+      </div>
+    );
+  }
 }

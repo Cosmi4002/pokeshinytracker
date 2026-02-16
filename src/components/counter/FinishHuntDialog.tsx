@@ -26,6 +26,8 @@ import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
 import { POKEBALLS, GAMES, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, getPokemonSpriteUrl } from '@/lib/pokemon-data';
 import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
+import { isFormEliminated, POKEMON_DATA_OVERRIDES } from '@/lib/form-filters';
+import { usePokedexOverrides } from '@/hooks/use-pokedex-overrides';
 import { MethodSelector } from '@/components/counter/MethodSelector';
 
 interface FinishHuntDialogProps {
@@ -39,6 +41,8 @@ interface FinishHuntDialogProps {
   hasShinyCharm: boolean;
   playlists: { id: string; name: string }[];
   startDate?: string | null;
+  initialForm?: string;
+  initialGender?: string;
 }
 
 export function FinishHuntDialog({
@@ -52,6 +56,8 @@ export function FinishHuntDialog({
   hasShinyCharm: initialHasShinyCharm,
   playlists,
   startDate,
+  initialForm = '',
+  initialGender = '',
 }: FinishHuntDialogProps) {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -60,8 +66,8 @@ export function FinishHuntDialog({
 
   const initialMethod = HUNTING_METHODS.find((m) => m.id === initialMethodId) ?? HUNTING_METHODS[0];
 
-  const [form, setForm] = useState('');
-  const [gender, setGender] = useState<string>('');
+  const [form, setForm] = useState(initialForm);
+  const [gender, setGender] = useState<string>(initialGender);
   const [currentHasShinyCharm, setCurrentHasShinyCharm] = useState(initialHasShinyCharm);
   const [pokeball, setPokeball] = useState('pokeball');
   const [game, setGame] = useState('');
@@ -74,18 +80,63 @@ export function FinishHuntDialog({
   const [playlistId, setPlaylistId] = useState<string>('');
   const [notes, setNotes] = useState('');
 
+  const { overrides } = usePokedexOverrides();
   const { pokemon: pokemonDetails } = usePokemonDetails(pokemonId);
-  const formOptions = useMemo(() => pokemonDetails?.forms ?? [], [pokemonDetails]);
+
+  // Flatten forms and varieties similar to ShinyCounter
+  const formOptions = useMemo(() => {
+    if (!pokemonDetails) return [];
+
+    const items: { id: number, name: string, displayName: string }[] = [];
+
+    // Add Forms
+    pokemonDetails.forms.forEach(f => {
+      if (f.formName === pokemonDetails.name) return;
+
+      const isExcluded = isFormEliminated(f.formName) || (overrides[`${f.id}-${f.formName}`] as any)?.is_excluded;
+      if (isExcluded) return;
+
+      items.push({
+        id: f.id,
+        name: f.formName,
+        displayName: f.displayName
+      });
+    });
+
+    // Add Varieties
+    pokemonDetails.varieties.forEach(v => {
+      if (v.isDefault) return;
+
+      const isExcluded = isFormEliminated(v.pokemon.name) || (overrides[`${v.pokemon.id}-${v.pokemon.name}`] as any)?.is_excluded;
+      if (isExcluded) return;
+
+      if (items.some(i => i.id === v.pokemon.id)) return;
+
+      items.push({
+        id: v.pokemon.id,
+        name: v.pokemon.name,
+        displayName: (overrides[`${v.pokemon.id}-${v.pokemon.name}`] as any)?.custom_display_name || formatPokemonName(v.pokemon.name, v.pokemon.id)
+      });
+    });
+
+    return items.sort((a, b) => a.displayName.localeCompare(b.displayName));
+  }, [pokemonDetails, overrides]);
 
   const spriteUrl = useMemo(() => {
-    // getPokemonSpriteUrl handles prepending ID, so we just pass the form name
-    return getPokemonSpriteUrl(pokemonId, {
+    const currentVariant = formOptions.find(f => f.name === form);
+    const displayId = currentVariant ? currentVariant.id : pokemonId;
+
+    // Gender Fallback: Only try to load female sprite if the Pokemon actually has gender differences.
+    // Otherwise, always use default (male) sprite to avoid 404/white square.
+    const showFemaleSprite = gender === 'female' && pokemonDetails?.hasGenderDifference;
+
+    return getPokemonSpriteUrl(displayId, {
       shiny: true,
-      female: gender === 'female',
+      female: showFemaleSprite,
       form: form || undefined,
       name: pokemonName,
     });
-  }, [pokemonId, gender, form, pokemonName]);
+  }, [pokemonId, gender, form, pokemonName, formOptions, pokemonDetails]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -111,8 +162,9 @@ export function FinishHuntDialog({
 
     try {
       // Calculate the final display name (e.g. "Silvally Bug")
+      // Use full name matching to match ShinyCounter fix
       const finalDisplayName = form
-        ? formOptions.find(f => f.formName.replace(/^[^-]+-/, '') === form)?.displayName || formatPokemonName(pokemonName, pokemonId)
+        ? formOptions.find(f => f.name === form)?.displayName || formatPokemonName(pokemonName, pokemonId)
         : formatPokemonName(pokemonName, pokemonId);
 
       const { error: insertError } = await supabase.from('caught_shinies').insert({
@@ -199,7 +251,7 @@ export function FinishHuntDialog({
                 <SelectContent>
                   <SelectItem value="default">Forma base</SelectItem>
                   {formOptions.map((f) => (
-                    <SelectItem key={f.id} value={f.formName.replace(/^[^-]+-/, '')}>
+                    <SelectItem key={f.id} value={f.name}>
                       {f.displayName}
                     </SelectItem>
                   ))}

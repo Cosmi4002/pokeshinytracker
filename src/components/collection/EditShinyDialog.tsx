@@ -24,8 +24,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { PokemonSelector } from '@/components/counter/PokemonSelector';
 import { MethodSelector } from '@/components/counter/MethodSelector';
 import { POKEBALLS, GAMES, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON } from '@/lib/pokemon-data';
-import { getPokemonSpriteUrl, formatPokemonName } from '@/hooks/use-pokemon';
-import { usePokemonDetails } from '@/hooks/use-pokemon';
+import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
+import { usePokedexOverrides } from '@/hooks/use-pokedex-overrides';
+import { isFormEliminated } from '@/lib/form-filters';
+import { getPokemonSpriteUrl } from '@/lib/pokemon-data';
+import { GenderSelector } from '@/components/ui/GenderSelector';
+import { Sparkles } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
 
 type CaughtShinyRow = Tables<'caught_shinies'>;
@@ -59,19 +63,64 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
   const [playlistId, setPlaylistId] = useState<string>('');
   const [notes, setNotes] = useState('');
 
+  const { overrides } = usePokedexOverrides();
   const { pokemon: pokemonDetails } = usePokemonDetails(pokemonId);
-  const formOptions = useMemo(() => pokemonDetails?.forms ?? [], [pokemonDetails]);
+
+  // Flatten forms and varieties similar to ShinyCounter
+  const formOptions = useMemo(() => {
+    if (!pokemonDetails) return [];
+
+    const items: { id: number, name: string, displayName: string }[] = [];
+
+    // Add Forms
+    pokemonDetails.forms.forEach(f => {
+      if (f.formName === pokemonDetails.name) return;
+
+      const isExcluded = isFormEliminated(f.formName) || (overrides[`${f.id}-${f.formName}`] as any)?.is_excluded;
+      if (isExcluded) return;
+
+      items.push({
+        id: f.id,
+        name: f.formName,
+        displayName: f.displayName
+      });
+    });
+
+    // Add Varieties
+    pokemonDetails.varieties.forEach(v => {
+      if (v.isDefault) return;
+
+      const isExcluded = isFormEliminated(v.pokemon.name) || (overrides[`${v.pokemon.id}-${v.pokemon.name}`] as any)?.is_excluded;
+      if (isExcluded) return;
+
+      if (items.some(i => i.id === v.pokemon.id)) return;
+
+      items.push({
+        id: v.pokemon.id,
+        name: v.pokemon.name,
+        displayName: (overrides[`${v.pokemon.id}-${v.pokemon.name}`] as any)?.custom_display_name || formatPokemonName(v.pokemon.name, v.pokemon.id)
+      });
+    });
+
+    return items.sort((a, b) => a.displayName.localeCompare(b.displayName));
+  }, [pokemonDetails, overrides]);
 
   const spriteUrl = useMemo(() => {
     if (!pokemonId) return '';
-    // getPokemonSpriteUrl handles prepending ID
-    return getPokemonSpriteUrl(pokemonId, {
+    const currentVariant = formOptions.find(f => f.name === form);
+    const displayId = currentVariant ? currentVariant.id : pokemonId;
+
+    // Gender Fallback: Only try to load female sprite if the Pokemon actually has gender differences.
+    // Otherwise, always use default (male) sprite to avoid 404/white square.
+    const showFemaleSprite = gender === 'female' && pokemonDetails?.hasGenderDifference;
+
+    return getPokemonSpriteUrl(displayId, {
       shiny: true,
-      female: gender === 'female',
+      female: showFemaleSprite,
       form: form || undefined,
       name: pokemonName,
     });
-  }, [pokemonId, gender, form, pokemonName]);
+  }, [pokemonId, gender, form, pokemonName, formOptions, pokemonDetails]);
 
   useEffect(() => {
     if (open && entry) {
@@ -108,18 +157,11 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
 
     setLoading(true);
     try {
-      const finalSpriteUrl =
-        spriteUrl ||
-        getPokemonSpriteUrl(pokemonId, {
-          shiny: true,
-          female: gender === 'female',
-          form: form ? `${pokemonId}-${form}` : undefined,
-          name: pokemonName,
-        });
+      const finalSpriteUrl = spriteUrl;
 
       // Calculate the final display name (e.g. "Silvally Bug")
       const finalDisplayName = form
-        ? formOptions.find(f => f.formName.replace(/^[^-]+-/, '') === form)?.displayName || formatPokemonName(pokemonName, pokemonId)
+        ? formOptions.find(f => f.name === form)?.displayName || formatPokemonName(pokemonName, pokemonId)
         : formatPokemonName(pokemonName, pokemonId);
 
       const { error } = await supabase
@@ -174,17 +216,40 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* 1. Sprite */}
+          {/* 1. Sprite & Quick Selectors */}
           {pokemonId && (
-            <div className="flex justify-center p-4 bg-muted rounded-lg">
+            <div className="flex flex-col items-center gap-4 p-4 bg-muted rounded-lg">
               <img
                 src={spriteUrl}
                 alt={pokemonName}
-                className="h-24 w-24 pokemon-sprite object-contain"
+                className="h-28 w-28 pokemon-sprite object-contain drop-shadow-md"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = '/placeholder.svg';
                 }}
               />
+
+              <div className="flex items-center gap-2 w-full justify-center">
+                {/* Form Selector (Compact) */}
+                {formOptions.length > 0 && (
+                  <Select value={form || 'default'} onValueChange={(v) => setForm(v === 'default' ? '' : v)}>
+                    <SelectTrigger className="h-10 w-[180px] bg-background/50 backdrop-blur-sm border-primary/20 hover:border-primary/50 transition-colors">
+                      <Sparkles className="mr-2 h-4 w-4 text-amber-400 fill-amber-400/20" />
+                      <SelectValue placeholder="Forma base" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="default">Forma base</SelectItem>
+                      {formOptions.map((f) => (
+                        <SelectItem key={f.id} value={f.name}>
+                          {f.displayName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+
+                {/* Gender Toggle */}
+                <GenderSelector value={gender} onChange={setGender} />
+              </div>
             </div>
           )}
 
@@ -199,41 +264,6 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
                 setForm('');
               }}
             />
-          </div>
-
-          {/* 3. Forma */}
-          {formOptions.length > 0 && (
-            <div className="space-y-2">
-              <Label>Forma / variante</Label>
-              <Select value={form || 'default'} onValueChange={(v) => setForm(v === 'default' ? '' : v)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Forma base" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="default">Forma base</SelectItem>
-                  {formOptions.map((f) => (
-                    <SelectItem key={f.id} value={f.formName.replace(/^[^-]+-/, '')}>
-                      {f.displayName}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-
-          {/* 4. Sesso */}
-          <div className="space-y-2">
-            <Label>Sesso</Label>
-            <Select value={gender} onValueChange={setGender}>
-              <SelectTrigger>
-                <SelectValue placeholder="Opzionale" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="male">♂ Maschio</SelectItem>
-                <SelectItem value="female">♀ Femmina</SelectItem>
-                <SelectItem value="genderless">⚪ Senza genere</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
 
           {/* 5. Shiny Charm */}
