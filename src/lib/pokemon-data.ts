@@ -482,6 +482,15 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
     }
   }
 
+  // Castform (and its weather forms) overrides
+  if (name && name.toLowerCase().includes('castform')) {
+    const sName = name.toLowerCase();
+    if (sName === 'castform') return 'https://img.pokemondb.net/sprites/home/shiny/castform.png';
+    if (sName === 'castform-sunny' || sName.includes('sunny')) return 'https://www.pokepedia.fr/images/8/88/Sprite_0351_Solaire_chromatique_HOME-v1.png';
+    if (sName === 'castform-rainy' || sName.includes('rainy')) return 'https://www.pokepedia.fr/images/1/1a/Sprite_0351_Eau_de_Pluie_chromatique_HOME-v1.png';
+    if (sName === 'castform-snowy' || sName.includes('snowy')) return 'https://www.pokepedia.fr/images/d/d7/Sprite_0351_Blizzard_chromatique_HOME-v1.png';
+  }
+
   // Furfrou overrides
   if (name && name.toLowerCase().includes('silvally')) {
     const sName = name.toLowerCase();
@@ -503,6 +512,24 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
     if (sName.includes('dragon')) return 'https://www.pokepedia.fr/images/1/16/Sprite_0773_Dragon_chromatique_HOME-v1.png';
     if (sName.includes('dark')) return 'https://www.pokepedia.fr/images/0/0e/Sprite_0773_T%C3%A9n%C3%A8bres_chromatique_HOME-v1.png';
     if (sName.includes('fairy')) return 'https://www.pokepedia.fr/images/7/70/Sprite_0773_F%C3%A9e_chromatique_HOME-v1.png';
+  }
+
+  // Pumpkaboo size overrides
+  if (name && name.toLowerCase().includes('pumpkaboo')) {
+    const sName = name.toLowerCase();
+    const subPath = shiny ? 'shiny' : 'normal';
+    if (sName.includes('small')) return `https://img.pokemondb.net/sprites/home/${subPath}/pumpkaboo-small.png`;
+    if (sName.includes('large')) return `https://img.pokemondb.net/sprites/home/${subPath}/pumpkaboo-large.png`;
+    if (sName.includes('super')) return `https://img.pokemondb.net/sprites/home/${subPath}/pumpkaboo-super.png`;
+  }
+
+  // Gourgeist size overrides
+  if (name && name.toLowerCase().includes('gourgeist')) {
+    const sName = name.toLowerCase();
+    const subPath = shiny ? 'shiny' : 'normal';
+    if (sName.includes('small')) return `https://img.pokemondb.net/sprites/home/${subPath}/gourgeist-small.png`;
+    if (sName.includes('large')) return `https://img.pokemondb.net/sprites/home/${subPath}/gourgeist-large.png`;
+    if (sName.includes('super')) return `https://img.pokemondb.net/sprites/home/${subPath}/gourgeist-super.png`;
   }
 
   // Deerling seasonal overrides
