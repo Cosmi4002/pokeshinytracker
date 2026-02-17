@@ -363,7 +363,7 @@ export function formatPokemonName(name: string, id: number, baseId?: number): st
 
   // Giratina, Dialga, Palkia naming
   if (name.toLowerCase().includes('giratina') || name.toLowerCase().includes('dialga') || name.toLowerCase().includes('palkia')) {
-    if (name.toLowerCase().includes('origin')) return `${name.split('-')[0].charAt(0).toUpperCase() + name.split('-')[0].slice(1)} (Originale)`;
+    if (name.toLowerCase().includes('origin')) return `${name.split('-')[0].charAt(0).toUpperCase() + name.split('-')[0].slice(1)} (Origin)`;
     if (name.toLowerCase().includes('altered')) return 'Giratina (Altera)';
     return name.charAt(0).toUpperCase() + name.slice(1);
   }
@@ -412,9 +412,9 @@ export function formatPokemonName(name: string, id: number, baseId?: number): st
   if (name.toLowerCase().includes('burmy') || name.toLowerCase().includes('wormadam')) {
     const parts = name.split('-');
     const base = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
-    if (parts.includes('sandy')) return `${base} (Mantello Sabbia)`;
-    if (parts.includes('trash')) return `${base} (Mantello Scarti)`;
-    if (parts.includes('plant')) return `${base} (Mantello Pianta)`;
+    if (parts.includes('plant')) return `${base} (Plant Cloak)`;
+    if (parts.includes('sandy')) return `${base} (Sandy Cloak)`;
+    if (parts.includes('trash')) return `${base} (Trash Cloak)`;
     return base;
   }
 
@@ -670,7 +670,11 @@ export function usePokemonDetails(pokemonId: number | null) {
           name.includes('-alola') || name.includes('-galar') ||
           name.includes('-hisui') || name.includes('-paldea')
         );
-        const hasGenderDiff = !isRegionalForm && POKEMON_WITH_GENDER_DIFF.includes(baseId);
+        // Exclude specific forms that do not actually have distinct female sprites
+        const excludedGenderDiffNames = ['pikachu-partner-cap'];
+        const excludedGenderDiffBaseIds = [667]; // Litleo
+        const isExcludedGenderForm = (name && excludedGenderDiffNames.includes(name.toLowerCase())) || excludedGenderDiffBaseIds.includes(baseId);
+        const hasGenderDiff = !isRegionalForm && POKEMON_WITH_GENDER_DIFF.includes(baseId) && !isExcludedGenderForm;
 
         const sprites = {
           default: getPokemonSpriteUrl(pokemonId!, { name: name, animated: true }),

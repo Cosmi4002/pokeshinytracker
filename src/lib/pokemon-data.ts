@@ -440,6 +440,14 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
     if (sName.includes('palkia')) return `https://img.pokemondb.net/sprites/home/shiny/palkia-origin.png`;
   }
 
+  // Wormadam Sandy / Trash overrides (use specific images)
+  if (name && name.toLowerCase().includes('wormadam-sandy')) {
+    return 'https://img.pokemondb.net/sprites/home/shiny/wormadam-sandy.png';
+  }
+  if (name && name.toLowerCase().includes('wormadam-trash')) {
+    return 'https://img.pokemondb.net/sprites/home/shiny/wormadam-trash.png';
+  }
+
   // Enamorus Therian override
   if (name && name.toLowerCase().includes('enamorus-therian')) {
     return `https://img.pokemondb.net/sprites/home/shiny/enamorus-therian.png`;
