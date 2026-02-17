@@ -392,7 +392,16 @@ export const toShowdownSlug = (name: string): string => {
 export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolean, name?: string, female?: boolean, form?: string, animated?: boolean } = {}): string {
   if (!pokemonId) return '';
 
+
   let { shiny = false, female = false, name, form } = options;
+
+  // Special case: Litleo (id 667) and Pikachu Partner Cap do not have a female sprite, always use base sprite
+  if (
+    pokemonId === 667 ||
+    (name && (name.toLowerCase() === 'litleo' || name.toLowerCase() === 'pikachu-partner-cap'))
+  ) {
+    female = false;
+  }
 
   // Combine name and form for overrides check
   if (name && form) {

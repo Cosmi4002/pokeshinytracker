@@ -11,7 +11,7 @@
     "name": "ivysaur",
     "generation": 1
   },
-  {
+  { 
     "id": 3,
     "baseId": 3,
     "name": "venusaur",
@@ -4373,7 +4373,7 @@
   { "id": 10019, "baseId": 666, "name": "vivillon-ocean", "generation": 6 },
   { "id": 10020, "baseId": 666, "name": "vivillon-jungle", "generation": 6 },
   { "id": 10021, "baseId": 666, "name": "vivillon-fancy", "generation": 6 },
-  { "id": 10022, "baseId": 666, "name": "vivillon-pokeball", "generation": 6 },
+  
   {
     "id": 667,
     "baseId": 667,
