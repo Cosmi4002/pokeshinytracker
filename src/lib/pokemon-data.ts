@@ -455,21 +455,21 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
 
   // Gen 9 Form Overrides
   if (name && name.toLowerCase().includes('maushold-family-of-three')) {
-    return `${baseUrl}/shiny/10243.png`;
+    return 'https://www.pokepedia.fr/Fichier:Sprite_0925_Trois_chromatique_HOME.png';
   }
   if (name && name.toLowerCase().includes('dudunsparce-three-segment')) {
-    return `${baseUrl}/shiny/10253.png`;
+    return 'https://www.pokepedia.fr/images/c/ca/Sprite_0982_Triple_chromatique_HOME.png';
   }
   if (name && name.toLowerCase().includes('squawkabilly-')) {
     const sName = name.toLowerCase();
-    if (sName.includes('blue')) return `${baseUrl}/shiny/10247.png`;
-    if (sName.includes('yellow')) return `${baseUrl}/shiny/10248.png`;
-    if (sName.includes('white')) return `${baseUrl}/shiny/10249.png`;
+    if (sName.includes('blue')) return 'https://www.pokepedia.fr/images/6/6e/Sprite_0931_Bleu_chromatique_HOME.png';
+    if (sName.includes('yellow')) return 'https://www.pokepedia.fr/images/b/bc/Sprite_0931_Jaune_chromatique_HOME.png';
+    if (sName.includes('white')) return 'https://www.pokepedia.fr/images/2/22/Sprite_0931_Blanc_chromatique_HOME.png';
   }
   if (name && name.toLowerCase().includes('tatsugiri-')) {
     const sName = name.toLowerCase();
-    if (sName.includes('droopy')) return `${baseUrl}/shiny/10251.png`;
-    if (sName.includes('stretchy')) return `${baseUrl}/shiny/10252.png`;
+    if (sName.includes('droopy')) return 'https://www.pokepedia.fr/images/b/b9/Sprite_0978_Affal%C3%A9e_chromatique_HOME.png';
+    if (sName.includes('stretchy')) return 'https://www.pokepedia.fr/images/3/38/Sprite_0978_Raide_chromatique_HOME.png';
   }
 
   // Minior Core overrides

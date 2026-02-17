@@ -142,7 +142,7 @@ export default function Pokedex() {
     }, [speciesGroups, search, generationFilter]);
 
     // Total caught count
-    const totalCaughtCount = Object.values(caughtData || {}).reduce((a, b) => (Number(a.count) || 0) + (Number(b) || 0), 0);
+    const totalCaughtCount = Object.values(caughtData || {}).reduce((a, b) => (Number(a) || 0) + (Number(b.count) || 0), 0);
 
     return (
         <div className="min-h-screen bg-background transition-colors duration-1000" style={{ backgroundImage: `radial-gradient(circle at 50% 0%, ${accentColor}15 0%, transparent 70%)` }}>
@@ -215,7 +215,9 @@ export default function Pokedex() {
                                 const isRegional = p.name.includes('-alola') || p.name.includes('-galar') || p.name.includes('-hisui') || p.name.includes('-paldea');
 
                                 // Gender diff logic
-                                const hasGenderDiff = !isRegional && (p.id < 10000) && POKEMON_WITH_GENDER_DIFF.includes(p.baseId);
+                                let hasGenderDiff = !isRegional && (p.id < 10000) && POKEMON_WITH_GENDER_DIFF.includes(p.baseId);
+                                // Litleo non deve mai avere doppio sprite
+                                if (p.baseId === 667) hasGenderDiff = false;
                                 const femaleVariant = group.find(v => v.name.endsWith('-female') && v.id !== p.id);
                                 const femaleId = femaleVariant ? femaleVariant.id : undefined;
 
