@@ -50,6 +50,27 @@ export default function Pokedex() {
         initialData: {}
     });
 
+    // Function to update caughtData after evolution
+    const updateCaughtDataForEvolution = (oldId: number, newId: number) => {
+        setCaughtData((prev) => {
+            const updated = { ...prev };
+
+            // Remove old Pokémon data
+            if (updated[oldId]) {
+                delete updated[oldId];
+            }
+
+            // Add or update new Pokémon data
+            if (!updated[newId]) {
+                updated[newId] = { count: 1, genders: new Set(), forms: new Set() };
+            } else {
+                updated[newId].count += 1;
+            }
+
+            return updated;
+        });
+    };
+
     // Restore scroll position after data is loaded
     useEffect(() => {
         if (!pokemonLoading && !caughtLoading) {
@@ -143,6 +164,24 @@ export default function Pokedex() {
 
     // Total caught count
     const totalCaughtCount = Object.values(caughtData || {}).reduce((a, b) => (Number(a) || 0) + (Number(b.count) || 0), 0);
+
+    // List of Pokémon that do not evolve
+    const NON_EVOLVING_POKEMON = [
+        83, // Farfetch'd
+        128, // Tauros
+        132, // Ditto
+        206, // Dunsparce
+        213, // Shuckle
+        227, // Skarmory
+        235, // Smeargle
+        243, // Raikou
+        244, // Entei
+        245, // Suicune
+        249, // Lugia
+        250, // Ho-Oh
+        251, // Celebi
+        // Add more as needed
+    ];
 
     return (
         <div className="min-h-screen bg-background transition-colors duration-1000" style={{ backgroundImage: `radial-gradient(circle at 50% 0%, ${accentColor}15 0%, transparent 70%)` }}>
@@ -258,7 +297,7 @@ export default function Pokedex() {
                                         baseId={p.baseId}
                                         displayName={p.displayName}
                                         spriteUrl={getPokemonSpriteUrl(p.id, { shiny: true, name: p.name })}
-                                        secondarySprite={hasMultipleSprites
+                                        secondarySprite={hasMultipleSprites && !isNonEvolving
                                             ? getPokemonSpriteUrl(secondaryForm?.id || femaleId || p.id, {
                                                 shiny: true,
                                                 female: hasGenderDiff && !femaleId,
@@ -266,7 +305,7 @@ export default function Pokedex() {
                                             })
                                             : undefined
                                         }
-                                        hasMultipleSprites={hasMultipleSprites}
+                                        hasMultipleSprites={hasMultipleSprites && !isNonEvolving}
                                         isPrimaryCaught={isPrimaryCaught}
                                         isSecondaryCaught={isSecondaryCaught}
                                         caughtPercentage={pct}

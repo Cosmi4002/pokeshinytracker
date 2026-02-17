@@ -1,4 +1,4 @@
-import { Pencil, Trash2, Calendar } from 'lucide-react';
+import { Pencil, Trash2, Calendar, ArrowUpCircle } from 'lucide-react';
 import { useRandomColor } from '@/lib/random-color-context';
 import { Button } from '@/components/ui/button';
 import { getGameTheme, GAME_ICONS, GAME_COVER_ART, GAME_LOGOS } from '@/lib/game-themes';
@@ -25,9 +25,10 @@ interface ShinyCardProps {
     entry: CaughtShinyRow;
     onEdit: () => void;
     onDelete: () => void;
+    onEvolve: () => void; // Added evolve handler
 }
 
-export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
+export function ShinyCard({ entry, onEdit, onDelete, onEvolve }: ShinyCardProps) {
     const { accentColor } = useRandomColor();
 
     const theme = useMemo(() => getGameTheme(entry.game), [entry.game]);
@@ -112,6 +113,14 @@ export function ShinyCard({ entry, onEdit, onDelete }: ShinyCardProps) {
                             className="h-8 w-8 rounded-full bg-black/50 hover:bg-white text-white hover:text-black border border-white/10 backdrop-blur-md shadow-lg"
                         >
                             <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                            variant="secondary"
+                            size="icon"
+                            onClick={onEvolve} // Added evolve button
+                            className="h-8 w-8 rounded-full bg-black/50 hover:bg-green-500 text-white border border-white/10 backdrop-blur-md shadow-lg"
+                        >
+                            <ArrowUpCircle className="h-4 w-4" />
                         </Button>
                         <AlertDialog>
                             <AlertDialogTrigger asChild>

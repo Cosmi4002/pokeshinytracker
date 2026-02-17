@@ -14,6 +14,7 @@ export const BANNED_FORM_NAMES: string[] = [
     'oinkologne-female',
     'meowstic-female',
     'indeedee-female',
+    'oricorio-baile',
     'oricorio-pau',
     'oricorio-pom-pom',
     'oricorio-sensu',
