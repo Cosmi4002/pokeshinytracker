@@ -2376,6 +2376,24 @@
     "generation": 3
   },
   {
+    "id": 10245,
+    "baseId": 351,
+    "name": "castform-sunny",
+    "generation": 3
+  },
+  {
+    "id": 10246,
+    "baseId": 351,
+    "name": "castform-rainy",
+    "generation": 3
+  },
+  {
+    "id": 10247,
+    "baseId": 351,
+    "name": "castform-snowy",
+    "generation": 3
+  },
+  {
     "id": 352,
     "baseId": 352,
     "name": "kecleon",
@@ -2583,6 +2601,24 @@
     "id": 386,
     "baseId": 386,
     "name": "deoxys-normal",
+    "generation": 3
+  },
+  {
+    "id": 10001,
+    "baseId": 386,
+    "name": "deoxys-attack",
+    "generation": 3
+  },
+  {
+    "id": 10002,
+    "baseId": 386,
+    "name": "deoxys-defense",
+    "generation": 3
+  },
+  {
+    "id": 10003,
+    "baseId": 386,
+    "name": "deoxys-speed",
     "generation": 3
   },
   {
@@ -4320,6 +4356,120 @@
     "generation": 6
   },
   {
+    "id": 10047,
+    "baseId": 666,
+    "name": "vivillon-polar",
+    "generation": 6
+  },
+  {
+    "id": 10048,
+    "baseId": 666,
+    "name": "vivillon-tundra",
+    "generation": 6
+  },
+  {
+    "id": 10049,
+    "baseId": 666,
+    "name": "vivillon-continental",
+    "generation": 6
+  },
+  {
+    "id": 10050,
+    "baseId": 666,
+    "name": "vivillon-garden",
+    "generation": 6
+  },
+  {
+    "id": 10051,
+    "baseId": 666,
+    "name": "vivillon-elegant",
+    "generation": 6
+  },
+  {
+    "id": 10052,
+    "baseId": 666,
+    "name": "vivillon-icy-snow",
+    "generation": 6
+  },
+  {
+    "id": 10053,
+    "baseId": 666,
+    "name": "vivillon-modern",
+    "generation": 6
+  },
+  {
+    "id": 10054,
+    "baseId": 666,
+    "name": "vivillon-marine",
+    "generation": 6
+  },
+  {
+    "id": 10055,
+    "baseId": 666,
+    "name": "vivillon-archipelago",
+    "generation": 6
+  },
+  {
+    "id": 10056,
+    "baseId": 666,
+    "name": "vivillon-high-plains",
+    "generation": 6
+  },
+  {
+    "id": 10057,
+    "baseId": 666,
+    "name": "vivillon-sandstorm",
+    "generation": 6
+  },
+  {
+    "id": 10058,
+    "baseId": 666,
+    "name": "vivillon-river",
+    "generation": 6
+  },
+  {
+    "id": 10059,
+    "baseId": 666,
+    "name": "vivillon-monsoon",
+    "generation": 6
+  },
+  {
+    "id": 10060,
+    "baseId": 666,
+    "name": "vivillon-savanna",
+    "generation": 6
+  },
+  {
+    "id": 10061,
+    "baseId": 666,
+    "name": "vivillon-sun",
+    "generation": 6
+  },
+  {
+    "id": 10062,
+    "baseId": 666,
+    "name": "vivillon-ocean",
+    "generation": 6
+  },
+  {
+    "id": 10063,
+    "baseId": 666,
+    "name": "vivillon-jungle",
+    "generation": 6
+  },
+  {
+    "id": 10064,
+    "baseId": 666,
+    "name": "vivillon-fancy",
+    "generation": 6
+  },
+  {
+    "id": 10065,
+    "baseId": 666,
+    "name": "vivillon-pokeball",
+    "generation": 6
+  },
+  {
     "id": 667,
     "baseId": 667,
     "name": "litleo",
@@ -4602,6 +4752,42 @@
     "generation": 6
   },
   {
+    "id": 10317,
+    "baseId": 710,
+    "name": "pumpkaboo-small",
+    "generation": 6
+  },
+  {
+    "id": 10318,
+    "baseId": 710,
+    "name": "pumpkaboo-large",
+    "generation": 6
+  },
+  {
+    "id": 10319,
+    "baseId": 710,
+    "name": "pumpkaboo-super",
+    "generation": 6
+  },
+  {
+    "id": 10320,
+    "baseId": 711,
+    "name": "gourgeist-small",
+    "generation": 6
+  },
+  {
+    "id": 10321,
+    "baseId": 711,
+    "name": "gourgeist-large",
+    "generation": 6
+  },
+  {
+    "id": 10322,
+    "baseId": 711,
+    "name": "gourgeist-super",
+    "generation": 6
+  },
+  {
     "id": 712,
     "baseId": 712,
     "name": "bergmite",
@@ -4791,6 +4977,24 @@
     "id": 741,
     "baseId": 741,
     "name": "oricorio-baile",
+    "generation": 7
+  },
+  {
+    "id": 10323,
+    "baseId": 741,
+    "name": "oricorio-pau",
+    "generation": 7
+  },
+  {
+    "id": 10324,
+    "baseId": 741,
+    "name": "oricorio-pom-pom",
+    "generation": 7
+  },
+  {
+    "id": 10325,
+    "baseId": 741,
+    "name": "oricorio-sensu",
     "generation": 7
   },
   {
@@ -6513,6 +6717,378 @@
     "id": 869,
     "baseId": 869,
     "name": "alcremie-vanilla-cream-strawberry-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10326,
+    "baseId": 869,
+    "name": "alcremie-ruby-cream-strawberry-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10327,
+    "baseId": 869,
+    "name": "alcremie-matcha-cream-strawberry-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10328,
+    "baseId": 869,
+    "name": "alcremie-mint-cream-strawberry-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10329,
+    "baseId": 869,
+    "name": "alcremie-lemon-cream-strawberry-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10330,
+    "baseId": 869,
+    "name": "alcremie-salted-cream-strawberry-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10331,
+    "baseId": 869,
+    "name": "alcremie-ruby-swirl-strawberry-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10332,
+    "baseId": 869,
+    "name": "alcremie-caramel-swirl-strawberry-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10333,
+    "baseId": 869,
+    "name": "alcremie-rainbow-swirl-strawberry-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10334,
+    "baseId": 869,
+    "name": "alcremie-vanilla-cream-berry-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10335,
+    "baseId": 869,
+    "name": "alcremie-ruby-cream-berry-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10336,
+    "baseId": 869,
+    "name": "alcremie-matcha-cream-berry-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10337,
+    "baseId": 869,
+    "name": "alcremie-mint-cream-berry-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10338,
+    "baseId": 869,
+    "name": "alcremie-lemon-cream-berry-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10339,
+    "baseId": 869,
+    "name": "alcremie-salted-cream-berry-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10340,
+    "baseId": 869,
+    "name": "alcremie-ruby-swirl-berry-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10341,
+    "baseId": 869,
+    "name": "alcremie-caramel-swirl-berry-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10342,
+    "baseId": 869,
+    "name": "alcremie-rainbow-swirl-berry-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10343,
+    "baseId": 869,
+    "name": "alcremie-vanilla-cream-love-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10344,
+    "baseId": 869,
+    "name": "alcremie-ruby-cream-love-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10345,
+    "baseId": 869,
+    "name": "alcremie-matcha-cream-love-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10346,
+    "baseId": 869,
+    "name": "alcremie-mint-cream-love-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10347,
+    "baseId": 869,
+    "name": "alcremie-lemon-cream-love-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10348,
+    "baseId": 869,
+    "name": "alcremie-salted-cream-love-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10349,
+    "baseId": 869,
+    "name": "alcremie-ruby-swirl-love-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10350,
+    "baseId": 869,
+    "name": "alcremie-caramel-swirl-love-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10351,
+    "baseId": 869,
+    "name": "alcremie-rainbow-swirl-love-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10352,
+    "baseId": 869,
+    "name": "alcremie-vanilla-cream-star-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10353,
+    "baseId": 869,
+    "name": "alcremie-ruby-cream-star-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10354,
+    "baseId": 869,
+    "name": "alcremie-matcha-cream-star-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10355,
+    "baseId": 869,
+    "name": "alcremie-mint-cream-star-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10356,
+    "baseId": 869,
+    "name": "alcremie-lemon-cream-star-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10357,
+    "baseId": 869,
+    "name": "alcremie-salted-cream-star-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10358,
+    "baseId": 869,
+    "name": "alcremie-ruby-swirl-star-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10359,
+    "baseId": 869,
+    "name": "alcremie-caramel-swirl-star-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10360,
+    "baseId": 869,
+    "name": "alcremie-rainbow-swirl-star-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10361,
+    "baseId": 869,
+    "name": "alcremie-vanilla-cream-clover-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10362,
+    "baseId": 869,
+    "name": "alcremie-ruby-cream-clover-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10363,
+    "baseId": 869,
+    "name": "alcremie-matcha-cream-clover-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10364,
+    "baseId": 869,
+    "name": "alcremie-mint-cream-clover-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10365,
+    "baseId": 869,
+    "name": "alcremie-lemon-cream-clover-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10366,
+    "baseId": 869,
+    "name": "alcremie-salted-cream-clover-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10367,
+    "baseId": 869,
+    "name": "alcremie-ruby-swirl-clover-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10368,
+    "baseId": 869,
+    "name": "alcremie-caramel-swirl-clover-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10369,
+    "baseId": 869,
+    "name": "alcremie-rainbow-swirl-clover-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10370,
+    "baseId": 869,
+    "name": "alcremie-vanilla-cream-flower-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10371,
+    "baseId": 869,
+    "name": "alcremie-ruby-cream-flower-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10372,
+    "baseId": 869,
+    "name": "alcremie-matcha-cream-flower-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10373,
+    "baseId": 869,
+    "name": "alcremie-mint-cream-flower-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10374,
+    "baseId": 869,
+    "name": "alcremie-lemon-cream-flower-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10375,
+    "baseId": 869,
+    "name": "alcremie-salted-cream-flower-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10376,
+    "baseId": 869,
+    "name": "alcremie-ruby-swirl-flower-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10377,
+    "baseId": 869,
+    "name": "alcremie-caramel-swirl-flower-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10378,
+    "baseId": 869,
+    "name": "alcremie-rainbow-swirl-flower-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10379,
+    "baseId": 869,
+    "name": "alcremie-vanilla-cream-ribbon-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10380,
+    "baseId": 869,
+    "name": "alcremie-ruby-cream-ribbon-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10381,
+    "baseId": 869,
+    "name": "alcremie-matcha-cream-ribbon-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10382,
+    "baseId": 869,
+    "name": "alcremie-mint-cream-ribbon-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10383,
+    "baseId": 869,
+    "name": "alcremie-lemon-cream-ribbon-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10384,
+    "baseId": 869,
+    "name": "alcremie-salted-cream-ribbon-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10385,
+    "baseId": 869,
+    "name": "alcremie-ruby-swirl-ribbon-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10386,
+    "baseId": 869,
+    "name": "alcremie-caramel-swirl-ribbon-sweet",
+    "generation": 8
+  },
+  {
+    "id": 10387,
+    "baseId": 869,
+    "name": "alcremie-rainbow-swirl-ribbon-sweet",
     "generation": 8
   }
 ]
