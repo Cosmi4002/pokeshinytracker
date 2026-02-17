@@ -2604,24 +2604,6 @@
     "generation": 3
   },
   {
-    "id": 10001,
-    "baseId": 386,
-    "name": "deoxys-attack",
-    "generation": 3
-  },
-  {
-    "id": 10002,
-    "baseId": 386,
-    "name": "deoxys-defense",
-    "generation": 3
-  },
-  {
-    "id": 10003,
-    "baseId": 386,
-    "name": "deoxys-speed",
-    "generation": 3
-  },
-  {
     "id": 387,
     "baseId": 387,
     "name": "turtwig",
@@ -4356,120 +4338,6 @@
     "generation": 6
   },
   {
-    "id": 10047,
-    "baseId": 666,
-    "name": "vivillon-polar",
-    "generation": 6
-  },
-  {
-    "id": 10048,
-    "baseId": 666,
-    "name": "vivillon-tundra",
-    "generation": 6
-  },
-  {
-    "id": 10049,
-    "baseId": 666,
-    "name": "vivillon-continental",
-    "generation": 6
-  },
-  {
-    "id": 10050,
-    "baseId": 666,
-    "name": "vivillon-garden",
-    "generation": 6
-  },
-  {
-    "id": 10051,
-    "baseId": 666,
-    "name": "vivillon-elegant",
-    "generation": 6
-  },
-  {
-    "id": 10052,
-    "baseId": 666,
-    "name": "vivillon-icy-snow",
-    "generation": 6
-  },
-  {
-    "id": 10053,
-    "baseId": 666,
-    "name": "vivillon-modern",
-    "generation": 6
-  },
-  {
-    "id": 10054,
-    "baseId": 666,
-    "name": "vivillon-marine",
-    "generation": 6
-  },
-  {
-    "id": 10055,
-    "baseId": 666,
-    "name": "vivillon-archipelago",
-    "generation": 6
-  },
-  {
-    "id": 10056,
-    "baseId": 666,
-    "name": "vivillon-high-plains",
-    "generation": 6
-  },
-  {
-    "id": 10057,
-    "baseId": 666,
-    "name": "vivillon-sandstorm",
-    "generation": 6
-  },
-  {
-    "id": 10058,
-    "baseId": 666,
-    "name": "vivillon-river",
-    "generation": 6
-  },
-  {
-    "id": 10059,
-    "baseId": 666,
-    "name": "vivillon-monsoon",
-    "generation": 6
-  },
-  {
-    "id": 10060,
-    "baseId": 666,
-    "name": "vivillon-savanna",
-    "generation": 6
-  },
-  {
-    "id": 10061,
-    "baseId": 666,
-    "name": "vivillon-sun",
-    "generation": 6
-  },
-  {
-    "id": 10062,
-    "baseId": 666,
-    "name": "vivillon-ocean",
-    "generation": 6
-  },
-  {
-    "id": 10063,
-    "baseId": 666,
-    "name": "vivillon-jungle",
-    "generation": 6
-  },
-  {
-    "id": 10064,
-    "baseId": 666,
-    "name": "vivillon-fancy",
-    "generation": 6
-  },
-  {
-    "id": 10065,
-    "baseId": 666,
-    "name": "vivillon-pokeball",
-    "generation": 6
-  },
-  {
     "id": 667,
     "baseId": 667,
     "name": "litleo",
@@ -4749,42 +4617,6 @@
     "id": 711,
     "baseId": 711,
     "name": "gourgeist-average",
-    "generation": 6
-  },
-  {
-    "id": 10317,
-    "baseId": 710,
-    "name": "pumpkaboo-small",
-    "generation": 6
-  },
-  {
-    "id": 10318,
-    "baseId": 710,
-    "name": "pumpkaboo-large",
-    "generation": 6
-  },
-  {
-    "id": 10319,
-    "baseId": 710,
-    "name": "pumpkaboo-super",
-    "generation": 6
-  },
-  {
-    "id": 10320,
-    "baseId": 711,
-    "name": "gourgeist-small",
-    "generation": 6
-  },
-  {
-    "id": 10321,
-    "baseId": 711,
-    "name": "gourgeist-large",
-    "generation": 6
-  },
-  {
-    "id": 10322,
-    "baseId": 711,
-    "name": "gourgeist-super",
     "generation": 6
   },
   {

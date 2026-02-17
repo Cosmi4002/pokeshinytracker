@@ -116,10 +116,6 @@ export default function Pokedex() {
                 if (isRegional) return false;
             }
 
-            // Exclude special forms that should only appear in Collection Forms
-            const specialForms = ['-sunny', '-rainy', '-snowy', '-attack', '-defense', '-speed', '-polar', '-tundra', '-continental', '-garden', '-elegant', '-icy-snow', '-modern', '-marine', '-archipelago', '-high-plains', '-sandstorm', '-river', '-monsoon', '-savanna', '-sun', '-ocean', '-jungle', '-fancy', '-pokeball', '-small', '-large', '-super', '-pau', '-pom-pom', '-sensu', '-ruby-cream', '-matcha-cream', '-mint-cream', '-lemon-cream', '-salted-cream', '-ruby-swirl', '-caramel-swirl', '-rainbow-swirl', '-berry-sweet', '-love-sweet', '-star-sweet', '-clover-sweet', '-flower-sweet', '-ribbon-sweet'];
-            if (specialForms.some(form => p.name.includes(form))) return false;
-
             return true;
         });
     }, [speciesGroups, search, generationFilter]);
