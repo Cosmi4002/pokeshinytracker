@@ -32,6 +32,9 @@ export const BANNED_FORM_KEYWORDS: string[] = [
     '-gmax',
     '-primal',
     '-eternal',
+    '-sunny',   // Castform forms
+    '-rainy',   // Castform forms
+    '-snowy',   // Castform forms
 ];
 
 /**
