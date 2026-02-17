@@ -548,6 +548,15 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
     if (sName.includes('winter')) return 'https://www.pokepedia.fr/images/a/a6/Sprite_0586_Hiver_chromatique_HOME-v1.png';
   }
 
+  // Oricorio style overrides
+  if (name && name.toLowerCase().includes('oricorio')) {
+    const sName = name.toLowerCase();
+    const subPath = shiny ? 'shiny' : 'normal';
+    if (sName.includes('pau')) return `https://img.pokemondb.net/sprites/home/${subPath}/oricorio-pau.png`;
+    if (sName.includes('pom-pom')) return `https://img.pokemondb.net/sprites/home/${subPath}/oricorio-pom-pom.png`;
+    if (sName.includes('sensu')) return `https://img.pokemondb.net/sprites/home/${subPath}/oricorio-sensu.png`;
+  }
+
   // Arceus type overrides
   if (name && name.toLowerCase().includes('arceus-')) {
     const sName = name.toLowerCase();

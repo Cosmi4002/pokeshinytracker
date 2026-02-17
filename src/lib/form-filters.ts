@@ -32,9 +32,48 @@ export const BANNED_FORM_KEYWORDS: string[] = [
     '-gmax',
     '-primal',
     '-eternal',
-    '-sunny',   // Castform forms
-    '-rainy',   // Castform forms
-    '-snowy',   // Castform forms
+    '-attack',  // Deoxys forms
+    '-defense', // Deoxys forms
+    '-speed',   // Deoxys forms
+    '-polar',   // Vivillon forms
+    '-tundra',  // Vivillon forms
+    '-continental', // Vivillon forms
+    '-garden',  // Vivillon forms
+    '-elegant', // Vivillon forms
+    '-icy-snow', // Vivillon forms
+    '-modern',  // Vivillon forms
+    '-marine',  // Vivillon forms
+    '-archipelago', // Vivillon forms
+    '-high-plains', // Vivillon forms
+    '-sandstorm', // Vivillon forms
+    '-river',   // Vivillon forms
+    '-monsoon', // Vivillon forms
+    '-savanna', // Vivillon forms
+    '-sun',     // Vivillon forms
+    '-ocean',   // Vivillon forms
+    '-jungle',  // Vivillon forms
+    '-fancy',   // Vivillon forms
+    '-pokeball', // Vivillon forms
+    '-small',   // Pumpkaboo, Gourgeist forms
+    '-large',   // Pumpkaboo, Gourgeist forms
+    '-super',   // Pumpkaboo, Gourgeist forms
+    '-pau',     // Oricorio forms
+    '-pom-pom', // Oricorio forms
+    '-sensu',   // Oricorio forms
+    '-ruby-cream', // Alcremie forms (except vanilla-cream-strawberry)
+    '-matcha-cream', // Alcremie forms
+    '-mint-cream', // Alcremie forms
+    '-lemon-cream', // Alcremie forms
+    '-salted-cream', // Alcremie forms
+    '-ruby-swirl', // Alcremie forms
+    '-caramel-swirl', // Alcremie forms
+    '-rainbow-swirl', // Alcremie forms
+    '-berry-sweet', // Alcremie forms
+    '-love-sweet', // Alcremie forms
+    '-star-sweet', // Alcremie forms
+    '-clover-sweet', // Alcremie forms
+    '-flower-sweet', // Alcremie forms
+    '-ribbon-sweet', // Alcremie forms
 ];
 
 /**
