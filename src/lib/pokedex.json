@@ -2604,6 +2604,24 @@
     "generation": 3
   },
   {
+    "id": 10001,
+    "baseId": 386,
+    "name": "deoxys-attack",
+    "generation": 3
+  },
+  {
+    "id": 10002,
+    "baseId": 386,
+    "name": "deoxys-defense",
+    "generation": 3
+  },
+  {
+    "id": 10003,
+    "baseId": 386,
+    "name": "deoxys-speed",
+    "generation": 3
+  },
+  {
     "id": 387,
     "baseId": 387,
     "name": "turtwig",
@@ -4337,6 +4355,25 @@
     "name": "vivillon-meadow",
     "generation": 6
   },
+  { "id": 10004, "baseId": 666, "name": "vivillon-polar", "generation": 6 },
+  { "id": 10005, "baseId": 666, "name": "vivillon-tundra", "generation": 6 },
+  { "id": 10006, "baseId": 666, "name": "vivillon-continental", "generation": 6 },
+  { "id": 10007, "baseId": 666, "name": "vivillon-garden", "generation": 6 },
+  { "id": 10008, "baseId": 666, "name": "vivillon-elegant", "generation": 6 },
+  { "id": 10009, "baseId": 666, "name": "vivillon-icy-snow", "generation": 6 },
+  { "id": 10010, "baseId": 666, "name": "vivillon-modern", "generation": 6 },
+  { "id": 10011, "baseId": 666, "name": "vivillon-marine", "generation": 6 },
+  { "id": 10012, "baseId": 666, "name": "vivillon-archipelago", "generation": 6 },
+  { "id": 10013, "baseId": 666, "name": "vivillon-high-plains", "generation": 6 },
+  { "id": 10014, "baseId": 666, "name": "vivillon-sandstorm", "generation": 6 },
+  { "id": 10015, "baseId": 666, "name": "vivillon-river", "generation": 6 },
+  { "id": 10016, "baseId": 666, "name": "vivillon-monsoon", "generation": 6 },
+  { "id": 10017, "baseId": 666, "name": "vivillon-savanna", "generation": 6 },
+  { "id": 10018, "baseId": 666, "name": "vivillon-sun", "generation": 6 },
+  { "id": 10019, "baseId": 666, "name": "vivillon-ocean", "generation": 6 },
+  { "id": 10020, "baseId": 666, "name": "vivillon-jungle", "generation": 6 },
+  { "id": 10021, "baseId": 666, "name": "vivillon-fancy", "generation": 6 },
+  { "id": 10022, "baseId": 666, "name": "vivillon-pokeball", "generation": 6 },
   {
     "id": 667,
     "baseId": 667,
@@ -4613,12 +4650,18 @@
     "name": "pumpkaboo-average",
     "generation": 6
   },
+  { "id": 10023, "baseId": 710, "name": "pumpkaboo-small", "generation": 6 },
+  { "id": 10024, "baseId": 710, "name": "pumpkaboo-large", "generation": 6 },
+  { "id": 10025, "baseId": 710, "name": "pumpkaboo-super", "generation": 6 },
   {
     "id": 711,
     "baseId": 711,
     "name": "gourgeist-average",
     "generation": 6
   },
+  { "id": 10026, "baseId": 711, "name": "gourgeist-small", "generation": 6 },
+  { "id": 10027, "baseId": 711, "name": "gourgeist-large", "generation": 6 },
+  { "id": 10028, "baseId": 711, "name": "gourgeist-super", "generation": 6 },
   {
     "id": 712,
     "baseId": 712,

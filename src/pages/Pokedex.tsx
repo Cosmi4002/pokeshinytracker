@@ -90,8 +90,29 @@ export default function Pokedex() {
     const filteredGroups = useMemo(() => {
         const searchLower = search.toLowerCase();
 
+        // Lista di baseId che devono mostrare solo la forma base
+        const ONLY_BASE_FORM = [351, 386, 666, 710, 711, 741, 869];
+        // Mappa baseId -> nome forma base
+        const BASE_FORM_NAME: Record<number, string> = {
+            351: 'castform',
+            386: 'deoxys-normal',
+            666: 'vivillon-meadow',
+            710: 'pumpkaboo-average',
+            711: 'gourgeist-average',
+            741: 'oricorio-baile',
+            869: 'alcremie-vanilla-cream-strawberry-sweet',
+        };
+
         return speciesGroups.filter(group => {
-            const p = group[0]; // Representative
+            let p = group[0]; // Representative
+
+            // Filtro per mostrare solo la forma base per i baseId speciali
+            if (ONLY_BASE_FORM.includes(p.baseId)) {
+                const baseForm = group.find(g => g.name === BASE_FORM_NAME[p.baseId]);
+                if (baseForm) p = baseForm;
+                else p = group[0];
+                group = [p];
+            }
 
             // Search
             const matchesSearch = !search || p.displayName.toLowerCase().includes(searchLower) || p.id.toString().includes(search);
