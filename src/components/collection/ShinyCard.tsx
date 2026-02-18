@@ -138,7 +138,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onEvolve }: ShinyCardProps)
                         <Button
                             variant="secondary"
                             size="icon"
-                            onClick={handleEvolve}
+                            onClick={onEvolve}
                             className="h-8 w-8 rounded-full bg-black/50 hover:bg-green-500 text-white border border-white/10 backdrop-blur-md shadow-lg"
                         >
                             <ArrowUpCircle className="h-4 w-4" />
