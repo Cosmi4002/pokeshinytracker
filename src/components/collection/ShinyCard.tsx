@@ -5,7 +5,7 @@ import { getGameTheme, GAME_ICONS, GAME_COVER_ART, GAME_LOGOS } from '@/lib/game
 import { POKEBALLS, HUNTING_METHODS, getPokemonSpriteUrl } from '@/lib/pokemon-data';
 import { formatPokemonName } from '@/hooks/use-pokemon';
 import type { Tables } from '@/integrations/supabase/types';
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useState } from 'react';
 import { cn } from '@/lib/utils';
 import {
     AlertDialog,
@@ -18,6 +18,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 type CaughtShinyRow = Tables<'caught_shinies'>;
 
@@ -30,6 +31,15 @@ interface ShinyCardProps {
 
 export function ShinyCard({ entry, onEdit, onDelete, onEvolve }: ShinyCardProps) {
     const { accentColor } = useRandomColor();
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+    const handleEvolveClick = () => {
+        setIsDialogOpen(true);
+    };
+
+    const handleDialogClose = () => {
+        setIsDialogOpen(false);
+    };
 
     const theme = useMemo(() => getGameTheme(entry.game), [entry.game]);
     const pokeball = useMemo(() => POKEBALLS.find((b) => b.id === entry.pokeball), [entry.pokeball]);
@@ -67,7 +77,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onEvolve }: ShinyCardProps)
                 entry.is_fail ? "border-red-500/80 shadow-[0_0_20px_rgba(239,68,68,0.25)] ring-1 ring-red-500/50" : "border-white/10"
             )}
             style={{
-                borderColor: entry.is_fail ? '#ef4444' : `${theme.primary}50`,
+                borderColor: entry.is_fail ? '#ef4444' : `${accentColor}50`,
             }}
         >
             {evolvedIcon}
@@ -128,7 +138,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onEvolve }: ShinyCardProps)
                         <Button
                             variant="secondary"
                             size="icon"
-                            onClick={onEvolve} // Added evolve button
+                            onClick={handleEvolve}
                             className="h-8 w-8 rounded-full bg-black/50 hover:bg-green-500 text-white border border-white/10 backdrop-blur-md shadow-lg"
                         >
                             <ArrowUpCircle className="h-4 w-4" />
