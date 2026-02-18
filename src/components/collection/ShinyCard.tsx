@@ -50,6 +50,16 @@ export function ShinyCard({ entry, onEdit, onDelete, onEvolve }: ShinyCardProps)
         return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
     }, []);
 
+    const evolvedIcon = entry.is_evolved ? (
+        <div className="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">
+            Evolved
+        </div>
+    ) : (
+        <div className="absolute top-2 right-2 bg-gray-500 text-white text-xs font-bold px-2 py-1 rounded">
+            Base
+        </div>
+    );
+
     return (
         <div
             className={cn(
@@ -60,6 +70,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onEvolve }: ShinyCardProps)
                 borderColor: entry.is_fail ? '#ef4444' : `${theme.primary}50`,
             }}
         >
+            {evolvedIcon}
             {/* TOP AREA: VISUAL (Fixed aspect ratio) */}
             <div className="relative w-full aspect-[16/10] overflow-hidden bg-black/40">
                 {/* Game Cover Art Background */}
@@ -98,7 +109,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onEvolve }: ShinyCardProps)
                         className="w-32 h-32 lg:w-40 lg:h-40 object-contain pokemon-sprite drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] transition-all duration-500 group-hover:scale-110 relative z-10"
                         style={{ imageRendering: 'auto' }}
                         onError={(e) => {
-                            (e.target as HTMLImageElement).src = '/placeholder.svg';
+                            e.currentTarget.src = '/fallback-sprite.png';
                         }}
                     />
                 </div>
