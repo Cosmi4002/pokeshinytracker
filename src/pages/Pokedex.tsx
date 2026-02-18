@@ -25,8 +25,11 @@ export default function Pokedex() {
     const [search, setSearch] = useState('');
     const [generationFilter, setGenerationFilter] = useState('all');
 
+    // Define setCaughtData to manage caught data state
+    const [caughtData, setCaughtData] = useState<Record<number, { count: number, genders: Set<string>, forms: Set<string> }>>({});
+
     // Fetch caught counts/data
-    const { data: caughtData, isLoading: caughtLoading } = useQuery({
+    const { data: caughtDataFromQuery, isLoading: caughtLoading } = useQuery({
         queryKey: ['caughtData', user?.id],
         queryFn: async () => {
             if (!user) return {};
@@ -184,6 +187,11 @@ export default function Pokedex() {
         // Add more as needed
     ];
 
+    // Define isNonEvolving to check if a Pokémon cannot evolve
+    const isNonEvolving = useMemo(() => {
+        return pokemon?.every(p => !p.evolvesTo);
+    }, [pokemon]);
+
     return (
         <div className="min-h-screen bg-background transition-colors duration-1000" style={{ backgroundImage: `radial-gradient(circle at 50% 0%, ${accentColor}15 0%, transparent 70%)` }}>
             <Navbar />
@@ -314,11 +322,7 @@ export default function Pokedex() {
                                         hasCaughtAny={isCaught}
                                         onClick={() => {
                                             if (isNonEvolving) {
-                                                toast({
-                                                    variant: 'destructive',
-                                                    title: 'Errore',
-                                                    description: 'Questo Pokémon non può evolversi.',
-                                                });
+                                                toast.error('Questo Pokémon non può evolversi.');
                                                 return;
                                             }
                                             navigate(`/pokedex/${p.id}`);

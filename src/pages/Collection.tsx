@@ -128,6 +128,9 @@ export default function Collection() {
           user_id: user!.id,
           pokemon_id: evolvedPokemonId,
           caught_date: new Date().toISOString(),
+          game: 'default_game', // Replace with actual game value
+          method: 'default_method', // Replace with actual method value
+          pokemon_name: 'Evolved Pokémon', // Replace with actual Pokémon name
         });
 
       if (insertError) throw insertError;
@@ -136,9 +139,6 @@ export default function Collection() {
         ...prev,
         { ...entry, id: `${entry.id}-evolved`, pokemon_id: evolvedPokemonId },
       ]);
-
-      // Update caughtData in the Pokédex
-      updateCaughtDataForEvolution(entry.pokemon_id, evolvedPokemonId);
 
       toast({
         title: 'Evoluzione completata',

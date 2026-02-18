@@ -12,6 +12,7 @@ export interface PokemonBasic {
   displayName: string;
   generation: number;
   hideFromPokedex?: boolean;
+  evolvesTo?: number[]; // Array of Pokémon IDs this Pokémon evolves into
 }
 
 export interface PokemonVariety {
