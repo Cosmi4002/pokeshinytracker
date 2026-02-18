@@ -1,3 +1,4 @@
+
 export type Json =
   | string
   | number
@@ -67,6 +68,7 @@ export type Database = {
           has_shiny_charm: boolean | null
           hunt_start_date: string | null
           id: string
+          is_evolved: boolean
           is_fail: boolean
           method: string
           notes: string | null

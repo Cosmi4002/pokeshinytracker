@@ -60,13 +60,26 @@ export function ShinyCard({ entry, onEdit, onDelete, onEvolve }: ShinyCardProps)
         return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
     }, []);
 
-    const evolvedIcon = entry.is_evolved ? (
-        <div className="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">
-            Evolved
+    // Bella indicazione con stelle e bagliore dorato
+    const isEvolved = (entry as any).is_evolved === true;
+    
+    const evolutionIndicator = isEvolved ? (
+        <div className="absolute top-2 right-2 flex items-center gap-1">
+            {/* Stelle dorate per evoluto */}
+            <div className="flex items-center gap-0.5">
+                <span className="text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]">★</span>
+                <span className="text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]">★</span>
+                <span className="text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]">★</span>
+            </div>
         </div>
     ) : (
-        <div className="absolute top-2 right-2 bg-gray-500 text-white text-xs font-bold px-2 py-1 rounded">
-            Base
+        <div className="absolute top-2 right-2 flex items-center gap-1 opacity-60">
+            {/* Stelle vuote per base */}
+            <div className="flex items-center gap-0.5">
+                <span className="text-white/40">☆</span>
+                <span className="text-white/40">☆</span>
+                <span className="text-white/40">☆</span>
+            </div>
         </div>
     );
 
@@ -80,7 +93,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onEvolve }: ShinyCardProps)
                 borderColor: entry.is_fail ? '#ef4444' : `${accentColor}50`,
             }}
         >
-            {evolvedIcon}
+            {evolutionIndicator}
             {/* TOP AREA: VISUAL (Fixed aspect ratio) */}
             <div className="relative w-full aspect-[16/10] overflow-hidden bg-black/40">
                 {/* Game Cover Art Background */}
