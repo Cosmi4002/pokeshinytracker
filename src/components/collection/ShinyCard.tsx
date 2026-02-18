@@ -189,10 +189,6 @@ export function ShinyCard({ entry, onEdit, onDelete, onEvolve }: ShinyCardProps)
                     </div>
                 </div>
 
-                {/* Sparkling overlays */}
-                <div className="absolute top-2 right-12 z-10 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="animate-ping" style={{ color: theme.accent }}>✨</div>
-                </div>
             </div>
 
             {/* BOTTOM AREA: CONTENT (Clean & High Contrast) */}

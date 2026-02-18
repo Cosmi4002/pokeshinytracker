@@ -114,11 +114,14 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
     // Otherwise, always use default (male) sprite to avoid 404/white square.
     const showFemaleSprite = gender === 'female' && pokemonDetails?.hasGenderDifference;
 
+    // When a form is selected, use the full form name as 'name' to ensure sprite URL generation works correctly
+    const spriteName = form ? form : pokemonName;
+
     return getPokemonSpriteUrl(displayId, {
       shiny: true,
       female: showFemaleSprite,
       form: form || undefined,
-      name: pokemonName,
+      name: spriteName,
     });
   }, [pokemonId, gender, form, pokemonName, formOptions, pokemonDetails]);
 

@@ -519,31 +519,31 @@ export function formatPokemonName(name: string, id: number, baseId?: number): st
     return `Minior (${colors[color || ''] || 'Nucleo'})`;
   }
 
-  // Vivillon pattern naming
+// Vivillon pattern naming
   if (name.toLowerCase().includes('vivillon')) {
     const sName = name.toLowerCase();
 
     // Check for patterns and return "Vivillon (Pattern)"
     const patterns: Record<string, string> = {
-      'meadow': 'Prato',
-      'icy-snow': 'Innevato',
-      'polar': 'Polare',
+      'meadow': 'Meadow',
+      'icy-snow': 'Icy Snow',
+      'polar': 'Polar',
       'tundra': 'Tundra',
-      'continental': 'Continentale',
-      'garden': 'Giardino',
-      'elegant': 'Elegante',
-      'modern': 'Moderno',
-      'marine': 'Marino',
-      'fancy': 'Sbarazzino',
-      'archipelago': 'Arcipelago',
-      'high-plains': 'Montana',
-      'sandstorm': 'Sabbia',
-      'river': 'Fluviale',
-      'monsoon': 'Monsone',
-      'savanna': 'Savana',
-      'sun': 'Solare',
-      'ocean': 'Oceanico',
-      'jungle': 'Giungla',
+      'continental': 'Continental',
+      'garden': 'Garden',
+      'elegant': 'Elegant',
+      'modern': 'Modern',
+      'marine': 'Marine',
+      'fancy': 'Fancy',
+      'archipelago': 'Archipelago',
+      'high-plains': 'High-Plains',
+      'sandstorm': 'Sandstorm',
+      'river': 'River',
+      'monsoon': 'Monsoon',
+      'savanna': 'Savanna',
+      'sun': 'Sun',
+      'ocean': 'Ocean',
+      'jungle': 'Jungle',
       'pokeball': 'Poké Ball',
       'poke-ball': 'Poké Ball'
     };
@@ -552,7 +552,7 @@ export function formatPokemonName(name: string, id: number, baseId?: number): st
       if (sName.includes(key)) return `Vivillon (${label})`;
     }
 
-    if (sName === 'vivillon') return 'Vivillon (Prato)';
+    if (sName === 'vivillon') return 'Vivillon (Meadow)';
     return 'Vivillon';
   }
 
