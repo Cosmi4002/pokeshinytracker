@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth-context';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
+import { toast } from 'react-toastify';
 
 export default function Pokedex() {
     const { pokemon, loading: pokemonLoading, error: pokemonError } = usePokemonList();
@@ -290,6 +291,7 @@ export default function Pokedex() {
                                 const caughtCount = (isPrimaryCaught ? 1 : 0) + (isSecondaryCaught ? 1 : 0);
                                 const pct = Math.min(100, (caughtCount / totalVars) * 100);
 
+                                // Add a safeguard to prevent errors when clicking on non-evolving Pokémon icons
                                 return (
                                     <PokedexCard
                                         key={p.id}
@@ -311,6 +313,14 @@ export default function Pokedex() {
                                         caughtPercentage={pct}
                                         hasCaughtAny={isCaught}
                                         onClick={() => {
+                                            if (isNonEvolving) {
+                                                toast({
+                                                    variant: 'destructive',
+                                                    title: 'Errore',
+                                                    description: 'Questo Pokémon non può evolversi.',
+                                                });
+                                                return;
+                                            }
                                             navigate(`/pokedex/${p.id}`);
                                         }}
                                     />
