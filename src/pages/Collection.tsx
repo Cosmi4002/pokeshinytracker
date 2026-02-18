@@ -342,6 +342,10 @@ export default function Collection() {
                     setIsEditDialogOpen(true);
                   }}
                   onDelete={() => handleDelete(entry.id)}
+                  onEvolve={() => {
+                    setEditEntry(entry);
+                    setIsEditDialogOpen(true);
+                  }}
                 />
               ))}
             </div>
