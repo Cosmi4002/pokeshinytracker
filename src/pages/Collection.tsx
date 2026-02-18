@@ -101,58 +101,6 @@ export default function Collection() {
     }
   };
 
-  const handleEvolve = async (entry: CaughtShinyRow) => {
-    try {
-      const evolvedPokemonId = entry.pokemon_id + 1; // Example: Increment ID for evolution
-
-      // Check if there are other Paras entries
-      const otherParas = entries.filter((e) => e.pokemon_id === entry.pokemon_id && e.id !== entry.id);
-
-      // Remove the pre-evolution from the collection only if no other Paras exists
-      if (otherParas.length === 0) {
-        const { error: deleteError } = await supabase
-          .from('caught_shinies')
-          .delete()
-          .eq('id', entry.id)
-          .eq('user_id', user!.id);
-
-        if (deleteError) throw deleteError;
-
-        setEntries((prev) => prev.filter((e) => e.id !== entry.id));
-      }
-
-      // Add the evolved Pokémon to the collection
-      const { error: insertError } = await supabase
-        .from('caught_shinies')
-        .insert({
-          user_id: user!.id,
-          pokemon_id: evolvedPokemonId,
-          caught_date: new Date().toISOString(),
-          game: 'default_game', // Replace with actual game value
-          method: 'default_method', // Replace with actual method value
-          pokemon_name: 'Evolved Pokémon', // Replace with actual Pokémon name
-        });
-
-      if (insertError) throw insertError;
-
-      setEntries((prev) => [
-        ...prev,
-        { ...entry, id: `${entry.id}-evolved`, pokemon_id: evolvedPokemonId },
-      ]);
-
-      toast({
-        title: 'Evoluzione completata',
-        description: `${entry.pokemon_name} è evoluto in Parasect!`,
-      });
-    } catch (err: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Errore',
-        description: err.message || 'Impossibile evolvere il Pokémon',
-      });
-    }
-  };
-
   const playlistMap = useMemo(() => {
     const m: Record<string, string> = {};
     playlists.forEach((p) => (m[p.id] = p.name));
@@ -394,7 +342,6 @@ export default function Collection() {
                     setIsEditDialogOpen(true);
                   }}
                   onDelete={() => handleDelete(entry.id)}
-                  onEvolve={() => handleEvolve(entry)}
                 />
               ))}
             </div>
