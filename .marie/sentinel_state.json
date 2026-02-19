@@ -2,14 +2,6 @@
   "lastEntropy": 0,
   "history": [
     {
-      "date": "2026-02-19T02:21:02.802Z",
-      "entropy": 0
-    },
-    {
-      "date": "2026-02-19T02:24:00.642Z",
-      "entropy": 0
-    },
-    {
       "date": "2026-02-19T02:28:59.457Z",
       "entropy": 0
     },
@@ -76,6 +68,18 @@
     {
       "date": "2026-02-19T03:52:34.848Z",
       "entropy": 0
+    },
+    {
+      "date": "2026-02-19T03:57:31.976Z",
+      "entropy": 0
+    },
+    {
+      "date": "2026-02-19T04:05:49.449Z",
+      "entropy": 0
+    },
+    {
+      "date": "2026-02-19T04:08:27.800Z",
+      "entropy": 0
     }
   ],
   "fileHashes": {
@@ -86,9 +90,9 @@
     "src\\components\\collection\\CreatePlaylistDialog.tsx": 1769904412412.3342,
     "src\\components\\collection\\EditPlaylistDialog.tsx": 1770001392676.6848,
     "src\\components\\collection\\EditShinyDialog.tsx": 1771455696849.9702,
-    "src\\components\\collection\\EvolveDialog.tsx": 1771472902545.5898,
+    "src\\components\\collection\\EvolveDialog.tsx": 1771473597697.267,
     "src\\components\\collection\\ManagePlaylistsDialog.tsx": 1770001432104.1636,
-    "src\\components\\collection\\ShinyCard.tsx": 1771385854254.5696,
+    "src\\components\\collection\\ShinyCard.tsx": 1771474040726.6396,
     "src\\components\\counter\\FinishHuntDialog.tsx": 1771218980116.926,
     "src\\components\\counter\\MethodSelector.tsx": 1770967853939.6943,
     "src\\components\\counter\\PokemonSelector.tsx": 1771220394167.1213,
@@ -177,7 +181,7 @@
     "src\\pages\\Hunts.tsx": 1770568548964.9773,
     "src\\pages\\Index.tsx": 1770501524465.4124,
     "src\\pages\\NotFound.tsx": 1769818178170.9314,
-    "src\\pages\\Pokedex.tsx": 1771472984669.108,
+    "src\\pages\\Pokedex.tsx": 1771473561936.293,
     "src\\pages\\PokedexManager.tsx": 1771090742816.786,
     "src\\pages\\PokemonDetails.tsx": 1771226978771.8076,
     "src\\plumbing\\BaseTool.ts": 1771467663518.197,
@@ -185,7 +189,7 @@
     "src\\test\\setup.ts": 1769818178047.0332,
     "src\\vite-env.d.ts": 1769818177955.2544,
     "tailwind.config.ts": 1770515404222.507,
-    "vitest.config.ts": 1769818177774.2556,
-    "vite.config.ts": 1769872587250.9226
+    "vite.config.ts": 1769872587250.9226,
+    "vitest.config.ts": 1769818177774.2556
   }
 }

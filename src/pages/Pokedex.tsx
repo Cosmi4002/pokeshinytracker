@@ -17,6 +17,14 @@ import { getPrevEvolutions } from '@/lib/evolution-data';
 type CaughtEntryStats = { count: number; genders: Set<string>; forms: Set<string> };
 type CaughtDataMap = Record<number, CaughtEntryStats>;
 
+function isMissingIsEvolvedColumn(error: unknown): boolean {
+    const message =
+        typeof error === 'object' && error !== null && 'message' in error
+            ? String((error as { message?: string }).message || '')
+            : '';
+    return message.includes('is_evolved') && message.toLowerCase().includes('column');
+}
+
 function collectPreviousEvolutions(pokemonId: number, visited = new Set<number>()): Set<number> {
     const previous = getPrevEvolutions(pokemonId);
     previous.forEach((prevId) => {
@@ -47,15 +55,30 @@ export default function Pokedex() {
         queryKey: ['caughtData', user?.id],
         queryFn: async () => {
             if (!user) return { caught: {} as CaughtDataMap, evolvedFromIds: [] as number[] };
-            const { data, error } = await supabase
+            let { data, error } = await supabase
                 .from('caught_shinies')
                 .select('pokemon_id, gender, form, is_evolved')
                 .eq('user_id', user.id);
+
+            if (error && isMissingIsEvolvedColumn(error)) {
+                const fallback = await supabase
+                    .from('caught_shinies')
+                    .select('pokemon_id, gender, form')
+                    .eq('user_id', user.id);
+                data = fallback.data;
+                error = fallback.error;
+            }
             if (error) throw error;
 
             const caught: CaughtDataMap = {};
             const evolvedFromIds = new Set<number>();
-            data?.forEach(row => {
+            const rows = (data || []) as Array<{
+                pokemon_id: number;
+                gender: string | null;
+                form: string | null;
+                is_evolved?: boolean;
+            }>;
+            rows.forEach(row => {
                 const id = row.pokemon_id;
                 if (!caught[id]) {
                     caught[id] = { count: 0, genders: new Set(), forms: new Set() };

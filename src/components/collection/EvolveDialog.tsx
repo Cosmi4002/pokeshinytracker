@@ -20,6 +20,14 @@ interface EvolveDialogProps {
   onSuccess: () => void;
 }
 
+function isMissingIsEvolvedColumn(error: unknown): boolean {
+  const message =
+    typeof error === 'object' && error !== null && 'message' in error
+      ? String((error as { message?: string }).message || '')
+      : '';
+  return message.includes('is_evolved') && message.toLowerCase().includes('column');
+}
+
 export function EvolveDialog({ open, onOpenChange, entry, onSuccess }: EvolveDialogProps) {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -78,7 +86,7 @@ export function EvolveDialog({ open, onOpenChange, entry, onSuccess }: EvolveDia
       });
 
       // Update the caught_shinies table
-      const { error } = await supabase
+      let { error } = await supabase
         .from('caught_shinies')
         .update({
           pokemon_id: selectedEvolution,
@@ -88,6 +96,19 @@ export function EvolveDialog({ open, onOpenChange, entry, onSuccess }: EvolveDia
         })
         .eq('id', entry.id)
         .eq('user_id', user.id);
+
+      if (error && isMissingIsEvolvedColumn(error)) {
+        const fallback = await supabase
+          .from('caught_shinies')
+          .update({
+            pokemon_id: selectedEvolution,
+            pokemon_name: evolutionPokemon.displayName,
+            sprite_url: newSpriteUrl,
+          })
+          .eq('id', entry.id)
+          .eq('user_id', user.id);
+        error = fallback.error;
+      }
 
       if (error) throw error;
 
