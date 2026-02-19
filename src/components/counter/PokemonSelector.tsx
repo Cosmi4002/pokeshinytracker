@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { Check, ChevronsUpDown, Search } from 'lucide-react';
+import { Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -77,8 +77,11 @@ export function PokemonSelector({ value, valueName, onChange }: PokemonSelectorP
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-[var(--radix-popover-trigger-width)] p-0"
+        className="w-[min(var(--radix-popover-trigger-width),calc(100vw-2rem))] max-w-[calc(100vw-2rem)] p-0"
         align="start"
+        side="bottom"
+        sideOffset={6}
+        collisionPadding={12}
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <Command shouldFilter={false}>
@@ -87,7 +90,7 @@ export function PokemonSelector({ value, valueName, onChange }: PokemonSelectorP
             value={searchTerm}
             onValueChange={setSearchTerm}
           />
-          <CommandList className="max-h-[300px] overflow-y-auto">
+          <CommandList className="max-h-[min(300px,50vh)] overflow-y-auto">
             {loading && <div className="p-4 text-sm text-center text-muted-foreground">Loading...</div>}
             {!loading && filteredPokemon.length === 0 && (
               <div className="py-6 text-center text-sm text-muted-foreground">No Pokémon found.</div>
