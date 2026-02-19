@@ -15,31 +15,31 @@ export const GAME_THEMES: Record<string, GameTheme> = {
     accent: '#FFE55C',
   },
   silver: {
-    primary: '#C0C0C0',
-    secondary: '#8C92AC',
-    accent: '#E8E8E8',
+    primary: '#DEE3EA', // Light silver
+    secondary: '#A8B2C2', // Soft metallic shadow
+    accent: '#F5F8FC', // Bright silver highlight
   },
   crystal: {
-    primary: '#4FD1C5',
-    secondary: '#2C7A7B',
-    accent: '#81E6D9',
+    primary: '#62D5E8', // Suicune cyan
+    secondary: '#4A66B4', // Violet-blue note
+    accent: '#B7A7F2', // Soft violet highlight
   },
 
   // Gen 3
   ruby: {
-    primary: '#E53E3E',
-    secondary: '#9B2C2C',
-    accent: '#FC8181',
+    primary: '#C61F3A', // Ruby red
+    secondary: '#851329', // Deep ruby shadow
+    accent: '#F36A85', // Gem highlight
   },
   sapphire: {
-    primary: '#3182CE',
-    secondary: '#2C5282',
-    accent: '#63B3ED',
+    primary: '#1E63C6', // Sapphire blue
+    secondary: '#153C8A', // Deep sapphire
+    accent: '#6FA8FF', // Light reflection
   },
   firered: {
-    primary: '#F56565',
-    secondary: '#C53030',
-    accent: '#FEB2B2',
+    primary: '#FF6A2E', // Bonfire flame orange
+    secondary: '#B93A12', // Ember red
+    accent: '#FFB26B', // Fire glow
   },
   leafgreen: {
     primary: '#48BB78',
@@ -47,16 +47,16 @@ export const GAME_THEMES: Record<string, GameTheme> = {
     accent: '#9AE6B4',
   },
   emerald: {
-    primary: '#38B2AC',
-    secondary: '#2C7A7B',
-    accent: '#81E6D9',
+    primary: '#14A36D', // Emerald green
+    secondary: '#0D6E4D', // Deep emerald
+    accent: '#6FE0B2', // Gem reflection
   },
 
   // Gen 4
   diamond: {
-    primary: '#4299E1',
-    secondary: '#2B6CB0',
-    accent: '#90CDF4',
+    primary: '#4C7FEA', // Dialga-like metallic blue
+    secondary: '#2B4FAD', // Deep steel blue
+    accent: '#AFC8FF', // Crystal reflection
   },
   pearl: {
     primary: '#F9A8D4',
@@ -69,9 +69,9 @@ export const GAME_THEMES: Record<string, GameTheme> = {
     accent: '#C2A26A', // Faded ochre highlight
   },
   heartgold: {
-    primary: '#F6AD55',
-    secondary: '#C05621',
-    accent: '#FBD38D',
+    primary: '#E4B33C', // Rich gold
+    secondary: '#A87919', // Dark gold
+    accent: '#FFD978', // Golden shine
   },
   soulsilver: {
     primary: '#CBD5E0',
@@ -81,36 +81,36 @@ export const GAME_THEMES: Record<string, GameTheme> = {
 
   // Gen 5
   black: {
-    primary: '#2D3748',
-    secondary: '#1A202C',
-    accent: '#4A5568',
+    primary: '#ECEFF4', // Off-white
+    secondary: '#BFC7D4', // Cool light gray
+    accent: '#FFFFFF', // Bright highlight
   },
   white: {
-    primary: '#E2E8F0',
-    secondary: '#A0AEC0',
-    accent: '#F7FAFC',
+    primary: '#1F2A26', // Jade black
+    secondary: '#131A18', // Deep dark jade
+    accent: '#4F6B61', // Jade reflection
   },
   black2: {
-    primary: '#2D3748',
-    secondary: '#1A202C',
-    accent: '#4A5568',
+    primary: '#0B0B0D', // Rich black
+    secondary: '#191F3F', // Midnight blue
+    accent: '#5D74C8', // Blue glow
   },
   white2: {
-    primary: '#E2E8F0',
-    secondary: '#A0AEC0',
-    accent: '#F7FAFC',
+    primary: '#E34234', // Cinnabar red
+    secondary: '#8E1F18', // Deep cinnabar
+    accent: '#FF9A7A', // Warm glow
   },
 
   // Gen 6
   x: {
-    primary: '#4299E1',
-    secondary: '#2C5282',
-    accent: '#90CDF4',
+    primary: '#5F9BEA',
+    secondary: '#2E5FA8',
+    accent: '#EAF2FF', // Light white nuance
   },
   y: {
-    primary: '#E53E3E',
-    secondary: '#9B2C2C',
-    accent: '#FC8181',
+    primary: '#A61E2E',
+    secondary: '#6F1320',
+    accent: '#E05A70',
   },
   omegaruby: {
     primary: '#E53E3E',
@@ -118,9 +118,9 @@ export const GAME_THEMES: Record<string, GameTheme> = {
     accent: '#FC8181',
   },
   alphasapphire: {
-    primary: '#3182CE',
-    secondary: '#2C5282',
-    accent: '#63B3ED',
+    primary: '#2C79D6', // Sapphire base
+    secondary: '#1F4F9B', // Deep ocean blue
+    accent: '#58D1D4', // Aqua-green note
   },
 
   // Gen 7
@@ -130,9 +130,9 @@ export const GAME_THEMES: Record<string, GameTheme> = {
     accent: '#FFD089',
   },
   moon: {
-    primary: '#9F7AEA',
-    secondary: '#6B46C1',
-    accent: '#D6BCFA',
+    primary: '#5B78D6', // Royal blue note
+    secondary: '#324EAA', // Deep royal
+    accent: '#AFC1FF', // Moonlight reflection
   },
   ultrasun: {
     primary: '#D9721E',
@@ -140,14 +140,14 @@ export const GAME_THEMES: Record<string, GameTheme> = {
     accent: '#F2B066',
   },
   ultramoon: {
-    primary: '#805AD5',
-    secondary: '#553C9A',
-    accent: '#D6BCFA',
+    primary: '#274C77', // Yale blue
+    secondary: '#1B3558', // Dark Yale
+    accent: '#6C8FC4', // Cold moon highlight
   },
   lgp: {
-    primary: '#F6AD55',
-    secondary: '#DD6B20',
-    accent: '#FBD38D',
+    primary: '#F2C230', // Pikachu yellow
+    secondary: '#8B5A2B', // Brown tone
+    accent: '#FFE28A',
   },
   lge: {
     primary: '#8B4513', // Saddle Brown
@@ -167,14 +167,14 @@ export const GAME_THEMES: Record<string, GameTheme> = {
     accent: '#FBB6CE',
   },
   brilliantdiamond: {
-    primary: '#4299E1',
-    secondary: '#2B6CB0',
-    accent: '#90CDF4',
+    primary: '#73C2FB', // Maya blue
+    secondary: '#3F86C6', // Maya blue deep
+    accent: '#BFE6FF', // Crystal reflection
   },
   shiningpearl: {
-    primary: '#ED8936',
-    secondary: '#C05621',
-    accent: '#FBD38D',
+    primary: '#F2E7DF', // Pearl white
+    secondary: '#C9B6C2', // Rosy pearl shadow
+    accent: '#FFF6FB', // Bright pearl shine
   },
   pla: {
     primary: '#38B2AC',

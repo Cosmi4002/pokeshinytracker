@@ -167,7 +167,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onEvolve }: ShinyCardProps)
           <div className="space-y-1.5">
             <div className="w-full flex justify-center">
               <div className="inline-flex items-center justify-center gap-1.5 max-w-full px-1">
-                <h3 className="text-base sm:text-lg font-black text-white tracking-tight capitalize leading-none text-center truncate max-w-[85%]">
+                <h3 className="text-base sm:text-lg font-black text-white tracking-tight capitalize leading-tight text-center break-words whitespace-normal max-w-full">
                   {displayName}
                 </h3>
                 {entry.gender && (entry.gender === 'male' || entry.gender === 'female') && (
