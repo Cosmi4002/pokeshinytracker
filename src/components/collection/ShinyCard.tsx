@@ -1,5 +1,4 @@
-import { Pencil, Trash2, Calendar, ArrowUpCircle } from 'lucide-react';
-import { useRandomColor } from '@/lib/random-color-context';
+import { Pencil, Trash2, Calendar, ArrowUpCircle, Mars, Venus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getGameTheme, GAME_LOGOS } from '@/lib/game-themes';
 import { POKEBALLS, HUNTING_METHODS, getPokemonSpriteUrl } from '@/lib/pokemon-data';
@@ -28,7 +27,6 @@ interface ShinyCardProps {
 }
 
 export function ShinyCard({ entry, onEdit, onDelete, onEvolve }: ShinyCardProps) {
-  const { accentColor } = useRandomColor();
   const isEvolved = entry.is_evolved === true;
 
   const theme = useMemo(() => getGameTheme(entry.game), [entry.game]);
@@ -60,13 +58,23 @@ export function ShinyCard({ entry, onEdit, onDelete, onEvolve }: ShinyCardProps)
         'group relative h-full flex flex-col overflow-hidden rounded-xl border bg-[#232323] shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1',
         entry.is_fail ? 'border-red-500/80 shadow-[0_0_20px_rgba(239,68,68,0.25)] ring-1 ring-red-500/50' : 'border-white/10'
       )}
-      style={{ borderColor: entry.is_fail ? '#ef4444' : `${accentColor}55` }}
+      style={{
+        borderColor: entry.is_fail ? '#ef4444' : `${theme.primary}95`,
+        boxShadow: entry.is_fail ? undefined : `0 14px 30px ${theme.secondary}44`,
+      }}
     >
       <div className="relative w-full h-40 sm:h-44 overflow-hidden bg-black/40">
-        <div className="absolute inset-0 z-0 bg-gradient-to-b from-[#171717] to-[#0f0f0f]" />
         <div
-          className="absolute inset-0 z-0 opacity-25"
-          style={{ background: `radial-gradient(circle at 50% 35%, ${theme.primary}, transparent 70%)` }}
+          className="absolute inset-0 z-0"
+          style={{
+            background: `linear-gradient(155deg, ${theme.secondary} 0%, #111 55%, ${theme.primary} 100%)`,
+          }}
+        />
+        <div
+          className="absolute inset-0 z-0 opacity-45"
+          style={{
+            background: `radial-gradient(circle at 22% 18%, ${theme.accent}, transparent 42%), radial-gradient(circle at 78% 78%, ${theme.primary}, transparent 52%)`,
+          }}
         />
 
         <div className="absolute inset-0 flex items-center justify-center z-10 p-2">
@@ -151,26 +159,25 @@ export function ShinyCard({ entry, onEdit, onDelete, onEvolve }: ShinyCardProps)
       <div
         className="flex-1 p-3 bg-[#222] relative z-10 border-t border-white/10"
         style={{
-          backgroundColor: `color-mix(in srgb, ${theme.primary} 14%, #1a1a1a)`,
-          borderTopColor: `${theme.primary}30`,
+          background: `linear-gradient(180deg, color-mix(in srgb, ${theme.secondary} 34%, #141414) 0%, color-mix(in srgb, ${theme.primary} 28%, #121212) 100%)`,
+          borderTopColor: `${theme.accent}66`,
         }}
       >
         <div className="space-y-2.5">
           <div className="space-y-1.5">
-            <div className="flex items-center justify-center gap-2 min-w-0">
-              <h3 className="text-base sm:text-lg font-black text-white tracking-tight capitalize leading-none text-center">
-                {displayName}
-              </h3>
-              {entry.gender && (entry.gender === 'male' || entry.gender === 'female') && (
-                <span
-                  className={cn(
-                    'text-base font-bold drop-shadow-sm flex-shrink-0 leading-none',
-                    entry.gender === 'male' ? 'text-blue-400' : 'text-pink-400'
-                  )}
-                >
-                  {entry.gender === 'male' ? '\u2642' : '\u2640'}
-                </span>
-              )}
+            <div className="w-full flex justify-center">
+              <div className="inline-flex items-center justify-center gap-1.5 max-w-full px-1">
+                <h3 className="text-base sm:text-lg font-black text-white tracking-tight capitalize leading-none text-center truncate max-w-[85%]">
+                  {displayName}
+                </h3>
+                {entry.gender && (entry.gender === 'male' || entry.gender === 'female') && (
+                  entry.gender === 'male' ? (
+                    <Mars className="h-4 w-4 text-blue-400 flex-shrink-0" strokeWidth={2.5} />
+                  ) : (
+                    <Venus className="h-4 w-4 text-pink-400 flex-shrink-0" strokeWidth={2.5} />
+                  )
+                )}
+              </div>
             </div>
 
             <div className="flex items-center justify-center">
@@ -191,9 +198,9 @@ export function ShinyCard({ entry, onEdit, onDelete, onEvolve }: ShinyCardProps)
               <div
                 className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.12em] border shadow-sm"
                 style={{
-                  backgroundColor: `${theme.primary}15`,
-                  borderColor: `${theme.primary}50`,
-                  color: theme.primary,
+                  backgroundColor: `color-mix(in srgb, ${theme.accent} 20%, #0d0d0d)`,
+                  borderColor: `${theme.accent}88`,
+                  color: theme.accent,
                 }}
               >
                 {method.name}
@@ -205,8 +212,8 @@ export function ShinyCard({ entry, onEdit, onDelete, onEvolve }: ShinyCardProps)
             <div
               className="rounded-lg p-2 border shadow-lg"
               style={{
-                backgroundColor: `color-mix(in srgb, ${theme.primary} 18%, #111 82%)`,
-                borderColor: `${theme.primary}55`,
+                background: `linear-gradient(145deg, color-mix(in srgb, ${theme.secondary} 48%, #101010), color-mix(in srgb, ${theme.primary} 42%, #0f0f0f))`,
+                borderColor: `${theme.accent}66`,
               }}
             >
               <div className="flex items-center gap-1 mb-1.5">
@@ -232,8 +239,8 @@ export function ShinyCard({ entry, onEdit, onDelete, onEvolve }: ShinyCardProps)
             <div
               className="rounded-lg p-2 border shadow-lg flex flex-col"
               style={{
-                backgroundColor: `color-mix(in srgb, ${theme.primary} 18%, #111 82%)`,
-                borderColor: `${theme.primary}55`,
+                background: `linear-gradient(145deg, color-mix(in srgb, ${theme.primary} 46%, #101010), color-mix(in srgb, ${theme.secondary} 38%, #0f0f0f))`,
+                borderColor: `${theme.accent}66`,
               }}
             >
               <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em] block mb-1.5">Encounters</span>
@@ -277,7 +284,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onEvolve }: ShinyCardProps)
                     src="/img/items/shiny-charm.png"
                     loading="lazy"
                     decoding="async"
-                    className="w-5 h-5 object-contain animate-pulse drop-shadow-[0_0_8px_rgba(234,179,8,0.6)]"
+                    className="w-7 h-7 object-contain animate-pulse drop-shadow-[0_0_8px_rgba(234,179,8,0.6)]"
                     alt="Shiny Charm"
                   />
                 </div>

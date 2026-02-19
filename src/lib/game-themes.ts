@@ -64,9 +64,9 @@ export const GAME_THEMES: Record<string, GameTheme> = {
     accent: '#FCE7F3',
   },
   platinum: {
-    primary: '#E5E4E2', // Platinum
-    secondary: '#B8860B', // Dark Goldenrod (Ochre accent)
-    accent: '#DAA520', // Goldenrod
+    primary: '#D9D5CC', // Soft platinum
+    secondary: '#9A7A3A', // Muted ochre
+    accent: '#C2A26A', // Faded ochre highlight
   },
   heartgold: {
     primary: '#F6AD55',
@@ -125,9 +125,9 @@ export const GAME_THEMES: Record<string, GameTheme> = {
 
   // Gen 7
   sun: {
-    primary: '#F6AD55',
-    secondary: '#DD6B20',
-    accent: '#FBD38D',
+    primary: '#FFB14A',
+    secondary: '#E97A1F',
+    accent: '#FFD089',
   },
   moon: {
     primary: '#9F7AEA',
@@ -135,9 +135,9 @@ export const GAME_THEMES: Record<string, GameTheme> = {
     accent: '#D6BCFA',
   },
   ultrasun: {
-    primary: '#ED8936',
-    secondary: '#C05621',
-    accent: '#FBD38D',
+    primary: '#D9721E',
+    secondary: '#A64717',
+    accent: '#F2B066',
   },
   ultramoon: {
     primary: '#805AD5',

@@ -2,22 +2,6 @@
   "lastEntropy": 0,
   "history": [
     {
-      "date": "2026-02-19T04:37:33.011Z",
-      "entropy": 0
-    },
-    {
-      "date": "2026-02-19T04:42:33.338Z",
-      "entropy": 0
-    },
-    {
-      "date": "2026-02-19T04:47:47.956Z",
-      "entropy": 0
-    },
-    {
-      "date": "2026-02-19T04:52:33.099Z",
-      "entropy": 0
-    },
-    {
       "date": "2026-02-19T04:57:36.189Z",
       "entropy": 0
     },
@@ -80,6 +64,22 @@
     {
       "date": "2026-02-19T06:13:07.297Z",
       "entropy": 0
+    },
+    {
+      "date": "2026-02-19T06:17:36.947Z",
+      "entropy": 0
+    },
+    {
+      "date": "2026-02-19T06:22:52.130Z",
+      "entropy": 0
+    },
+    {
+      "date": "2026-02-19T06:29:27.659Z",
+      "entropy": 0
+    },
+    {
+      "date": "2026-02-19T06:33:25.923Z",
+      "entropy": 0
     }
   ],
   "fileHashes": {
@@ -92,7 +92,7 @@
     "src\\components\\collection\\EditShinyDialog.tsx": 1771479931655.6345,
     "src\\components\\collection\\EvolveDialog.tsx": 1771480180031.2378,
     "src\\components\\collection\\ManagePlaylistsDialog.tsx": 1770001432104.1636,
-    "src\\components\\collection\\ShinyCard.tsx": 1771479666105.9,
+    "src\\components\\collection\\ShinyCard.tsx": 1771482625426.685,
     "src\\components\\counter\\FinishHuntDialog.tsx": 1771218980116.926,
     "src\\components\\counter\\MethodSelector.tsx": 1770967853939.6943,
     "src\\components\\counter\\PokemonSelector.tsx": 1771479133109.045,
@@ -119,8 +119,8 @@
     "src\\components\\ui\\carousel.tsx": 1769818179495.5728,
     "src\\components\\ui\\chart.tsx": 1769818180036.071,
     "src\\components\\ui\\checkbox.tsx": 1769818179962.5103,
-    "src\\components\\ui\\command.tsx": 1770315609441.5242,
     "src\\components\\ui\\collapsible.tsx": 1769818179850.649,
+    "src\\components\\ui\\command.tsx": 1770315609441.5242,
     "src\\components\\ui\\context-menu.tsx": 1769818179047.443,
     "src\\components\\ui\\dialog.tsx": 1769818179421.3982,
     "src\\components\\ui\\drawer.tsx": 1769818179031.8174,
@@ -138,13 +138,13 @@
     "src\\components\\ui\\progress.tsx": 1769818180204.1082,
     "src\\components\\ui\\radio-group.tsx": 1769818179872.7815,
     "src\\components\\ui\\resizable.tsx": 1769818179805.398,
+    "src\\components\\ui\\scroll-area.tsx": 1770679875074.1838,
     "src\\components\\ui\\select.tsx": 1770315583093.625,
     "src\\components\\ui\\separator.tsx": 1769818180194.8484,
     "src\\components\\ui\\sheet.tsx": 1769818179294.5708,
     "src\\components\\ui\\sidebar.tsx": 1769818179483.5522,
     "src\\components\\ui\\skeleton.tsx": 1769818179722.0254,
     "src\\components\\ui\\slider.tsx": 1769818179449.6309,
-    "src\\components\\ui\\sonner.tsx": 1769818179782.054,
     "src\\components\\ui\\switch.tsx": 1769818180047.8738,
     "src\\components\\ui\\table.tsx": 1769818179795.0334,
     "src\\components\\ui\\tabs.tsx": 1769818179078.6917,
@@ -154,10 +154,9 @@
     "src\\components\\ui\\toggle-group.tsx": 1769818179747.0315,
     "src\\components\\ui\\toggle.tsx": 1769818179094.3164,
     "src\\components\\ui\\tooltip.tsx": 1769818179306.6802,
-    "src\\components\\ui\\scroll-area.tsx": 1770679875074.1838,
     "src\\components\\ui\\use-toast.ts": 1769818179912.643,
-    "src\\hooks\\use-mobile.tsx": 1769818178652.7957,
     "src\\domain\\DomainEntity.ts": 1771467663518.197,
+    "src\\hooks\\use-mobile.tsx": 1769818178652.7957,
     "src\\hooks\\use-pokedex-overrides.ts": 1771076139403.9187,
     "src\\hooks\\use-pokemon.ts": 1771386141790.597,
     "src\\hooks\\use-toast.ts": 1769818178719.912,
@@ -169,7 +168,7 @@
     "src\\lib\\color-utils.ts": 1771476166665.686,
     "src\\lib\\evolution-data.ts": 1771458298243.5305,
     "src\\lib\\form-filters.ts": 1771371437553.3525,
-    "src\\lib\\game-themes.ts": 1771477820820.626,
+    "src\\lib\\game-themes.ts": 1771482744662.1118,
     "src\\lib\\pokemon-data.ts": 1771479922465.6633,
     "src\\lib\\random-color-context.tsx": 1771477165146.3718,
     "src\\lib\\theme-context.tsx": 1769977817631.0764,
@@ -180,6 +179,7 @@
     "src\\pages\\Counter.tsx": 1770510761388.5667,
     "src\\pages\\Debug.tsx": 1771195130837.4607,
     "src\\pages\\Hunts.tsx": 1770568548964.9773,
+    "src\\components\\ui\\sonner.tsx": 1769818179782.054,
     "src\\pages\\Index.tsx": 1770501524465.4124,
     "src\\pages\\NotFound.tsx": 1769818178170.9314,
     "src\\pages\\Pokedex.tsx": 1771475329210.5005,
