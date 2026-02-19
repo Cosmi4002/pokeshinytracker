@@ -212,31 +212,31 @@ export function ShinyCard({ entry, onEdit, onDelete, onEvolve }: ShinyCardProps)
                         </div>
                     )}
 
-                    {/* Info Grid - Darker boxes and better alignment */}
-                    <div className="grid grid-cols-2 gap-3 mt-4">
+                    {/* Info Grid - cleaner hierarchy for dates and encounters */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 mt-3 sm:mt-4">
                         <div
-                            className="rounded-xl p-3 border border-white/10 shadow-lg"
+                            className="rounded-xl p-2.5 sm:p-3 border shadow-lg"
                             style={{
-                                backgroundColor: `${theme.primary}25`,
-                                borderColor: `${theme.primary}40`
+                                backgroundColor: `color-mix(in srgb, ${theme.primary} 18%, #111 82%)`,
+                                borderColor: `${theme.primary}55`
                             }}
                         >
-                            <div className="flex items-center gap-1.5 mb-2">
-                                <Calendar className="w-3.5 h-3.5 text-white/60" />
-                                <span className="text-[10px] font-bold text-white/50 uppercase tracking-wider">
-                                    {entry.is_fail ? 'Duration' : 'Hunt Dates'}
+                            <div className="flex items-center gap-1.5 mb-2.5">
+                                <Calendar className="w-3.5 h-3.5 text-white/70" />
+                                <span className="text-[9px] sm:text-[10px] font-bold text-white/60 uppercase tracking-[0.14em]">
+                                    Hunt Dates
                                 </span>
                             </div>
-                            <div className="space-y-1.5">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[10px] text-white/40 font-bold uppercase w-8">Start</span>
-                                    <span className="text-[11px] font-bold text-white/90 tabular-nums">
-                                        {entry.hunt_start_date ? formatDate(entry.hunt_start_date) : 'Unknown'}
+                            <div className="space-y-1.5 sm:space-y-2">
+                                <div className="flex items-center justify-between gap-2 rounded-md bg-black/25 px-2 py-1.5">
+                                    <span className="text-[9px] sm:text-[10px] text-white/55 font-bold uppercase tracking-wider">Start</span>
+                                    <span className="text-[10px] sm:text-[11px] font-semibold text-white/95 tabular-nums text-right">
+                                        {entry.hunt_start_date ? formatDate(entry.hunt_start_date) : '--'}
                                     </span>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[10px] text-white/40 font-bold uppercase w-8">End</span>
-                                    <span className="text-[11px] font-bold text-white/90 tabular-nums">
+                                <div className="flex items-center justify-between gap-2 rounded-md bg-black/25 px-2 py-1.5">
+                                    <span className="text-[9px] sm:text-[10px] text-white/55 font-bold uppercase tracking-wider">Caught</span>
+                                    <span className="text-[10px] sm:text-[11px] font-semibold text-white/95 tabular-nums text-right">
                                         {formatDate(entry.caught_date)}
                                     </span>
                                 </div>
@@ -244,22 +244,24 @@ export function ShinyCard({ entry, onEdit, onDelete, onEvolve }: ShinyCardProps)
                         </div>
 
                         <div
-                            className="rounded-xl p-3 border border-white/10 shadow-lg flex flex-col justify-between"
+                            className="rounded-xl p-2.5 sm:p-3 border shadow-lg flex flex-col"
                             style={{
-                                backgroundColor: `${theme.primary}25`,
-                                borderColor: `${theme.primary}40`
+                                backgroundColor: `color-mix(in srgb, ${theme.primary} 18%, #111 82%)`,
+                                borderColor: `${theme.primary}55`
                             }}
                         >
-                            <span className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] block mb-1.5">Encounters</span>
-                            <div className="flex items-center gap-2 mt-auto">
-                                <span className="text-3xl font-black tabular-nums tracking-tighter text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] leading-none">
+                            <span className="text-[9px] sm:text-[10px] font-bold text-white/60 uppercase tracking-[0.14em] block mb-1.5 sm:mb-2">
+                                Encounters
+                            </span>
+                            <div className="flex-1 flex items-center justify-center rounded-md bg-black/25 px-2 py-2.5 sm:py-3">
+                                <span className="text-[1.75rem] sm:text-[2rem] font-black tabular-nums tracking-tight text-white leading-none">
                                     {entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-'}
                                 </span>
                             </div>
                             {entry.phase_number && (
-                                <div className="mt-1 pt-1 border-t border-white/10">
+                                <div className="mt-2 pt-2 border-t border-white/15">
                                     <span
-                                        className="text-[10px] font-black uppercase tracking-widest bg-white/10 px-1.5 py-0.5 rounded"
+                                        className="text-[10px] font-black uppercase tracking-widest bg-black/30 px-2 py-0.5 rounded"
                                         style={{ color: theme.primary }}
                                     >
                                         PHASE #{entry.phase_number}

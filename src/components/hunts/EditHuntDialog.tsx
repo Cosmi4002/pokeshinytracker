@@ -101,6 +101,7 @@ export function EditHuntDialog({ open, onOpenChange, hunt, onSuccess }: EditHunt
                         <Label>Pokémon</Label>
                         <PokemonSelector
                             value={pokemonId}
+                            valueName={pokemonName}
                             onChange={(id, name) => {
                                 setPokemonId(id);
                                 setPokemonName(name);

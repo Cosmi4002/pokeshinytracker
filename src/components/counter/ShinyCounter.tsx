@@ -12,7 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { GenderSelector } from '@/components/ui/GenderSelector';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,7 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { PokemonSelector } from './PokemonSelector';
 import { MethodSelector } from './MethodSelector';
-import { calculateShinyStats, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, getGameSpecificSpriteUrl, getPokemonSpriteUrl } from '@/lib/pokemon-data';
+import { calculateShinyStats, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, getGameSpecificSpriteUrl } from '@/lib/pokemon-data';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
 import { FinishHuntDialog } from './FinishHuntDialog';
@@ -186,8 +185,8 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
       // If we're not in the initial load of a hunt (which sets its own variants),
       // reset form/gender to avoid stale variant data from the previous Pokemon
       if (!isInitial) {
-        setSelectedForm(null);
-        setSelectedGender(null);
+        setSelectedForm('');
+        setSelectedGender('');
       }
     }
   }, [selectedPokemonId]);
@@ -538,9 +537,37 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
               <Label>Pokémon</Label>
               <PokemonSelector
                 value={selectedPokemonId}
-                onChange={(id, name) => {
-                  setSelectedPokemonId(id);
+                valueName={selectedPokemonName}
+                onChange={(id, name, baseId) => {
+                  if (id === null) {
+                    setSelectedPokemonId(null);
+                    setSelectedPokemonName('');
+                    setSelectedForm('');
+                    setSelectedGender('');
+                    return;
+                  }
+
+                  const isFemaleVariant = name.endsWith('-female');
+                  const isMaleVariant = name.endsWith('-male');
+                  const resolvedBaseId = baseId ?? id;
+
+                  setSelectedPokemonId(resolvedBaseId);
                   setSelectedPokemonName(name);
+
+                  if (isFemaleVariant) {
+                    setSelectedGender('female');
+                    setSelectedForm('');
+                  } else if (isMaleVariant) {
+                    setSelectedGender('');
+                    setSelectedForm('');
+                  } else if (resolvedBaseId !== id) {
+                    // Selecting a variant directly from the picker should also preselect the form.
+                    setSelectedForm(name);
+                    setSelectedGender('');
+                  } else {
+                    setSelectedForm('');
+                    setSelectedGender('');
+                  }
                 }}
               />
             </div>

@@ -19,17 +19,23 @@ import { usePokemonList, getPokemonSpriteUrl } from '@/hooks/use-pokemon';
 
 interface PokemonSelectorProps {
   value: number | null;
-  onChange: (pokemonId: number | null, pokemonName: string) => void;
+  valueName?: string;
+  onChange: (pokemonId: number | null, pokemonName: string, pokemonBaseId?: number) => void;
 }
 
-export function PokemonSelector({ value, onChange }: PokemonSelectorProps) {
+export function PokemonSelector({ value, valueName, onChange }: PokemonSelectorProps) {
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const { pokemon, loading } = usePokemonList();
 
   const selectedPokemon = useMemo(() => {
+    if (value === null) return undefined;
+    if (valueName) {
+      const exact = pokemon.find(p => p.id === value && p.name === valueName);
+      if (exact) return exact;
+    }
     return pokemon.find(p => p.id === value);
-  }, [pokemon, value]);
+  }, [pokemon, value, valueName]);
 
   const filteredPokemon = useMemo(() => {
     if (!searchTerm) return pokemon;
@@ -89,10 +95,10 @@ export function PokemonSelector({ value, onChange }: PokemonSelectorProps) {
             <CommandGroup>
               {filteredPokemon.map((p) => (
                 <CommandItem
-                  key={p.id}
+                  key={`${p.id}-${p.name}`}
                   value={`${p.id}-${p.name}`}
                   onSelect={() => {
-                    onChange(p.id, p.name);
+                    onChange(p.id, p.name, p.baseId);
                     setOpen(false);
                     setSearchTerm('');
                   }}
@@ -109,12 +115,12 @@ export function PokemonSelector({ value, onChange }: PokemonSelectorProps) {
                     }}
                   />
                   <span>#{p.baseId.toString().padStart(4, '0')} {p.displayName}</span>
-                  <Check
-                    className={cn(
-                      "ml-auto h-4 w-4",
-                      value === p.id ? "opacity-100" : "opacity-0"
-                    )}
-                  />
+                    <Check
+                      className={cn(
+                        "ml-auto h-4 w-4",
+                        value === p.id && (!valueName || valueName === p.name) ? "opacity-100" : "opacity-0"
+                      )}
+                    />
                 </CommandItem>
               ))}
             </CommandGroup>

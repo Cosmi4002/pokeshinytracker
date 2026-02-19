@@ -41,22 +41,44 @@ export function EvolveDialog({ open, onOpenChange, entry, onSuccess }: EvolveDia
     return pokemon.find(p => p.id === entry.pokemon_id);
   }, [entry, pokemon]);
 
+  const evolutionSourceId = useMemo(() => {
+    if (!entry) return null;
+    return currentPokemon?.baseId ?? entry.pokemon_id;
+  }, [entry, currentPokemon]);
+
+  const currentFormSuffix = useMemo(() => {
+    const source = (entry?.form || currentPokemon?.name || '').toLowerCase();
+    if (!source.includes('-')) return '';
+    return source.split('-').slice(1).join('-');
+  }, [entry?.form, currentPokemon?.name]);
+
   // Get available evolutions
   const availableEvolutions = useMemo(() => {
-    if (!entry || !pokemon) return [];
-    
-    const nextIds = getNextEvolutions(entry.pokemon_id);
+    if (!entry || !pokemon || !evolutionSourceId) return [];
+
+    const nextIds = getNextEvolutions(evolutionSourceId);
     return nextIds.map(id => {
-      const poke = pokemon.find(p => p.id === id);
-      return poke ? { id: poke.id, name: poke.name, displayName: poke.displayName } : null;
-    }).filter(Boolean) as { id: number; name: string; displayName: string }[];
-  }, [entry, pokemon]);
+      const baseEvolution = pokemon.find(p => p.id === id);
+      if (!baseEvolution) return null;
+
+      // Preserve form suffix when possible (e.g. deerling-summer -> sawsbuck-summer)
+      const matchedForm =
+        currentFormSuffix
+          ? pokemon.find(
+              p => p.baseId === id && p.name.toLowerCase().endsWith(`-${currentFormSuffix}`)
+            )
+          : null;
+
+      const poke = matchedForm || baseEvolution;
+      return poke ? { id: poke.id, baseId: poke.baseId, name: poke.name, displayName: poke.displayName } : null;
+    }).filter(Boolean) as { id: number; baseId: number; name: string; displayName: string }[];
+  }, [entry, pokemon, evolutionSourceId, currentFormSuffix]);
 
   // Check if current Pokemon can evolve
   const canEvolveThis = useMemo(() => {
-    if (!entry) return false;
-    return canEvolve(entry.pokemon_id);
-  }, [entry]);
+    if (!evolutionSourceId) return false;
+    return canEvolve(evolutionSourceId);
+  }, [evolutionSourceId]);
 
   const currentSpriteUrl = useMemo(() => {
     if (!entry) return '';
@@ -92,6 +114,7 @@ export function EvolveDialog({ open, onOpenChange, entry, onSuccess }: EvolveDia
           pokemon_id: selectedEvolution,
           pokemon_name: evolutionPokemon.displayName,
           sprite_url: newSpriteUrl,
+          form: evolutionPokemon.id !== evolutionPokemon.baseId ? evolutionPokemon.name : null,
           is_evolved: true,
         })
         .eq('id', entry.id)
@@ -104,6 +127,7 @@ export function EvolveDialog({ open, onOpenChange, entry, onSuccess }: EvolveDia
             pokemon_id: selectedEvolution,
             pokemon_name: evolutionPokemon.displayName,
             sprite_url: newSpriteUrl,
+            form: evolutionPokemon.id !== evolutionPokemon.baseId ? evolutionPokemon.name : null,
           })
           .eq('id', entry.id)
           .eq('user_id', user.id);

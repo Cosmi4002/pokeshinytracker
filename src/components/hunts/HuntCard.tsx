@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Trash2, Clock, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { HUNTING_METHODS, getGameSpecificSpriteUrl, getPokemonSpriteUrl } from '@/lib/pokemon-data';
+import { HUNTING_METHODS, getGameSpecificSpriteUrl } from '@/lib/pokemon-data';
 import { calculateShinyStats } from '@/lib/pokemon-data';
 import { formatPokemonName } from '@/hooks/use-pokemon';
 import type { Tables } from '@/integrations/supabase/types';
@@ -46,7 +46,13 @@ export function HuntCard({ hunt, onDelete, onEdit, onContinue, layoutStyle = 'gr
                         <div className="flex-shrink-0">
                             {hunt.pokemon_id ? (
                                 <img
-                                    src={getGameSpecificSpriteUrl(hunt.pokemon_id, hunt.method || 'gen9-random', hunt.pokemon_name || undefined) || ''}
+                                    src={getGameSpecificSpriteUrl(
+                                        hunt.pokemon_id,
+                                        hunt.method || 'gen9-random',
+                                        hunt.pokemon_name || undefined,
+                                        hunt.form || undefined,
+                                        hunt.gender || undefined
+                                    ) || ''}
                                     alt={hunt.pokemon_name || 'Pokemon'}
                                     className="w-16 h-16 object-contain pokemon-sprite"
                                     onError={(e) => {
@@ -114,7 +120,13 @@ export function HuntCard({ hunt, onDelete, onEdit, onContinue, layoutStyle = 'gr
                     <div className="flex justify-center mb-2">
                         {hunt.pokemon_id ? (
                             <img
-                                src={getGameSpecificSpriteUrl(hunt.pokemon_id, hunt.method || 'gen9-random', hunt.pokemon_name || undefined) || ''}
+                                src={getGameSpecificSpriteUrl(
+                                    hunt.pokemon_id,
+                                    hunt.method || 'gen9-random',
+                                    hunt.pokemon_name || undefined,
+                                    hunt.form || undefined,
+                                    hunt.gender || undefined
+                                ) || ''}
                                 alt={hunt.pokemon_name || 'Pokemon'}
                                 className="w-16 h-16 object-contain pokemon-sprite"
                                 onError={(e) => {
@@ -191,7 +203,13 @@ export function HuntCard({ hunt, onDelete, onEdit, onContinue, layoutStyle = 'gr
                 <div className="flex justify-center mb-4">
                     {hunt.pokemon_id ? (
                         <img
-                            src={getGameSpecificSpriteUrl(hunt.pokemon_id, hunt.method || 'gen9-random', hunt.pokemon_name || undefined) || ''}
+                            src={getGameSpecificSpriteUrl(
+                                hunt.pokemon_id,
+                                hunt.method || 'gen9-random',
+                                hunt.pokemon_name || undefined,
+                                hunt.form || undefined,
+                                hunt.gender || undefined
+                            ) || ''}
                             alt={hunt.pokemon_name || 'Pokemon'}
                             className="w-24 h-24 lg:w-40 lg:h-40 object-contain pokemon-sprite"
                             onError={(e) => {

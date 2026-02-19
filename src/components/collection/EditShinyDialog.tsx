@@ -177,7 +177,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
           pokemon_name: finalDisplayName,
           sprite_url: finalSpriteUrl,
           form: form || null,
-          gender: gender || null,
+          gender: pokemonDetails?.hasGenderDifference ? (gender || null) : null,
           has_shiny_charm: hasShinyCharm,
           pokeball,
           game,
@@ -265,6 +265,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
             <Label>Pokémon *</Label>
             <PokemonSelector
               value={pokemonId}
+              valueName={pokemonName}
               onChange={(id, name) => {
                 setPokemonId(id);
                 setPokemonName(name);
