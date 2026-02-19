@@ -26,12 +26,13 @@ export default function PokedexManager() {
     const navigate = useNavigate();
     const { user, loading: authLoading } = useAuth();
     const { toast } = useToast();
-    const { overrides, saveOverrides, loading: themesLoading } = useGlobalCollectionThemes();
+    const { overrides, effects, saveConfig, loading: themesLoading } = useGlobalCollectionThemes();
     const [isEditorEnabled, setIsEditorEnabled] = useState(() => {
         return localStorage.getItem('pokedex-editor-enabled') === 'true';
     });
     const [selectedGame, setSelectedGame] = useState('black2');
     const [draftOverrides, setDraftOverrides] = useState(overrides);
+    const [isBlackEffectEnabled, setIsBlackEffectEnabled] = useState(effects.blackEffectEnabled);
     const [isSavingThemes, setIsSavingThemes] = useState(false);
 
     const isAdmin = user?.email === 'chritel04@gmail.com';
@@ -52,6 +53,10 @@ export default function PokedexManager() {
     useEffect(() => {
         setDraftOverrides(overrides);
     }, [overrides]);
+
+    useEffect(() => {
+        setIsBlackEffectEnabled(effects.blackEffectEnabled);
+    }, [effects.blackEffectEnabled]);
 
     const gameBaseTheme = getGameTheme(selectedGame);
     const activeTheme = {
@@ -89,10 +94,10 @@ export default function PokedexManager() {
     const handleSaveGlobalThemes = async () => {
         setIsSavingThemes(true);
         try {
-            await saveOverrides(draftOverrides);
+            await saveConfig(draftOverrides, { blackEffectEnabled: isBlackEffectEnabled });
             toast({
                 title: 'Palette salvata',
-                description: 'Le nuove sfumature collection sono ora globali per tutti gli utenti.',
+                description: 'Le nuove sfumature/effetti collection sono ora globali per tutti gli utenti.',
             });
         } catch (error: any) {
             toast({
@@ -238,6 +243,16 @@ export default function PokedexManager() {
                             <Button type="button" variant="outline" onClick={handleApplyBlack2Preset}>
                                 Preset Black 2
                             </Button>
+                            <div className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-white/10 bg-white/[0.02]">
+                                <Switch
+                                    id="black-effect-global"
+                                    checked={isBlackEffectEnabled}
+                                    onCheckedChange={setIsBlackEffectEnabled}
+                                />
+                                <Label htmlFor="black-effect-global" className="text-xs font-medium">
+                                    Effetto Black globale
+                                </Label>
+                            </div>
                             <Button type="button" variant="outline" onClick={handleResetSelectedGame}>
                                 Ripristina gioco selezionato
                             </Button>

@@ -29,7 +29,7 @@ export default function Collection() {
   const { user, loading: authLoading } = useAuth();
   const { accentColor } = useRandomColor();
   const { pokemon } = usePokemonList();
-  const { mergedThemes } = useGlobalCollectionThemes();
+  const { mergedThemes, effects } = useGlobalCollectionThemes();
   const { toast } = useToast();
 
   const [entries, setEntries] = useState<CaughtShinyRow[]>([]);
@@ -352,6 +352,7 @@ export default function Collection() {
                   key={entry.id}
                   entry={entry}
                   themeOverride={mergedThemes[entry.game]}
+                  applyBlackEffect={effects.blackEffectEnabled}
                   onEdit={() => {
                     setEditEntry(entry);
                     setIsEditDialogOpen(true);

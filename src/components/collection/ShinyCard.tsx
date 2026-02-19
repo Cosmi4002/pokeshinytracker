@@ -25,9 +25,10 @@ interface ShinyCardProps {
   onDelete: () => void;
   onEvolve: () => void;
   themeOverride?: GameTheme;
+  applyBlackEffect?: boolean;
 }
 
-export function ShinyCard({ entry, onEdit, onDelete, onEvolve, themeOverride }: ShinyCardProps) {
+export function ShinyCard({ entry, onEdit, onDelete, onEvolve, themeOverride, applyBlackEffect = false }: ShinyCardProps) {
   const isEvolved = entry.is_evolved === true;
 
   const theme = useMemo(() => themeOverride || getGameTheme(entry.game), [entry.game, themeOverride]);
@@ -61,7 +62,11 @@ export function ShinyCard({ entry, onEdit, onDelete, onEvolve, themeOverride }: 
       )}
       style={{
         borderColor: entry.is_fail ? '#ef4444' : `${theme.primary}95`,
-        boxShadow: entry.is_fail ? undefined : `0 14px 30px ${theme.secondary}44`,
+        boxShadow: entry.is_fail
+          ? undefined
+          : applyBlackEffect
+            ? `0 16px 36px color-mix(in srgb, #191f3f, ${theme.secondary} 55%), inset 0 1px 0 rgba(255,255,255,0.06)`
+            : `0 14px 30px ${theme.secondary}44`,
       }}
     >
       <div className="relative w-full h-40 sm:h-44 overflow-hidden bg-black/40">
@@ -77,6 +82,15 @@ export function ShinyCard({ entry, onEdit, onDelete, onEvolve, themeOverride }: 
             background: `radial-gradient(circle at 22% 18%, ${theme.accent}, transparent 42%), radial-gradient(circle at 78% 78%, ${theme.primary}, transparent 52%)`,
           }}
         />
+        {applyBlackEffect && (
+          <div
+            className="absolute inset-0 z-0 opacity-65"
+            style={{
+              background:
+                'linear-gradient(165deg, rgba(11,11,13,0.78) 0%, rgba(25,31,63,0.48) 38%, rgba(8,10,20,0.86) 100%)',
+            }}
+          />
+        )}
 
         <div className="absolute inset-0 flex items-center justify-center z-10 p-2">
           <div
@@ -160,7 +174,9 @@ export function ShinyCard({ entry, onEdit, onDelete, onEvolve, themeOverride }: 
       <div
         className="flex-1 p-3 bg-[#222] relative z-10 border-t border-white/10"
         style={{
-          background: `linear-gradient(180deg, color-mix(in srgb, ${theme.secondary} 34%, #141414) 0%, color-mix(in srgb, ${theme.primary} 28%, #121212) 100%)`,
+          background: applyBlackEffect
+            ? `linear-gradient(180deg, color-mix(in srgb, #0b0b0d 62%, ${theme.secondary}) 0%, color-mix(in srgb, #131831 55%, ${theme.primary}) 100%)`
+            : `linear-gradient(180deg, color-mix(in srgb, ${theme.secondary} 34%, #141414) 0%, color-mix(in srgb, ${theme.primary} 28%, #121212) 100%)`,
           borderTopColor: `${theme.accent}66`,
         }}
       >
