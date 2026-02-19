@@ -298,7 +298,14 @@ export function ShinyCard({ entry, onEdit, onDelete, onEvolve, themeOverride, ap
               </div>
               {entry.phase_number && (
                 <div className="mt-1.5 pt-1.5 border-t border-white/15">
-                  <span className="text-[9px] font-black uppercase tracking-[0.12em] bg-black/30 px-1.5 py-0.5 rounded" style={{ color: theme.primary }}>
+                  <span
+                    className="text-[9px] font-black uppercase tracking-[0.12em] px-1.5 py-0.5 rounded border"
+                    style={{
+                      color: theme.accent,
+                      backgroundColor: `color-mix(in srgb, ${theme.accent} 20%, #0d0d0d)`,
+                      borderColor: `${theme.accent}88`,
+                    }}
+                  >
                     PHASE #{entry.phase_number}
                   </span>
                 </div>

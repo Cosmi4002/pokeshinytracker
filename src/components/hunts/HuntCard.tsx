@@ -234,10 +234,8 @@ export function HuntCard({ hunt, onDelete, onEdit, onContinue, layoutStyle = 'gr
                     <div
                         className="text-4xl font-bold tabular-nums"
                         style={{
-                            background: `linear-gradient(90deg, ${accentColor} 0%, color-mix(in srgb, ${accentColor}, white 40%) 50%, ${accentColor} 100%)`,
-                            backgroundClip: 'text',
-                            WebkitBackgroundClip: 'text',
-                            color: 'transparent'
+                            color: accentColor,
+                            textShadow: '0 1px 10px rgba(0,0,0,0.35)',
                         }}
                     >
                         {(hunt.counter || 0).toLocaleString()}

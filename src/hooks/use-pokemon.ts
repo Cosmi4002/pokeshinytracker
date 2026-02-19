@@ -278,20 +278,13 @@ export const GENERATION_RANGES: Record<number, [number, number]> = {
   9: [906, 1025],
 };
 
-function getGeneration(id: number, name?: string): number {
-  if (name) {
-    const slug = name.toLowerCase();
-    if (slug.includes('-alola')) return 7;
-    if (slug.includes('-galar')) return 8;
-    if (slug.includes('-hisui')) return 8; // Legends Arceus is considered Gen 8 technically, or proximity
-    if (slug.includes('-paldea')) return 9;
-  }
-
-  if (id > 10000) {
+function getGeneration(id: number, _name?: string, baseId?: number): number {
+  const rangeId = baseId && baseId > 0 ? baseId : id;
+  if (rangeId > 10000) {
     return 9;
   }
   for (const [gen, [start, end]] of Object.entries(GENERATION_RANGES)) {
-    if (id >= start && id <= end) return parseInt(gen);
+    if (rangeId >= start && rangeId <= end) return parseInt(gen);
   }
   return 1;
 }
@@ -604,10 +597,34 @@ export function usePokemonList() {
 
             return {
               ...p,
+              generation: p.generation || getGeneration(p.id, p.name, p.baseId),
               displayName: override?.custom_display_name || formatPokemonName(p.name, p.id, p.baseId),
               hideFromPokedex: isExcluded,
             };
           });
+
+        const listById = new Map<number, PokemonBasic>();
+        list.forEach((p) => listById.set(p.id, p));
+
+        Object.entries(MANUAL_VARIETIES).forEach(([baseIdStr, varieties]) => {
+          const baseId = parseInt(baseIdStr, 10);
+          const baseEntry = listById.get(baseId);
+          varieties.forEach((v) => {
+            if (listById.has(v.id)) return;
+            const override = (overrides[`${v.id}-${v.name}`] || POKEMON_DATA_OVERRIDES[v.id]) as any;
+            const isExcluded = override?.is_excluded || isFormEliminated(v.name);
+            const entry: PokemonBasic = {
+              id: v.id,
+              baseId,
+              name: v.name,
+              generation: baseEntry?.generation || getGeneration(v.id, v.name, baseId),
+              displayName: override?.custom_display_name || formatPokemonName(v.name, v.id, baseId),
+              hideFromPokedex: isExcluded,
+            };
+            list.push(entry);
+            listById.set(entry.id, entry);
+          });
+        });
 
         setPokemon(list);
         setLoading(false);
@@ -716,7 +733,7 @@ export function usePokemonDetails(pokemonId: number | null) {
           displayName: override?.custom_display_name || override?.displayName || formatPokemonName(name, pokemonId!, baseId),
           sprites,
           types: override?.types || [], // PokeAPI types removed as requested
-          generation: entry.generation || getGeneration(pokemonId!, name),
+          generation: entry.generation || getGeneration(pokemonId!, name, baseId),
           forms,
           varieties,
           hasGenderDifference: hasGenderDiff,
