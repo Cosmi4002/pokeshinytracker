@@ -78,9 +78,24 @@ export default function Pokedex() {
     const speciesGroups = useMemo(() => {
         if (!pokemon || !Array.isArray(pokemon)) return [];
         const map = new Map<string, PokemonBasic[]>();
-        const forceSingleCardBaseIds = new Set([351, 386, 666, 710, 711, 741, 774, 869]);
+        const preferredBaseForms: Record<number, string> = {
+            201: 'unown',
+            351: 'castform',
+            386: 'deoxys-normal',
+            671: 'florges',
+            666: 'vivillon-meadow',
+            710: 'pumpkaboo-average',
+            711: 'gourgeist-average',
+            741: 'oricorio-baile',
+            774: 'minior-red-meteor',
+            869: 'alcremie-vanilla-cream-strawberry-sweet',
+            925: 'maushold-family-of-four',
+            982: 'dudunsparce-two-segment',
+        };
+        const forceSingleCardBaseIds = new Set([201, 351, 386, 671, 666, 710, 711, 741, 774, 869]);
         pokemon.forEach(p => {
-            if (p.hideFromPokedex) return;
+            const isPreferredBase = preferredBaseForms[p.baseId] === p.name;
+            if (p.hideFromPokedex && !isPreferredBase) return;
 
             // Group by base ID AND name prefix (to group gender variants, but separate regional variants)
             // Clean name key: remove gender suffixes
@@ -106,11 +121,12 @@ export default function Pokedex() {
         const searchLower = search.toLowerCase();
 
         // Lista di baseId che devono mostrare solo la forma base
-        const ONLY_BASE_FORM = [351, 386, 666, 710, 711, 741, 774, 869];
+        const ONLY_BASE_FORM = [351, 386, 671, 666, 710, 711, 741, 774, 869];
         // Mappa baseId -> nome forma base
         const BASE_FORM_NAME: Record<number, string> = {
             351: 'castform',
             386: 'deoxys-normal',
+            671: 'florges',
             666: 'vivillon-meadow',
             710: 'pumpkaboo-average',
             711: 'gourgeist-average',

@@ -705,17 +705,12 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
     }
   }
 
-  // Alcremie overrides based on Sweet type
+  // Alcremie overrides: use full form slug to preserve all cream/sweet variants.
   if (name && name.toLowerCase().includes('alcremie')) {
-    const sName = name.toLowerCase();
+    const source = (form || name).toLowerCase();
     const subPath = shiny ? 'shiny' : 'normal';
-    if (sName.includes('strawberry')) return `https://img.pokemondb.net/sprites/home/${subPath}/alcremie-rainbow-swirl-strawberry.png`;
-    if (sName.includes('ribbon')) return `https://img.pokemondb.net/sprites/home/${subPath}/alcremie-ruby-cream-ribbon.png`;
-    if (sName.includes('flower')) return `https://img.pokemondb.net/sprites/home/${subPath}/alcremie-ruby-cream-flower.png`;
-    if (sName.includes('love')) return `https://img.pokemondb.net/sprites/home/${subPath}/alcremie-ruby-cream-love.png`;
-    if (sName.includes('clover')) return `https://img.pokemondb.net/sprites/home/${subPath}/alcremie-ruby-cream-clover.png`;
-    if (sName.includes('berry')) return `https://img.pokemondb.net/sprites/home/${subPath}/alcremie-ruby-cream-berry.png`;
-    if (sName.includes('star')) return `https://img.pokemondb.net/sprites/home/${subPath}/alcremie-salted-cream-star.png`;
+    const normalized = source.replace(/-sweet/g, '');
+    return `https://img.pokemondb.net/sprites/home/${subPath}/${normalized}.png`;
   }
 
   // Minior (Red) override

@@ -38,6 +38,10 @@ export function EvolveDialog({ open, onOpenChange, entry, onSuccess }: EvolveDia
   // Get the current Pokemon details
   const currentPokemon = useMemo(() => {
     if (!entry || !pokemon) return null;
+    if (entry.form) {
+      const formMatch = pokemon.find(p => p.name === entry.form);
+      if (formMatch) return formMatch;
+    }
     return pokemon.find(p => p.id === entry.pokemon_id);
   }, [entry, pokemon]);
 
