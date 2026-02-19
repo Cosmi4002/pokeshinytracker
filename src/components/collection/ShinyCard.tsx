@@ -73,7 +73,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onEvolve, themeOverride, ap
         <div
           className="absolute inset-0 z-0"
           style={{
-            background: `linear-gradient(155deg, ${theme.secondary} 0%, #111 55%, ${theme.primary} 100%)`,
+            background: `radial-gradient(circle at 50% 30%, ${theme.secondary} 0%, #111 58%, ${theme.primary} 100%)`,
           }}
         />
         <div
@@ -87,7 +87,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onEvolve, themeOverride, ap
             className="absolute inset-0 z-0 opacity-65"
             style={{
               background:
-                'linear-gradient(165deg, rgba(11,11,13,0.78) 0%, rgba(25,31,63,0.48) 38%, rgba(8,10,20,0.86) 100%)',
+                'radial-gradient(circle at 50% 25%, rgba(11,11,13,0.78) 0%, rgba(25,31,63,0.48) 45%, rgba(8,10,20,0.86) 100%)',
             }}
           />
         )}
