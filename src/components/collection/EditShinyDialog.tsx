@@ -128,9 +128,12 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
 
   useEffect(() => {
     if (open && entry) {
-      const listMatch = pokemonList.find((p) => p.id === entry.pokemon_id);
-      setPokemonId(entry.pokemon_id);
-      setPokemonName(listMatch?.name || entry.pokemon_name);
+      const formMatch = entry.form ? pokemonList.find((p) => p.name === entry.form) : undefined;
+      const idMatch = pokemonList.find((p) => p.id === entry.pokemon_id);
+      const resolved = formMatch || idMatch;
+
+      setPokemonId(resolved?.id ?? entry.pokemon_id);
+      setPokemonName(resolved?.name || entry.form || entry.pokemon_name);
       setForm(entry.form ?? '');
       setGender(entry.gender ?? '');
       setHasShinyCharm(entry.has_shiny_charm ?? false);
@@ -146,7 +149,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
       setPlaylistId(entry.playlist_id ?? '');
       setNotes(entry.notes ?? '');
     }
-  }, [open, entry]);
+  }, [open, entry, pokemonList]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
