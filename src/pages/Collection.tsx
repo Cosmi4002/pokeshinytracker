@@ -19,6 +19,7 @@ import { ManagePlaylistsDialog } from '@/components/collection/ManagePlaylistsDi
 import { EditShinyDialog } from '@/components/collection/EditShinyDialog';
 import { EvolveDialog } from '@/components/collection/EvolveDialog';
 import { ShinyCard } from '@/components/collection/ShinyCard';
+import { useGlobalCollectionThemes } from '@/hooks/use-global-collection-themes';
 import type { Tables } from '@/integrations/supabase/types';
 
 type CaughtShinyRow = Tables<'caught_shinies'>;
@@ -28,6 +29,7 @@ export default function Collection() {
   const { user, loading: authLoading } = useAuth();
   const { accentColor } = useRandomColor();
   const { pokemon } = usePokemonList();
+  const { mergedThemes } = useGlobalCollectionThemes();
   const { toast } = useToast();
 
   const [entries, setEntries] = useState<CaughtShinyRow[]>([]);
@@ -349,6 +351,7 @@ export default function Collection() {
                 <ShinyCard
                   key={entry.id}
                   entry={entry}
+                  themeOverride={mergedThemes[entry.game]}
                   onEdit={() => {
                     setEditEntry(entry);
                     setIsEditDialogOpen(true);

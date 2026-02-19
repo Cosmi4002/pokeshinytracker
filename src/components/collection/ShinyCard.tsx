@@ -1,6 +1,6 @@
 import { Pencil, Trash2, Calendar, ArrowUpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getGameTheme, GAME_LOGOS } from '@/lib/game-themes';
+import { getGameTheme, GAME_LOGOS, type GameTheme } from '@/lib/game-themes';
 import { POKEBALLS, HUNTING_METHODS, getPokemonSpriteUrl } from '@/lib/pokemon-data';
 import type { Tables } from '@/integrations/supabase/types';
 import { useMemo, useCallback } from 'react';
@@ -24,12 +24,13 @@ interface ShinyCardProps {
   onEdit: () => void;
   onDelete: () => void;
   onEvolve: () => void;
+  themeOverride?: GameTheme;
 }
 
-export function ShinyCard({ entry, onEdit, onDelete, onEvolve }: ShinyCardProps) {
+export function ShinyCard({ entry, onEdit, onDelete, onEvolve, themeOverride }: ShinyCardProps) {
   const isEvolved = entry.is_evolved === true;
 
-  const theme = useMemo(() => getGameTheme(entry.game), [entry.game]);
+  const theme = useMemo(() => themeOverride || getGameTheme(entry.game), [entry.game, themeOverride]);
   const pokeball = useMemo(() => POKEBALLS.find((b) => b.id === entry.pokeball), [entry.pokeball]);
   const method = useMemo(() => HUNTING_METHODS.find((m) => m.id === entry.method), [entry.method]);
 

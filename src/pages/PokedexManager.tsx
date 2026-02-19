@@ -4,22 +4,35 @@ import {
     ArrowLeft,
     Settings2,
     ShieldCheck,
-    AlertCircle
+    AlertCircle,
+    Palette,
+    Save
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { ColorPicker } from "@/components/settings/ColorPicker";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Navbar } from "@/components/layout/Navbar";
 import { useAuth } from "@/lib/auth-context";
+import { useToast } from "@/hooks/use-toast";
+import { useGlobalCollectionThemes } from "@/hooks/use-global-collection-themes";
+import { GAMES } from "@/lib/pokemon-data";
+import { getGameTheme } from "@/lib/game-themes";
 import { cn } from "@/lib/utils";
 
 export default function PokedexManager() {
     const navigate = useNavigate();
     const { user, loading: authLoading } = useAuth();
+    const { toast } = useToast();
+    const { overrides, saveOverrides, loading: themesLoading } = useGlobalCollectionThemes();
     const [isEditorEnabled, setIsEditorEnabled] = useState(() => {
         return localStorage.getItem('pokedex-editor-enabled') === 'true';
     });
+    const [selectedGame, setSelectedGame] = useState('black2');
+    const [draftOverrides, setDraftOverrides] = useState(overrides);
+    const [isSavingThemes, setIsSavingThemes] = useState(false);
 
     const isAdmin = user?.email === 'chritel04@gmail.com';
 
@@ -34,6 +47,62 @@ export default function PokedexManager() {
         localStorage.setItem('pokedex-editor-enabled', checked ? 'true' : 'false');
         // Dispatch custom event to notify other components (like PokemonDetails)
         window.dispatchEvent(new Event('editor-mode-changed'));
+    };
+
+    useEffect(() => {
+        setDraftOverrides(overrides);
+    }, [overrides]);
+
+    const gameBaseTheme = getGameTheme(selectedGame);
+    const activeTheme = {
+        primary: draftOverrides[selectedGame]?.primary || gameBaseTheme.primary,
+        secondary: draftOverrides[selectedGame]?.secondary || gameBaseTheme.secondary,
+        accent: draftOverrides[selectedGame]?.accent || gameBaseTheme.accent,
+    };
+
+    const updateThemeColor = (key: 'primary' | 'secondary' | 'accent', value: string) => {
+        setDraftOverrides((prev) => ({
+            ...prev,
+            [selectedGame]: {
+                ...prev[selectedGame],
+                [key]: value,
+            },
+        }));
+    };
+
+    const handleApplyBlack2Preset = () => {
+        setDraftOverrides((prev) => ({
+            ...prev,
+            [selectedGame]: {
+                primary: '#0B0B0D',
+                secondary: '#191F3F',
+                accent: '#5D74C8',
+            },
+        }));
+    };
+
+    const handleResetSelectedGame = () => {
+        const { [selectedGame]: _removed, ...rest } = draftOverrides;
+        setDraftOverrides(rest);
+    };
+
+    const handleSaveGlobalThemes = async () => {
+        setIsSavingThemes(true);
+        try {
+            await saveOverrides(draftOverrides);
+            toast({
+                title: 'Palette salvata',
+                description: 'Le nuove sfumature collection sono ora globali per tutti gli utenti.',
+            });
+        } catch (error: any) {
+            toast({
+                variant: 'destructive',
+                title: 'Errore salvataggio',
+                description: error?.message || 'Impossibile salvare la palette globale.',
+            });
+        } finally {
+            setIsSavingThemes(false);
+        }
     };
 
     if (authLoading) {
@@ -103,6 +172,84 @@ export default function PokedexManager() {
                             <p>
                                 Quando l'editor è attivo, potrai vedere le icone di modifica (matita e occhio) nelle schede Pokémon per apportare modifiche globali.
                             </p>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card className="mt-6 border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl overflow-hidden">
+                    <CardHeader className="border-b border-white/5 bg-white/[0.02]">
+                        <div className="flex items-center gap-2 text-primary mb-1">
+                            <Palette className="h-4 w-4" />
+                            <span className="text-xs font-bold uppercase tracking-widest">Globale Collection</span>
+                        </div>
+                        <CardTitle>Palette Riquadri Collezione</CardTitle>
+                        <CardDescription>
+                            Modifica le sfumature dei riquadri per ogni gioco. Il salvataggio è globale e visibile a tutti.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-6 space-y-5">
+                        <div className="space-y-2">
+                            <Label>Gioco da modificare</Label>
+                            <Select value={selectedGame} onValueChange={setSelectedGame}>
+                                <SelectTrigger>
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="max-h-72 overflow-y-auto">
+                                    {GAMES.map((game) => (
+                                        <SelectItem key={game.id} value={game.id}>
+                                            {game.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <ColorPicker
+                                label="Primary"
+                                value={activeTheme.primary}
+                                onChange={(v) => updateThemeColor('primary', v)}
+                            />
+                            <ColorPicker
+                                label="Secondary"
+                                value={activeTheme.secondary}
+                                onChange={(v) => updateThemeColor('secondary', v)}
+                            />
+                            <ColorPicker
+                                label="Accent"
+                                value={activeTheme.accent}
+                                onChange={(v) => updateThemeColor('accent', v)}
+                            />
+                        </div>
+
+                        <div className="rounded-xl border border-white/10 p-4">
+                            <p className="text-xs text-muted-foreground mb-3">Anteprima rapida (stile card collection)</p>
+                            <div
+                                className="h-20 rounded-lg border"
+                                style={{
+                                    borderColor: `${activeTheme.primary}99`,
+                                    background: `linear-gradient(145deg, color-mix(in srgb, ${activeTheme.secondary} 42%, #111), color-mix(in srgb, ${activeTheme.primary} 36%, #111))`,
+                                    boxShadow: `0 0 18px ${activeTheme.secondary}55`,
+                                }}
+                            />
+                        </div>
+
+                        <div className="flex flex-wrap gap-2">
+                            <Button type="button" variant="outline" onClick={handleApplyBlack2Preset}>
+                                Preset Black 2
+                            </Button>
+                            <Button type="button" variant="outline" onClick={handleResetSelectedGame}>
+                                Ripristina gioco selezionato
+                            </Button>
+                            <Button
+                                type="button"
+                                className="ml-auto"
+                                onClick={handleSaveGlobalThemes}
+                                disabled={themesLoading || isSavingThemes}
+                            >
+                                <Save className="mr-2 h-4 w-4" />
+                                {isSavingThemes ? 'Salvataggio...' : 'Salva Globale'}
+                            </Button>
                         </div>
                     </CardContent>
                 </Card>
