@@ -48,9 +48,14 @@ export function EvolveDialog({ open, onOpenChange, entry, onSuccess }: EvolveDia
 
   const currentFormSuffix = useMemo(() => {
     const source = (entry?.form || currentPokemon?.name || '').toLowerCase();
-    if (!source.includes('-')) return '';
-    return source.split('-').slice(1).join('-');
-  }, [entry?.form, currentPokemon?.name]);
+    if (source.includes('-')) {
+      return source.split('-').slice(1).join('-');
+    }
+    const display = (entry?.pokemon_name || '').toLowerCase();
+    const seasonMatch = display.match(/\((spring|summer|autumn|winter)\)/i);
+    if (seasonMatch) return seasonMatch[1].toLowerCase();
+    return '';
+  }, [entry?.form, currentPokemon?.name, entry?.pokemon_name]);
 
   // Get available evolutions
   const availableEvolutions = useMemo(() => {

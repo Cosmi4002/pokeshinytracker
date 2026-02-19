@@ -26,25 +26,24 @@ interface ShinyCardProps {
   onEvolve: () => void;
   themeOverride?: GameTheme;
   applyBlackEffect?: boolean;
+  spriteName?: string;
 }
 
-export function ShinyCard({ entry, onEdit, onDelete, onEvolve, themeOverride, applyBlackEffect = false }: ShinyCardProps) {
+export function ShinyCard({ entry, onEdit, onDelete, onEvolve, themeOverride, applyBlackEffect = false, spriteName }: ShinyCardProps) {
   const isEvolved = entry.is_evolved === true;
 
   const theme = useMemo(() => themeOverride || getGameTheme(entry.game), [entry.game, themeOverride]);
   const pokeball = useMemo(() => POKEBALLS.find((b) => b.id === entry.pokeball), [entry.pokeball]);
   const method = useMemo(() => HUNTING_METHODS.find((m) => m.id === entry.method), [entry.method]);
 
-  const spriteUrl = useMemo(
-    () =>
-      getPokemonSpriteUrl(entry.pokemon_id, {
-        shiny: true,
-        name: entry.pokemon_name,
-        form: entry.form || undefined,
-        female: entry.gender === 'female',
-      }),
-    [entry.pokemon_id, entry.pokemon_name, entry.form, entry.gender]
-  );
+  const spriteUrl = useMemo(() => {
+    const spriteSlug = entry.form || spriteName || entry.pokemon_name;
+    return getPokemonSpriteUrl(entry.pokemon_id, {
+      shiny: true,
+      name: spriteSlug,
+      female: entry.gender === 'female',
+    });
+  }, [entry.pokemon_id, entry.pokemon_name, entry.form, entry.gender, spriteName]);
 
   const displayName = entry.pokemon_name;
 

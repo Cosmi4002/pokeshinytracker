@@ -40,6 +40,7 @@ export const PokedexCard = memo(function PokedexCard({
 
     return (
         <button
+            type="button"
             onClick={onClick}
             className={cn(
                 "relative group flex flex-col items-center justify-center p-3 rounded-2xl transition-all duration-500 border-2",

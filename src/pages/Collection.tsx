@@ -353,6 +353,7 @@ export default function Collection() {
                   entry={entry}
                   themeOverride={mergedThemes[entry.game]}
                   applyBlackEffect={effects.blackEffectEnabled}
+                  spriteName={pokemonMap.get(entry.pokemon_id)?.name}
                   onEdit={() => {
                     setEditEntry(entry);
                     setIsEditDialogOpen(true);

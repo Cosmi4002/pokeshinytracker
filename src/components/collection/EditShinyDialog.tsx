@@ -24,7 +24,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { PokemonSelector } from '@/components/counter/PokemonSelector';
 import { MethodSelector } from '@/components/counter/MethodSelector';
 import { POKEBALLS, GAMES, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON } from '@/lib/pokemon-data';
-import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
+import { usePokemonDetails, usePokemonList, formatPokemonName } from '@/hooks/use-pokemon';
 import { usePokedexOverrides } from '@/hooks/use-pokedex-overrides';
 import { isFormEliminated } from '@/lib/form-filters';
 import { getPokemonSpriteUrl } from '@/lib/pokemon-data';
@@ -65,6 +65,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
 
   const { overrides } = usePokedexOverrides();
   const { pokemon: pokemonDetails } = usePokemonDetails(pokemonId);
+  const { pokemon: pokemonList } = usePokemonList();
 
   // Flatten forms and varieties similar to ShinyCounter
   const formOptions = useMemo(() => {
@@ -127,8 +128,9 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
 
   useEffect(() => {
     if (open && entry) {
+      const listMatch = pokemonList.find((p) => p.id === entry.pokemon_id);
       setPokemonId(entry.pokemon_id);
-      setPokemonName(entry.pokemon_name);
+      setPokemonName(listMatch?.name || entry.pokemon_name);
       setForm(entry.form ?? '');
       setGender(entry.gender ?? '');
       setHasShinyCharm(entry.has_shiny_charm ?? false);

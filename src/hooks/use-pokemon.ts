@@ -658,7 +658,33 @@ export function usePokemonDetails(pokemonId: number | null) {
       setError(null);
 
       try {
-        const entry = pokedexData.find((p: any) => p.id === pokemonId);
+        let entry = pokedexData.find((p: any) => p.id === pokemonId);
+        if (!entry) {
+          let manualBaseId: number | null = null;
+          let manualName: string | null = null;
+          for (const [baseIdStr, varieties] of Object.entries(MANUAL_VARIETIES)) {
+            const found = varieties.find((v) => v.id === pokemonId);
+            if (found) {
+              manualBaseId = parseInt(baseIdStr, 10);
+              manualName = found.name;
+              break;
+            }
+          }
+
+          if (manualBaseId && manualName) {
+            const baseEntry = pokedexData.find((p: any) => p.id === manualBaseId);
+            if (baseEntry) {
+              entry = {
+                ...baseEntry,
+                id: pokemonId,
+                baseId: manualBaseId,
+                name: manualName,
+                generation: baseEntry.generation,
+              };
+            }
+          }
+        }
+
         if (!entry) {
           setError('Pokemon not found in local pokedex');
           setLoading(false);
