@@ -24,6 +24,7 @@ export function HuntCard({ hunt, onDelete, onEdit, onContinue, layoutStyle = 'gr
     const { accentColor } = useRandomColor();
     const method = HUNTING_METHODS.find((m) => m.id === hunt.method);
     const stats = calculateShinyStats(hunt.counter || 0, hunt.method || 'gen9-random', hunt.has_shiny_charm || false);
+    const displayPokemonName = formatPokemonName(hunt.form || hunt.pokemon_name || '', hunt.pokemon_id);
 
 
     const timeAgo = hunt.updated_at
@@ -68,7 +69,7 @@ export function HuntCard({ hunt, onDelete, onEdit, onContinue, layoutStyle = 'gr
 
                         {/* Info */}
                         <div className="flex-1 min-w-0">
-                            <h3 className="font-bold truncate capitalize">{formatPokemonName(hunt.pokemon_name || '', hunt.pokemon_id)}</h3>
+                            <h3 className="font-bold truncate capitalize">{displayPokemonName}</h3>
                             <div className="text-2xl font-bold tabular-nums shiny-text">
                                 {(hunt.counter || 0).toLocaleString()}
                             </div>
@@ -141,7 +142,7 @@ export function HuntCard({ hunt, onDelete, onEdit, onContinue, layoutStyle = 'gr
                     </div>
 
                     <h3 className="text-sm font-bold text-center mb-1 truncate capitalize">
-                        {formatPokemonName(hunt.pokemon_name || '', hunt.pokemon_id)}
+                        {displayPokemonName}
                     </h3>
 
                     <div className="text-center mb-2">
@@ -225,7 +226,7 @@ export function HuntCard({ hunt, onDelete, onEdit, onContinue, layoutStyle = 'gr
 
                 {/* Pokemon Name */}
                 <h3 className="text-xl font-bold text-center mb-2 capitalize">
-                    {formatPokemonName(hunt.pokemon_name || '', hunt.pokemon_id)}
+                    {displayPokemonName}
                 </h3>
 
                 {/* Counter */}

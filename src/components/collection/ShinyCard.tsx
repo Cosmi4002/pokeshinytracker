@@ -3,327 +3,289 @@ import { useRandomColor } from '@/lib/random-color-context';
 import { Button } from '@/components/ui/button';
 import { getGameTheme, GAME_LOGOS } from '@/lib/game-themes';
 import { POKEBALLS, HUNTING_METHODS, getPokemonSpriteUrl } from '@/lib/pokemon-data';
-import { formatPokemonName } from '@/hooks/use-pokemon';
 import type { Tables } from '@/integrations/supabase/types';
 import { useMemo, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 type CaughtShinyRow = Tables<'caught_shinies'>;
 
 interface ShinyCardProps {
-    entry: CaughtShinyRow;
-    onEdit: () => void;
-    onDelete: () => void;
-    onEvolve: () => void; // Added evolve handler
+  entry: CaughtShinyRow;
+  onEdit: () => void;
+  onDelete: () => void;
+  onEvolve: () => void;
 }
 
 export function ShinyCard({ entry, onEdit, onDelete, onEvolve }: ShinyCardProps) {
-    const { accentColor } = useRandomColor();
-    const isEvolved = entry.is_evolved === true;
+  const { accentColor } = useRandomColor();
+  const isEvolved = entry.is_evolved === true;
 
-    const theme = useMemo(() => getGameTheme(entry.game), [entry.game]);
-    const pokeball = useMemo(() => POKEBALLS.find((b) => b.id === entry.pokeball), [entry.pokeball]);
-    const method = useMemo(() => HUNTING_METHODS.find((m) => m.id === entry.method), [entry.method]);
+  const theme = useMemo(() => getGameTheme(entry.game), [entry.game]);
+  const pokeball = useMemo(() => POKEBALLS.find((b) => b.id === entry.pokeball), [entry.pokeball]);
+  const method = useMemo(() => HUNTING_METHODS.find((m) => m.id === entry.method), [entry.method]);
 
-    const spriteUrl = useMemo(() => getPokemonSpriteUrl(entry.pokemon_id, {
+  const spriteUrl = useMemo(
+    () =>
+      getPokemonSpriteUrl(entry.pokemon_id, {
         shiny: true,
         name: entry.pokemon_name,
         form: entry.form || undefined,
-        female: entry.gender === 'female'
-    }), [entry.pokemon_id, entry.pokemon_name, entry.form, entry.gender]);
+        female: entry.gender === 'female',
+      }),
+    [entry.pokemon_id, entry.pokemon_name, entry.form, entry.gender]
+  );
 
-    const displayName = entry.pokemon_name;
+  const displayName = entry.pokemon_name;
 
-    const formatDate = useCallback((dateString: string) => {
-        if (!dateString) return 'Unknown';
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-    }, []);
+  const formatDate = useCallback((dateString: string) => {
+    if (!dateString) return '--';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  }, []);
 
-    return (
+  return (
+    <div
+      className={cn(
+        'group relative h-full flex flex-col overflow-hidden rounded-xl border bg-[#232323] shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1',
+        entry.is_fail ? 'border-red-500/80 shadow-[0_0_20px_rgba(239,68,68,0.25)] ring-1 ring-red-500/50' : 'border-white/10'
+      )}
+      style={{ borderColor: entry.is_fail ? '#ef4444' : `${accentColor}55` }}
+    >
+      <div className="relative w-full h-40 sm:h-44 overflow-hidden bg-black/40">
+        <div className="absolute inset-0 z-0 bg-gradient-to-b from-[#171717] to-[#0f0f0f]" />
         <div
-            className={cn(
-                "group relative h-full flex flex-col overflow-hidden rounded-2xl border bg-[#2d2d2d] shadow-2xl transition-all duration-500 hover:shadow-[0_0_30px_rgba(0,0,0,0.5)] hover:-translate-y-2",
-                entry.is_fail ? "border-red-500/80 shadow-[0_0_20px_rgba(239,68,68,0.25)] ring-1 ring-red-500/50" : "border-white/10"
-            )}
-            style={{
-                borderColor: entry.is_fail ? '#ef4444' : `${accentColor}50`,
-            }}
-        >
-            {/* TOP AREA: VISUAL (Fixed aspect ratio) */}
-            <div className="relative w-full aspect-[16/10] overflow-hidden bg-black/40">
-                <div className="absolute inset-0 z-0 bg-gradient-to-b from-[#1a1a1a] to-[#0f0f0f]" />
-                <div
-                    className="absolute inset-0 z-0 opacity-25"
-                    style={{ background: `radial-gradient(circle at 50% 35%, ${theme.primary}, transparent 70%)` }}
-                />
+          className="absolute inset-0 z-0 opacity-25"
+          style={{ background: `radial-gradient(circle at 50% 35%, ${theme.primary}, transparent 70%)` }}
+        />
 
-                <div className="absolute inset-0 flex items-center justify-center z-10 p-2 -translate-y-4">
-                    {/* Character Platform/Grounding */}
-                    <div
-                        className="absolute bottom-1/4 w-32 h-8 blur-xl opacity-60 rounded-[100%]"
-                        style={{
-                            background: `radial-gradient(ellipse at center, ${theme.primary}, transparent 70%)`,
-                        }}
-                    />
-                    <img
-                        key={spriteUrl}
-                        src={spriteUrl}
-                        loading="lazy"
-                        decoding="async"
-                        alt={entry.pokemon_name}
-                        className="w-32 h-32 lg:w-40 lg:h-40 object-contain pokemon-sprite drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] transition-all duration-500 group-hover:scale-110 relative z-10"
-                        style={{ imageRendering: 'auto' }}
-                        onError={(e) => {
-                            e.currentTarget.src = '/fallback-sprite.png';
-                        }}
-                    />
-                </div>
-
-                {/* Game Icon & Actions */}
-                <div className="absolute top-2 left-2 right-2 flex justify-between items-start z-20">
-                    <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-300 -translate-x-2 group-hover:translate-x-0">
-                        <Button
-                            variant="secondary"
-                            size="icon"
-                            onClick={onEdit}
-                            className="h-8 w-8 rounded-full bg-black/50 hover:bg-white text-white hover:text-black border border-white/10 backdrop-blur-md shadow-lg"
-                        >
-                            <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                            variant="secondary"
-                            size="icon"
-                            onClick={onEvolve}
-                            className="h-8 w-8 rounded-full bg-black/50 hover:bg-green-500 text-white border border-white/10 backdrop-blur-md shadow-lg"
-                        >
-                            <ArrowUpCircle className="h-4 w-4" />
-                        </Button>
-                        <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                                <Button
-                                    variant="secondary"
-                                    size="icon"
-                                    className="h-8 w-8 rounded-full bg-black/50 hover:bg-destructive text-white border border-white/10 backdrop-blur-md shadow-lg"
-                                >
-                                    <Trash2 className="h-4 w-4" />
-                                </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent className="bg-[#1a1a1a] border-white/10 text-white">
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle className="text-xl font-bold">Delete {displayName}?</AlertDialogTitle>
-                                    <AlertDialogDescription className="text-white/60">
-                                        Sei sicuro di voler eliminare questo Pokémon dalla tua collezione? Questa azione non può essere annullata.
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                    <AlertDialogCancel className="bg-white/5 hover:bg-white/10 border-white/10 text-white">
-                                        Annulla
-                                    </AlertDialogCancel>
-                                    <AlertDialogAction
-                                        onClick={onDelete}
-                                        className="bg-destructive hover:bg-destructive/90 text-white"
-                                    >
-                                        Elimina
-                                    </AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
-                    </div>
-                    {isEvolved && (
-                        <div
-                            className="h-8 w-8 rounded-full bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 flex items-center justify-center backdrop-blur-md"
-                            title="Pokemon evoluto"
-                        >
-                            <ArrowUpCircle className="h-4 w-4" />
-                        </div>
-                    )}
-                </div>
-
-            </div>
-
-            {/* BOTTOM AREA: CONTENT (Clean & High Contrast) */}
-            <div className="flex-1 p-4 bg-[#242424] relative z-10 border-t border-white/10"
-                style={{
-                    backgroundColor: `color-mix(in srgb, ${theme.primary} 20%, #1a1a1a)`,
-                    borderTopColor: `${theme.primary}30`
-                }}>
-                <div className="space-y-3">
-                    {/* Header Section: Name, Gender, Logo */}
-                    <div className="flex flex-col gap-2">
-                        {/* Name and Gender Row - Centered */}
-                        <div className="flex items-center justify-center gap-2 min-w-0">
-                            <h3 className="text-xl lg:text-2xl font-black text-white tracking-tight capitalize leading-none">
-                                {displayName}
-                            </h3>
-                            {entry.gender && (entry.gender === 'male' || entry.gender === 'female') && (
-                                <span className={cn(
-                                    "text-xl font-bold drop-shadow-sm flex-shrink-0 leading-none",
-                                    entry.gender === 'male' ? "text-blue-400" : "text-pink-400"
-                                )}>
-                                    {entry.gender === 'male' ? '♂' : '♀'}
-                                </span>
-                            )}
-                        </div>
-
-                        {/* Game Logo & Fail Badge Row */}
-                        <div className="flex items-center justify-between w-full">
-                            <div className="flex-1" />
-                            <div className="flex items-center justify-center flex-1">
-                                {GAME_LOGOS[entry.game] && (
-                                    <img
-                                        src={GAME_LOGOS[entry.game]}
-                                        loading="lazy"
-                                        decoding="async"
-                                        alt={entry.game}
-                                        className="h-16 lg:h-20 w-auto max-w-[120px] object-contain brightness-110 drop-shadow-lg"
-                                    />
-                                )}
-                            </div>
-                            <div className="flex-1" />
-                        </div>
-                    </div>
-
-                    {/* Method Badge - Centered */}
-                    {method && (
-                        <div className="flex justify-center">
-                            <div
-                                className="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border shadow-sm"
-                                style={{
-                                    backgroundColor: `${theme.primary}15`,
-                                    borderColor: `${theme.primary}50`,
-                                    color: theme.primary
-                                }}
-                            >
-                                {method.name}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Info Grid - cleaner hierarchy for dates and encounters */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 mt-3 sm:mt-4">
-                        <div
-                            className="rounded-xl p-2.5 sm:p-3 border shadow-lg"
-                            style={{
-                                backgroundColor: `color-mix(in srgb, ${theme.primary} 18%, #111 82%)`,
-                                borderColor: `${theme.primary}55`
-                            }}
-                        >
-                            <div className="flex items-center gap-1.5 mb-2.5">
-                                <Calendar className="w-3.5 h-3.5 text-white/70" />
-                                <span className="text-[9px] sm:text-[10px] font-bold text-white/60 uppercase tracking-[0.14em]">
-                                    Hunt Dates
-                                </span>
-                            </div>
-                            <div className="space-y-1.5 sm:space-y-2">
-                                <div className="flex items-center justify-between gap-2 rounded-md bg-black/25 px-2 py-1.5">
-                                    <span className="text-[9px] sm:text-[10px] text-white/55 font-bold uppercase tracking-wider">Start</span>
-                                    <span className="text-[10px] sm:text-[11px] font-semibold text-white/95 tabular-nums text-right">
-                                        {entry.hunt_start_date ? formatDate(entry.hunt_start_date) : '--'}
-                                    </span>
-                                </div>
-                                <div className="flex items-center justify-between gap-2 rounded-md bg-black/25 px-2 py-1.5">
-                                    <span className="text-[9px] sm:text-[10px] text-white/55 font-bold uppercase tracking-wider">Caught</span>
-                                    <span className="text-[10px] sm:text-[11px] font-semibold text-white/95 tabular-nums text-right">
-                                        {formatDate(entry.caught_date)}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div
-                            className="rounded-xl p-2.5 sm:p-3 border shadow-lg flex flex-col"
-                            style={{
-                                backgroundColor: `color-mix(in srgb, ${theme.primary} 18%, #111 82%)`,
-                                borderColor: `${theme.primary}55`
-                            }}
-                        >
-                            <span className="text-[9px] sm:text-[10px] font-bold text-white/60 uppercase tracking-[0.14em] block mb-1.5 sm:mb-2">
-                                Encounters
-                            </span>
-                            <div className="flex-1 flex items-center justify-center rounded-md bg-black/25 px-2 py-2.5 sm:py-3">
-                                <span className="text-[1.75rem] sm:text-[2rem] font-black tabular-nums tracking-tight text-white leading-none">
-                                    {entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-'}
-                                </span>
-                            </div>
-                            {entry.phase_number && (
-                                <div className="mt-2 pt-2 border-t border-white/15">
-                                    <span
-                                        className="text-[10px] font-black uppercase tracking-widest bg-black/30 px-2 py-0.5 rounded"
-                                        style={{ color: theme.primary }}
-                                    >
-                                        PHASE #{entry.phase_number}
-                                    </span>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Pokeball Detail - Enhanced */}
-                    {pokeball && (
-                        <div
-                            className="mt-3 pt-3 border-t flex items-center justify-between"
-                            style={{
-                                borderTopColor: `${theme.primary}20`
-                            }}
-                        >
-                            <div className="flex items-center gap-2">
-                                {entry.is_fail ? (
-                                    <div className="relative overflow-hidden rounded border border-red-500/50 bg-red-950/40 pl-2 pr-3 py-0.5 shadow-[0_0_10px_rgba(239,68,68,0.2)] inset-shadow-sm">
-                                        <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_45%,rgba(239,68,68,0.2)_50%,transparent_55%)] bg-[length:200%_200%] animate-[shimmer_3s_infinite]" />
-                                        <div className="flex items-center gap-1.5">
-                                            <div className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_5px_rgba(239,68,68,0.8)]" />
-                                            <span className="text-red-400 font-black text-[10px] tracking-[0.15em] uppercase drop-shadow-sm">
-                                                FAIL
-                                            </span>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <>
-                                        <img
-                                            src={pokeball.sprite}
-                                            loading="lazy"
-                                            decoding="async"
-                                            className="w-5 h-5 object-contain"
-                                            alt="pokeball"
-                                        />
-                                        <span className="text-[10px] text-white/50 font-semibold uppercase tracking-wide">{pokeball.name}</span>
-                                    </>
-                                )}
-                            </div>
-                            {entry.has_shiny_charm && !isEvolved && (
-                                <div className="flex items-center" title="Shiny Charm Active">
-                                    <img
-                                        src="/img/items/shiny-charm.png"
-                                        loading="lazy"
-                                        decoding="async"
-                                        className="w-6 h-6 object-contain animate-pulse drop-shadow-[0_0_8px_rgba(234,179,8,0.6)]"
-                                        alt="Shiny Charm"
-                                    />
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            {/* Action Edit button on card bottom hover? No, let's keep them on top for now */}
+        <div className="absolute inset-0 flex items-center justify-center z-10 p-2">
+          <div
+            className="absolute bottom-6 w-24 h-6 blur-xl opacity-60 rounded-[100%]"
+            style={{ background: `radial-gradient(ellipse at center, ${theme.primary}, transparent 70%)` }}
+          />
+          <div className="h-28 w-28 sm:h-32 sm:w-32 flex items-center justify-center">
+            <img
+              key={spriteUrl}
+              src={spriteUrl}
+              loading="lazy"
+              decoding="async"
+              alt={entry.pokemon_name}
+              className="h-full w-full object-contain pokemon-sprite drop-shadow-[0_8px_16px_rgba(0,0,0,0.75)] transition-all duration-300 group-hover:scale-105 relative z-10"
+              style={{ imageRendering: 'auto' }}
+              onError={(e) => {
+                e.currentTarget.src = '/fallback-sprite.png';
+              }}
+            />
+          </div>
         </div>
-    );
+
+        <div className="absolute top-2 left-2 right-2 flex justify-between items-start z-20">
+          <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-300 -translate-x-2 group-hover:translate-x-0">
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={onEdit}
+              className="h-7 w-7 rounded-full bg-black/55 hover:bg-white text-white hover:text-black border border-white/10 backdrop-blur-md shadow-lg"
+            >
+              <Pencil className="h-3.5 w-3.5" />
+            </Button>
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={onEvolve}
+              className="h-7 w-7 rounded-full bg-black/55 hover:bg-green-500 text-white border border-white/10 backdrop-blur-md shadow-lg"
+            >
+              <ArrowUpCircle className="h-3.5 w-3.5" />
+            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className="h-7 w-7 rounded-full bg-black/55 hover:bg-destructive text-white border border-white/10 backdrop-blur-md shadow-lg"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="bg-[#1a1a1a] border-white/10 text-white">
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="text-xl font-bold">Delete {displayName}?</AlertDialogTitle>
+                  <AlertDialogDescription className="text-white/60">
+                    Sei sicuro di voler eliminare questo Pokemon dalla tua collezione? Questa azione non puo essere annullata.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="bg-white/5 hover:bg-white/10 border-white/10 text-white">
+                    Annulla
+                  </AlertDialogCancel>
+                  <AlertDialogAction onClick={onDelete} className="bg-destructive hover:bg-destructive/90 text-white">
+                    Elimina
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+
+          {isEvolved && (
+            <div
+              className="h-7 w-7 rounded-full bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 flex items-center justify-center backdrop-blur-md"
+              title="Pokemon evoluto"
+            >
+              <ArrowUpCircle className="h-3.5 w-3.5" />
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div
+        className="flex-1 p-3 bg-[#222] relative z-10 border-t border-white/10"
+        style={{
+          backgroundColor: `color-mix(in srgb, ${theme.primary} 14%, #1a1a1a)`,
+          borderTopColor: `${theme.primary}30`,
+        }}
+      >
+        <div className="space-y-2.5">
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-center gap-2 min-w-0">
+              <h3 className="text-base sm:text-lg font-black text-white tracking-tight capitalize leading-none text-center">
+                {displayName}
+              </h3>
+              {entry.gender && (entry.gender === 'male' || entry.gender === 'female') && (
+                <span
+                  className={cn(
+                    'text-base font-bold drop-shadow-sm flex-shrink-0 leading-none',
+                    entry.gender === 'male' ? 'text-blue-400' : 'text-pink-400'
+                  )}
+                >
+                  {entry.gender === 'male' ? '\u2642' : '\u2640'}
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center justify-center">
+              {GAME_LOGOS[entry.game] && (
+                <img
+                  src={GAME_LOGOS[entry.game]}
+                  loading="lazy"
+                  decoding="async"
+                  alt={entry.game}
+                  className="h-10 sm:h-12 w-auto max-w-[92px] object-contain brightness-110 drop-shadow-lg"
+                />
+              )}
+            </div>
+          </div>
+
+          {method && (
+            <div className="flex justify-center">
+              <div
+                className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.12em] border shadow-sm"
+                style={{
+                  backgroundColor: `${theme.primary}15`,
+                  borderColor: `${theme.primary}50`,
+                  color: theme.primary,
+                }}
+              >
+                {method.name}
+              </div>
+            </div>
+          )}
+
+          <div className="grid grid-cols-2 gap-2 mt-2">
+            <div
+              className="rounded-lg p-2 border shadow-lg"
+              style={{
+                backgroundColor: `color-mix(in srgb, ${theme.primary} 18%, #111 82%)`,
+                borderColor: `${theme.primary}55`,
+              }}
+            >
+              <div className="flex items-center gap-1 mb-1.5">
+                <Calendar className="w-3 h-3 text-white/70" />
+                <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em]">Hunt Dates</span>
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center justify-between gap-1 rounded-md bg-black/25 px-1.5 py-1">
+                  <span className="text-[8px] sm:text-[9px] text-white/55 font-bold uppercase tracking-wider">Start</span>
+                  <span className="text-[9px] sm:text-[10px] font-semibold text-white/95 tabular-nums text-right">
+                    {entry.hunt_start_date ? formatDate(entry.hunt_start_date) : '--'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between gap-1 rounded-md bg-black/25 px-1.5 py-1">
+                  <span className="text-[8px] sm:text-[9px] text-white/55 font-bold uppercase tracking-wider">Caught</span>
+                  <span className="text-[9px] sm:text-[10px] font-semibold text-white/95 tabular-nums text-right">
+                    {formatDate(entry.caught_date)}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div
+              className="rounded-lg p-2 border shadow-lg flex flex-col"
+              style={{
+                backgroundColor: `color-mix(in srgb, ${theme.primary} 18%, #111 82%)`,
+                borderColor: `${theme.primary}55`,
+              }}
+            >
+              <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em] block mb-1.5">Encounters</span>
+              <div className="flex-1 flex items-center justify-center rounded-md bg-black/25 px-1.5 py-2">
+                <span className="text-2xl sm:text-[1.75rem] font-black tabular-nums tracking-tight text-white leading-none">
+                  {entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-'}
+                </span>
+              </div>
+              {entry.phase_number && (
+                <div className="mt-1.5 pt-1.5 border-t border-white/15">
+                  <span className="text-[9px] font-black uppercase tracking-[0.12em] bg-black/30 px-1.5 py-0.5 rounded" style={{ color: theme.primary }}>
+                    PHASE #{entry.phase_number}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {pokeball && (
+            <div className="mt-2 pt-2 border-t flex items-center justify-between" style={{ borderTopColor: `${theme.primary}20` }}>
+              <div className="flex items-center gap-2">
+                {entry.is_fail ? (
+                  <div className="relative overflow-hidden rounded border border-red-500/50 bg-red-950/40 pl-2 pr-3 py-0.5 shadow-[0_0_10px_rgba(239,68,68,0.2)] inset-shadow-sm">
+                    <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_45%,rgba(239,68,68,0.2)_50%,transparent_55%)] bg-[length:200%_200%] animate-[shimmer_3s_infinite]" />
+                    <div className="flex items-center gap-1.5">
+                      <div className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_5px_rgba(239,68,68,0.8)]" />
+                      <span className="text-red-400 font-black text-[10px] tracking-[0.15em] uppercase drop-shadow-sm">FAIL</span>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <img src={pokeball.sprite} loading="lazy" decoding="async" className="w-4 h-4 object-contain" alt="pokeball" />
+                    <span className="text-[9px] text-white/50 font-semibold uppercase tracking-wide">{pokeball.name}</span>
+                  </>
+                )}
+              </div>
+
+              {entry.has_shiny_charm && !isEvolved && (
+                <div className="flex items-center" title="Shiny Charm Active">
+                  <img
+                    src="/img/items/shiny-charm.png"
+                    loading="lazy"
+                    decoding="async"
+                    className="w-5 h-5 object-contain animate-pulse drop-shadow-[0_0_8px_rgba(234,179,8,0.6)]"
+                    alt="Shiny Charm"
+                  />
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
-
-
-
-
