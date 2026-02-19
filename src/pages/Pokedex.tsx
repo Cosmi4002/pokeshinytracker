@@ -12,29 +12,9 @@ import { POKEMON_FORM_COUNTS } from '@/lib/pokemon-data';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth-context';
 import { useQuery } from '@tanstack/react-query';
-import { getPrevEvolutions } from '@/lib/evolution-data';
 
 type CaughtEntryStats = { count: number; genders: Set<string>; forms: Set<string> };
 type CaughtDataMap = Record<number, CaughtEntryStats>;
-
-function isMissingIsEvolvedColumn(error: unknown): boolean {
-    const message =
-        typeof error === 'object' && error !== null && 'message' in error
-            ? String((error as { message?: string }).message || '')
-            : '';
-    return message.includes('is_evolved') && message.toLowerCase().includes('column');
-}
-
-function collectPreviousEvolutions(pokemonId: number, visited = new Set<number>()): Set<number> {
-    const previous = getPrevEvolutions(pokemonId);
-    previous.forEach((prevId) => {
-        if (!visited.has(prevId)) {
-            visited.add(prevId);
-            collectPreviousEvolutions(prevId, visited);
-        }
-    });
-    return visited;
-}
 
 export default function Pokedex() {
     const { pokemon, loading: pokemonLoading, error: pokemonError } = usePokemonList();
@@ -48,36 +28,20 @@ export default function Pokedex() {
 
     // Define setCaughtData to manage caught data state
     const [caughtData, setCaughtData] = useState<CaughtDataMap>({});
-    const [evolvedFromPokemonIds, setEvolvedFromPokemonIds] = useState<Set<number>>(new Set());
 
     // Fetch caught counts/data
     const { data: caughtDataFromQuery, isLoading: caughtLoading } = useQuery({
         queryKey: ['caughtData', user?.id],
         queryFn: async () => {
-            if (!user) return { caught: {} as CaughtDataMap, evolvedFromIds: [] as number[] };
-            let { data, error } = await supabase
+            if (!user) return {} as CaughtDataMap;
+            const { data, error } = await supabase
                 .from('caught_shinies')
-                .select('pokemon_id, gender, form, is_evolved')
+                .select('pokemon_id, gender, form')
                 .eq('user_id', user.id);
-
-            if (error && isMissingIsEvolvedColumn(error)) {
-                const fallback = await supabase
-                    .from('caught_shinies')
-                    .select('pokemon_id, gender, form')
-                    .eq('user_id', user.id);
-                data = fallback.data;
-                error = fallback.error;
-            }
             if (error) throw error;
 
             const caught: CaughtDataMap = {};
-            const evolvedFromIds = new Set<number>();
-            const rows = (data || []) as Array<{
-                pokemon_id: number;
-                gender: string | null;
-                form: string | null;
-                is_evolved?: boolean;
-            }>;
+            const rows = (data || []) as Array<{ pokemon_id: number; gender: string | null; form: string | null }>;
             rows.forEach(row => {
                 const id = row.pokemon_id;
                 if (!caught[id]) {
@@ -86,19 +50,15 @@ export default function Pokedex() {
                 caught[id].count++;
                 if (row.gender) caught[id].genders.add(row.gender);
                 if (row.form) caught[id].forms.add(row.form);
-                if (row.is_evolved) {
-                    collectPreviousEvolutions(id).forEach((prevId) => evolvedFromIds.add(prevId));
-                }
             });
-            return { caught, evolvedFromIds: Array.from(evolvedFromIds) };
+            return caught;
         },
         enabled: !!user,
-        initialData: { caught: {} as CaughtDataMap, evolvedFromIds: [] as number[] }
+        initialData: {} as CaughtDataMap
     });
 
     useEffect(() => {
-        setCaughtData(caughtDataFromQuery.caught || {});
-        setEvolvedFromPokemonIds(new Set(caughtDataFromQuery.evolvedFromIds || []));
+        setCaughtData(caughtDataFromQuery || {});
     }, [caughtDataFromQuery]);
 
     // Restore scroll position after data is loaded
@@ -323,7 +283,6 @@ export default function Pokedex() {
                                         isSecondaryCaught={isSecondaryCaught}
                                         caughtPercentage={pct}
                                         hasCaughtAny={isCaught}
-                                        isEvolutionSourceHighlighted={evolvedFromPokemonIds.has(p.id) || evolvedFromPokemonIds.has(p.baseId)}
                                         onClick={() => {
                                             navigate(`/pokedex/${p.id}`);
                                         }}

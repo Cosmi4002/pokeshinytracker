@@ -96,6 +96,14 @@ export default function PokemonDetails() {
                         matchedVariant = variants.find(v => v.id === row.pokemon_id && v.category === 'base');
                     }
 
+                    // Third-chance fallback: entries salvate come female/male per specie senza sprite gender-diff.
+                    if (!matchedVariant) {
+                        const hasGenderVariantForId = variants.some(v => v.id === row.pokemon_id && v.category === 'gender');
+                        if (!hasGenderVariantForId) {
+                            matchedVariant = variants.find(v => v.id === row.pokemon_id && v.category === 'base');
+                        }
+                    }
+
                     if (matchedVariant) {
                         caughtSet.add(matchedVariant.name);
                     }
@@ -118,7 +126,7 @@ export default function PokemonDetails() {
             name: details.name,
             displayName: details.hasGenderDifference ? 'Maschio' : details.displayName,
             category: 'base',
-            gender: 'male',
+            gender: details.hasGenderDifference ? 'male' : 'genderless',
             spriteUrl: details.sprites.shiny
         };
         items.push(baseVariant);

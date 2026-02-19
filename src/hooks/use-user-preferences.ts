@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
 import type { Tables } from '@/integrations/supabase/types';
+import { colorToHsl, hslToTriplet } from '@/lib/color-utils';
+import { useRandomColor } from '@/lib/random-color-context';
 
 type UserPreferences = Tables<'user_preferences'>;
 
@@ -13,13 +15,22 @@ const DEFAULT_PREFERENCES = {
 
 export function useUserPreferences() {
     const { user } = useAuth();
+    const { setManualColor, resetToRandom } = useRandomColor();
     const [preferences, setPreferences] = useState<UserPreferences | null>(null);
     const [loading, setLoading] = useState(true);
+
+    const applyBackgroundPreference = useCallback((prefs: Partial<UserPreferences> | typeof DEFAULT_PREFERENCES) => {
+        if (!prefs.background_color) return;
+        const parsed = colorToHsl(prefs.background_color);
+        if (!parsed) return;
+        document.documentElement.style.setProperty('--background', hslToTriplet(parsed));
+    }, []);
 
     // Load preferences from database
     useEffect(() => {
         if (!user) {
             setPreferences(null);
+            resetToRandom();
             setLoading(false);
             return;
         }
@@ -33,42 +44,21 @@ export function useUserPreferences() {
 
             if (data) {
                 setPreferences(data);
-                applyPreferences(data);
+                applyBackgroundPreference(data);
+                if (data.theme_color) {
+                    setManualColor(data.theme_color);
+                } else {
+                    resetToRandom();
+                }
             } else {
-                // Use defaults if no preferences exist yet
-                applyPreferences(DEFAULT_PREFERENCES);
+                applyBackgroundPreference(DEFAULT_PREFERENCES);
+                resetToRandom();
             }
             setLoading(false);
         };
 
         loadPreferences();
-    }, [user?.id]);
-
-    // Apply preferences to CSS variables
-    const applyPreferences = (prefs: Partial<UserPreferences> | typeof DEFAULT_PREFERENCES) => {
-        const root = document.documentElement;
-
-        if (prefs.theme_color) {
-            // Set primary color (Hex)
-            root.style.setProperty('--primary', prefs.theme_color);
-            root.style.setProperty('--shiny', prefs.theme_color);
-            root.style.setProperty('--shiny-glow', prefs.theme_color); // Simplified glow for hex support
-            root.style.setProperty('--ring', prefs.theme_color);
-            // We can't easily generate foreground contrast from hex in pure JS without helper, 
-            // but usually white/black text on colored button is handled by --primary-foreground.
-            // For now, let's assume a default foreground or keep what is there.
-            // Note: If --primary is hex, calculated sub-colors based on HSL vars in CSS won't update automatically.
-            // We force main colors for now.
-        }
-
-        if (prefs.background_color) {
-            root.style.setProperty('--background', prefs.background_color);
-            // Should accurate update card/popover too? 
-            // Often users want the whole app tinted. 
-            // For simpler logic, we just set background. 
-            // Advanced: lighten/darken for cards.
-        }
-    };
+    }, [user?.id, applyBackgroundPreference, resetToRandom, setManualColor]);
 
     // Save preferences to database
     const savePreferences = async (updates: Partial<Omit<UserPreferences, 'id' | 'user_id' | 'created_at' | 'updated_at'>>) => {
@@ -103,7 +93,12 @@ export function useUserPreferences() {
                 setPreferences(data);
             }
 
-            applyPreferences(newPrefs);
+            applyBackgroundPreference(newPrefs);
+            if (updates.theme_color === null) {
+                resetToRandom();
+            } else if (updates.theme_color) {
+                setManualColor(updates.theme_color);
+            }
             setPreferences(prev => ({ ...prev!, ...updates }));
 
             return { success: true };

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Moon, Sun, Palette, Layout, Save, RotateCcw, Sparkles } from 'lucide-react';
+import { Moon, Sun, Palette, Layout, Save, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -24,7 +24,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useRandomColor } from '@/lib/random-color-context';
 
 export function ThemeCustomizer() {
-  const { setTheme, theme, setColorScheme, colorScheme } = useTheme();
+  const { setColorScheme, colorScheme } = useTheme();
   const { accentColor, setManualColor, resetToRandom, isRandom } = useRandomColor();
   const { preferences, loading, savePreferences } = useUserPreferences();
   const { toast } = useToast();
@@ -39,9 +39,6 @@ export function ThemeCustomizer() {
   useEffect(() => {
     if (open) {
       if (preferences) {
-        // If we are in random mode, use the accentColor for the picker (visual feedback)
-        // or keep the last saved preference?
-        // Let's use accentColor if isRandom is true, so the picker shows the current dynamic color
         if (isRandom) {
           setThemeColor(accentColor);
         } else {
@@ -84,8 +81,15 @@ export function ThemeCustomizer() {
   };
 
   const handleReset = () => {
-    // 1. Reset Context to Random
+    // 1. Immediate local reset
     resetToRandom();
+
+    // 2. Persist random mode by clearing fixed theme color
+    void savePreferences({
+      theme_color: null,
+      background_color: backgroundColor,
+      layout_style: layoutStyle,
+    });
 
     toast({
       title: '🔄 Modalità Random Attiva',

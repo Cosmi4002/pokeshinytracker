@@ -2,38 +2,6 @@
   "lastEntropy": 0,
   "history": [
     {
-      "date": "2026-02-19T02:28:59.457Z",
-      "entropy": 0
-    },
-    {
-      "date": "2026-02-19T02:33:10.511Z",
-      "entropy": 0
-    },
-    {
-      "date": "2026-02-19T02:37:21.988Z",
-      "entropy": 0
-    },
-    {
-      "date": "2026-02-19T02:42:27.307Z",
-      "entropy": 0
-    },
-    {
-      "date": "2026-02-19T02:48:13.076Z",
-      "entropy": 0
-    },
-    {
-      "date": "2026-02-19T02:52:23.607Z",
-      "entropy": 0
-    },
-    {
-      "date": "2026-02-19T02:58:15.843Z",
-      "entropy": 0
-    },
-    {
-      "date": "2026-02-19T03:04:38.959Z",
-      "entropy": 0
-    },
-    {
       "date": "2026-02-19T03:10:16.632Z",
       "entropy": 0
     },
@@ -80,6 +48,38 @@
     {
       "date": "2026-02-19T04:08:27.800Z",
       "entropy": 0
+    },
+    {
+      "date": "2026-02-19T04:12:47.148Z",
+      "entropy": 0
+    },
+    {
+      "date": "2026-02-19T04:17:39.565Z",
+      "entropy": 0
+    },
+    {
+      "date": "2026-02-19T04:23:31.458Z",
+      "entropy": 0
+    },
+    {
+      "date": "2026-02-19T04:27:33.008Z",
+      "entropy": 0
+    },
+    {
+      "date": "2026-02-19T04:32:32.755Z",
+      "entropy": 0
+    },
+    {
+      "date": "2026-02-19T04:37:33.011Z",
+      "entropy": 0
+    },
+    {
+      "date": "2026-02-19T04:42:33.338Z",
+      "entropy": 0
+    },
+    {
+      "date": "2026-02-19T04:47:47.956Z",
+      "entropy": 0
     }
   ],
   "fileHashes": {
@@ -92,7 +92,7 @@
     "src\\components\\collection\\EditShinyDialog.tsx": 1771455696849.9702,
     "src\\components\\collection\\EvolveDialog.tsx": 1771473597697.267,
     "src\\components\\collection\\ManagePlaylistsDialog.tsx": 1770001432104.1636,
-    "src\\components\\collection\\ShinyCard.tsx": 1771474040726.6396,
+    "src\\components\\collection\\ShinyCard.tsx": 1771475936898.563,
     "src\\components\\counter\\FinishHuntDialog.tsx": 1771218980116.926,
     "src\\components\\counter\\MethodSelector.tsx": 1770967853939.6943,
     "src\\components\\counter\\PokemonSelector.tsx": 1771220394167.1213,
@@ -102,7 +102,7 @@
     "src\\components\\hunts\\HuntCard.tsx": 1770672965672.8674,
     "src\\components\\layout\\Navbar.tsx": 1771090709024.4026,
     "src\\components\\layout\\ScrollRestoration.tsx": 1771074222482.4016,
-    "src\\components\\layout\\ThemeCustomizer.tsx": 1770504647239.8694,
+    "src\\components\\layout\\ThemeCustomizer.tsx": 1771476285051.2866,
     "src\\components\\NavLink.tsx": 1769881918580.4404,
     "src\\components\\pokedex\\PokedexCard.tsx": 1771471683539.2234,
     "src\\components\\settings\\ColorPicker.tsx": 1769982034778.8323,
@@ -113,8 +113,8 @@
     "src\\components\\ui\\avatar.tsx": 1769818179063.0676,
     "src\\components\\ui\\badge.tsx": 1769818180168.3628,
     "src\\components\\ui\\breadcrumb.tsx": 1769818180102.8264,
-    "src\\components\\ui\\button.tsx": 1769818179852.973,
     "src\\components\\ui\\calendar.tsx": 1769818179734.0332,
+    "src\\components\\ui\\button.tsx": 1769818179852.973,
     "src\\components\\ui\\card.tsx": 1769818179710.6577,
     "src\\components\\ui\\carousel.tsx": 1769818179495.5728,
     "src\\components\\ui\\chart.tsx": 1769818180036.071,
@@ -161,16 +161,17 @@
     "src\\hooks\\use-pokedex-overrides.ts": 1771076139403.9187,
     "src\\hooks\\use-pokemon.ts": 1771386141790.597,
     "src\\hooks\\use-toast.ts": 1769818178719.912,
-    "src\\hooks\\use-user-preferences.ts": 1769987646085.5034,
+    "src\\hooks\\use-user-preferences.ts": 1771476253711.5542,
     "src\\infrastructure\\BaseAdapter.ts": 1771467663518.197,
     "src\\integrations\\supabase\\client.ts": 1769964677899.9258,
     "src\\integrations\\supabase\\types.ts": 1771384448483.783,
     "src\\lib\\auth-context.tsx": 1769964687404.5178,
+    "src\\lib\\color-utils.ts": 1771476166665.686,
     "src\\lib\\evolution-data.ts": 1771458298243.5305,
     "src\\lib\\form-filters.ts": 1771371437553.3525,
     "src\\lib\\game-themes.ts": 1771214547675.4907,
     "src\\lib\\pokemon-data.ts": 1771371388769.118,
-    "src\\lib\\random-color-context.tsx": 1770504445762.7546,
+    "src\\lib\\random-color-context.tsx": 1771476206885.3784,
     "src\\lib\\theme-context.tsx": 1769977817631.0764,
     "src\\lib\\utils.ts": 1769818178485.6814,
     "src\\main.tsx": 1769977827075.1062,
@@ -181,9 +182,9 @@
     "src\\pages\\Hunts.tsx": 1770568548964.9773,
     "src\\pages\\Index.tsx": 1770501524465.4124,
     "src\\pages\\NotFound.tsx": 1769818178170.9314,
-    "src\\pages\\Pokedex.tsx": 1771473561936.293,
+    "src\\pages\\Pokedex.tsx": 1771475329210.5005,
     "src\\pages\\PokedexManager.tsx": 1771090742816.786,
-    "src\\pages\\PokemonDetails.tsx": 1771226978771.8076,
+    "src\\pages\\PokemonDetails.tsx": 1771475652259.3938,
     "src\\plumbing\\BaseTool.ts": 1771467663518.197,
     "src\\test\\example.test.ts": 1769818178097.1272,
     "src\\test\\setup.ts": 1769818178047.0332,

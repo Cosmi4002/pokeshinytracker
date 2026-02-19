@@ -1,11 +1,11 @@
 import { Pencil, Trash2, Calendar, ArrowUpCircle } from 'lucide-react';
 import { useRandomColor } from '@/lib/random-color-context';
 import { Button } from '@/components/ui/button';
-import { getGameTheme, GAME_ICONS, GAME_COVER_ART, GAME_LOGOS } from '@/lib/game-themes';
+import { getGameTheme, GAME_LOGOS } from '@/lib/game-themes';
 import { POKEBALLS, HUNTING_METHODS, getPokemonSpriteUrl } from '@/lib/pokemon-data';
 import { formatPokemonName } from '@/hooks/use-pokemon';
 import type { Tables } from '@/integrations/supabase/types';
-import { useMemo, useCallback, useState } from 'react';
+import { useMemo, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import {
     AlertDialog,
@@ -31,15 +31,7 @@ interface ShinyCardProps {
 
 export function ShinyCard({ entry, onEdit, onDelete, onEvolve }: ShinyCardProps) {
     const { accentColor } = useRandomColor();
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-    const handleEvolveClick = () => {
-        setIsDialogOpen(true);
-    };
-
-    const handleDialogClose = () => {
-        setIsDialogOpen(false);
-    };
+    const isEvolved = entry.is_evolved === true;
 
     const theme = useMemo(() => getGameTheme(entry.game), [entry.game]);
     const pokeball = useMemo(() => POKEBALLS.find((b) => b.id === entry.pokeball), [entry.pokeball]);
@@ -72,24 +64,11 @@ export function ShinyCard({ entry, onEdit, onDelete, onEvolve }: ShinyCardProps)
         >
             {/* TOP AREA: VISUAL (Fixed aspect ratio) */}
             <div className="relative w-full aspect-[16/10] overflow-hidden bg-black/40">
-                {/* Game Cover Art Background */}
-                {GAME_COVER_ART[entry.game] ? (
-                    <div className="absolute inset-0 z-0 overflow-hidden">
-                        <img
-                            src={GAME_COVER_ART[entry.game]}
-                            loading="lazy"
-                            decoding="async"
-                            className="w-full h-full object-contain opacity-40 transform transition-transform duration-700 group-hover:scale-105"
-                            alt="background"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f0f] to-transparent opacity-80" />
-                    </div>
-                ) : (
-                    <div
-                        className="absolute inset-0 opacity-20"
-                        style={{ background: `linear-gradient(135deg, ${theme.primary}, ${theme.secondary})` }}
-                    />
-                )}
+                <div className="absolute inset-0 z-0 bg-gradient-to-b from-[#1a1a1a] to-[#0f0f0f]" />
+                <div
+                    className="absolute inset-0 z-0 opacity-25"
+                    style={{ background: `radial-gradient(circle at 50% 35%, ${theme.primary}, transparent 70%)` }}
+                />
 
                 <div className="absolute inset-0 flex items-center justify-center z-10 p-2 -translate-y-4">
                     {/* Character Platform/Grounding */}
@@ -163,6 +142,14 @@ export function ShinyCard({ entry, onEdit, onDelete, onEvolve }: ShinyCardProps)
                             </AlertDialogContent>
                         </AlertDialog>
                     </div>
+                    {isEvolved && (
+                        <div
+                            className="h-8 w-8 rounded-full bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 flex items-center justify-center backdrop-blur-md"
+                            title="Pokemon evoluto"
+                        >
+                            <ArrowUpCircle className="h-4 w-4" />
+                        </div>
+                    )}
                 </div>
 
             </div>
@@ -314,7 +301,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onEvolve }: ShinyCardProps)
                                     </>
                                 )}
                             </div>
-                            {entry.has_shiny_charm && (
+                            {entry.has_shiny_charm && !isEvolved && (
                                 <div className="flex items-center" title="Shiny Charm Active">
                                     <img
                                         src="/img/items/shiny-charm.png"
