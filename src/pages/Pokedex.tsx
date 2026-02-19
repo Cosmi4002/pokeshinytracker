@@ -102,7 +102,7 @@ export default function Pokedex() {
         const searchLower = search.toLowerCase();
 
         // Lista di baseId che devono mostrare solo la forma base
-        const ONLY_BASE_FORM = [351, 386, 666, 710, 711, 741, 869];
+        const ONLY_BASE_FORM = [351, 386, 666, 710, 711, 741, 774, 869];
         // Mappa baseId -> nome forma base
         const BASE_FORM_NAME: Record<number, string> = {
             351: 'castform',
@@ -111,6 +111,7 @@ export default function Pokedex() {
             710: 'pumpkaboo-average',
             711: 'gourgeist-average',
             741: 'oricorio-baile',
+            774: 'minior-red-meteor',
             869: 'alcremie-vanilla-cream-strawberry-sweet',
         };
 
@@ -240,8 +241,13 @@ export default function Pokedex() {
 
                                 // Granular caught status
                                 // 1. Primary sprite (Male or Single Strike)
+                                const formsForId = caughtData[p.id]?.forms;
+                                const isSpecialFormId = p.id > 10000 || p.id !== p.baseId;
+                                const hasFormMatch = !!formsForId?.has(p.name);
                                 const isPrimaryCaught = caughtData[p.id]?.count > 0 &&
-                                    (!hasGenderDiff || caughtData[p.id]?.genders.has('male') || caughtData[p.id]?.forms.has(p.name));
+                                    (isSpecialFormId
+                                        ? hasFormMatch
+                                        : (!hasGenderDiff || caughtData[p.id]?.genders.has('male') || hasFormMatch));
 
                                 // 2. Secondary sprite (Female or Rapid Strike)
                                 let isSecondaryCaught = false;
