@@ -78,13 +78,17 @@ export default function Pokedex() {
     const speciesGroups = useMemo(() => {
         if (!pokemon || !Array.isArray(pokemon)) return [];
         const map = new Map<string, PokemonBasic[]>();
+        const forceSingleCardBaseIds = new Set([351, 386, 666, 710, 711, 741, 774, 869]);
         pokemon.forEach(p => {
+            if (p.hideFromPokedex) return;
+
             // Group by base ID AND name prefix (to group gender variants, but separate regional variants)
             // Clean name key: remove gender suffixes
             let nameKey = p.name.replace(/-male$|-female$/, '');
 
             // Special grouping for species with major form differences we want on one card
             if (p.baseId === 892) nameKey = 'urshifu';
+            if (forceSingleCardBaseIds.has(p.baseId)) nameKey = `base-${p.baseId}`;
 
             // Key includes baseId to sort by dex number, but nameKey to distinguish Alola/Galar etc.
             const key = `${p.baseId}-${nameKey}`;
