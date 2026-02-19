@@ -18,6 +18,11 @@ export const BANNED_FORM_NAMES: string[] = [
     'oricorio-pau',
     'oricorio-pom-pom',
     'oricorio-sensu',
+    // Keep only Florges Red in Pokedex
+    'florges-yellow',
+    'florges-orange',
+    'florges-blue',
+    'florges-white',
 ];
 
 /**
