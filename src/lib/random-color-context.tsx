@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
-import { colorToHsl, hslToCss, hslToTriplet } from '@/lib/color-utils';
+import { colorToHsl, hslToCss } from '@/lib/color-utils';
 
 type RandomColorContextType = {
     accentColor: string;
@@ -18,14 +18,13 @@ export function RandomColorProvider({ children }: { children: ReactNode }) {
         const root = document.documentElement;
         const hsl = { h, s, l };
         const cssColor = hslToCss(hsl);
-        const triplet = hslToTriplet(hsl);
 
         setAccentColorState(cssColor);
-        root.style.setProperty('--primary', triplet);
-        root.style.setProperty('--ring', triplet);
-        root.style.setProperty('--accent', triplet);
-        root.style.setProperty('--primary-foreground', '0 0% 100%');
-        root.style.setProperty('--accent-foreground', '0 0% 100%');
+        root.style.setProperty('--primary', cssColor);
+        root.style.setProperty('--ring', cssColor);
+        root.style.setProperty('--accent', cssColor);
+        root.style.setProperty('--primary-foreground', 'hsl(0 0% 100%)');
+        root.style.setProperty('--accent-foreground', 'hsl(0 0% 100%)');
     }, []);
 
     const applyRandomHue = useCallback((hue: number) => {

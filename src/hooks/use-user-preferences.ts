@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
 import type { Tables } from '@/integrations/supabase/types';
-import { colorToHsl, hslToTriplet } from '@/lib/color-utils';
+import { colorToHsl, hslToCss } from '@/lib/color-utils';
 import { useRandomColor } from '@/lib/random-color-context';
 
 type UserPreferences = Tables<'user_preferences'>;
@@ -23,7 +23,7 @@ export function useUserPreferences() {
         if (!prefs.background_color) return;
         const parsed = colorToHsl(prefs.background_color);
         if (!parsed) return;
-        document.documentElement.style.setProperty('--background', hslToTriplet(parsed));
+        document.documentElement.style.setProperty('--background', hslToCss(parsed));
     }, []);
 
     // Load preferences from database
