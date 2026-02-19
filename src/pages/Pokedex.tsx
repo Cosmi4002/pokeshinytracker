@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Input } from '@/components/ui/input';
@@ -12,8 +12,21 @@ import { POKEMON_FORM_COUNTS } from '@/lib/pokemon-data';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth-context';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect } from 'react';
-import { toast } from 'react-toastify';
+import { getPrevEvolutions } from '@/lib/evolution-data';
+
+type CaughtEntryStats = { count: number; genders: Set<string>; forms: Set<string> };
+type CaughtDataMap = Record<number, CaughtEntryStats>;
+
+function collectPreviousEvolutions(pokemonId: number, visited = new Set<number>()): Set<number> {
+    const previous = getPrevEvolutions(pokemonId);
+    previous.forEach((prevId) => {
+        if (!visited.has(prevId)) {
+            visited.add(prevId);
+            collectPreviousEvolutions(prevId, visited);
+        }
+    });
+    return visited;
+}
 
 export default function Pokedex() {
     const { pokemon, loading: pokemonLoading, error: pokemonError } = usePokemonList();
@@ -26,19 +39,22 @@ export default function Pokedex() {
     const [generationFilter, setGenerationFilter] = useState('all');
 
     // Define setCaughtData to manage caught data state
-    const [caughtData, setCaughtData] = useState<Record<number, { count: number, genders: Set<string>, forms: Set<string> }>>({});
+    const [caughtData, setCaughtData] = useState<CaughtDataMap>({});
+    const [evolvedFromPokemonIds, setEvolvedFromPokemonIds] = useState<Set<number>>(new Set());
 
     // Fetch caught counts/data
     const { data: caughtDataFromQuery, isLoading: caughtLoading } = useQuery({
         queryKey: ['caughtData', user?.id],
         queryFn: async () => {
-            if (!user) return {};
+            if (!user) return { caught: {} as CaughtDataMap, evolvedFromIds: [] as number[] };
             const { data, error } = await supabase
                 .from('caught_shinies')
-                .select('pokemon_id, gender, form');
+                .select('pokemon_id, gender, form, is_evolved')
+                .eq('user_id', user.id);
             if (error) throw error;
 
-            const caught: Record<number, { count: number, genders: Set<string>, forms: Set<string> }> = {};
+            const caught: CaughtDataMap = {};
+            const evolvedFromIds = new Set<number>();
             data?.forEach(row => {
                 const id = row.pokemon_id;
                 if (!caught[id]) {
@@ -47,33 +63,20 @@ export default function Pokedex() {
                 caught[id].count++;
                 if (row.gender) caught[id].genders.add(row.gender);
                 if (row.form) caught[id].forms.add(row.form);
+                if (row.is_evolved) {
+                    collectPreviousEvolutions(id).forEach((prevId) => evolvedFromIds.add(prevId));
+                }
             });
-            return caught;
+            return { caught, evolvedFromIds: Array.from(evolvedFromIds) };
         },
         enabled: !!user,
-        initialData: {}
+        initialData: { caught: {} as CaughtDataMap, evolvedFromIds: [] as number[] }
     });
 
-    // Function to update caughtData after evolution
-    const updateCaughtDataForEvolution = (oldId: number, newId: number) => {
-        setCaughtData((prev) => {
-            const updated = { ...prev };
-
-            // Remove old Pokémon data
-            if (updated[oldId]) {
-                delete updated[oldId];
-            }
-
-            // Add or update new Pokémon data
-            if (!updated[newId]) {
-                updated[newId] = { count: 1, genders: new Set(), forms: new Set() };
-            } else {
-                updated[newId].count += 1;
-            }
-
-            return updated;
-        });
-    };
+    useEffect(() => {
+        setCaughtData(caughtDataFromQuery.caught || {});
+        setEvolvedFromPokemonIds(new Set(caughtDataFromQuery.evolvedFromIds || []));
+    }, [caughtDataFromQuery]);
 
     // Restore scroll position after data is loaded
     useEffect(() => {
@@ -168,29 +171,6 @@ export default function Pokedex() {
 
     // Total caught count
     const totalCaughtCount = Object.values(caughtData || {}).reduce((a, b) => (Number(a) || 0) + (Number(b.count) || 0), 0);
-
-    // List of Pokémon that do not evolve
-    const NON_EVOLVING_POKEMON = [
-        83, // Farfetch'd
-        128, // Tauros
-        132, // Ditto
-        206, // Dunsparce
-        213, // Shuckle
-        227, // Skarmory
-        235, // Smeargle
-        243, // Raikou
-        244, // Entei
-        245, // Suicune
-        249, // Lugia
-        250, // Ho-Oh
-        251, // Celebi
-        // Add more as needed
-    ];
-
-    // Define isNonEvolving to check if a Pokémon cannot evolve
-    const isNonEvolving = useMemo(() => {
-        return pokemon?.every(p => !p.evolvesTo);
-    }, [pokemon]);
 
     return (
         <div className="min-h-screen bg-background transition-colors duration-1000" style={{ backgroundImage: `radial-gradient(circle at 50% 0%, ${accentColor}15 0%, transparent 70%)` }}>
@@ -307,7 +287,7 @@ export default function Pokedex() {
                                         baseId={p.baseId}
                                         displayName={p.displayName}
                                         spriteUrl={getPokemonSpriteUrl(p.id, { shiny: true, name: p.name })}
-                                        secondarySprite={hasMultipleSprites && !isNonEvolving
+                                        secondarySprite={hasMultipleSprites
                                             ? getPokemonSpriteUrl(secondaryForm?.id || femaleId || p.id, {
                                                 shiny: true,
                                                 female: hasGenderDiff && !femaleId,
@@ -315,16 +295,13 @@ export default function Pokedex() {
                                             })
                                             : undefined
                                         }
-                                        hasMultipleSprites={hasMultipleSprites && !isNonEvolving}
+                                        hasMultipleSprites={hasMultipleSprites}
                                         isPrimaryCaught={isPrimaryCaught}
                                         isSecondaryCaught={isSecondaryCaught}
                                         caughtPercentage={pct}
                                         hasCaughtAny={isCaught}
+                                        isEvolutionSourceHighlighted={evolvedFromPokemonIds.has(p.id) || evolvedFromPokemonIds.has(p.baseId)}
                                         onClick={() => {
-                                            if (isNonEvolving) {
-                                                toast.error('Questo Pokémon non può evolversi.');
-                                                return;
-                                            }
                                             navigate(`/pokedex/${p.id}`);
                                         }}
                                     />

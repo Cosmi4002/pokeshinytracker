@@ -13,6 +13,7 @@ interface PokedexCardProps {
     isSecondaryCaught?: boolean;
     caughtPercentage: number; // 0-100
     hasCaughtAny: boolean;
+    isEvolutionSourceHighlighted?: boolean;
     onClick: () => void;
 }
 
@@ -27,6 +28,7 @@ export const PokedexCard = memo(function PokedexCard({
     isSecondaryCaught = false,
     caughtPercentage,
     hasCaughtAny,
+    isEvolutionSourceHighlighted = false,
     onClick
 }: PokedexCardProps) {
     const { accentColor } = useRandomColor();
@@ -43,12 +45,22 @@ export const PokedexCard = memo(function PokedexCard({
                 "relative group flex flex-col items-center justify-center p-3 rounded-2xl transition-all duration-500 border-2",
                 "backdrop-blur-sm overflow-hidden cursor-pointer w-full min-h-[210px]",
                 "hover:scale-105 active:scale-95",
-                !hasCaughtAny && "border-white/5 grayscale hover:grayscale-0",
+                !hasCaughtAny && !isEvolutionSourceHighlighted && "border-white/5 grayscale hover:grayscale-0",
             )}
             style={{
-                borderColor: hasCaughtAny ? `color-mix(in srgb, ${accentColor}, transparent ${isComplete ? 0 : 40}%)` : undefined,
-                boxShadow: isComplete ? `0 0 25px ${accentColor}60` : undefined,
-                backgroundColor: !hasCaughtAny
+                borderColor: isEvolutionSourceHighlighted
+                    ? 'rgba(251, 191, 36, 0.9)'
+                    : hasCaughtAny
+                        ? `color-mix(in srgb, ${accentColor}, transparent ${isComplete ? 0 : 40}%)`
+                        : undefined,
+                boxShadow: isEvolutionSourceHighlighted
+                    ? '0 0 24px rgba(251, 191, 36, 0.45), inset 0 0 12px rgba(251, 191, 36, 0.2)'
+                    : isComplete
+                        ? `0 0 25px ${accentColor}60`
+                        : undefined,
+                backgroundColor: isEvolutionSourceHighlighted
+                    ? 'rgba(120, 83, 18, 0.35)'
+                    : !hasCaughtAny
                     ? 'rgba(0, 0, 0, 0.6)'
                     : `color-mix(in srgb, ${accentColor}, black 85%)`,
                 '--glow-opacity': glowIntensity,
@@ -76,6 +88,12 @@ export const PokedexCard = memo(function PokedexCard({
                     "absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent",
                     isComplete ? "opacity-60" : "opacity-30"
                 )} />
+            )}
+
+            {isEvolutionSourceHighlighted && (
+                <div className="absolute top-2 left-2 z-20 rounded-full border border-amber-300/70 bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold text-amber-100">
+                    EVO
+                </div>
             )}
 
             {/* Sprites container */}

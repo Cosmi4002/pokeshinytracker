@@ -5,9 +5,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
-import { getPokemonSpriteUrl, formatPokemonName } from '@/hooks/use-pokemon';
+import { getPokemonSpriteUrl } from '@/hooks/use-pokemon';
 import { usePokemonList } from '@/hooks/use-pokemon';
-import { EVOLUTION_DATA, canEvolve, getNextEvolutions } from '@/lib/evolution-data';
+import { canEvolve, getNextEvolutions } from '@/lib/evolution-data';
 import type { Tables } from '@/integrations/supabase/types';
 import { cn } from '@/lib/utils';
 
@@ -120,7 +120,12 @@ export function EvolveDialog({ open, onOpenChange, entry, onSuccess }: EvolveDia
   if (!entry) return null;
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) handleClose();
+      }}
+    >
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
