@@ -2,22 +2,6 @@
   "lastEntropy": 0,
   "history": [
     {
-      "date": "2026-02-20T04:32:05.571Z",
-      "entropy": 0
-    },
-    {
-      "date": "2026-02-20T04:37:05.667Z",
-      "entropy": 0
-    },
-    {
-      "date": "2026-02-20T04:42:05.623Z",
-      "entropy": 0
-    },
-    {
-      "date": "2026-02-20T04:47:05.833Z",
-      "entropy": 0
-    },
-    {
       "date": "2026-02-20T04:52:32.896Z",
       "entropy": 0
     },
@@ -80,6 +64,22 @@
     {
       "date": "2026-02-20T06:07:52.618Z",
       "entropy": 0
+    },
+    {
+      "date": "2026-02-20T06:12:25.247Z",
+      "entropy": 0
+    },
+    {
+      "date": "2026-02-20T06:17:10.150Z",
+      "entropy": 0
+    },
+    {
+      "date": "2026-02-20T06:22:08.419Z",
+      "entropy": 0
+    },
+    {
+      "date": "2026-02-20T06:27:34.122Z",
+      "entropy": 0
     }
   ],
   "fileHashes": {
@@ -121,8 +121,8 @@
     "src\\components\\ui\\checkbox.tsx": 1769818179962.5103,
     "src\\components\\ui\\collapsible.tsx": 1769818179850.649,
     "src\\components\\ui\\command.tsx": 1771534822806.5532,
-    "src\\components\\ui\\context-menu.tsx": 1769818179047.443,
     "src\\components\\ui\\dialog.tsx": 1769818179421.3982,
+    "src\\components\\ui\\context-menu.tsx": 1769818179047.443,
     "src\\components\\ui\\drawer.tsx": 1769818179031.8174,
     "src\\components\\ui\\dropdown-menu.tsx": 1769818179150.0242,
     "src\\components\\ui\\form.tsx": 1769818179236.8599,
@@ -160,7 +160,7 @@
     "src\\hooks\\use-global-collection-themes.ts": 1771487690227.7437,
     "src\\hooks\\use-mobile.tsx": 1769818178652.7957,
     "src\\hooks\\use-pokedex-overrides.ts": 1771076139403.9187,
-    "src\\hooks\\use-pokemon.ts": 1771566910106.043,
+    "src\\hooks\\use-pokemon.ts": 1771568534085.7747,
     "src\\hooks\\use-toast.ts": 1769818178719.912,
     "src\\hooks\\use-user-preferences.ts": 1771477155959.0984,
     "src\\infrastructure\\BaseAdapter.ts": 1771467663518.197,
@@ -177,10 +177,10 @@
     "src\\lib\\utils.ts": 1769818178485.6814,
     "src\\main.tsx": 1769977827075.1062,
     "src\\pages\\Auth.tsx": 1770519046183.9678,
-    "src\\pages\\Collection.tsx": 1771566943195.4304,
+    "src\\pages\\Collection.tsx": 1771568666648.4275,
     "src\\pages\\Counter.tsx": 1770510761388.5667,
     "src\\pages\\Debug.tsx": 1771195130837.4607,
-    "src\\pages\\Hunts.tsx": 1771567128416.59,
+    "src\\pages\\Hunts.tsx": 1771568238645.8425,
     "src\\pages\\Index.tsx": 1770501524465.4124,
     "src\\pages\\NotFound.tsx": 1769818178170.9314,
     "src\\pages\\Pokedex.tsx": 1771567591963.1392,

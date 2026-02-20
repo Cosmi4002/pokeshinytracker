@@ -437,6 +437,7 @@ export function formatPokemonName(name: string, id: number, baseId?: number): st
     if (name.includes('blue')) return `${base} (Fiore Blu)`;
     if (name.includes('white')) return `${base} (Fiore Bianco)`;
     if (name.includes('red')) return `${base} (Fiore Rosso)`;
+    if (name.toLowerCase() === 'floette') return 'Floette (Red)';
     return base;
   }
 

@@ -46,6 +46,13 @@ export default function Collection() {
   const [filterGame, setFilterGame] = useState<string>('all');
   const [filterPlaylist, setFilterPlaylist] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const normalize = (value: string | null | undefined) =>
+    (value || '')
+      .toLowerCase()
+      .trim()
+      .replace(/[()]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/_+/g, '-');
 
   const fetchData = async () => {
     if (!user) {
@@ -134,18 +141,58 @@ export default function Collection() {
     return m;
   }, [playlists]);
 
-  const pokemonMap = useMemo(() => {
-    const m = new Map<number, any>();
-    pokemon.forEach((p) => m.set(p.id, p));
+  const pokemonByName = useMemo(() => {
+    const m = new Map<string, any>();
+    pokemon.forEach((p) => m.set(normalize(p.name), p));
     return m;
   }, [pokemon]);
+
+  const pokemonByDisplayName = useMemo(() => {
+    const m = new Map<string, any>();
+    pokemon.forEach((p) => m.set(normalize(p.displayName), p));
+    return m;
+  }, [pokemon]);
+
+  const pokemonById = useMemo(() => {
+    const m = new Map<number, any[]>();
+    pokemon.forEach((p) => {
+      if (!m.has(p.id)) m.set(p.id, []);
+      m.get(p.id)!.push(p);
+    });
+    return m;
+  }, [pokemon]);
+
+  const resolveEntryPokemon = (entry: CaughtShinyRow) => {
+    const formSlug = normalize(entry.form);
+    if (formSlug) {
+      const byForm = pokemonByName.get(formSlug);
+      if (byForm) return byForm;
+    }
+
+    const nameSlug = normalize(entry.pokemon_name);
+    if (nameSlug) {
+      const byName = pokemonByName.get(nameSlug);
+      if (byName) return byName;
+      const byDisplay = pokemonByDisplayName.get(nameSlug);
+      if (byDisplay) return byDisplay;
+    }
+
+    const candidates = pokemonById.get(entry.pokemon_id) || [];
+    if (candidates.length === 0) return undefined;
+    if (candidates.length === 1) return candidates[0];
+
+    const byDisplay = candidates.find((p) => normalize(p.displayName) === nameSlug);
+    if (byDisplay) return byDisplay;
+
+    return candidates[0];
+  };
 
   const filteredEntries = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
     return entries.filter((entry) => {
       if (entry.form && isFormEliminated(entry.form)) return false;
+      const poke = resolveEntryPokemon(entry);
       if (query) {
-        const poke = pokemonMap.get(entry.pokemon_id);
         const haystack = [
           entry.pokemon_name,
           entry.form || '',
@@ -156,7 +203,6 @@ export default function Collection() {
         if (!haystack.includes(query)) return false;
       }
       if (filterGen !== 'all') {
-        const poke = pokemonMap.get(entry.pokemon_id);
         if (poke && poke.generation.toString() !== filterGen) return false;
       }
       if (filterGame !== 'all' && entry.game !== filterGame) return false;
@@ -166,7 +212,7 @@ export default function Collection() {
       }
       return true;
     });
-  }, [entries, searchQuery, filterGen, filterGame, filterPlaylist, pokemonMap, playlistMap]);
+  }, [entries, searchQuery, filterGen, filterGame, filterPlaylist, playlistMap, pokemonById, pokemonByName, pokemonByDisplayName]);
 
   if (authLoading || (user && loading)) {
     return (
@@ -371,13 +417,15 @@ export default function Collection() {
             </Card>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {filteredEntries.map((entry) => (
+              {filteredEntries.map((entry) => {
+                const resolved = resolveEntryPokemon(entry);
+                return (
                 <ShinyCard
                   key={entry.id}
                   entry={entry}
                   themeOverride={mergedThemes[entry.game]}
                   applyBlackEffect={effects.blackEffectEnabled}
-                  spriteName={pokemonMap.get(entry.pokemon_id)?.name}
+                  spriteName={resolved?.name}
                   onEdit={() => {
                     setEditEntry(entry);
                     setIsEditDialogOpen(true);
@@ -385,7 +433,8 @@ export default function Collection() {
                   onDelete={() => handleDelete(entry.id)}
                   onToggleEvolved={() => handleToggleEvolved(entry)}
                 />
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

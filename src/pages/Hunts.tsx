@@ -27,10 +27,23 @@ export default function Hunts() {
     const [loading, setLoading] = useState(true);
     const [editingHunt, setEditingHunt] = useState<ActiveHuntRow | null>(null);
     const [isEditOpen, setIsEditOpen] = useState(false);
+    const normalize = (value: string | null | undefined) =>
+        (value || '')
+            .toLowerCase()
+            .trim()
+            .replace(/[()]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/_+/g, '-');
 
     const pokemonByName = useMemo(() => {
         const m = new Map<string, any>();
-        pokemon.forEach((p) => m.set(p.name.toLowerCase(), p));
+        pokemon.forEach((p) => m.set(normalize(p.name), p));
+        return m;
+    }, [pokemon]);
+
+    const pokemonByDisplayName = useMemo(() => {
+        const m = new Map<string, any>();
+        pokemon.forEach((p) => m.set(normalize(p.displayName), p));
         return m;
     }, [pokemon]);
 
@@ -44,19 +57,25 @@ export default function Hunts() {
     }, [pokemon]);
 
     const resolveHuntPokemon = (hunt: ActiveHuntRow) => {
-        const formSlug = (hunt.form || '').toLowerCase();
+        const formSlug = normalize(hunt.form);
         if (formSlug) {
             const byForm = pokemonByName.get(formSlug);
             if (byForm) return byForm;
+        }
+
+        const huntNameSlug = normalize(hunt.pokemon_name);
+        if (huntNameSlug) {
+            const byName = pokemonByName.get(huntNameSlug);
+            if (byName) return byName;
+            const byDisplay = pokemonByDisplayName.get(huntNameSlug);
+            if (byDisplay) return byDisplay;
         }
 
         const candidates = pokemonById.get(hunt.pokemon_id || 0) || [];
         if (candidates.length === 0) return undefined;
         if (candidates.length === 1) return candidates[0];
 
-        const byDisplay = candidates.find(
-            (p) => p.displayName.toLowerCase() === (hunt.pokemon_name || '').toLowerCase()
-        );
+        const byDisplay = candidates.find((p) => normalize(p.displayName) === huntNameSlug);
         if (byDisplay) return byDisplay;
 
         return candidates[0];
