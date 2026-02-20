@@ -17,7 +17,6 @@ import { AddShinyDialog } from '@/components/collection/AddShinyDialog';
 import { CreatePlaylistDialog } from '@/components/collection/CreatePlaylistDialog';
 import { ManagePlaylistsDialog } from '@/components/collection/ManagePlaylistsDialog';
 import { EditShinyDialog } from '@/components/collection/EditShinyDialog';
-import { EvolveDialog } from '@/components/collection/EvolveDialog';
 import { ShinyCard } from '@/components/collection/ShinyCard';
 import { useGlobalCollectionThemes } from '@/hooks/use-global-collection-themes';
 import type { Tables } from '@/integrations/supabase/types';
@@ -40,8 +39,6 @@ export default function Collection() {
   const [isManagePlaylistsDialogOpen, setIsManagePlaylistsDialogOpen] = useState(false);
   const [editEntry, setEditEntry] = useState<CaughtShinyRow | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [evolveEntry, setEvolveEntry] = useState<CaughtShinyRow | null>(null);
-  const [isEvolveDialogOpen, setIsEvolveDialogOpen] = useState(false);
 
   // Filters
   const [filterGen, setFilterGen] = useState<string>('all');
@@ -251,15 +248,6 @@ export default function Collection() {
               playlists={playlists.map((p) => ({ id: p.id, name: p.name }))}
               onSuccess={fetchData}
             />
-            <EvolveDialog
-              open={isEvolveDialogOpen}
-              onOpenChange={(open) => {
-                setIsEvolveDialogOpen(open);
-                if (!open) setEvolveEntry(null);
-              }}
-              entry={evolveEntry}
-              onSuccess={fetchData}
-            />
           </div>
 
           {/* Filters */}
@@ -359,10 +347,6 @@ export default function Collection() {
                     setIsEditDialogOpen(true);
                   }}
                   onDelete={() => handleDelete(entry.id)}
-                  onEvolve={() => {
-                    setEvolveEntry(entry);
-                    setIsEvolveDialogOpen(true);
-                  }}
                 />
               ))}
             </div>

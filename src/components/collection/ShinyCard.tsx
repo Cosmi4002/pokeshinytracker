@@ -23,13 +23,12 @@ interface ShinyCardProps {
   entry: CaughtShinyRow;
   onEdit: () => void;
   onDelete: () => void;
-  onEvolve: () => void;
   themeOverride?: GameTheme;
   applyBlackEffect?: boolean;
   spriteName?: string;
 }
 
-export function ShinyCard({ entry, onEdit, onDelete, onEvolve, themeOverride, applyBlackEffect = false, spriteName }: ShinyCardProps) {
+export function ShinyCard({ entry, onEdit, onDelete, themeOverride, applyBlackEffect = false, spriteName }: ShinyCardProps) {
   const isEvolved = entry.is_evolved === true;
 
   const theme = useMemo(() => themeOverride || getGameTheme(entry.game), [entry.game, themeOverride]);
@@ -121,14 +120,6 @@ export function ShinyCard({ entry, onEdit, onDelete, onEvolve, themeOverride, ap
               className="h-7 w-7 rounded-full bg-black/55 hover:bg-white text-white hover:text-black border border-white/10 backdrop-blur-md shadow-lg"
             >
               <Pencil className="h-3.5 w-3.5" />
-            </Button>
-            <Button
-              variant="secondary"
-              size="icon"
-              onClick={onEvolve}
-              className="h-7 w-7 rounded-full bg-black/55 hover:bg-green-500 text-white border border-white/10 backdrop-blur-md shadow-lg"
-            >
-              <ArrowUpCircle className="h-3.5 w-3.5" />
             </Button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
