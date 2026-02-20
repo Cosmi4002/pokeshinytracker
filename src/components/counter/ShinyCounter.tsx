@@ -57,6 +57,17 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
   const [playlists, setPlaylists] = useState<{ id: string; name: string }[]>([]);
   const [huntCreatedAt, setHuntCreatedAt] = useState<string | null>(null);
   const isInitialLoadRef = useRef(true);
+  const userIdRef = useRef<string | null>(null);
+  const latestStateRef = useRef({
+    pokemonId: null as number | null,
+    pokemonName: '',
+    methodId: HUNTING_METHODS[0].id,
+    counter: 0,
+    hasShinyCharm: false,
+    incrementAmount: 1,
+    form: '',
+    gender: '',
+  });
 
   const { pokemon: pokemonDetails } = usePokemonDetails(selectedPokemonId || 0);
 
@@ -88,6 +99,23 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
 
     return items.sort((a, b) => a.displayName.localeCompare(b.displayName));
   }, [pokemonDetails]);
+
+  useEffect(() => {
+    userIdRef.current = user?.id ?? null;
+  }, [user?.id]);
+
+  useEffect(() => {
+    latestStateRef.current = {
+      pokemonId: selectedPokemonId,
+      pokemonName: selectedPokemonName ?? '',
+      methodId: selectedMethod.id,
+      counter,
+      hasShinyCharm,
+      incrementAmount,
+      form: selectedForm || '',
+      gender: selectedGender || '',
+    };
+  }, [selectedPokemonId, selectedPokemonName, selectedMethod.id, counter, hasShinyCharm, incrementAmount, selectedForm, selectedGender]);
 
   // Load active hunt and playlists from Supabase when user is logged in
   useEffect(() => {
@@ -241,6 +269,32 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
 
     return () => clearTimeout(timer);
   }, [user?.id, loading, counter, incrementAmount, selectedPokemonId, selectedPokemonName, selectedMethod, hasShinyCharm, selectedForm, selectedGender]);
+
+  // Ensure latest hunt variant/name is persisted when unmounting (e.g. hiding/removing a counter card).
+  useEffect(() => {
+    return () => {
+      const currentUserId = userIdRef.current;
+      const currentHuntId = activeHuntIdRef.current;
+      if (!currentUserId || !currentHuntId || isInitialLoadRef.current) return;
+
+      const latest = latestStateRef.current;
+      void supabase
+        .from('active_hunts')
+        .update({
+          pokemon_id: latest.pokemonId,
+          pokemon_name: latest.pokemonName,
+          method: latest.methodId,
+          counter: latest.counter,
+          has_shiny_charm: latest.hasShinyCharm,
+          increment_amount: latest.incrementAmount,
+          form: latest.form || null,
+          gender: latest.gender || null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', currentHuntId)
+        .eq('user_id', currentUserId);
+    };
+  }, []);
 
   // Calculate stats based on current counter and method
   const stats = useMemo(() => {
