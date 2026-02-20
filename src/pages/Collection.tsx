@@ -228,7 +228,7 @@ export default function Collection() {
       .sort((a, b) => {
         const aTime = new Date(a.caught_date || a.created_at).getTime();
         const bTime = new Date(b.caught_date || b.created_at).getTime();
-        return aTime - bTime;
+        return bTime - aTime;
       });
   }, [entries, searchQuery, filterGen, filterGame, filterPlaylist, playlistMap, pokemonById, pokemonByName, pokemonByDisplayName]);
 
