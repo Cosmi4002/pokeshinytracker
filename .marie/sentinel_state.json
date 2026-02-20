@@ -2,14 +2,6 @@
   "lastEntropy": 0,
   "history": [
     {
-      "date": "2026-02-19T22:57:10.728Z",
-      "entropy": 0
-    },
-    {
-      "date": "2026-02-19T23:02:27.641Z",
-      "entropy": 0
-    },
-    {
       "date": "2026-02-19T23:07:29.700Z",
       "entropy": 0
     },
@@ -79,6 +71,14 @@
     },
     {
       "date": "2026-02-20T00:32:11.592Z",
+      "entropy": 0
+    },
+    {
+      "date": "2026-02-20T00:37:21.607Z",
+      "entropy": 0
+    },
+    {
+      "date": "2026-02-20T00:42:15.809Z",
       "entropy": 0
     }
   ],
@@ -165,8 +165,8 @@
     "src\\hooks\\use-user-preferences.ts": 1771477155959.0984,
     "src\\infrastructure\\BaseAdapter.ts": 1771467663518.197,
     "src\\integrations\\supabase\\client.ts": 1769964677899.9258,
-    "src\\lib\\auth-context.tsx": 1769964687404.5178,
     "src\\integrations\\supabase\\types.ts": 1771384448483.783,
+    "src\\lib\\auth-context.tsx": 1769964687404.5178,
     "src\\lib\\color-utils.ts": 1771476166665.686,
     "src\\lib\\evolution-data.ts": 1771489330193.066,
     "src\\lib\\form-filters.ts": 1771546939240.8716,
@@ -183,7 +183,7 @@
     "src\\pages\\Hunts.tsx": 1770568548964.9773,
     "src\\pages\\Index.tsx": 1770501524465.4124,
     "src\\pages\\NotFound.tsx": 1769818178170.9314,
-    "src\\pages\\Pokedex.tsx": 1771547513794.7368,
+    "src\\pages\\Pokedex.tsx": 1771547674569.3499,
     "src\\pages\\PokedexManager.tsx": 1771487703345.2026,
     "src\\pages\\PokemonDetails.tsx": 1771475652259.3938,
     "src\\plumbing\\BaseTool.ts": 1771467663518.197,

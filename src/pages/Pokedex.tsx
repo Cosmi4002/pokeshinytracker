@@ -81,9 +81,7 @@ export default function Pokedex() {
         const preferredBaseForms: Record<number, string> = {
             201: 'unown',
             351: 'castform',
-            386: 'deoxys-normal',
             493: 'arceus',
-            666: 'vivillon-meadow',
             669: 'flabebe',
             670: 'floette',
             671: 'florges',
@@ -103,7 +101,7 @@ export default function Pokedex() {
             1017: 'ogerpon',
             1024: 'terapagos',
         };
-        const forceSingleCardBaseIds = new Set([201, 351, 386, 493, 666, 669, 670, 671, 676, 773, 710, 711, 741, 774, 849, 869, 925, 931, 1017, 1024]);
+        const forceSingleCardBaseIds = new Set([201, 351, 493, 669, 670, 671, 676, 773, 710, 711, 741, 774, 849, 869, 925, 931, 1017, 1024]);
         pokemon.forEach(p => {
             const isPreferredBase = preferredBaseForms[p.baseId] === p.name;
             if (p.hideFromPokedex && !isPreferredBase) return;
@@ -132,13 +130,11 @@ export default function Pokedex() {
         const searchLower = search.toLowerCase();
 
         // Lista di baseId che devono mostrare solo la forma base
-        const ONLY_BASE_FORM = [351, 386, 493, 666, 669, 670, 671, 676, 773, 710, 711, 741, 774, 849, 869, 925, 931, 1017, 1024];
+        const ONLY_BASE_FORM = [351, 493, 669, 670, 671, 676, 773, 710, 711, 741, 774, 849, 869, 925, 931, 1017, 1024];
         // Mappa baseId -> nome forma base
         const BASE_FORM_NAME: Record<number, string> = {
             351: 'castform',
-            386: 'deoxys-normal',
             493: 'arceus',
-            666: 'vivillon-meadow',
             669: 'flabebe',
             670: 'floette',
             671: 'florges',
