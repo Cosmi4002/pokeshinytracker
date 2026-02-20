@@ -45,7 +45,7 @@ export function PokemonSelector({ value, valueName, onChange }: PokemonSelectorP
   const selectedPokemon = useMemo(() => {
     if (value === null) return undefined;
     if (valueName) {
-      const exact = pokemon.find(p => p.id === value && p.name === valueName);
+      const exact = pokemon.find(p => p.name === valueName && (p.id === value || p.baseId === value));
       if (exact) return exact;
     }
     return pokemon.find(p => p.id === value);
@@ -58,6 +58,7 @@ export function PokemonSelector({ value, valueName, onChange }: PokemonSelectorP
       .filter(p =>
         p.name.toLowerCase().includes(searchLower) ||
         p.displayName.toLowerCase().includes(searchLower) ||
+        p.id.toString().includes(searchLower) ||
         p.baseId.toString().includes(searchLower)
       );
   }, [pokemon, searchTerm]);
@@ -137,7 +138,7 @@ export function PokemonSelector({ value, valueName, onChange }: PokemonSelectorP
                     <Check
                       className={cn(
                         "ml-auto h-4 w-4",
-                        value === p.id && (!valueName || valueName === p.name) ? "opacity-100" : "opacity-0"
+                        (valueName ? valueName === p.name : value === p.id) ? "opacity-100" : "opacity-0"
                       )}
                     />
                 </CommandItem>

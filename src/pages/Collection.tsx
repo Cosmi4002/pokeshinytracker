@@ -142,7 +142,17 @@ export default function Collection() {
   const filteredEntries = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
     return entries.filter((entry) => {
-      if (query && !entry.pokemon_name.toLowerCase().includes(query)) return false;
+      if (query) {
+        const poke = pokemonMap.get(entry.pokemon_id);
+        const haystack = [
+          entry.pokemon_name,
+          entry.form || '',
+          poke?.displayName || '',
+          poke?.name || '',
+          String(entry.pokemon_id),
+        ].join(' ').toLowerCase();
+        if (!haystack.includes(query)) return false;
+      }
       if (filterGen !== 'all') {
         const poke = pokemonMap.get(entry.pokemon_id);
         if (poke && poke.generation.toString() !== filterGen) return false;

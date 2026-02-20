@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { Loader2 } from 'lucide-react';
 import { GenderSelector } from '@/components/ui/GenderSelector';
 import { Button } from '@/components/ui/button';
@@ -26,9 +26,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { PokemonSelector } from '@/components/counter/PokemonSelector';
 import { MethodSelector } from '@/components/counter/MethodSelector';
 import { POKEBALLS, GAMES, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON } from '@/lib/pokemon-data';
-import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
-import { usePokedexOverrides } from '@/hooks/use-pokedex-overrides';
-import { isFormEliminated } from '@/lib/form-filters';
+import { usePokemonDetails, usePokemonList, formatPokemonName } from '@/hooks/use-pokemon';
 import { getPokemonSpriteUrl } from '@/lib/pokemon-data';
 
 interface AddShinyDialogProps {
@@ -59,47 +57,25 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
   const [playlistId, setPlaylistId] = useState<string>('');
   const [notes, setNotes] = useState('');
 
-  const { overrides } = usePokedexOverrides();
+  const { pokemon: pokemonList } = usePokemonList();
   const { pokemon: pokemonDetails } = usePokemonDetails(pokemonId);
 
-  // Flatten forms and varieties similar to ShinyCounter
+  // Build options from finalized pokedex list (same source used by counter/pokedex).
   const formOptions = useMemo(() => {
-    if (!pokemonDetails) return [];
+    if (!pokemonId || pokemonList.length === 0) return [];
 
-    const items: { id: number, name: string, displayName: string }[] = [];
+    const selectedEntry = pokemonList.find(p => p.id === pokemonId);
+    const baseId = selectedEntry?.baseId ?? pokemonId;
 
-    // Add Forms
-    pokemonDetails.forms.forEach(f => {
-      if (f.formName === pokemonDetails.name) return;
-
-      const isExcluded = isFormEliminated(f.formName) || (overrides[`${f.id}-${f.formName}`] as any)?.is_excluded;
-      if (isExcluded) return;
-
-      items.push({
-        id: f.id,
-        name: f.formName,
-        displayName: f.displayName
-      });
-    });
-
-    // Add Varieties
-    pokemonDetails.varieties.forEach(v => {
-      if (v.isDefault) return;
-
-      const isExcluded = isFormEliminated(v.pokemon.name) || (overrides[`${v.pokemon.id}-${v.pokemon.name}`] as any)?.is_excluded;
-      if (isExcluded) return;
-
-      if (items.some(i => i.id === v.pokemon.id)) return;
-
-      items.push({
-        id: v.pokemon.id,
-        name: v.pokemon.name,
-        displayName: (overrides[`${v.pokemon.id}-${v.pokemon.name}`] as any)?.custom_display_name || formatPokemonName(v.pokemon.name, v.pokemon.id)
-      });
-    });
-
-    return items.sort((a, b) => a.displayName.localeCompare(b.displayName));
-  }, [pokemonDetails, overrides]);
+    return pokemonList
+      .filter(p => p.baseId === baseId && p.id !== baseId)
+      .map(p => ({
+        id: p.id,
+        name: p.name,
+        displayName: p.displayName,
+      }))
+      .sort((a, b) => a.displayName.localeCompare(b.displayName));
+  }, [pokemonId, pokemonList]);
 
   const spriteUrl = useMemo(() => {
     if (!pokemonId) return '';
@@ -251,10 +227,35 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
             <PokemonSelector
               value={pokemonId}
               valueName={pokemonName}
-              onChange={(id, name) => {
-                setPokemonId(id);
+              onChange={(id, name, baseId) => {
+                if (id === null) {
+                  setPokemonId(null);
+                  setPokemonName('');
+                  setForm('');
+                  setGender('');
+                  return;
+                }
+
+                const isFemaleVariant = name.endsWith('-female');
+                const isMaleVariant = name.endsWith('-male');
+                const resolvedBaseId = baseId ?? id;
+
+                setPokemonId(resolvedBaseId);
                 setPokemonName(name);
-                setForm('');
+
+                if (isFemaleVariant) {
+                  setGender('female');
+                  setForm('');
+                } else if (isMaleVariant) {
+                  setGender('');
+                  setForm('');
+                } else if (resolvedBaseId !== id) {
+                  setForm(name);
+                  setGender('');
+                } else {
+                  setForm('');
+                  setGender('');
+                }
               }}
             />
           </div>

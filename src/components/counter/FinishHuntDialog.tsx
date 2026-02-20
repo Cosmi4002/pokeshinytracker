@@ -25,9 +25,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
 import { POKEBALLS, GAMES, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, getPokemonSpriteUrl } from '@/lib/pokemon-data';
-import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
-import { isFormEliminated, POKEMON_DATA_OVERRIDES } from '@/lib/form-filters';
-import { usePokedexOverrides } from '@/hooks/use-pokedex-overrides';
+import { usePokemonDetails, formatPokemonName, usePokemonList } from '@/hooks/use-pokemon';
 import { MethodSelector } from '@/components/counter/MethodSelector';
 
 interface FinishHuntDialogProps {
@@ -80,47 +78,25 @@ export function FinishHuntDialog({
   const [playlistId, setPlaylistId] = useState<string>('');
   const [notes, setNotes] = useState('');
 
-  const { overrides } = usePokedexOverrides();
   const { pokemon: pokemonDetails } = usePokemonDetails(pokemonId);
+  const { pokemon: pokemonList } = usePokemonList();
 
-  // Flatten forms and varieties similar to ShinyCounter
+  // Build options from the same finalized pokedex list used by selector/counter.
   const formOptions = useMemo(() => {
-    if (!pokemonDetails) return [];
+    if (!pokemonId || pokemonList.length === 0) return [];
 
-    const items: { id: number, name: string, displayName: string }[] = [];
+    const selectedEntry = pokemonList.find(p => p.id === pokemonId);
+    const baseId = selectedEntry?.baseId ?? pokemonId;
 
-    // Add Forms
-    pokemonDetails.forms.forEach(f => {
-      if (f.formName === pokemonDetails.name) return;
-
-      const isExcluded = isFormEliminated(f.formName) || (overrides[`${f.id}-${f.formName}`] as any)?.is_excluded;
-      if (isExcluded) return;
-
-      items.push({
-        id: f.id,
-        name: f.formName,
-        displayName: f.displayName
-      });
-    });
-
-    // Add Varieties
-    pokemonDetails.varieties.forEach(v => {
-      if (v.isDefault) return;
-
-      const isExcluded = isFormEliminated(v.pokemon.name) || (overrides[`${v.pokemon.id}-${v.pokemon.name}`] as any)?.is_excluded;
-      if (isExcluded) return;
-
-      if (items.some(i => i.id === v.pokemon.id)) return;
-
-      items.push({
-        id: v.pokemon.id,
-        name: v.pokemon.name,
-        displayName: (overrides[`${v.pokemon.id}-${v.pokemon.name}`] as any)?.custom_display_name || formatPokemonName(v.pokemon.name, v.pokemon.id)
-      });
-    });
-
-    return items.sort((a, b) => a.displayName.localeCompare(b.displayName));
-  }, [pokemonDetails, overrides]);
+    return pokemonList
+      .filter(p => p.baseId === baseId && p.id !== baseId)
+      .map(p => ({
+        id: p.id,
+        name: p.name,
+        displayName: p.displayName,
+      }))
+      .sort((a, b) => a.displayName.localeCompare(b.displayName));
+  }, [pokemonId, pokemonList]);
 
   const spriteUrl = useMemo(() => {
     const currentVariant = formOptions.find(f => f.name === form);

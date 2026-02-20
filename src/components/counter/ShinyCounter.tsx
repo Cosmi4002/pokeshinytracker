@@ -29,9 +29,7 @@ import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
 import { FinishHuntDialog } from './FinishHuntDialog';
 import { useRandomColor } from '@/lib/random-color-context';
-import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
-import { isFormEliminated, POKEMON_DATA_OVERRIDES } from '@/lib/form-filters';
-import { usePokedexOverrides } from '@/hooks/use-pokedex-overrides';
+import { usePokemonDetails, usePokemonList } from '@/hooks/use-pokemon';
 
 interface ShinyCounterProps {
   huntId?: string;
@@ -39,7 +37,6 @@ interface ShinyCounterProps {
 
 export function ShinyCounter({ huntId }: ShinyCounterProps) {
   const { user } = useAuth();
-  const { overrides } = usePokedexOverrides();
   const { accentColor } = useRandomColor();
   const [counter, setCounter] = useState(0);
   const [incrementAmount, setIncrementAmount] = useState(1);
@@ -62,49 +59,24 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
   const isInitialLoadRef = useRef(true);
 
   const { pokemon: pokemonDetails } = usePokemonDetails(selectedPokemonId || 0);
+  const { pokemon: pokemonList } = usePokemonList();
 
-  // Flatten forms and varieties similar to PokemonDetails
+  // Build form options directly from the finalized pokedex list used across the app.
   const formOptions = useMemo(() => {
-    if (!pokemonDetails) return [];
+    if (!selectedPokemonId || pokemonList.length === 0) return [];
 
-    const items: { id: number, name: string, displayName: string }[] = [];
+    const selectedEntry = pokemonList.find(p => p.id === selectedPokemonId);
+    const baseId = selectedEntry?.baseId ?? selectedPokemonId;
 
-    // Add Forms
-    pokemonDetails.forms.forEach(f => {
-      // Skip if it's the base form (we handle base separately or as empty string, 
-      // but if we want to list it as an option, we can. 
-      // ShinyCounter logic uses '' as base.
-      if (f.formName === pokemonDetails.name) return;
-
-      const isExcluded = isFormEliminated(f.formName) || (overrides[`${f.id}-${f.formName}`] as any)?.is_excluded;
-      if (isExcluded) return;
-
-      items.push({
-        id: f.id,
-        name: f.formName, // Store full name
-        displayName: f.displayName
-      });
-    });
-
-    // Add Varieties (Regionals, etc)
-    pokemonDetails.varieties.forEach(v => {
-      if (v.isDefault) return; // Base handled elsewhere or implicitly
-
-      const isExcluded = isFormEliminated(v.pokemon.name) || (overrides[`${v.pokemon.id}-${v.pokemon.name}`] as any)?.is_excluded;
-      if (isExcluded) return;
-
-      // Avoid duplicates from forms array
-      if (items.some(i => i.id === v.pokemon.id)) return;
-
-      items.push({
-        id: v.pokemon.id,
-        name: v.pokemon.name,
-        displayName: (overrides[`${v.pokemon.id}-${v.pokemon.name}`] as any)?.custom_display_name || formatPokemonName(v.pokemon.name, v.pokemon.id)
-      });
-    });
-
-    return items.sort((a, b) => a.displayName.localeCompare(b.displayName));
-  }, [pokemonDetails, overrides]);
+    return pokemonList
+      .filter(p => p.baseId === baseId && p.id !== baseId)
+      .map(p => ({
+        id: p.id,
+        name: p.name,
+        displayName: p.displayName,
+      }))
+      .sort((a, b) => a.displayName.localeCompare(b.displayName));
+  }, [selectedPokemonId, pokemonList]);
 
   // Load active hunt and playlists from Supabase when user is logged in
   useEffect(() => {
