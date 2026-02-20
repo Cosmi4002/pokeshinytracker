@@ -229,7 +229,13 @@ export default function Collection() {
       .sort((a, b) => {
         const aTime = new Date(a.caught_date || a.created_at).getTime();
         const bTime = new Date(b.caught_date || b.created_at).getTime();
-        return sortByDate === 'desc' ? bTime - aTime : aTime - bTime;
+        const primary = sortByDate === 'desc' ? bTime - aTime : aTime - bTime;
+        if (primary !== 0) return primary;
+
+        // Tie-break: if capture date is the same, keep first the one added earlier to collection.
+        const aCreated = new Date(a.created_at).getTime();
+        const bCreated = new Date(b.created_at).getTime();
+        return aCreated - bCreated;
       });
   }, [entries, searchQuery, filterGen, filterGame, filterPlaylist, playlistMap, pokemonById, pokemonByName, pokemonByDisplayName, sortByDate]);
 
