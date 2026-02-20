@@ -167,8 +167,7 @@ export const MANUAL_VARIETIES: Record<number, { id: number, name: string }[]> = 
   ],
   670: [ // Floette
     { id: 10068, name: 'floette-yellow' }, { id: 10069, name: 'floette-orange' },
-    { id: 10070, name: 'floette-blue' }, { id: 10071, name: 'floette-white' },
-    { id: 10072, name: 'floette-eternal' }
+    { id: 10070, name: 'floette-blue' }, { id: 10071, name: 'floette-white' }
   ],
   671: [ // Florges
     { id: 10073, name: 'florges-yellow' }, { id: 10074, name: 'florges-orange' },

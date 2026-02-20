@@ -791,7 +791,7 @@ export const POKEMON_FORM_COUNTS: Record<number, number> = {
   // Gen 6
   666: 20, // Vivillon
   669: 5, // Flabebe
-  670: 6, // Floette (inc. AZ)
+  670: 5, // Floette
   671: 5, // Florges
   676: 10, // Furfrou
   678: 2, // Meowstic

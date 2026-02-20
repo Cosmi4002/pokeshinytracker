@@ -18,13 +18,27 @@ interface HuntCardProps {
     onEdit: (hunt: ActiveHuntRow) => void;
     onContinue?: (huntId: string) => void;
     layoutStyle?: string;
+    displayName?: string;
+    spriteName?: string;
+    spritePokemonId?: number | null;
 }
 
-export function HuntCard({ hunt, onDelete, onEdit, onContinue, layoutStyle = 'grid' }: HuntCardProps) {
+export function HuntCard({
+    hunt,
+    onDelete,
+    onEdit,
+    onContinue,
+    layoutStyle = 'grid',
+    displayName,
+    spriteName,
+    spritePokemonId,
+}: HuntCardProps) {
     const { accentColor } = useRandomColor();
     const method = HUNTING_METHODS.find((m) => m.id === hunt.method);
     const stats = calculateShinyStats(hunt.counter || 0, hunt.method || 'gen9-random', hunt.has_shiny_charm || false);
-    const displayPokemonName = formatPokemonName(hunt.form || hunt.pokemon_name || '', hunt.pokemon_id);
+    const displayPokemonName = displayName || formatPokemonName(hunt.form || hunt.pokemon_name || '', hunt.pokemon_id);
+    const spriteId = spritePokemonId || hunt.pokemon_id;
+    const spriteLookupName = spriteName || hunt.form || hunt.pokemon_name || undefined;
 
 
     const timeAgo = hunt.updated_at
@@ -45,16 +59,16 @@ export function HuntCard({ hunt, onDelete, onEdit, onContinue, layoutStyle = 'gr
                     <div className="flex items-center gap-4">
                         {/* Pokemon Sprite */}
                         <div className="flex-shrink-0">
-                            {hunt.pokemon_id ? (
+                            {spriteId ? (
                                 <img
                                     src={getGameSpecificSpriteUrl(
-                                        hunt.pokemon_id,
+                                        spriteId,
                                         hunt.method || 'gen9-random',
-                                        hunt.pokemon_name || undefined,
+                                        spriteLookupName,
                                         hunt.form || undefined,
                                         hunt.gender || undefined
                                     ) || ''}
-                                    alt={hunt.pokemon_name || 'Pokemon'}
+                                    alt={displayPokemonName || 'Pokemon'}
                                     className="w-16 h-16 object-contain pokemon-sprite"
                                     onError={(e) => {
                                         (e.target as HTMLImageElement).src = '/placeholder.svg';
@@ -119,16 +133,16 @@ export function HuntCard({ hunt, onDelete, onEdit, onContinue, layoutStyle = 'gr
                 <CardContent className="pt-4 pb-3 px-3">
                     {/* Pokemon Sprite */}
                     <div className="flex justify-center mb-2">
-                        {hunt.pokemon_id ? (
+                        {spriteId ? (
                             <img
                                 src={getGameSpecificSpriteUrl(
-                                    hunt.pokemon_id,
+                                    spriteId,
                                     hunt.method || 'gen9-random',
-                                    hunt.pokemon_name || undefined,
+                                    spriteLookupName,
                                     hunt.form || undefined,
                                     hunt.gender || undefined
                                 ) || ''}
-                                alt={hunt.pokemon_name || 'Pokemon'}
+                                alt={displayPokemonName || 'Pokemon'}
                                 className="w-16 h-16 object-contain pokemon-sprite"
                                 onError={(e) => {
                                     (e.target as HTMLImageElement).src = '/placeholder.svg';
@@ -202,16 +216,16 @@ export function HuntCard({ hunt, onDelete, onEdit, onContinue, layoutStyle = 'gr
             <CardContent className="pt-6">
                 {/* Pokemon Sprite */}
                 <div className="flex justify-center mb-4">
-                    {hunt.pokemon_id ? (
+                    {spriteId ? (
                         <img
                             src={getGameSpecificSpriteUrl(
-                                hunt.pokemon_id,
+                                spriteId,
                                 hunt.method || 'gen9-random',
-                                hunt.pokemon_name || undefined,
+                                spriteLookupName,
                                 hunt.form || undefined,
                                 hunt.gender || undefined
                             ) || ''}
-                            alt={hunt.pokemon_name || 'Pokemon'}
+                            alt={displayPokemonName || 'Pokemon'}
                             className="w-24 h-24 lg:w-40 lg:h-40 object-contain pokemon-sprite"
                             onError={(e) => {
                                 (e.target as HTMLImageElement).src = '/placeholder.svg';

@@ -19,6 +19,7 @@ import { ManagePlaylistsDialog } from '@/components/collection/ManagePlaylistsDi
 import { EditShinyDialog } from '@/components/collection/EditShinyDialog';
 import { ShinyCard } from '@/components/collection/ShinyCard';
 import { useGlobalCollectionThemes } from '@/hooks/use-global-collection-themes';
+import { isFormEliminated } from '@/lib/form-filters';
 import type { Tables } from '@/integrations/supabase/types';
 
 type CaughtShinyRow = Tables<'caught_shinies'>;
@@ -142,6 +143,7 @@ export default function Collection() {
   const filteredEntries = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
     return entries.filter((entry) => {
+      if (entry.form && isFormEliminated(entry.form)) return false;
       if (query) {
         const poke = pokemonMap.get(entry.pokemon_id);
         const haystack = [

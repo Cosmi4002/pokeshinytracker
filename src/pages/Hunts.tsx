@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Plus, Trash2, ArrowRight, Clock } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Navbar } from '@/components/layout/Navbar';
@@ -11,6 +11,7 @@ import { HuntCard } from '@/components/hunts/HuntCard';
 import { EditHuntDialog } from '@/components/hunts/EditHuntDialog';
 import { useUserPreferences } from '@/hooks/use-user-preferences';
 import { useRandomColor } from '@/lib/random-color-context';
+import { usePokemonList } from '@/hooks/use-pokemon';
 import type { Tables } from '@/integrations/supabase/types';
 
 type ActiveHuntRow = Tables<'active_hunts'>;
@@ -18,6 +19,7 @@ type ActiveHuntRow = Tables<'active_hunts'>;
 export default function Hunts() {
     const { user } = useAuth();
     const { accentColor } = useRandomColor();
+    const { pokemon } = usePokemonList();
     const { toast } = useToast();
     const navigate = useNavigate();
     const { preferences } = useUserPreferences();
@@ -25,6 +27,40 @@ export default function Hunts() {
     const [loading, setLoading] = useState(true);
     const [editingHunt, setEditingHunt] = useState<ActiveHuntRow | null>(null);
     const [isEditOpen, setIsEditOpen] = useState(false);
+
+    const pokemonByName = useMemo(() => {
+        const m = new Map<string, any>();
+        pokemon.forEach((p) => m.set(p.name.toLowerCase(), p));
+        return m;
+    }, [pokemon]);
+
+    const pokemonById = useMemo(() => {
+        const m = new Map<number, any[]>();
+        pokemon.forEach((p) => {
+            if (!m.has(p.id)) m.set(p.id, []);
+            m.get(p.id)!.push(p);
+        });
+        return m;
+    }, [pokemon]);
+
+    const resolveHuntPokemon = (hunt: ActiveHuntRow) => {
+        const formSlug = (hunt.form || '').toLowerCase();
+        if (formSlug) {
+            const byForm = pokemonByName.get(formSlug);
+            if (byForm) return byForm;
+        }
+
+        const candidates = pokemonById.get(hunt.pokemon_id || 0) || [];
+        if (candidates.length === 0) return undefined;
+        if (candidates.length === 1) return candidates[0];
+
+        const byDisplay = candidates.find(
+            (p) => p.displayName.toLowerCase() === (hunt.pokemon_name || '').toLowerCase()
+        );
+        if (byDisplay) return byDisplay;
+
+        return candidates[0];
+    };
 
     const fetchHunts = async () => {
         if (!user) {
@@ -204,7 +240,9 @@ export default function Hunts() {
                                     ? 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3'
                                     : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'
                         }>
-                            {hunts.map((hunt) => (
+                            {hunts.map((hunt) => {
+                                const resolved = resolveHuntPokemon(hunt);
+                                return (
                                 <HuntCard
                                     key={hunt.id}
                                     hunt={hunt}
@@ -212,8 +250,12 @@ export default function Hunts() {
                                     onEdit={handleEditHunt}
                                     onContinue={handleContinueHunt}
                                     layoutStyle={preferences.layout_style || 'grid'}
+                                    displayName={resolved?.displayName}
+                                    spriteName={resolved?.name}
+                                    spritePokemonId={resolved?.id}
                                 />
-                            ))}
+                                );
+                            })}
                         </div>
                     )}
                 </div>

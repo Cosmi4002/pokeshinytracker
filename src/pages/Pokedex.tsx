@@ -104,9 +104,10 @@ export default function Pokedex() {
         const forceVisibleBaseIds = new Set([351, 386, 666]);
         const forceSingleCardBaseIds = new Set([201, 493, 669, 670, 671, 676, 773, 710, 711, 741, 774, 849, 869, 925, 931, 1017, 1024]);
         pokemon.forEach(p => {
+            const isCanonicalBase = p.id === p.baseId;
             const isPreferredBase = preferredBaseForms[p.baseId] === p.name;
             const isForceVisible = forceVisibleBaseIds.has(p.baseId);
-            if (p.hideFromPokedex && !isPreferredBase && !isForceVisible) return;
+            if (p.hideFromPokedex && !isCanonicalBase && !isPreferredBase && !isForceVisible) return;
 
             // Group by base ID AND name prefix (to group gender variants, but separate regional variants)
             // Clean name key: remove gender suffixes
