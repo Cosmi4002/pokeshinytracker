@@ -316,7 +316,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
             </div>
           </div>
 
-          {pokeball && (
+          {(pokeball || entry.has_shiny_charm) && (
             <div className="mt-2 pt-2 border-t flex items-center justify-between" style={{ borderTopColor: `${theme.primary}20` }}>
               <div className="flex items-center gap-2">
                 {entry.is_fail ? (
@@ -327,15 +327,17 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                       <span className="text-red-400 font-black text-[10px] tracking-[0.15em] uppercase drop-shadow-sm">FAIL</span>
                     </div>
                   </div>
-                ) : (
+                ) : pokeball ? (
                   <>
                     <img src={pokeball.sprite} loading="lazy" decoding="async" className="w-4 h-4 object-contain" alt="pokeball" />
                     <span className="text-[9px] text-white/50 font-semibold uppercase tracking-wide">{pokeball.name}</span>
                   </>
+                ) : (
+                  <span className="text-[9px] text-white/40 font-semibold uppercase tracking-wide">No Pokeball</span>
                 )}
               </div>
 
-              {entry.has_shiny_charm && !isEvolved && (
+              {entry.has_shiny_charm && (
                 <div className="flex items-center" title="Shiny Charm Active">
                   <img
                     src="/img/items/shiny-charm.png"
