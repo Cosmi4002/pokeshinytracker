@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Sparkles } from 'lucide-react';
 import { GenderSelector } from '@/components/ui/GenderSelector';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -221,25 +221,59 @@ export function FinishHuntDialog({
           {formOptions.length > 0 && (
             <div className="space-y-2">
               <Label>Forma / variante</Label>
-              <Select value={form || 'default'} onValueChange={(v) => setForm(v === 'default' ? '' : v)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Forma base" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="default">Forma base</SelectItem>
-                  {formOptions.map((f) => (
-                    <SelectItem key={f.id} value={f.name}>
-                      {f.displayName}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  variant={form ? 'outline' : 'default'}
+                  size="sm"
+                  className="rounded-full"
+                  onClick={() => setForm('')}
+                >
+                  <Sparkles className="h-3 w-3 mr-1" />
+                  Forma base
+                </Button>
+                {formOptions.map((f) => (
+                  <Button
+                    key={f.name}
+                    type="button"
+                    variant={form === f.name ? 'default' : 'outline'}
+                    size="sm"
+                    className="rounded-full"
+                    onClick={() => setForm(f.name)}
+                  >
+                    {f.displayName}
+                  </Button>
+                ))}
+              </div>
             </div>
           )}
 
           <div className="space-y-2">
             <Label>Genere</Label>
-            <GenderSelector value={gender} onChange={setGender} />
+            {pokemonDetails?.hasGenderDifference ? (
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant={gender === 'female' ? 'outline' : 'default'}
+                  size="sm"
+                  className="rounded-full"
+                  onClick={() => setGender('')}
+                >
+                  Maschio
+                </Button>
+                <Button
+                  type="button"
+                  variant={gender === 'female' ? 'default' : 'outline'}
+                  size="sm"
+                  className="rounded-full"
+                  onClick={() => setGender('female')}
+                >
+                  Femmina
+                </Button>
+              </div>
+            ) : (
+              <GenderSelector value={gender} onChange={setGender} />
+            )}
           </div>
 
           <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
