@@ -246,10 +246,12 @@ export default function Collection() {
         const primary = sortByDate === 'desc' ? bDay - aDay : aDay - bDay;
         if (primary !== 0) return primary;
 
-        // Tie-break: if capture day is the same, keep first the one added earlier to collection.
+        // Tie-break on same capture day:
+        // - desc (recent -> old): newer added first
+        // - asc  (old -> recent): older added first
         const aCreated = new Date(a.created_at).getTime();
         const bCreated = new Date(b.created_at).getTime();
-        return aCreated - bCreated;
+        return sortByDate === 'desc' ? bCreated - aCreated : aCreated - bCreated;
       });
   }, [entries, searchQuery, filterGen, filterGame, filterPlaylist, playlistMap, pokemonById, pokemonByName, pokemonByDisplayName, sortByDate]);
 
