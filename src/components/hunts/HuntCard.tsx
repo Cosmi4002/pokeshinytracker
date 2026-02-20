@@ -2,9 +2,8 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Trash2, Clock, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { HUNTING_METHODS, getGameSpecificSpriteUrl } from '@/lib/pokemon-data';
+import { HUNTING_METHODS } from '@/lib/pokemon-data';
 import { calculateShinyStats } from '@/lib/pokemon-data';
-import { formatPokemonName } from '@/hooks/use-pokemon';
 import type { Tables } from '@/integrations/supabase/types';
 import { formatDistanceToNow } from 'date-fns';
 import { it } from 'date-fns/locale';
@@ -18,8 +17,8 @@ interface HuntCardProps {
     onEdit: (hunt: ActiveHuntRow) => void;
     onContinue?: (huntId: string) => void;
     layoutStyle?: string;
-    displayName?: string;
-    spriteUrl?: string;
+    resolvedDisplayName: string;
+    resolvedSpriteUrl: string;
 }
 
 export function HuntCard({
@@ -28,20 +27,14 @@ export function HuntCard({
     onEdit,
     onContinue,
     layoutStyle = 'grid',
-    displayName,
-    spriteUrl,
+    resolvedDisplayName,
+    resolvedSpriteUrl,
 }: HuntCardProps) {
     const { accentColor } = useRandomColor();
     const method = HUNTING_METHODS.find((m) => m.id === hunt.method);
     const stats = calculateShinyStats(hunt.counter || 0, hunt.method || 'gen9-random', hunt.has_shiny_charm || false);
-    const displayPokemonName = displayName || formatPokemonName(hunt.form || hunt.pokemon_name || '', hunt.pokemon_id);
-    const computedSpriteUrl = spriteUrl || (hunt.pokemon_id ? getGameSpecificSpriteUrl(
-        hunt.pokemon_id,
-        hunt.method || 'gen9-random',
-        hunt.pokemon_name || undefined,
-        hunt.form || undefined,
-        hunt.gender || undefined
-    ) : '');
+    const displayPokemonName = resolvedDisplayName;
+    const computedSpriteUrl = resolvedSpriteUrl;
 
 
     const timeAgo = hunt.updated_at
@@ -62,7 +55,7 @@ export function HuntCard({
                     <div className="flex items-center gap-4">
                         {/* Pokemon Sprite */}
                         <div className="flex-shrink-0">
-                            {computedSpriteUrl ? (
+                            {!!computedSpriteUrl ? (
                                 <img
                                     src={computedSpriteUrl}
                                     alt={displayPokemonName || 'Pokemon'}
@@ -130,7 +123,7 @@ export function HuntCard({
                 <CardContent className="pt-4 pb-3 px-3">
                     {/* Pokemon Sprite */}
                     <div className="flex justify-center mb-2">
-                        {computedSpriteUrl ? (
+                        {!!computedSpriteUrl ? (
                             <img
                                 src={computedSpriteUrl}
                                 alt={displayPokemonName || 'Pokemon'}
@@ -207,7 +200,7 @@ export function HuntCard({
             <CardContent className="pt-6">
                 {/* Pokemon Sprite */}
                 <div className="flex justify-center mb-4">
-                    {computedSpriteUrl ? (
+                    {!!computedSpriteUrl ? (
                         <img
                             src={computedSpriteUrl}
                             alt={displayPokemonName || 'Pokemon'}

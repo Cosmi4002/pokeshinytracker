@@ -20,6 +20,12 @@ type ResolvedHunt = {
     hunt: ActiveHuntRow;
     displayName: string;
     spriteUrl: string;
+    resolvedPokemon?: {
+        id: number;
+        baseId: number;
+        name: string;
+        displayName: string;
+    };
 };
 
 export default function Hunts() {
@@ -42,14 +48,22 @@ export default function Hunts() {
             .replace(/_+/g, '-');
 
     const pokemonByName = useMemo(() => {
-        const m = new Map<string, any>();
-        pokemon.forEach((p) => m.set(normalize(p.name), p));
+        const m = new Map<string, any[]>();
+        pokemon.forEach((p) => {
+            const key = normalize(p.name);
+            if (!m.has(key)) m.set(key, []);
+            m.get(key)!.push(p);
+        });
         return m;
     }, [pokemon]);
 
     const pokemonByDisplayName = useMemo(() => {
-        const m = new Map<string, any>();
-        pokemon.forEach((p) => m.set(normalize(p.displayName), p));
+        const m = new Map<string, any[]>();
+        pokemon.forEach((p) => {
+            const key = normalize(p.displayName);
+            if (!m.has(key)) m.set(key, []);
+            m.get(key)!.push(p);
+        });
         return m;
     }, [pokemon]);
 
@@ -62,18 +76,29 @@ export default function Hunts() {
         return m;
     }, [pokemon]);
 
+    const pickBest = (items: any[] | undefined, hunt: ActiveHuntRow) => {
+        if (!items || items.length === 0) return undefined;
+        if (items.length === 1) return items[0];
+        const target = hunt.pokemon_id || 0;
+        return (
+            items.find((p) => p.id === target) ||
+            items.find((p) => p.baseId === target) ||
+            items[0]
+        );
+    };
+
     const resolveHuntPokemon = (hunt: ActiveHuntRow) => {
         const formSlug = normalize(hunt.form);
         if (formSlug) {
-            const byForm = pokemonByName.get(formSlug);
+            const byForm = pickBest(pokemonByName.get(formSlug), hunt);
             if (byForm) return byForm;
         }
 
         const huntNameSlug = normalize(hunt.pokemon_name);
         if (huntNameSlug) {
-            const byName = pokemonByName.get(huntNameSlug);
+            const byName = pickBest(pokemonByName.get(huntNameSlug), hunt);
             if (byName) return byName;
-            const byDisplay = pokemonByDisplayName.get(huntNameSlug);
+            const byDisplay = pickBest(pokemonByDisplayName.get(huntNameSlug), hunt);
             if (byDisplay) return byDisplay;
         }
 
@@ -111,9 +136,68 @@ export default function Hunts() {
                 hunt,
                 displayName,
                 spriteUrl,
+                resolvedPokemon: resolved
+                    ? {
+                        id: resolved.id,
+                        baseId: resolved.baseId,
+                        name: resolved.name,
+                        displayName: resolved.displayName,
+                    }
+                    : undefined,
             };
         });
     }, [hunts, pokemonById, pokemonByDisplayName, pokemonByName]);
+
+    // Auto-fix stale hunt rows (old/wrong name/form) to keep hunts aligned with current pokedex data.
+    useEffect(() => {
+        if (!user || resolvedHunts.length === 0) return;
+
+        const staleRows = resolvedHunts.filter(({ hunt, resolvedPokemon, displayName }) => {
+            if (!resolvedPokemon) return false;
+            const expectedForm = resolvedPokemon.id !== resolvedPokemon.baseId ? resolvedPokemon.name : null;
+            const expectedPokemonId = resolvedPokemon.baseId;
+            return (
+                (hunt.pokemon_name || '') !== displayName ||
+                (hunt.form || null) !== expectedForm ||
+                (hunt.pokemon_id || 0) !== expectedPokemonId
+            );
+        });
+
+        if (staleRows.length === 0) return;
+
+        const syncRows = async () => {
+            for (const row of staleRows) {
+                if (!row.resolvedPokemon) continue;
+                const expectedForm = row.resolvedPokemon.id !== row.resolvedPokemon.baseId ? row.resolvedPokemon.name : null;
+
+                await supabase
+                    .from('active_hunts')
+                    .update({
+                        pokemon_id: row.resolvedPokemon.baseId,
+                        pokemon_name: row.displayName,
+                        form: expectedForm,
+                        updated_at: new Date().toISOString(),
+                    })
+                    .eq('id', row.hunt.id)
+                    .eq('user_id', user.id);
+            }
+
+            setHunts((prev) =>
+                prev.map((h) => {
+                    const fixed = staleRows.find((r) => r.hunt.id === h.id);
+                    if (!fixed || !fixed.resolvedPokemon) return h;
+                    return {
+                        ...h,
+                        pokemon_id: fixed.resolvedPokemon.baseId,
+                        pokemon_name: fixed.displayName,
+                        form: fixed.resolvedPokemon.id !== fixed.resolvedPokemon.baseId ? fixed.resolvedPokemon.name : null,
+                    };
+                })
+            );
+        };
+
+        void syncRows();
+    }, [resolvedHunts, user?.id]);
 
     const fetchHunts = async () => {
         if (!user) {
@@ -302,8 +386,8 @@ export default function Hunts() {
                                     onEdit={handleEditHunt}
                                     onContinue={handleContinueHunt}
                                     layoutStyle={preferences.layout_style || 'grid'}
-                                    displayName={displayName}
-                                    spriteUrl={spriteUrl}
+                                    resolvedDisplayName={displayName}
+                                    resolvedSpriteUrl={spriteUrl}
                                 />
                                 );
                             })}
