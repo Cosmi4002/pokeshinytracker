@@ -201,29 +201,35 @@ export default function Collection() {
 
   const filteredEntries = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
-    return entries.filter((entry) => {
-      if (entry.form && isFormEliminated(entry.form)) return false;
-      const poke = resolveEntryPokemon(entry);
-      if (query) {
-        const haystack = [
-          entry.pokemon_name,
-          entry.form || '',
-          poke?.displayName || '',
-          poke?.name || '',
-          String(entry.pokemon_id),
-        ].join(' ').toLowerCase();
-        if (!haystack.includes(query)) return false;
-      }
-      if (filterGen !== 'all') {
-        if (poke && poke.generation.toString() !== filterGen) return false;
-      }
-      if (filterGame !== 'all' && entry.game !== filterGame) return false;
-      if (filterPlaylist !== 'all') {
-        const plName = entry.playlist_id ? playlistMap[entry.playlist_id] : null;
-        if (plName !== filterPlaylist) return false;
-      }
-      return true;
-    });
+    return entries
+      .filter((entry) => {
+        if (entry.form && isFormEliminated(entry.form)) return false;
+        const poke = resolveEntryPokemon(entry);
+        if (query) {
+          const haystack = [
+            entry.pokemon_name,
+            entry.form || '',
+            poke?.displayName || '',
+            poke?.name || '',
+            String(entry.pokemon_id),
+          ].join(' ').toLowerCase();
+          if (!haystack.includes(query)) return false;
+        }
+        if (filterGen !== 'all') {
+          if (poke && poke.generation.toString() !== filterGen) return false;
+        }
+        if (filterGame !== 'all' && entry.game !== filterGame) return false;
+        if (filterPlaylist !== 'all') {
+          const plName = entry.playlist_id ? playlistMap[entry.playlist_id] : null;
+          if (plName !== filterPlaylist) return false;
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        const aTime = new Date(a.caught_date || a.created_at).getTime();
+        const bTime = new Date(b.caught_date || b.created_at).getTime();
+        return aTime - bTime;
+      });
   }, [entries, searchQuery, filterGen, filterGame, filterPlaylist, playlistMap, pokemonById, pokemonByName, pokemonByDisplayName]);
 
   if (authLoading || (user && loading)) {
