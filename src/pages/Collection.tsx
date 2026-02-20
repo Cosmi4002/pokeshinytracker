@@ -54,6 +54,14 @@ export default function Collection() {
       .replace(/\s+/g, '-')
       .replace(/_+/g, '-');
 
+  const isAbortLikeError = (err: unknown) => {
+    if (!err || typeof err !== 'object') return false;
+    const maybe = err as { name?: string; message?: string };
+    const name = (maybe.name || '').toLowerCase();
+    const message = (maybe.message || '').toLowerCase();
+    return name.includes('abort') || message.includes('aborted');
+  };
+
   const fetchData = async () => {
     if (!user) {
       setEntries([]);
@@ -75,6 +83,10 @@ export default function Collection() {
       setEntries(shiniesRes.data || []);
       setPlaylists(playlistsRes.data || []);
     } catch (err: any) {
+      if (isAbortLikeError(err)) {
+        // Avoid noisy errors and avoid wiping UI for transient aborted requests.
+        return;
+      }
       toast({
         variant: 'destructive',
         title: 'Errore',

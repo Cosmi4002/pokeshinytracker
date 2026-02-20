@@ -20,6 +20,13 @@ export default function Counter() {
   const navigate = useNavigate();
   const [activeHunts, setActiveHunts] = useState<ActiveHunt[]>([]);
   const [loading, setLoading] = useState(true);
+  const isAbortLikeError = (err: unknown) => {
+    if (!err || typeof err !== 'object') return false;
+    const maybe = err as { name?: string; message?: string };
+    const name = (maybe.name || '').toLowerCase();
+    const message = (maybe.message || '').toLowerCase();
+    return name.includes('abort') || message.includes('aborted');
+  };
 
   // If huntId is present, we are in "Single Focus Mode"
   const isSingleView = !!huntId;
@@ -32,19 +39,30 @@ export default function Counter() {
 
     const fetchHunts = async () => {
       setLoading(true);
-      const { data } = await supabase
-        .from('active_hunts')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('is_visible_on_counter', true) // Solo cacce visibili
-        .order('order_index', { ascending: true }) // Ordina per indice
-        .order('updated_at', { ascending: false })
-        .limit(MAX_ACTIVE_COUNTERS); // Fetch up to 9 most recent hunts
+      try {
+        const { data, error } = await supabase
+          .from('active_hunts')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('is_visible_on_counter', true) // Solo cacce visibili
+          .order('order_index', { ascending: true }) // Ordina per indice
+          .order('updated_at', { ascending: false })
+          .limit(MAX_ACTIVE_COUNTERS); // Fetch up to 9 most recent hunts
 
-      if (data) {
-        setActiveHunts(data);
+        if (error && !isAbortLikeError(error)) {
+          console.error('Error fetching hunts:', error);
+        }
+
+        if (data) {
+          setActiveHunts(data);
+        }
+      } catch (err) {
+        if (!isAbortLikeError(err)) {
+          console.error('Unexpected fetch hunts error:', err);
+        }
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchHunts();

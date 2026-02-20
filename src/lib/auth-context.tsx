@@ -50,8 +50,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUser(session?.user ?? null);
         })
         .catch(() => {
-          setSession(null);
-          setUser(null);
+          // Keep existing auth state on transient network aborts/timeouts.
+          // onAuthStateChange will reconcile when the SDK recovers.
         })
         .finally(() => {
           if (timeoutId) clearTimeout(timeoutId);
