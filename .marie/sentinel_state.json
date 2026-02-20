@@ -2,10 +2,6 @@
   "lastEntropy": 0,
   "history": [
     {
-      "date": "2026-02-20T03:32:05.624Z",
-      "entropy": 0
-    },
-    {
       "date": "2026-02-20T03:37:05.393Z",
       "entropy": 0
     },
@@ -80,6 +76,10 @@
     {
       "date": "2026-02-20T05:07:50.972Z",
       "entropy": 0
+    },
+    {
+      "date": "2026-02-20T05:12:10.819Z",
+      "entropy": 0
     }
   ],
   "fileHashes": {
@@ -93,6 +93,7 @@
     "src\\components\\collection\\EvolveDialog.tsx": 1771543818622.999,
     "src\\components\\collection\\ManagePlaylistsDialog.tsx": 1770001432104.1636,
     "src\\components\\collection\\ShinyCard.tsx": 1771546249268.8672,
+    "src\\components\\counter\\FinishHuntDialog.tsx": 1771562928583.2146,
     "src\\components\\counter\\MethodSelector.tsx": 1770967853939.6943,
     "src\\components\\counter\\PokemonSelector.tsx": 1771550926082.0803,
     "src\\components\\counter\\ShinyCounter.tsx": 1771560033876.7212,
@@ -107,8 +108,8 @@
     "src\\components\\settings\\ColorPicker.tsx": 1769982034778.8323,
     "src\\components\\ui\\accordion.tsx": 1769818179562.0288,
     "src\\components\\ui\\alert-dialog.tsx": 1769818179251.7563,
-    "src\\components\\ui\\alert.tsx": 1769818179519.5784,
     "src\\components\\ui\\aspect-ratio.tsx": 1769818179137.069,
+    "src\\components\\ui\\alert.tsx": 1769818179519.5784,
     "src\\components\\ui\\avatar.tsx": 1769818179063.0676,
     "src\\components\\ui\\badge.tsx": 1769818180168.3628,
     "src\\components\\ui\\breadcrumb.tsx": 1769818180102.8264,
@@ -191,7 +192,6 @@
     "src\\vite-env.d.ts": 1769818177955.2544,
     "tailwind.config.ts": 1770515404222.507,
     "vite.config.ts": 1769872587250.9226,
-    "vitest.config.ts": 1769818177774.2556,
-    "src\\components\\counter\\FinishHuntDialog.tsx": 1771562928583.2146
+    "vitest.config.ts": 1769818177774.2556
   }
 }

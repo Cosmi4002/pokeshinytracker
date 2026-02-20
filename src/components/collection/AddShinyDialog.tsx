@@ -148,7 +148,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
         pokemon_name: finalDisplayName,
         sprite_url: finalSpriteUrl,
         form: form || null,
-        gender: pokemonDetails?.hasGenderDifference ? (gender || null) : null,
+        gender: gender || null,
         has_shiny_charm: hasShinyCharm,
         pokeball,
         game,
@@ -221,9 +221,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
                 </Select>
 
                 {/* Gender Selector (icons) */}
-                {pokemonDetails?.hasGenderDifference && (
-                  <GenderSelector value={gender} onChange={setGender} />
-                )}
+                <GenderSelector value={gender} onChange={setGender} />
               </div>
             </div>
           )}
