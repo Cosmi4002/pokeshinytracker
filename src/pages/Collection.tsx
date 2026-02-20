@@ -45,6 +45,7 @@ export default function Collection() {
   const [filterGen, setFilterGen] = useState<string>('all');
   const [filterGame, setFilterGame] = useState<string>('all');
   const [filterPlaylist, setFilterPlaylist] = useState<string>('all');
+  const [sortByDate, setSortByDate] = useState<'desc' | 'asc'>('desc');
   const [searchQuery, setSearchQuery] = useState('');
   const normalize = (value: string | null | undefined) =>
     (value || '')
@@ -228,9 +229,9 @@ export default function Collection() {
       .sort((a, b) => {
         const aTime = new Date(a.caught_date || a.created_at).getTime();
         const bTime = new Date(b.caught_date || b.created_at).getTime();
-        return bTime - aTime;
+        return sortByDate === 'desc' ? bTime - aTime : aTime - bTime;
       });
-  }, [entries, searchQuery, filterGen, filterGame, filterPlaylist, playlistMap, pokemonById, pokemonByName, pokemonByDisplayName]);
+  }, [entries, searchQuery, filterGen, filterGame, filterPlaylist, playlistMap, pokemonById, pokemonByName, pokemonByDisplayName, sortByDate]);
 
   if (authLoading || (user && loading)) {
     return (
@@ -359,7 +360,7 @@ export default function Collection() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                 <div>
                   <Label>Cerca</Label>
                   <Input
@@ -397,6 +398,18 @@ export default function Collection() {
                           {game.name}
                         </SelectItem>
                       ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Ordine data</Label>
+                  <Select value={sortByDate} onValueChange={(v) => setSortByDate(v as 'desc' | 'asc')}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="desc">Recenti -&gt; Vecchi</SelectItem>
+                      <SelectItem value="asc">Vecchi -&gt; Recenti</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
