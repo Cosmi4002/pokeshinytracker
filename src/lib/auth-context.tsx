@@ -6,7 +6,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, username: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
@@ -67,7 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, username: string) => {
     if (!isSupabaseConfigured) {
       return { error: new Error(getSupabaseConfigErrorMessage() ?? 'Supabase non configurato') };
     }
@@ -80,7 +80,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       email,
       password,
       options: {
-        emailRedirectTo: redirectUrl
+        emailRedirectTo: redirectUrl,
+        data: {
+          username: username.trim(),
+        },
       }
     });
     

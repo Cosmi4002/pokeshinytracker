@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { z } from 'zod';
-import { Sparkles, Mail, Lock, Loader2, ArrowRight, ChevronLeft } from 'lucide-react';
+import { Sparkles, Mail, Lock, Loader2, ArrowRight, ChevronLeft, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -79,6 +79,9 @@ const authSchema = z.object({
   email: z.string().email('Inserisci un email valida'),
   password: z.string().min(6, 'Minimo 6 caratteri'),
 });
+const signUpSchema = authSchema.extend({
+  username: z.string().min(3, 'Username minimo 3 caratteri').max(24, 'Username massimo 24 caratteri'),
+});
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -88,7 +91,8 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [username, setUsername] = useState('');
+  const [errors, setErrors] = useState<{ email?: string; password?: string; username?: string }>({});
   const supabaseConfigError = getSupabaseConfigErrorMessage();
 
   useEffect(() => {
@@ -108,6 +112,25 @@ export default function Auth() {
         err.errors.forEach((error) => {
           if (error.path[0] === 'email') fieldErrors.email = error.message;
           if (error.path[0] === 'password') fieldErrors.password = error.message;
+        });
+        setErrors(fieldErrors);
+      }
+      return false;
+    }
+  };
+
+  const validateSignUpForm = () => {
+    try {
+      signUpSchema.parse({ email, password, username: username.trim() });
+      setErrors({});
+      return true;
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        const fieldErrors: { email?: string; password?: string; username?: string } = {};
+        err.errors.forEach((error) => {
+          if (error.path[0] === 'email') fieldErrors.email = error.message;
+          if (error.path[0] === 'password') fieldErrors.password = error.message;
+          if (error.path[0] === 'username') fieldErrors.username = error.message;
         });
         setErrors(fieldErrors);
       }
@@ -139,9 +162,9 @@ export default function Auth() {
       toast({ variant: 'destructive', title: 'Supabase non configurato', description: supabaseConfigError ?? 'Configura Supabase.' });
       return;
     }
-    if (!validateForm()) return;
+    if (!validateSignUpForm()) return;
     setLoading(true);
-    const { error } = await signUp(email, password);
+    const { error } = await signUp(email, password, username.trim());
     setLoading(false);
     if (error) {
       toast({ variant: 'destructive', title: 'Errore registrazione', description: error.message });
@@ -274,6 +297,16 @@ export default function Auth() {
               <TabsContent value="register" className="space-y-6 mt-0 animate-in fade-in slide-in-from-bottom-8 duration-700">
                 <form onSubmit={handleSignUp} className="space-y-5">
                   <div className="space-y-4">
+                    <FloatingInput
+                      label="Username"
+                      type="text"
+                      icon={User}
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      disabled={loading}
+                      accentColor={accentColor}
+                      error={errors.username}
+                    />
                     <FloatingInput
                       label="Indirizzo Email"
                       type="email"

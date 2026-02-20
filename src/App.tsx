@@ -13,6 +13,7 @@ import PokemonDetails from "./pages/PokemonDetails";
 import PokedexManager from "./pages/PokedexManager";
 import Collection from "./pages/Collection";
 import Memo from "./pages/Memo";
+import UserCollectionsSearch from "./pages/UserCollectionsSearch";
 import { ScrollRestoration } from "@/components/layout/ScrollRestoration";
 
 import NotFound from "./pages/NotFound";
@@ -41,6 +42,7 @@ function AppContent() {
           <Route path="/pokedex/manage" element={<PokedexManager />} />
           <Route path="/collection" element={<Collection />} />
           <Route path="/memo" element={<Memo />} />
+          <Route path="/users" element={<UserCollectionsSearch />} />
           <Route path="/debug" element={<Debug />} />
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

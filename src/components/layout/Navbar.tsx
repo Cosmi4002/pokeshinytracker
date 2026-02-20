@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Calculator, Search, Grid3X3, LogOut, User, Sparkles, Settings2, FileText } from 'lucide-react';
+import { Calculator, Search, Grid3X3, LogOut, User, Sparkles, Settings2, FileText, Pencil, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { supabaseProjectRef } from '@/integrations/supabase/client';
@@ -13,19 +13,115 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ThemeCustomizer } from '@/components/layout/ThemeCustomizer';
 import { useRandomColor } from '@/lib/random-color-context';
+import { useEffect, useMemo, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 export function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { accentColor } = useRandomColor();
+  const { toast } = useToast();
+  const [profileUsername, setProfileUsername] = useState<string | null>(null);
 
   const navLinks = [
     { to: '/counter', label: 'Counter', icon: Calculator },
     { to: '/pokedex', label: 'Pokedex', icon: Search },
     { to: '/collection', label: 'Collection', icon: Grid3X3 },
     { to: '/memo', label: 'Memo', icon: FileText },
+    { to: '/users', label: 'Users', icon: Users },
   ];
+
+  const metadataUsername = useMemo(() => {
+    const raw = (user?.user_metadata as Record<string, unknown> | undefined)?.username;
+    return typeof raw === 'string' && raw.trim() ? raw.trim() : null;
+  }, [user?.user_metadata]);
+
+  const displayUsername = profileUsername || metadataUsername;
+
+  const handleSetUsername = async () => {
+    if (!user) return;
+    const current = displayUsername || '';
+    const next = window.prompt('Inserisci username (3-24 caratteri):', current);
+    if (next === null) return;
+
+    const username = next.trim();
+    if (username.length < 3 || username.length > 24) {
+      toast({
+        variant: 'destructive',
+        title: 'Username non valido',
+        description: 'Deve avere tra 3 e 24 caratteri.',
+      });
+      return;
+    }
+
+    try {
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .upsert(
+          {
+            user_id: user.id,
+            username,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: 'user_id' }
+        );
+
+      if (profileError) throw profileError;
+
+      const { error: metadataError } = await supabase.auth.updateUser({
+        data: { username },
+      });
+      if (metadataError) {
+        console.warn('Could not sync username to auth metadata:', metadataError);
+      }
+
+      setProfileUsername(username);
+      toast({
+        title: 'Username aggiornato',
+        description: `Nuovo username: @${username}`,
+      });
+    } catch (err: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Errore aggiornamento username',
+        description: err?.message || 'Impossibile aggiornare username.',
+      });
+    }
+  };
+
+  useEffect(() => {
+    let active = true;
+    if (!user) {
+      setProfileUsername(null);
+      return;
+    }
+
+    const loadProfileUsername = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('username')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (!active) return;
+        if (error) {
+          setProfileUsername(null);
+          return;
+        }
+        setProfileUsername(data?.username ?? null);
+      } catch {
+        if (active) setProfileUsername(null);
+      }
+    };
+
+    loadProfileUsername();
+    return () => {
+      active = false;
+    };
+  }, [user?.id]);
 
   return (
     <nav className="sticky top-0 z-50 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
@@ -93,8 +189,19 @@ export function Navbar() {
                   <FileText className="mr-2 h-4 w-4" />
                   Memo
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/users')}>
+                  <Users className="mr-2 h-4 w-4" />
+                  Users
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleSetUsername}>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Imposta username
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="text-muted-foreground text-xs flex flex-col items-start gap-1">
+                  <span className="font-semibold text-foreground">
+                    {displayUsername ? `@${displayUsername}` : 'Username non impostato'}
+                  </span>
                   <span className="font-semibold text-foreground">{user.email}</span>
                   <span>ID: {user.id.slice(0, 8)}...</span>
                   <span>Project: {supabaseProjectRef}</span>
