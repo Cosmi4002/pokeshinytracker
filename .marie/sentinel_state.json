@@ -2,22 +2,6 @@
   "lastEntropy": 0,
   "history": [
     {
-      "date": "2026-02-20T00:17:29.896Z",
-      "entropy": 0
-    },
-    {
-      "date": "2026-02-20T00:22:07.489Z",
-      "entropy": 0
-    },
-    {
-      "date": "2026-02-20T00:27:05.764Z",
-      "entropy": 0
-    },
-    {
-      "date": "2026-02-20T00:32:11.592Z",
-      "entropy": 0
-    },
-    {
       "date": "2026-02-20T00:37:21.607Z",
       "entropy": 0
     },
@@ -80,6 +64,22 @@
     {
       "date": "2026-02-20T01:52:05.279Z",
       "entropy": 0
+    },
+    {
+      "date": "2026-02-20T01:57:04.924Z",
+      "entropy": 0
+    },
+    {
+      "date": "2026-02-20T02:02:05.527Z",
+      "entropy": 0
+    },
+    {
+      "date": "2026-02-20T02:07:06.109Z",
+      "entropy": 0
+    },
+    {
+      "date": "2026-02-20T02:12:28.296Z",
+      "entropy": 0
     }
   ],
   "fileHashes": {
@@ -96,7 +96,7 @@
     "src\\components\\counter\\FinishHuntDialog.tsx": 1771550955991.3438,
     "src\\components\\counter\\MethodSelector.tsx": 1770967853939.6943,
     "src\\components\\counter\\PokemonSelector.tsx": 1771550926082.0803,
-    "src\\components\\counter\\ShinyCounter.tsx": 1771550941891.6743,
+    "src\\components\\counter\\ShinyCounter.tsx": 1771553365058.1904,
     "src\\components\\ErrorBoundary.tsx": 1771195107706.245,
     "src\\components\\hunts\\EditHuntDialog.tsx": 1771479262631.3792,
     "src\\components\\hunts\\HuntCard.tsx": 1771535042236.989,
@@ -191,7 +191,7 @@
     "src\\test\\setup.ts": 1769818178047.0332,
     "src\\vite-env.d.ts": 1769818177955.2544,
     "tailwind.config.ts": 1770515404222.507,
-    "vite.config.ts": 1769872587250.9226,
-    "vitest.config.ts": 1769818177774.2556
+    "vitest.config.ts": 1769818177774.2556,
+    "vite.config.ts": 1769872587250.9226
   }
 }
