@@ -17,6 +17,7 @@ import { AddShinyDialog } from '@/components/collection/AddShinyDialog';
 import { CreatePlaylistDialog } from '@/components/collection/CreatePlaylistDialog';
 import { ManagePlaylistsDialog } from '@/components/collection/ManagePlaylistsDialog';
 import { EditShinyDialog } from '@/components/collection/EditShinyDialog';
+import { SetEvolutionDialog } from '@/components/collection/SetEvolutionDialog';
 import { ShinyCard } from '@/components/collection/ShinyCard';
 import { useGlobalCollectionThemes } from '@/hooks/use-global-collection-themes';
 import { isFormEliminated } from '@/lib/form-filters';
@@ -24,6 +25,20 @@ import type { Tables } from '@/integrations/supabase/types';
 
 type CaughtShinyRow = Tables<'caught_shinies'>;
 type PlaylistRow = Tables<'shiny_playlists'>;
+const EVOLVED_FROM_LOCAL_KEY = 'collection_evolved_from_v1';
+
+type EvolvedFromLocalMap = Record<string, { id: number; name: string }>;
+
+function readEvolvedFromLocalMap(): EvolvedFromLocalMap {
+  try {
+    const raw = localStorage.getItem(EVOLVED_FROM_LOCAL_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw) as EvolvedFromLocalMap;
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
+}
 
 export default function Collection() {
   const { user, loading: authLoading } = useAuth();
@@ -40,6 +55,8 @@ export default function Collection() {
   const [isManagePlaylistsDialogOpen, setIsManagePlaylistsDialogOpen] = useState(false);
   const [editEntry, setEditEntry] = useState<CaughtShinyRow | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [evolveEntry, setEvolveEntry] = useState<CaughtShinyRow | null>(null);
+  const [isEvolveDialogOpen, setIsEvolveDialogOpen] = useState(false);
 
   // Filters
   const [filterGen, setFilterGen] = useState<string>('all');
@@ -81,7 +98,19 @@ export default function Collection() {
       if (shiniesRes.error) throw shiniesRes.error;
       if (playlistsRes.error) throw playlistsRes.error;
 
-      setEntries(shiniesRes.data || []);
+      const localMap = readEvolvedFromLocalMap();
+      const merged = (shiniesRes.data || []).map((row) => {
+        const local = localMap[row.id];
+        if (!local) return row;
+        if ((row as any).evolved_from_id) return row;
+        return {
+          ...row,
+          evolved_from_id: local.id,
+          evolved_from_name: local.name,
+        } as any;
+      });
+
+      setEntries(merged as CaughtShinyRow[]);
       setPlaylists(playlistsRes.data || []);
     } catch (err: any) {
       if (isAbortLikeError(err)) {
@@ -124,28 +153,9 @@ export default function Collection() {
     }
   };
 
-  const handleToggleEvolved = async (entry: CaughtShinyRow) => {
-    if (!user) return;
-    const nextValue = !(entry.is_evolved === true);
-    try {
-      const { error } = await supabase
-        .from('caught_shinies')
-        .update({ is_evolved: nextValue })
-        .eq('id', entry.id)
-        .eq('user_id', user.id);
-
-      if (error) throw error;
-
-      setEntries((prev) =>
-        prev.map((e) => (e.id === entry.id ? { ...e, is_evolved: nextValue } : e))
-      );
-    } catch (err: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Errore',
-        description: err.message || 'Impossibile aggiornare lo stato evoluzione',
-      });
-    }
+  const handleOpenEvolveDialog = (entry: CaughtShinyRow) => {
+    setEvolveEntry(entry);
+    setIsEvolveDialogOpen(true);
   };
 
   const playlistMap = useMemo(() => {
@@ -371,6 +381,15 @@ export default function Collection() {
               playlists={playlists.map((p) => ({ id: p.id, name: p.name }))}
               onSuccess={fetchData}
             />
+            <SetEvolutionDialog
+              open={isEvolveDialogOpen}
+              onOpenChange={(open) => {
+                setIsEvolveDialogOpen(open);
+                if (!open) setEvolveEntry(null);
+              }}
+              entry={evolveEntry}
+              onSuccess={fetchData}
+            />
           </div>
 
           {/* Filters */}
@@ -484,7 +503,7 @@ export default function Collection() {
                     setIsEditDialogOpen(true);
                   }}
                   onDelete={() => handleDelete(entry.id)}
-                  onToggleEvolved={() => handleToggleEvolved(entry)}
+                  onToggleEvolved={() => handleOpenEvolveDialog(entry)}
                 />
                 );
               })}

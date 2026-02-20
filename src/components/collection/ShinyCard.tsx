@@ -31,6 +31,8 @@ interface ShinyCardProps {
 
 export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverride, applyBlackEffect = false, spriteName }: ShinyCardProps) {
   const isEvolved = entry.is_evolved === true;
+  const evolvedFromId = (entry as any).evolved_from_id as number | null | undefined;
+  const evolvedFromName = (entry as any).evolved_from_name as string | null | undefined;
 
   const theme = useMemo(() => themeOverride || getGameTheme(entry.game), [entry.game, themeOverride]);
   const pokeball = useMemo(() => POKEBALLS.find((b) => b.id === entry.pokeball), [entry.pokeball]);
@@ -46,6 +48,14 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   }, [entry.pokemon_id, entry.pokemon_name, entry.form, entry.gender, spriteName]);
 
   const displayName = entry.pokemon_name;
+  const evolvedFromSpriteUrl = useMemo(() => {
+    if (!isEvolved || !evolvedFromId) return '';
+    const byName = getPokemonSpriteUrl(evolvedFromId, {
+      shiny: true,
+      name: evolvedFromName || undefined,
+    });
+    return byName || getPokemonSpriteUrl(evolvedFromId, { shiny: true });
+  }, [isEvolved, evolvedFromId, evolvedFromName]);
 
   const formatDate = useCallback((dateString: string) => {
     if (!dateString) return '--';
@@ -164,11 +174,24 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
           </div>
 
           {isEvolved && (
-            <div
-              className="h-7 w-7 rounded-full bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 flex items-center justify-center backdrop-blur-md"
-              title="Pokemon evoluto"
-            >
-              <ArrowUpCircle className="h-3.5 w-3.5" />
+            <div className="flex flex-col items-center gap-1 w-9">
+              <div
+                className="h-7 w-7 rounded-full bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 flex items-center justify-center backdrop-blur-md"
+                title="Pokemon evoluto"
+              >
+                <ArrowUpCircle className="h-3.5 w-3.5" />
+              </div>
+              {evolvedFromSpriteUrl && (
+                <img
+                  src={evolvedFromSpriteUrl}
+                  alt="Evoluto da"
+                  className="h-9 w-9 object-contain drop-shadow block mx-auto"
+                  title={`Evoluto da ${evolvedFromName || 'pokemon precedente'}`}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = getPokemonSpriteUrl(evolvedFromId!, { shiny: true });
+                  }}
+                />
+              )}
             </div>
           )}
         </div>
