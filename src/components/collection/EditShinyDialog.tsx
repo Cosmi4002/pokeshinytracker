@@ -112,8 +112,19 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
   useEffect(() => {
     if (open && entry) {
       const formMatch = entry.form ? pokemonList.find((p) => p.name === entry.form) : undefined;
-      const idMatch = pokemonList.find((p) => p.id === entry.pokemon_id);
-      const resolved = formMatch || idMatch;
+      const displayNameMatch = pokemonList.find(
+        (p) => p.displayName.toLowerCase() === (entry.pokemon_name || '').toLowerCase()
+      );
+      const idCandidates = pokemonList.filter((p) => p.id === entry.pokemon_id);
+      const idMatch =
+        idCandidates.length <= 1
+          ? idCandidates[0]
+          : idCandidates.find(
+            (p) =>
+              p.displayName.toLowerCase() === (entry.pokemon_name || '').toLowerCase() ||
+              p.name.toLowerCase() === (entry.form || '').toLowerCase()
+          );
+      const resolved = formMatch || displayNameMatch || idMatch;
       const resolvedBaseId = resolved?.baseId ?? entry.pokemon_id;
 
       setPokemonId(resolvedBaseId);
