@@ -270,6 +270,33 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
     return () => clearTimeout(timer);
   }, [user?.id, loading, counter, incrementAmount, selectedPokemonId, selectedPokemonName, selectedMethod, hasShinyCharm, selectedForm, selectedGender]);
 
+  // Fast-sync variant/name changes so Hunts page reflects them immediately after navigation.
+  useEffect(() => {
+    if (!user || isInitialLoadRef.current) return;
+    if (!activeHuntIdRef.current) return;
+
+    const syncVariantNow = async () => {
+      try {
+        await supabase
+          .from('active_hunts')
+          .update({
+            pokemon_id: selectedPokemonId,
+            pokemon_name: selectedPokemonName ?? '',
+            form: selectedForm || null,
+            gender: selectedGender || null,
+            method: selectedMethod.id,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', activeHuntIdRef.current)
+          .eq('user_id', user.id);
+      } catch {
+        // non-blocking best-effort sync
+      }
+    };
+
+    void syncVariantNow();
+  }, [user?.id, selectedPokemonId, selectedPokemonName, selectedForm, selectedGender, selectedMethod.id]);
+
   // Ensure latest hunt variant/name is persisted when unmounting (e.g. hiding/removing a counter card).
   useEffect(() => {
     return () => {
