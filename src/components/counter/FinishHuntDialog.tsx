@@ -125,6 +125,13 @@ export function FinishHuntDialog({
     });
   }, [pokemonId, gender, form, pokemonName, formOptions, pokemonDetails]);
 
+  const selectedDisplayName = useMemo(() => {
+    if (form) {
+      return formOptions.find(f => f.name === form)?.displayName || formatPokemonName(pokemonName, pokemonId);
+    }
+    return formatPokemonName(pokemonName, pokemonId);
+  }, [form, formOptions, pokemonName, pokemonId]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -186,7 +193,7 @@ export function FinishHuntDialog({
 
       toast({
         title: '🎉 Caccia completata!',
-        description: `${formatPokemonName(pokemonName, pokemonId)} shiny è stato aggiunto alla tua collezione!`,
+        description: `${finalDisplayName} shiny è stato aggiunto alla tua collezione!`,
       });
 
       onOpenChange(false);
@@ -224,7 +231,7 @@ export function FinishHuntDialog({
               }}
             />
             <div>
-              <h3 className="font-bold text-lg">{formatPokemonName(pokemonName, pokemonId)}</h3>
+              <h3 className="font-bold text-lg">{selectedDisplayName}</h3>
               <p className="text-sm text-muted-foreground">#{pokemonId.toString().padStart(4, '0')}</p>
             </div>
           </div>
