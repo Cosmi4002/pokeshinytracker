@@ -19,8 +19,7 @@ interface HuntCardProps {
     onContinue?: (huntId: string) => void;
     layoutStyle?: string;
     displayName?: string;
-    spriteName?: string;
-    spritePokemonId?: number | null;
+    spriteUrl?: string;
 }
 
 export function HuntCard({
@@ -30,15 +29,19 @@ export function HuntCard({
     onContinue,
     layoutStyle = 'grid',
     displayName,
-    spriteName,
-    spritePokemonId,
+    spriteUrl,
 }: HuntCardProps) {
     const { accentColor } = useRandomColor();
     const method = HUNTING_METHODS.find((m) => m.id === hunt.method);
     const stats = calculateShinyStats(hunt.counter || 0, hunt.method || 'gen9-random', hunt.has_shiny_charm || false);
     const displayPokemonName = displayName || formatPokemonName(hunt.form || hunt.pokemon_name || '', hunt.pokemon_id);
-    const spriteId = spritePokemonId || hunt.pokemon_id;
-    const spriteLookupName = spriteName || hunt.form || hunt.pokemon_name || undefined;
+    const computedSpriteUrl = spriteUrl || (hunt.pokemon_id ? getGameSpecificSpriteUrl(
+        hunt.pokemon_id,
+        hunt.method || 'gen9-random',
+        hunt.pokemon_name || undefined,
+        hunt.form || undefined,
+        hunt.gender || undefined
+    ) : '');
 
 
     const timeAgo = hunt.updated_at
@@ -59,15 +62,9 @@ export function HuntCard({
                     <div className="flex items-center gap-4">
                         {/* Pokemon Sprite */}
                         <div className="flex-shrink-0">
-                            {spriteId ? (
+                            {computedSpriteUrl ? (
                                 <img
-                                    src={getGameSpecificSpriteUrl(
-                                        spriteId,
-                                        hunt.method || 'gen9-random',
-                                        spriteLookupName,
-                                        hunt.form || undefined,
-                                        hunt.gender || undefined
-                                    ) || ''}
+                                    src={computedSpriteUrl}
                                     alt={displayPokemonName || 'Pokemon'}
                                     className="w-16 h-16 object-contain pokemon-sprite"
                                     onError={(e) => {
@@ -133,15 +130,9 @@ export function HuntCard({
                 <CardContent className="pt-4 pb-3 px-3">
                     {/* Pokemon Sprite */}
                     <div className="flex justify-center mb-2">
-                        {spriteId ? (
+                        {computedSpriteUrl ? (
                             <img
-                                src={getGameSpecificSpriteUrl(
-                                    spriteId,
-                                    hunt.method || 'gen9-random',
-                                    spriteLookupName,
-                                    hunt.form || undefined,
-                                    hunt.gender || undefined
-                                ) || ''}
+                                src={computedSpriteUrl}
                                 alt={displayPokemonName || 'Pokemon'}
                                 className="w-16 h-16 object-contain pokemon-sprite"
                                 onError={(e) => {
@@ -216,15 +207,9 @@ export function HuntCard({
             <CardContent className="pt-6">
                 {/* Pokemon Sprite */}
                 <div className="flex justify-center mb-4">
-                    {spriteId ? (
+                    {computedSpriteUrl ? (
                         <img
-                            src={getGameSpecificSpriteUrl(
-                                spriteId,
-                                hunt.method || 'gen9-random',
-                                spriteLookupName,
-                                hunt.form || undefined,
-                                hunt.gender || undefined
-                            ) || ''}
+                            src={computedSpriteUrl}
                             alt={displayPokemonName || 'Pokemon'}
                             className="w-24 h-24 lg:w-40 lg:h-40 object-contain pokemon-sprite"
                             onError={(e) => {

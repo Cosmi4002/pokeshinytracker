@@ -107,7 +107,12 @@ export function PokemonSelector({ value, valueName, onChange }: PokemonSelectorP
             value={searchTerm}
             onValueChange={setSearchTerm}
           />
-          <CommandList className="max-h-[min(320px,50dvh)] overflow-y-auto">
+          <CommandList
+            className="max-h-[min(320px,50dvh)] overflow-y-auto overscroll-contain touch-pan-y"
+            style={{ WebkitOverflowScrolling: 'touch' }}
+            onWheel={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
+          >
             {loading && <div className="p-4 text-sm text-center text-muted-foreground">Loading...</div>}
             {!loading && filteredPokemon.length === 0 && (
               <div className="py-6 text-center text-sm text-muted-foreground">No Pokémon found.</div>

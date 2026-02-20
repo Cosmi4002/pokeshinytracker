@@ -11,10 +11,16 @@ import { HuntCard } from '@/components/hunts/HuntCard';
 import { EditHuntDialog } from '@/components/hunts/EditHuntDialog';
 import { useUserPreferences } from '@/hooks/use-user-preferences';
 import { useRandomColor } from '@/lib/random-color-context';
-import { usePokemonList } from '@/hooks/use-pokemon';
+import { usePokemonList, formatPokemonName } from '@/hooks/use-pokemon';
+import { getGameSpecificSpriteUrl } from '@/lib/pokemon-data';
 import type { Tables } from '@/integrations/supabase/types';
 
 type ActiveHuntRow = Tables<'active_hunts'>;
+type ResolvedHunt = {
+    hunt: ActiveHuntRow;
+    displayName: string;
+    spriteUrl: string;
+};
 
 export default function Hunts() {
     const { user } = useAuth();
@@ -80,6 +86,34 @@ export default function Hunts() {
 
         return candidates[0];
     };
+
+    const resolvedHunts = useMemo<ResolvedHunt[]>(() => {
+        return hunts.map((hunt) => {
+            const resolved = resolveHuntPokemon(hunt);
+            const displayName = resolved?.displayName
+                || formatPokemonName(hunt.form || hunt.pokemon_name || '', hunt.pokemon_id);
+
+            const spritePokemonId = resolved?.id || hunt.pokemon_id || 0;
+            const spriteName = resolved?.name || hunt.form || hunt.pokemon_name || undefined;
+            const spriteForm = resolved && resolved.id !== resolved.baseId
+                ? resolved.name
+                : hunt.form || undefined;
+
+            const spriteUrl = getGameSpecificSpriteUrl(
+                spritePokemonId,
+                hunt.method || 'gen9-random',
+                spriteName,
+                spriteForm,
+                hunt.gender || undefined
+            ) || '';
+
+            return {
+                hunt,
+                displayName,
+                spriteUrl,
+            };
+        });
+    }, [hunts, pokemonById, pokemonByDisplayName, pokemonByName]);
 
     const fetchHunts = async () => {
         if (!user) {
@@ -259,8 +293,7 @@ export default function Hunts() {
                                     ? 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3'
                                     : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'
                         }>
-                            {hunts.map((hunt) => {
-                                const resolved = resolveHuntPokemon(hunt);
+                            {resolvedHunts.map(({ hunt, displayName, spriteUrl }) => {
                                 return (
                                 <HuntCard
                                     key={hunt.id}
@@ -269,9 +302,8 @@ export default function Hunts() {
                                     onEdit={handleEditHunt}
                                     onContinue={handleContinueHunt}
                                     layoutStyle={preferences.layout_style || 'grid'}
-                                    displayName={resolved?.displayName}
-                                    spriteName={resolved?.name}
-                                    spritePokemonId={resolved?.id}
+                                    displayName={displayName}
+                                    spriteUrl={spriteUrl}
                                 />
                                 );
                             })}
