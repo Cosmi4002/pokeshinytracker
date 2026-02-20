@@ -24,7 +24,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { PokemonSelector } from '@/components/counter/PokemonSelector';
 import { MethodSelector } from '@/components/counter/MethodSelector';
 import { POKEBALLS, GAMES, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON } from '@/lib/pokemon-data';
-import { usePokemonDetails, usePokemonList, formatPokemonName } from '@/hooks/use-pokemon';
+import { usePokemonDetails, usePokemonList, formatPokemonName, MANUAL_VARIETIES } from '@/hooks/use-pokemon';
 import { getPokemonSpriteUrl } from '@/lib/pokemon-data';
 import { GenderSelector } from '@/components/ui/GenderSelector';
 import { Sparkles } from 'lucide-react';
@@ -111,24 +111,48 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
 
   useEffect(() => {
     if (open && entry) {
-      const formMatch = entry.form ? pokemonList.find((p) => p.name === entry.form) : undefined;
+      // Resolve by stored `form` first (source of truth), avoiding wrong matches on duplicated numeric IDs.
+      const formSlug = entry.form?.toLowerCase() || '';
+      const listFormMatch = formSlug ? pokemonList.find((p) => p.name.toLowerCase() === formSlug) : undefined;
+
+      let manualFormMatch: { baseId: number; id: number; name: string } | undefined;
+      if (!listFormMatch && formSlug) {
+        for (const [baseIdStr, variants] of Object.entries(MANUAL_VARIETIES)) {
+          const found = variants.find((v) => v.name.toLowerCase() === formSlug);
+          if (found) {
+            manualFormMatch = {
+              baseId: Number(baseIdStr),
+              id: found.id,
+              name: found.name,
+            };
+            break;
+          }
+        }
+      }
+
       const displayNameMatch = pokemonList.find(
         (p) => p.displayName.toLowerCase() === (entry.pokemon_name || '').toLowerCase()
       );
       const idCandidates = pokemonList.filter((p) => p.id === entry.pokemon_id);
-      const idMatch =
-        idCandidates.length <= 1
-          ? idCandidates[0]
-          : idCandidates.find(
-            (p) =>
-              p.displayName.toLowerCase() === (entry.pokemon_name || '').toLowerCase() ||
-              p.name.toLowerCase() === (entry.form || '').toLowerCase()
-          );
-      const resolved = formMatch || displayNameMatch || idMatch;
-      const resolvedBaseId = resolved?.baseId ?? entry.pokemon_id;
+      const idMatch = idCandidates[0];
+
+      const resolvedBaseId =
+        listFormMatch?.baseId ??
+        manualFormMatch?.baseId ??
+        displayNameMatch?.baseId ??
+        idMatch?.baseId ??
+        entry.pokemon_id;
+
+      const resolvedName =
+        listFormMatch?.name ??
+        manualFormMatch?.name ??
+        displayNameMatch?.name ??
+        entry.form ??
+        idMatch?.name ??
+        entry.pokemon_name;
 
       setPokemonId(resolvedBaseId);
-      setPokemonName(resolved?.name || entry.form || entry.pokemon_name);
+      setPokemonName(resolvedName);
       setForm(entry.form ?? '');
       setGender(entry.gender ?? '');
       setHasShinyCharm(entry.has_shiny_charm ?? false);
