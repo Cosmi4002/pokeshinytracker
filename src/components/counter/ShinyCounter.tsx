@@ -57,6 +57,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
   const [playlists, setPlaylists] = useState<{ id: string; name: string }[]>([]);
   const [huntCreatedAt, setHuntCreatedAt] = useState<string | null>(null);
   const isInitialLoadRef = useRef(true);
+  const skipNextVariantResetRef = useRef(false);
   const userIdRef = useRef<string | null>(null);
   const latestStateRef = useRef({
     pokemonId: null as number | null,
@@ -193,6 +194,10 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
   useEffect(() => {
     if (selectedPokemonId) {
       const isInitial = isInitialLoadRef.current;
+      if (skipNextVariantResetRef.current) {
+        skipNextVariantResetRef.current = false;
+        return;
+      }
       // If we're not in the initial load of a hunt (which sets its own variants),
       // reset form/gender to avoid stale variant data from the previous Pokemon
       if (!isInitial) {
@@ -601,6 +606,8 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
                   const isFemaleVariant = name.endsWith('-female');
                   const isMaleVariant = name.endsWith('-male');
                   const resolvedBaseId = baseId ?? id;
+                  const isDirectVariantSelection = resolvedBaseId !== id || isFemaleVariant || isMaleVariant;
+                  skipNextVariantResetRef.current = isDirectVariantSelection;
 
                   setSelectedPokemonId(resolvedBaseId);
                   setSelectedPokemonName(name);
