@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Calculator, Search, Grid3X3, LogOut, User, Sparkles, Crosshair, Settings2 } from 'lucide-react';
+import { Calculator, Search, Grid3X3, LogOut, User, Sparkles, Settings2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { supabaseProjectRef } from '@/integrations/supabase/client';
@@ -21,7 +21,6 @@ export function Navbar() {
   const { accentColor } = useRandomColor();
 
   const navLinks = [
-    { to: '/hunts', label: 'Hunts', icon: Crosshair },
     { to: '/counter', label: 'Counter', icon: Calculator },
     { to: '/pokedex', label: 'Pokédex', icon: Search },
     { to: '/collection', label: 'Collection', icon: Grid3X3 },

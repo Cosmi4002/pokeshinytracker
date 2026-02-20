@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Sparkles, Calculator, Search, Grid3X3, Crosshair, ArrowRight } from 'lucide-react';
+import { Sparkles, Calculator, Search, Grid3X3, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useAuth } from '@/lib/auth-context';
@@ -23,12 +23,6 @@ export default function Index() {
       title: 'Shiny Counter',
       description: 'Track your encounters.',
       link: '/counter',
-    },
-    {
-      icon: Crosshair,
-      title: 'Active Hunts',
-      description: 'Manage your ongoing hunts.',
-      link: '/hunts',
     },
     {
       icon: Search,

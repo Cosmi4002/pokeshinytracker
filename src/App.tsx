@@ -8,7 +8,6 @@ import { RandomColorProvider } from "@/lib/random-color-context";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Counter from "./pages/Counter";
-import Hunts from "./pages/Hunts";
 import Pokedex from "./pages/Pokedex";
 import PokemonDetails from "./pages/PokemonDetails";
 import PokedexManager from "./pages/PokedexManager";
@@ -36,7 +35,6 @@ function AppContent() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/counter" element={<Counter />} />
           <Route path="/counter/:huntId" element={<Counter />} />
-          <Route path="/hunts" element={<Hunts />} />
           <Route path="/pokedex" element={<Pokedex />} />
           <Route path="/pokedex/:pokemonId" element={<PokemonDetails />} />
           <Route path="/pokedex/manage" element={<PokedexManager />} />
