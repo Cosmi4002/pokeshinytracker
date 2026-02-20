@@ -27,9 +27,10 @@ interface ShinyCardProps {
   themeOverride?: GameTheme;
   applyBlackEffect?: boolean;
   spriteName?: string;
+  displayName?: string;
 }
 
-export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverride, applyBlackEffect = false, spriteName }: ShinyCardProps) {
+export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverride, applyBlackEffect = false, spriteName, displayName }: ShinyCardProps) {
   const isEvolved = entry.is_evolved === true;
 
   const theme = useMemo(() => themeOverride || getGameTheme(entry.game), [entry.game, themeOverride]);
@@ -45,7 +46,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
     });
   }, [entry.pokemon_id, entry.pokemon_name, entry.form, entry.gender, spriteName]);
 
-  const displayName = entry.pokemon_name;
+  const resolvedDisplayName = displayName || entry.pokemon_name;
 
   const formatDate = useCallback((dateString: string) => {
     if (!dateString) return '--';
@@ -146,7 +147,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
               </AlertDialogTrigger>
               <AlertDialogContent className="bg-[#1a1a1a] border-white/10 text-white">
                 <AlertDialogHeader>
-                  <AlertDialogTitle className="text-xl font-bold">Delete {displayName}?</AlertDialogTitle>
+                  <AlertDialogTitle className="text-xl font-bold">Delete {resolvedDisplayName}?</AlertDialogTitle>
                   <AlertDialogDescription className="text-white/60">
                     Sei sicuro di voler eliminare questo Pokemon dalla tua collezione? Questa azione non puo essere annullata.
                   </AlertDialogDescription>
@@ -188,7 +189,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
             <div className="w-full flex justify-center">
               <div className="inline-flex items-center justify-center gap-1.5 max-w-full px-1">
                 <h3 className="text-base sm:text-lg font-black text-white tracking-tight capitalize leading-tight text-center break-words whitespace-normal max-w-full">
-                  {displayName}
+                  {resolvedDisplayName}
                 </h3>
                 {entry.gender && (entry.gender === 'male' || entry.gender === 'female') && (
                   entry.gender === 'male' ? (

@@ -2,18 +2,6 @@
   "lastEntropy": 0,
   "history": [
     {
-      "date": "2026-02-20T03:52:07.277Z",
-      "entropy": 0
-    },
-    {
-      "date": "2026-02-20T03:57:05.336Z",
-      "entropy": 0
-    },
-    {
-      "date": "2026-02-20T04:02:31.213Z",
-      "entropy": 0
-    },
-    {
       "date": "2026-02-20T04:07:09.610Z",
       "entropy": 0
     },
@@ -80,6 +68,18 @@
     {
       "date": "2026-02-20T05:27:08.322Z",
       "entropy": 0
+    },
+    {
+      "date": "2026-02-20T05:32:35.330Z",
+      "entropy": 0
+    },
+    {
+      "date": "2026-02-20T05:37:05.628Z",
+      "entropy": 0
+    },
+    {
+      "date": "2026-02-20T05:42:26.923Z",
+      "entropy": 0
     }
   ],
   "fileHashes": {
@@ -89,10 +89,10 @@
     "src\\components\\collection\\AddShinyDialog.tsx": 1771564318842.0833,
     "src\\components\\collection\\CreatePlaylistDialog.tsx": 1769904412412.3342,
     "src\\components\\collection\\EditPlaylistDialog.tsx": 1770001392676.6848,
-    "src\\components\\collection\\EditShinyDialog.tsx": 1771564919588.0798,
+    "src\\components\\collection\\EditShinyDialog.tsx": 1771565322956.0173,
     "src\\components\\collection\\EvolveDialog.tsx": 1771543818622.999,
     "src\\components\\collection\\ManagePlaylistsDialog.tsx": 1770001432104.1636,
-    "src\\components\\collection\\ShinyCard.tsx": 1771546249268.8672,
+    "src\\components\\collection\\ShinyCard.tsx": 1771565886679.2456,
     "src\\components\\counter\\FinishHuntDialog.tsx": 1771564530464.6511,
     "src\\components\\counter\\MethodSelector.tsx": 1770967853939.6943,
     "src\\components\\counter\\PokemonSelector.tsx": 1771550926082.0803,
@@ -103,8 +103,8 @@
     "src\\components\\layout\\Navbar.tsx": 1771090709024.4026,
     "src\\components\\layout\\ScrollRestoration.tsx": 1771074222482.4016,
     "src\\components\\layout\\ThemeCustomizer.tsx": 1771476285051.2866,
-    "src\\components\\pokedex\\PokedexCard.tsx": 1771537974282.2244,
     "src\\components\\NavLink.tsx": 1769881918580.4404,
+    "src\\components\\pokedex\\PokedexCard.tsx": 1771537974282.2244,
     "src\\components\\settings\\ColorPicker.tsx": 1769982034778.8323,
     "src\\components\\ui\\accordion.tsx": 1769818179562.0288,
     "src\\components\\ui\\alert-dialog.tsx": 1769818179251.7563,
@@ -177,7 +177,7 @@
     "src\\lib\\utils.ts": 1769818178485.6814,
     "src\\main.tsx": 1769977827075.1062,
     "src\\pages\\Auth.tsx": 1770519046183.9678,
-    "src\\pages\\Collection.tsx": 1771551977622.2815,
+    "src\\pages\\Collection.tsx": 1771565921642.0269,
     "src\\pages\\Counter.tsx": 1770510761388.5667,
     "src\\pages\\Debug.tsx": 1771195130837.4607,
     "src\\pages\\Hunts.tsx": 1770568548964.9773,
@@ -189,9 +189,9 @@
     "src\\plumbing\\BaseTool.ts": 1771467663518.197,
     "src\\test\\example.test.ts": 1769818178097.1272,
     "src\\test\\setup.ts": 1769818178047.0332,
+    "src\\vite-env.d.ts": 1769818177955.2544,
     "tailwind.config.ts": 1770515404222.507,
     "vite.config.ts": 1769872587250.9226,
-    "src\\vite-env.d.ts": 1769818177955.2544,
     "vitest.config.ts": 1769818177774.2556
   }
 }
