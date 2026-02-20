@@ -101,10 +101,13 @@ export default function Pokedex() {
             1017: 'ogerpon',
             1024: 'terapagos',
         };
+        // Always show these full species lines even if some forms were hidden via overrides.
+        const forceVisibleBaseIds = new Set([386, 666]);
         const forceSingleCardBaseIds = new Set([201, 351, 493, 669, 670, 671, 676, 773, 710, 711, 741, 774, 849, 869, 925, 931, 1017, 1024]);
         pokemon.forEach(p => {
             const isPreferredBase = preferredBaseForms[p.baseId] === p.name;
-            if (p.hideFromPokedex && !isPreferredBase) return;
+            const isForceVisible = forceVisibleBaseIds.has(p.baseId);
+            if (p.hideFromPokedex && !isPreferredBase && !isForceVisible) return;
 
             // Group by base ID AND name prefix (to group gender variants, but separate regional variants)
             // Clean name key: remove gender suffixes
