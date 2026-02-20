@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Loader2 } from 'lucide-react';
+import { GenderSelector } from '@/components/ui/GenderSelector';
 import { Button } from '@/components/ui/button';
 import { Sparkles } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -25,7 +26,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { PokemonSelector } from '@/components/counter/PokemonSelector';
 import { MethodSelector } from '@/components/counter/MethodSelector';
 import { POKEBALLS, GAMES, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON } from '@/lib/pokemon-data';
-import { usePokemonDetails, usePokemonList, formatPokemonName } from '@/hooks/use-pokemon';
+import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
 import { getPokemonSpriteUrl } from '@/lib/pokemon-data';
 
 interface AddShinyDialogProps {
@@ -56,25 +57,32 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
   const [playlistId, setPlaylistId] = useState<string>('');
   const [notes, setNotes] = useState('');
 
-  const { pokemon: pokemonList } = usePokemonList();
   const { pokemon: pokemonDetails } = usePokemonDetails(pokemonId);
 
-  // Build options from finalized pokedex list (same source used by counter/pokedex).
+  // Build form/variant options exactly like counter/pokedex details (forms + varieties).
   const formOptions = useMemo(() => {
-    if (!pokemonId || pokemonList.length === 0) return [];
+    if (!pokemonDetails) return [];
 
-    const selectedEntry = pokemonList.find(p => p.id === pokemonId);
-    const baseId = selectedEntry?.baseId ?? pokemonId;
+    const items: { id: number; name: string; displayName: string }[] = [];
 
-    return pokemonList
-      .filter(p => p.baseId === baseId && p.id !== baseId)
-      .map(p => ({
-        id: p.id,
-        name: p.name,
-        displayName: p.displayName,
-      }))
-      .sort((a, b) => a.displayName.localeCompare(b.displayName));
-  }, [pokemonId, pokemonList]);
+    pokemonDetails.forms.forEach((f) => {
+      if (f.formName === pokemonDetails.name) return;
+      if (items.some((i) => i.name === f.formName)) return;
+      items.push({ id: f.id, name: f.formName, displayName: f.displayName });
+    });
+
+    pokemonDetails.varieties.forEach((v) => {
+      if (v.isDefault) return;
+      if (items.some((i) => i.name === v.pokemon.name)) return;
+      items.push({
+        id: v.pokemon.id,
+        name: v.pokemon.name,
+        displayName: formatPokemonName(v.pokemon.name, v.pokemon.id, pokemonDetails.baseId),
+      });
+    });
+
+    return items.sort((a, b) => a.displayName.localeCompare(b.displayName));
+  }, [pokemonDetails]);
 
   const spriteUrl = useMemo(() => {
     if (!pokemonId) return '';
@@ -197,34 +205,24 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
 
               <div className="flex items-center gap-2 w-full justify-center">
                 {/* Form Selector (Compact) */}
-                {formOptions.length > 0 && (
-                  <Select value={form || 'default'} onValueChange={(v) => setForm(v === 'default' ? '' : v)}>
-                    <SelectTrigger className="h-8 w-[200px] rounded-full bg-background/50 backdrop-blur-sm border-primary/20 hover:border-primary/50 transition-colors text-xs">
-                      <Sparkles className="mr-2 h-4 w-4 text-amber-400 fill-amber-400/20" />
-                      <SelectValue placeholder="Forma base" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="default">Forma base</SelectItem>
-                      {formOptions.map((f) => (
-                        <SelectItem key={f.id} value={f.name}>
-                          {f.displayName}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
+                <Select value={form || 'default'} onValueChange={(v) => setForm(v === 'default' ? '' : v)}>
+                  <SelectTrigger className="h-8 w-[200px] rounded-full bg-background/50 backdrop-blur-sm border-primary/20 hover:border-primary/50 transition-colors text-xs">
+                    <Sparkles className="mr-2 h-4 w-4 text-amber-400 fill-amber-400/20" />
+                    <SelectValue placeholder="Forma base" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="default">Forma base</SelectItem>
+                    {formOptions.map((f) => (
+                      <SelectItem key={f.id} value={f.name}>
+                        {f.displayName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-                {/* Gender Selector */}
+                {/* Gender Selector (icons) */}
                 {pokemonDetails?.hasGenderDifference && (
-                  <Select value={gender || 'male'} onValueChange={(v) => setGender(v === 'female' ? 'female' : '')}>
-                    <SelectTrigger className="h-8 w-[120px] rounded-full text-xs">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="male">Maschio</SelectItem>
-                      <SelectItem value="female">Femmina</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <GenderSelector value={gender} onChange={setGender} />
                 )}
               </div>
             </div>
