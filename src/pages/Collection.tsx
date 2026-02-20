@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Plus, Trash2, Filter, LogIn, List } from 'lucide-react';
+import { Plus, Filter, LogIn, List } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
@@ -99,6 +99,30 @@ export default function Collection() {
         variant: 'destructive',
         title: 'Errore',
         description: err.message || 'Impossibile eliminare',
+      });
+    }
+  };
+
+  const handleToggleEvolved = async (entry: CaughtShinyRow) => {
+    if (!user) return;
+    const nextValue = !(entry.is_evolved === true);
+    try {
+      const { error } = await supabase
+        .from('caught_shinies')
+        .update({ is_evolved: nextValue })
+        .eq('id', entry.id)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setEntries((prev) =>
+        prev.map((e) => (e.id === entry.id ? { ...e, is_evolved: nextValue } : e))
+      );
+    } catch (err: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Errore',
+        description: err.message || 'Impossibile aggiornare lo stato evoluzione',
       });
     }
   };
@@ -347,6 +371,7 @@ export default function Collection() {
                     setIsEditDialogOpen(true);
                   }}
                   onDelete={() => handleDelete(entry.id)}
+                  onToggleEvolved={() => handleToggleEvolved(entry)}
                 />
               ))}
             </div>
