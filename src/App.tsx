@@ -15,6 +15,7 @@ import Collection from "./pages/Collection";
 import Memo from "./pages/Memo";
 import UserCollectionsSearch from "./pages/UserCollectionsSearch";
 import { ScrollRestoration } from "@/components/layout/ScrollRestoration";
+import { Analytics } from "@vercel/analytics/react";
 
 import NotFound from "./pages/NotFound";
 import Debug from "./pages/Debug";
@@ -30,6 +31,7 @@ function AppContent() {
     <>
       <Toaster />
       <Sonner />
+      <Analytics />
       <BrowserRouter>
         <ScrollRestoration />
         <Routes>
