@@ -25,7 +25,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
 import { POKEBALLS, GAMES, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, getPokemonSpriteUrl } from '@/lib/pokemon-data';
-import { usePokemonDetails, formatPokemonName, usePokemonList } from '@/hooks/use-pokemon';
+import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
 import { MethodSelector } from '@/components/counter/MethodSelector';
 
 interface FinishHuntDialogProps {
@@ -79,24 +79,35 @@ export function FinishHuntDialog({
   const [notes, setNotes] = useState('');
 
   const { pokemon: pokemonDetails } = usePokemonDetails(pokemonId);
-  const { pokemon: pokemonList } = usePokemonList();
 
-  // Build options from the same finalized pokedex list used by selector/counter.
+  // Build all forms/varieties from pokemon details without exclusion filters.
   const formOptions = useMemo(() => {
-    if (!pokemonId || pokemonList.length === 0) return [];
+    if (!pokemonDetails) return [];
 
-    const selectedEntry = pokemonList.find(p => p.id === pokemonId);
-    const baseId = selectedEntry?.baseId ?? pokemonId;
+    const items: { id: number, name: string, displayName: string }[] = [];
 
-    return pokemonList
-      .filter(p => p.baseId === baseId && p.id !== baseId)
-      .map(p => ({
-        id: p.id,
-        name: p.name,
-        displayName: p.displayName,
-      }))
-      .sort((a, b) => a.displayName.localeCompare(b.displayName));
-  }, [pokemonId, pokemonList]);
+    pokemonDetails.forms.forEach((f) => {
+      if (f.formName === pokemonDetails.name) return;
+      if (items.some((i) => i.name === f.formName)) return;
+      items.push({
+        id: f.id,
+        name: f.formName,
+        displayName: f.displayName,
+      });
+    });
+
+    pokemonDetails.varieties.forEach((v) => {
+      if (v.isDefault) return;
+      if (items.some((i) => i.name === v.pokemon.name)) return;
+      items.push({
+        id: v.pokemon.id,
+        name: v.pokemon.name,
+        displayName: formatPokemonName(v.pokemon.name, v.pokemon.id, pokemonDetails.baseId),
+      });
+    });
+
+    return items.sort((a, b) => a.displayName.localeCompare(b.displayName));
+  }, [pokemonDetails]);
 
   const spriteUrl = useMemo(() => {
     const currentVariant = formOptions.find(f => f.name === form);

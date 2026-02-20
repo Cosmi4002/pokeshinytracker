@@ -22,7 +22,7 @@ import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
 import { FinishHuntDialog } from './FinishHuntDialog';
 import { useRandomColor } from '@/lib/random-color-context';
-import { usePokemonDetails, usePokemonList } from '@/hooks/use-pokemon';
+import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
 
 interface ShinyCounterProps {
   huntId?: string;
@@ -52,24 +52,35 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
   const isInitialLoadRef = useRef(true);
 
   const { pokemon: pokemonDetails } = usePokemonDetails(selectedPokemonId || 0);
-  const { pokemon: pokemonList } = usePokemonList();
 
-  // Build form options directly from the finalized pokedex list used across the app.
+  // Build all forms/varieties from pokemon details without exclusion filters.
   const formOptions = useMemo(() => {
-    if (!selectedPokemonId || pokemonList.length === 0) return [];
+    if (!pokemonDetails) return [];
 
-    const selectedEntry = pokemonList.find(p => p.id === selectedPokemonId);
-    const baseId = selectedEntry?.baseId ?? selectedPokemonId;
+    const items: { id: number, name: string, displayName: string }[] = [];
 
-    return pokemonList
-      .filter(p => p.baseId === baseId && p.id !== baseId)
-      .map(p => ({
-        id: p.id,
-        name: p.name,
-        displayName: p.displayName,
-      }))
-      .sort((a, b) => a.displayName.localeCompare(b.displayName));
-  }, [selectedPokemonId, pokemonList]);
+    pokemonDetails.forms.forEach((f) => {
+      if (f.formName === pokemonDetails.name) return;
+      if (items.some((i) => i.name === f.formName)) return;
+      items.push({
+        id: f.id,
+        name: f.formName,
+        displayName: f.displayName,
+      });
+    });
+
+    pokemonDetails.varieties.forEach((v) => {
+      if (v.isDefault) return;
+      if (items.some((i) => i.name === v.pokemon.name)) return;
+      items.push({
+        id: v.pokemon.id,
+        name: v.pokemon.name,
+        displayName: formatPokemonName(v.pokemon.name, v.pokemon.id, pokemonDetails.baseId),
+      });
+    });
+
+    return items.sort((a, b) => a.displayName.localeCompare(b.displayName));
+  }, [pokemonDetails]);
 
   // Load active hunt and playlists from Supabase when user is logged in
   useEffect(() => {
