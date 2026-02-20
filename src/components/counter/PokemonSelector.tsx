@@ -4,7 +4,6 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
   Command,
-  CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
@@ -23,10 +22,14 @@ interface PokemonSelectorProps {
   onChange: (pokemonId: number | null, pokemonName: string, pokemonBaseId?: number) => void;
 }
 
+const MAX_RESULTS_EMPTY_SEARCH = 120;
+const MAX_RESULTS_WITH_SEARCH = 200;
+
 export function PokemonSelector({ value, valueName, onChange }: PokemonSelectorProps) {
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [isSmallScreen, setIsSmallScreen] = useState(false);
+  const [isXboxBrowser, setIsXboxBrowser] = useState(false);
   const { pokemon, loading } = usePokemonList();
 
   useEffect(() => {
@@ -34,7 +37,7 @@ export function PokemonSelector({ value, valueName, onChange }: PokemonSelectorP
     const mediaQuery = window.matchMedia('(max-width: 640px)');
     const handleChange = () => setIsSmallScreen(mediaQuery.matches);
     handleChange();
-    if (mediaQuery.addEventListener) {
+    if (typeof mediaQuery.addEventListener === 'function') {
       mediaQuery.addEventListener('change', handleChange);
       return () => mediaQuery.removeEventListener('change', handleChange);
     }
@@ -42,26 +45,49 @@ export function PokemonSelector({ value, valueName, onChange }: PokemonSelectorP
     return () => mediaQuery.removeListener(handleChange);
   }, []);
 
+  useEffect(() => {
+    if (typeof navigator === 'undefined') return;
+    const ua = navigator.userAgent || '';
+    setIsXboxBrowser(/xbox/i.test(ua));
+  }, []);
+
   const selectedPokemon = useMemo(() => {
     if (value === null) return undefined;
     if (valueName) {
-      const exact = pokemon.find(p => p.name === valueName && (p.id === value || p.baseId === value));
+      const exact = pokemon.find((p) => p.name === valueName && (p.id === value || p.baseId === value));
       if (exact) return exact;
     }
-    return pokemon.find(p => p.id === value);
+    return pokemon.find((p) => p.id === value);
   }, [pokemon, value, valueName]);
 
-  const filteredPokemon = useMemo(() => {
-    if (!searchTerm) return pokemon;
-    const searchLower = searchTerm.toLowerCase();
-    return pokemon
-      .filter(p =>
-        p.name.toLowerCase().includes(searchLower) ||
-        p.displayName.toLowerCase().includes(searchLower) ||
-        p.id.toString().includes(searchLower) ||
-        p.baseId.toString().includes(searchLower)
-      );
-  }, [pokemon, searchTerm]);
+  const searchablePokemon = useMemo(() => {
+    return pokemon.map((p) => ({
+      ...p,
+      nameLower: (p.name || '').toLowerCase(),
+      displayLower: (p.displayName || '').toLowerCase(),
+      idText: String(p.id),
+      baseIdText: String(p.baseId),
+    }));
+  }, [pokemon]);
+
+  const { filteredPokemon, totalMatches } = useMemo(() => {
+    const searchLower = (searchTerm || '').trim().toLowerCase();
+    const maxResults = searchLower ? MAX_RESULTS_WITH_SEARCH : MAX_RESULTS_EMPTY_SEARCH;
+
+    const matches = searchLower
+      ? searchablePokemon.filter((p) =>
+          p.nameLower.includes(searchLower) ||
+          p.displayLower.includes(searchLower) ||
+          p.idText.includes(searchLower) ||
+          p.baseIdText.includes(searchLower)
+        )
+      : searchablePokemon;
+
+    return {
+      filteredPokemon: matches.slice(0, maxResults),
+      totalMatches: matches.length,
+    };
+  }, [searchablePokemon, searchTerm]);
 
   return (
     <Popover open={open} onOpenChange={setOpen} modal={false}>
@@ -86,7 +112,7 @@ export function PokemonSelector({ value, valueName, onChange }: PokemonSelectorP
               <span>#{selectedPokemon.baseId.toString().padStart(4, '0')} {selectedPokemon.displayName}</span>
             </div>
           ) : (
-            <span className="text-muted-foreground">Select Pokémon...</span>
+            <span className="text-muted-foreground">Select Pokemon...</span>
           )}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -94,7 +120,7 @@ export function PokemonSelector({ value, valueName, onChange }: PokemonSelectorP
       <PopoverContent
         className="w-[min(var(--radix-popover-trigger-width),calc(100vw-2rem))] max-w-[calc(100vw-2rem)] max-h-[min(var(--radix-popper-available-height),calc(100dvh-2rem))] overflow-hidden p-0"
         align="start"
-        side={isSmallScreen ? "top" : "bottom"}
+        side={isSmallScreen ? 'top' : 'bottom'}
         sideOffset={isSmallScreen ? 4 : 6}
         collisionPadding={16}
         sticky="always"
@@ -103,7 +129,7 @@ export function PokemonSelector({ value, valueName, onChange }: PokemonSelectorP
       >
         <Command shouldFilter={false}>
           <CommandInput
-            placeholder="Search Pokémon..."
+            placeholder="Search Pokemon..."
             value={searchTerm}
             onValueChange={setSearchTerm}
           />
@@ -115,7 +141,12 @@ export function PokemonSelector({ value, valueName, onChange }: PokemonSelectorP
           >
             {loading && <div className="p-4 text-sm text-center text-muted-foreground">Loading...</div>}
             {!loading && filteredPokemon.length === 0 && (
-              <div className="py-6 text-center text-sm text-muted-foreground">No Pokémon found.</div>
+              <div className="py-6 text-center text-sm text-muted-foreground">No Pokemon found.</div>
+            )}
+            {!loading && filteredPokemon.length > 0 && totalMatches > filteredPokemon.length && (
+              <div className="px-3 py-2 text-xs text-muted-foreground border-b">
+                Showing first {filteredPokemon.length} of {totalMatches} results. Keep typing to narrow down.
+              </div>
             )}
             <CommandGroup>
               {filteredPokemon.map((p) => (
@@ -129,23 +160,26 @@ export function PokemonSelector({ value, valueName, onChange }: PokemonSelectorP
                   }}
                   className="flex items-center gap-2"
                 >
-                  <img
-                    key={getPokemonSpriteUrl(p.id, { shiny: true, name: p.name })}
-                    src={getPokemonSpriteUrl(p.id, { shiny: true, name: p.name })}
-                    alt={p.displayName}
-                    className="h-8 w-8 pokemon-sprite object-contain"
-                    decoding="async"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/placeholder.svg';
-                    }}
-                  />
-                  <span>#{p.baseId.toString().padStart(4, '0')} {p.displayName}</span>
-                    <Check
-                      className={cn(
-                        "ml-auto h-4 w-4",
-                        (valueName ? valueName === p.name : value === p.id) ? "opacity-100" : "opacity-0"
-                      )}
+                  {!isXboxBrowser && (
+                    <img
+                      key={getPokemonSpriteUrl(p.id, { shiny: true, name: p.name })}
+                      src={getPokemonSpriteUrl(p.id, { shiny: true, name: p.name })}
+                      alt={p.displayName}
+                      className="h-8 w-8 pokemon-sprite object-contain"
+                      loading="lazy"
+                      decoding="async"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/placeholder.svg';
+                      }}
                     />
+                  )}
+                  <span>#{p.baseId.toString().padStart(4, '0')} {p.displayName}</span>
+                  <Check
+                    className={cn(
+                      'ml-auto h-4 w-4',
+                      (valueName ? valueName === p.name : value === p.id) ? 'opacity-100' : 'opacity-0'
+                    )}
+                  />
                 </CommandItem>
               ))}
             </CommandGroup>
