@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Calculator, Search, Grid3X3, LogOut, User, Sparkles, Settings2 } from 'lucide-react';
+import { Calculator, Search, Grid3X3, LogOut, User, Sparkles, Settings2, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { supabaseProjectRef } from '@/integrations/supabase/client';
@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { ThemeCustomizer } from '@/components/layout/ThemeCustomizer'; // Import ThemeCustomizer
+import { ThemeCustomizer } from '@/components/layout/ThemeCustomizer';
 import { useRandomColor } from '@/lib/random-color-context';
 
 export function Navbar() {
@@ -22,9 +22,9 @@ export function Navbar() {
 
   const navLinks = [
     { to: '/counter', label: 'Counter', icon: Calculator },
-    { to: '/pokedex', label: 'Pokédex', icon: Search },
+    { to: '/pokedex', label: 'Pokedex', icon: Search },
     { to: '/collection', label: 'Collection', icon: Grid3X3 },
-
+    { to: '/memo', label: 'Memo', icon: FileText },
   ];
 
   return (
@@ -53,8 +53,8 @@ export function Navbar() {
                   variant={isActive ? 'default' : 'ghost'}
                   size="sm"
                   className={cn(
-                    "h-9 px-2 sm:px-3 gap-1.5 sm:gap-2",
-                    isActive && "bg-primary text-primary-foreground shadow-sm"
+                    'h-9 px-2 sm:px-3 gap-1.5 sm:gap-2',
+                    isActive && 'bg-primary text-primary-foreground shadow-sm'
                   )}
                 >
                   <Icon className="h-4 w-4" />
@@ -77,7 +77,7 @@ export function Navbar() {
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={() => navigate('/pokedex')}>
                   <Search className="mr-2 h-4 w-4" />
-                  Pokédex
+                  Pokedex
                 </DropdownMenuItem>
                 {user.email === 'chritel04@gmail.com' && (
                   <DropdownMenuItem onClick={() => navigate('/pokedex/manage')}>
@@ -88,6 +88,10 @@ export function Navbar() {
                 <DropdownMenuItem onClick={() => navigate('/collection')}>
                   <Grid3X3 className="mr-2 h-4 w-4" />
                   Collezione
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/memo')}>
+                  <FileText className="mr-2 h-4 w-4" />
+                  Memo
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="text-muted-foreground text-xs flex flex-col items-start gap-1">
