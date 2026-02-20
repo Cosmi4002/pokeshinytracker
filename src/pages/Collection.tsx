@@ -202,6 +202,15 @@ export default function Collection() {
 
   const filteredEntries = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
+
+    const toDayValue = (value?: string | null) => {
+      if (!value) return Number.NaN;
+      // Compare by calendar day (YYYY-MM-DD), ignoring time component.
+      const day = value.slice(0, 10);
+      const parsed = new Date(`${day}T00:00:00Z`).getTime();
+      return parsed;
+    };
+
     return entries
       .filter((entry) => {
         if (entry.form && isFormEliminated(entry.form)) return false;
@@ -217,7 +226,7 @@ export default function Collection() {
           if (!haystack.includes(query)) return false;
         }
         if (filterGen !== 'all') {
-          if (poke && poke.generation.toString() !== filterGen) return false;
+          if (!poke || poke.generation.toString() !== filterGen) return false;
         }
         if (filterGame !== 'all' && entry.game !== filterGame) return false;
         if (filterPlaylist !== 'all') {
@@ -227,12 +236,17 @@ export default function Collection() {
         return true;
       })
       .sort((a, b) => {
-        const aTime = new Date(a.caught_date || a.created_at).getTime();
-        const bTime = new Date(b.caught_date || b.created_at).getTime();
-        const primary = sortByDate === 'desc' ? bTime - aTime : aTime - bTime;
+        const aDay = Number.isFinite(toDayValue(a.caught_date))
+          ? toDayValue(a.caught_date)
+          : toDayValue(a.created_at);
+        const bDay = Number.isFinite(toDayValue(b.caught_date))
+          ? toDayValue(b.caught_date)
+          : toDayValue(b.created_at);
+
+        const primary = sortByDate === 'desc' ? bDay - aDay : aDay - bDay;
         if (primary !== 0) return primary;
 
-        // Tie-break: if capture date is the same, keep first the one added earlier to collection.
+        // Tie-break: if capture day is the same, keep first the one added earlier to collection.
         const aCreated = new Date(a.created_at).getTime();
         const bCreated = new Date(b.created_at).getTime();
         return aCreated - bCreated;
@@ -306,7 +320,7 @@ export default function Collection() {
                 La mia collezione Shiny
               </h1>
               <p className="text-muted-foreground mt-1 font-medium">
-                {entries.length} shiny Pokémon catturati
+                {filteredEntries.length} mostrati su {entries.length} shiny Pokemon
               </p>
             </div>
 
