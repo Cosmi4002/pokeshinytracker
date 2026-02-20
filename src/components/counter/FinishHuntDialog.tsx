@@ -232,12 +232,12 @@ export function FinishHuntDialog({
           {formOptions.length > 0 && (
             <div className="space-y-2">
               <Label>Forma / variante</Label>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex items-center gap-1 overflow-x-auto pb-1">
                 <Button
                   type="button"
                   variant={form ? 'outline' : 'default'}
                   size="sm"
-                  className="rounded-full"
+                  className="h-7 px-2.5 rounded-full text-[11px] shrink-0"
                   onClick={() => setForm('')}
                 >
                   <Sparkles className="h-3 w-3 mr-1" />
@@ -249,7 +249,7 @@ export function FinishHuntDialog({
                     type="button"
                     variant={form === f.name ? 'default' : 'outline'}
                     size="sm"
-                    className="rounded-full"
+                    className="h-7 px-2.5 rounded-full text-[11px] shrink-0"
                     onClick={() => setForm(f.name)}
                   >
                     {f.displayName}
@@ -267,7 +267,7 @@ export function FinishHuntDialog({
                   type="button"
                   variant={gender === 'female' ? 'outline' : 'default'}
                   size="sm"
-                  className="rounded-full"
+                  className="h-7 px-2.5 rounded-full text-[11px]"
                   onClick={() => setGender('')}
                 >
                   Maschio
@@ -276,7 +276,7 @@ export function FinishHuntDialog({
                   type="button"
                   variant={gender === 'female' ? 'default' : 'outline'}
                   size="sm"
-                  className="rounded-full"
+                  className="h-7 px-2.5 rounded-full text-[11px]"
                   onClick={() => setGender('female')}
                 >
                   Femmina

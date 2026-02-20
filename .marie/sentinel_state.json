@@ -2,22 +2,6 @@
   "lastEntropy": 0,
   "history": [
     {
-      "date": "2026-02-20T01:47:51.035Z",
-      "entropy": 0
-    },
-    {
-      "date": "2026-02-20T01:52:05.279Z",
-      "entropy": 0
-    },
-    {
-      "date": "2026-02-20T01:57:04.924Z",
-      "entropy": 0
-    },
-    {
-      "date": "2026-02-20T02:02:05.527Z",
-      "entropy": 0
-    },
-    {
       "date": "2026-02-20T02:07:06.109Z",
       "entropy": 0
     },
@@ -80,6 +64,22 @@
     {
       "date": "2026-02-20T03:22:06.706Z",
       "entropy": 0
+    },
+    {
+      "date": "2026-02-20T03:27:52.160Z",
+      "entropy": 0
+    },
+    {
+      "date": "2026-02-20T03:32:05.624Z",
+      "entropy": 0
+    },
+    {
+      "date": "2026-02-20T03:37:05.393Z",
+      "entropy": 0
+    },
+    {
+      "date": "2026-02-20T03:42:37.863Z",
+      "entropy": 0
     }
   ],
   "fileHashes": {
@@ -93,18 +93,18 @@
     "src\\components\\collection\\EvolveDialog.tsx": 1771543818622.999,
     "src\\components\\collection\\ManagePlaylistsDialog.tsx": 1770001432104.1636,
     "src\\components\\collection\\ShinyCard.tsx": 1771546249268.8672,
-    "src\\components\\counter\\FinishHuntDialog.tsx": 1771555862254.2554,
+    "src\\components\\counter\\FinishHuntDialog.tsx": 1771558874027.348,
     "src\\components\\counter\\MethodSelector.tsx": 1770967853939.6943,
     "src\\components\\counter\\PokemonSelector.tsx": 1771550926082.0803,
-    "src\\components\\counter\\ShinyCounter.tsx": 1771553365058.1904,
+    "src\\components\\counter\\ShinyCounter.tsx": 1771558862154.5964,
     "src\\components\\ErrorBoundary.tsx": 1771195107706.245,
     "src\\components\\hunts\\EditHuntDialog.tsx": 1771479262631.3792,
     "src\\components\\hunts\\HuntCard.tsx": 1771535042236.989,
-    "src\\components\\layout\\Navbar.tsx": 1771090709024.4026,
     "src\\components\\layout\\ScrollRestoration.tsx": 1771074222482.4016,
+    "src\\components\\layout\\Navbar.tsx": 1771090709024.4026,
     "src\\components\\layout\\ThemeCustomizer.tsx": 1771476285051.2866,
-    "src\\components\\pokedex\\PokedexCard.tsx": 1771537974282.2244,
     "src\\components\\NavLink.tsx": 1769881918580.4404,
+    "src\\components\\pokedex\\PokedexCard.tsx": 1771537974282.2244,
     "src\\components\\settings\\ColorPicker.tsx": 1769982034778.8323,
     "src\\components\\ui\\accordion.tsx": 1769818179562.0288,
     "src\\components\\ui\\alert-dialog.tsx": 1769818179251.7563,
@@ -123,7 +123,6 @@
     "src\\components\\ui\\command.tsx": 1771534822806.5532,
     "src\\components\\ui\\context-menu.tsx": 1769818179047.443,
     "src\\components\\ui\\dialog.tsx": 1769818179421.3982,
-    "src\\components\\ui\\drawer.tsx": 1769818179031.8174,
     "src\\components\\ui\\dropdown-menu.tsx": 1769818179150.0242,
     "src\\components\\ui\\form.tsx": 1769818179236.8599,
     "src\\components\\ui\\GenderSelector.tsx": 1769983378063.5496,
@@ -157,8 +156,9 @@
     "src\\components\\ui\\tooltip.tsx": 1769818179306.6802,
     "src\\components\\ui\\use-toast.ts": 1769818179912.643,
     "src\\domain\\DomainEntity.ts": 1771467663518.197,
-    "src\\hooks\\use-global-collection-themes.ts": 1771487690227.7437,
+    "src\\components\\ui\\drawer.tsx": 1769818179031.8174,
     "src\\hooks\\use-mobile.tsx": 1769818178652.7957,
+    "src\\hooks\\use-global-collection-themes.ts": 1771487690227.7437,
     "src\\hooks\\use-pokedex-overrides.ts": 1771076139403.9187,
     "src\\hooks\\use-pokemon.ts": 1771539133984.3147,
     "src\\hooks\\use-toast.ts": 1769818178719.912,
@@ -166,8 +166,8 @@
     "src\\infrastructure\\BaseAdapter.ts": 1771467663518.197,
     "src\\integrations\\supabase\\client.ts": 1769964677899.9258,
     "src\\integrations\\supabase\\types.ts": 1771384448483.783,
-    "src\\lib\\auth-context.tsx": 1769964687404.5178,
     "src\\lib\\color-utils.ts": 1771476166665.686,
+    "src\\lib\\auth-context.tsx": 1769964687404.5178,
     "src\\lib\\evolution-data.ts": 1771489330193.066,
     "src\\lib\\form-filters.ts": 1771546939240.8716,
     "src\\lib\\game-themes.ts": 1771485982821.9402,
@@ -190,8 +190,8 @@
     "src\\test\\example.test.ts": 1769818178097.1272,
     "src\\test\\setup.ts": 1769818178047.0332,
     "src\\vite-env.d.ts": 1769818177955.2544,
-    "vite.config.ts": 1769872587250.9226,
     "tailwind.config.ts": 1770515404222.507,
+    "vite.config.ts": 1769872587250.9226,
     "vitest.config.ts": 1769818177774.2556
   }
 }

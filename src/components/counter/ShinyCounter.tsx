@@ -331,14 +331,14 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
                     />
 
                     {/* Variant/Gender Controls */}
-                    <div className="flex flex-col items-center gap-2 mt-2">
+                    <div className="flex flex-col items-center gap-1.5 mt-2 w-full">
                       {formOptions.length > 0 && (
-                        <div className="flex flex-wrap justify-center gap-2 max-w-[420px]">
+                        <div className="flex items-center gap-1 max-w-[340px] w-full overflow-x-auto pb-1">
                           <Button
                             type="button"
                             variant={selectedForm ? "outline" : "default"}
                             size="sm"
-                            className="h-8 px-3 rounded-full text-xs"
+                            className="h-7 px-2.5 rounded-full text-[11px] shrink-0"
                             style={selectedForm ? { borderColor: accentColor, color: accentColor } : { backgroundColor: accentColor }}
                             onClick={() => setSelectedForm('')}
                           >
@@ -351,7 +351,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
                               type="button"
                               variant={selectedForm === f.name ? "default" : "outline"}
                               size="sm"
-                              className="h-8 px-3 rounded-full text-xs"
+                              className="h-7 px-2.5 rounded-full text-[11px] shrink-0"
                               style={selectedForm === f.name ? { backgroundColor: accentColor } : { borderColor: accentColor, color: accentColor }}
                               onClick={() => setSelectedForm(f.name)}
                             >
@@ -367,7 +367,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
                             type="button"
                             variant={selectedGender === 'female' ? "outline" : "default"}
                             size="sm"
-                            className="h-8 px-3 rounded-full text-xs"
+                            className="h-7 px-2.5 rounded-full text-[11px]"
                             style={selectedGender === 'female' ? { borderColor: accentColor, color: accentColor } : { backgroundColor: accentColor }}
                             onClick={() => setSelectedGender('')}
                           >
@@ -377,7 +377,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
                             type="button"
                             variant={selectedGender === 'female' ? "default" : "outline"}
                             size="sm"
-                            className="h-8 px-3 rounded-full text-xs"
+                            className="h-7 px-2.5 rounded-full text-[11px]"
                             style={selectedGender === 'female' ? { backgroundColor: accentColor } : { borderColor: accentColor, color: accentColor }}
                             onClick={() => setSelectedGender('female')}
                           >
