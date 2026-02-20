@@ -232,56 +232,37 @@ export function FinishHuntDialog({
           {formOptions.length > 0 && (
             <div className="space-y-2">
               <Label>Forma / variante</Label>
-              <div className="flex items-center gap-1 overflow-x-auto pb-1">
-                <Button
-                  type="button"
-                  variant={form ? 'outline' : 'default'}
-                  size="sm"
-                  className="h-7 px-2.5 rounded-full text-[11px] shrink-0"
-                  onClick={() => setForm('')}
-                >
-                  <Sparkles className="h-3 w-3 mr-1" />
-                  Forma base
-                </Button>
-                {formOptions.map((f) => (
-                  <Button
-                    key={f.name}
-                    type="button"
-                    variant={form === f.name ? 'default' : 'outline'}
-                    size="sm"
-                    className="h-7 px-2.5 rounded-full text-[11px] shrink-0"
-                    onClick={() => setForm(f.name)}
-                  >
-                    {f.displayName}
-                  </Button>
-                ))}
-              </div>
+              <Select value={form || 'default'} onValueChange={(v) => setForm(v === 'default' ? '' : v)}>
+                <SelectTrigger className="h-8 rounded-full text-xs">
+                  <div className="flex items-center gap-2 truncate">
+                    <Sparkles className="h-3 w-3" />
+                    <SelectValue placeholder="Forma base" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="default">Forma base</SelectItem>
+                  {formOptions.map((f) => (
+                    <SelectItem key={f.name} value={f.name}>
+                      {f.displayName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           )}
 
           <div className="space-y-2">
             <Label>Genere</Label>
             {pokemonDetails?.hasGenderDifference ? (
-              <div className="flex items-center gap-2">
-                <Button
-                  type="button"
-                  variant={gender === 'female' ? 'outline' : 'default'}
-                  size="sm"
-                  className="h-7 px-2.5 rounded-full text-[11px]"
-                  onClick={() => setGender('')}
-                >
-                  Maschio
-                </Button>
-                <Button
-                  type="button"
-                  variant={gender === 'female' ? 'default' : 'outline'}
-                  size="sm"
-                  className="h-7 px-2.5 rounded-full text-[11px]"
-                  onClick={() => setGender('female')}
-                >
-                  Femmina
-                </Button>
-              </div>
+              <Select value={gender || 'male'} onValueChange={(v) => setGender(v === 'female' ? 'female' : '')}>
+                <SelectTrigger className="h-8 rounded-full text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="male">Maschio</SelectItem>
+                  <SelectItem value="female">Femmina</SelectItem>
+                </SelectContent>
+              </Select>
             ) : (
               <GenderSelector value={gender} onChange={setGender} />
             )}

@@ -6,6 +6,13 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent } from '@/components/ui/card';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -333,57 +340,40 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
                     {/* Variant/Gender Controls */}
                     <div className="flex flex-col items-center gap-1.5 mt-2 w-full">
                       {formOptions.length > 0 && (
-                        <div className="flex items-center gap-1 max-w-[340px] w-full overflow-x-auto pb-1">
-                          <Button
-                            type="button"
-                            variant={selectedForm ? "outline" : "default"}
-                            size="sm"
-                            className="h-7 px-2.5 rounded-full text-[11px] shrink-0"
-                            style={selectedForm ? { borderColor: accentColor, color: accentColor } : { backgroundColor: accentColor }}
-                            onClick={() => setSelectedForm('')}
+                        <Select value={selectedForm || 'default'} onValueChange={(v) => setSelectedForm(v === 'default' ? '' : v)}>
+                          <SelectTrigger
+                            className="h-8 min-w-[200px] max-w-[340px] px-3 rounded-full text-xs"
+                            style={{ borderColor: accentColor }}
                           >
-                            <Sparkles className="h-3 w-3 mr-1" />
-                            Forma base
-                          </Button>
-                          {formOptions.map((f) => (
-                            <Button
-                              key={f.name}
-                              type="button"
-                              variant={selectedForm === f.name ? "default" : "outline"}
-                              size="sm"
-                              className="h-7 px-2.5 rounded-full text-[11px] shrink-0"
-                              style={selectedForm === f.name ? { backgroundColor: accentColor } : { borderColor: accentColor, color: accentColor }}
-                              onClick={() => setSelectedForm(f.name)}
-                            >
-                              {f.displayName}
-                            </Button>
-                          ))}
-                        </div>
+                            <div className="flex items-center gap-2 truncate">
+                              <Sparkles className="h-3 w-3" style={{ color: accentColor }} />
+                              <SelectValue placeholder="Forma base" />
+                            </div>
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="default">Forma base</SelectItem>
+                            {formOptions.map((f) => (
+                              <SelectItem key={f.name} value={f.name}>
+                                {f.displayName}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       )}
 
                       {pokemonDetails?.hasGenderDifference && (
-                        <div className="flex items-center gap-2">
-                          <Button
-                            type="button"
-                            variant={selectedGender === 'female' ? "outline" : "default"}
-                            size="sm"
-                            className="h-7 px-2.5 rounded-full text-[11px]"
-                            style={selectedGender === 'female' ? { borderColor: accentColor, color: accentColor } : { backgroundColor: accentColor }}
-                            onClick={() => setSelectedGender('')}
+                        <Select value={selectedGender || 'male'} onValueChange={(v) => setSelectedGender(v === 'female' ? 'female' : '')}>
+                          <SelectTrigger
+                            className="h-8 min-w-[140px] px-3 rounded-full text-xs"
+                            style={{ borderColor: accentColor }}
                           >
-                            Maschio
-                          </Button>
-                          <Button
-                            type="button"
-                            variant={selectedGender === 'female' ? "default" : "outline"}
-                            size="sm"
-                            className="h-7 px-2.5 rounded-full text-[11px]"
-                            style={selectedGender === 'female' ? { backgroundColor: accentColor } : { borderColor: accentColor, color: accentColor }}
-                            onClick={() => setSelectedGender('female')}
-                          >
-                            Femmina
-                          </Button>
-                        </div>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="male">Maschio</SelectItem>
+                            <SelectItem value="female">Femmina</SelectItem>
+                          </SelectContent>
+                        </Select>
                       )}
                     </div>
                   </div>
