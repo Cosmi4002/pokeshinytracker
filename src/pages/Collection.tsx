@@ -133,56 +133,29 @@ export default function Collection() {
     return m;
   }, [playlists]);
 
-  const pokemonByName = useMemo(() => {
-    const m = new Map<string, any>();
-    pokemon.forEach((p) => m.set(p.name.toLowerCase(), p));
+  const pokemonMap = useMemo(() => {
+    const m = new Map<number, any>();
+    pokemon.forEach((p) => m.set(p.id, p));
     return m;
   }, [pokemon]);
-
-  const pokemonById = useMemo(() => {
-    const m = new Map<number, any[]>();
-    pokemon.forEach((p) => {
-      if (!m.has(p.id)) m.set(p.id, []);
-      m.get(p.id)!.push(p);
-    });
-    return m;
-  }, [pokemon]);
-
-  const resolveEntryPokemon = (entry: CaughtShinyRow) => {
-    const formSlug = (entry.form || '').toLowerCase();
-    if (formSlug) {
-      const byForm = pokemonByName.get(formSlug);
-      if (byForm) return byForm;
-    }
-
-    const candidates = pokemonById.get(entry.pokemon_id) || [];
-    if (candidates.length === 0) return undefined;
-    if (candidates.length === 1) return candidates[0];
-
-    const byDisplay = candidates.find(
-      (p) => p.displayName.toLowerCase() === (entry.pokemon_name || '').toLowerCase()
-    );
-    if (byDisplay) return byDisplay;
-
-    return candidates[0];
-  };
 
   const filteredEntries = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
     return entries.filter((entry) => {
-      const resolved = resolveEntryPokemon(entry);
       if (query) {
+        const poke = pokemonMap.get(entry.pokemon_id);
         const haystack = [
           entry.pokemon_name,
           entry.form || '',
-          resolved?.displayName || '',
-          resolved?.name || '',
+          poke?.displayName || '',
+          poke?.name || '',
           String(entry.pokemon_id),
         ].join(' ').toLowerCase();
         if (!haystack.includes(query)) return false;
       }
       if (filterGen !== 'all') {
-        if (resolved && resolved.generation.toString() !== filterGen) return false;
+        const poke = pokemonMap.get(entry.pokemon_id);
+        if (poke && poke.generation.toString() !== filterGen) return false;
       }
       if (filterGame !== 'all' && entry.game !== filterGame) return false;
       if (filterPlaylist !== 'all') {
@@ -191,7 +164,7 @@ export default function Collection() {
       }
       return true;
     });
-  }, [entries, searchQuery, filterGen, filterGame, filterPlaylist, playlistMap, pokemonById, pokemonByName]);
+  }, [entries, searchQuery, filterGen, filterGame, filterPlaylist, pokemonMap, playlistMap]);
 
   if (authLoading || (user && loading)) {
     return (
@@ -396,16 +369,13 @@ export default function Collection() {
             </Card>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {filteredEntries.map((entry) => {
-                const resolved = resolveEntryPokemon(entry);
-                return (
+              {filteredEntries.map((entry) => (
                 <ShinyCard
                   key={entry.id}
                   entry={entry}
                   themeOverride={mergedThemes[entry.game]}
                   applyBlackEffect={effects.blackEffectEnabled}
-                  spriteName={resolved?.name}
-                  displayName={resolved?.displayName || entry.pokemon_name}
+                  spriteName={pokemonMap.get(entry.pokemon_id)?.name}
                   onEdit={() => {
                     setEditEntry(entry);
                     setIsEditDialogOpen(true);
@@ -413,8 +383,7 @@ export default function Collection() {
                   onDelete={() => handleDelete(entry.id)}
                   onToggleEvolved={() => handleToggleEvolved(entry)}
                 />
-                );
-              })}
+              ))}
             </div>
           )}
         </div>
