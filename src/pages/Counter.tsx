@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { Tables } from '@/integrations/supabase/types';
 
 type ActiveHunt = Tables<'active_hunts'>;
+const MAX_ACTIVE_COUNTERS = 9;
 
 export default function Counter() {
   const { huntId } = useParams<{ huntId?: string }>();
@@ -38,7 +39,7 @@ export default function Counter() {
         .eq('is_visible_on_counter', true) // Solo cacce visibili
         .order('order_index', { ascending: true }) // Ordina per indice
         .order('updated_at', { ascending: false })
-        .limit(6); // Fetch up to 6 most recent hunts
+        .limit(MAX_ACTIVE_COUNTERS); // Fetch up to 9 most recent hunts
 
       if (data) {
         setActiveHunts(data);
@@ -100,7 +101,7 @@ export default function Counter() {
         .eq('is_visible_on_counter', true)
         .order('order_index', { ascending: true })
         .order('updated_at', { ascending: false })
-        .limit(6);
+        .limit(MAX_ACTIVE_COUNTERS);
 
       if (newData) setActiveHunts(newData);
     }
@@ -128,7 +129,7 @@ export default function Counter() {
               Multi-Counter View
             </h1>
             <div className="text-sm text-muted-foreground">
-              Mostrando fino a 6 cacce attive
+              Mostrando fino a {MAX_ACTIVE_COUNTERS} cacce attive
             </div>
           </div>
         )}
@@ -195,8 +196,8 @@ export default function Counter() {
                 ))}
 
                 {/* Empty Slots */}
-                {activeHunts.length < 6 && (
-                  Array.from({ length: 6 - activeHunts.length }).map((_, index) => (
+                {activeHunts.length < MAX_ACTIVE_COUNTERS && (
+                  Array.from({ length: MAX_ACTIVE_COUNTERS - activeHunts.length }).map((_, index) => (
                     <Card
                       key={`empty-${index}`}
                       className="border-dashed border-2 flex items-center justify-center min-h-[500px] transition-colors cursor-pointer group"

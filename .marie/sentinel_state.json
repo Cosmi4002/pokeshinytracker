@@ -2,14 +2,6 @@
   "lastEntropy": 0,
   "history": [
     {
-      "date": "2026-02-20T05:42:26.923Z",
-      "entropy": 0
-    },
-    {
-      "date": "2026-02-20T05:47:09.633Z",
-      "entropy": 0
-    },
-    {
       "date": "2026-02-20T05:52:05.953Z",
       "entropy": 0
     },
@@ -80,6 +72,14 @@
     {
       "date": "2026-02-20T07:17:33.922Z",
       "entropy": 0
+    },
+    {
+      "date": "2026-02-20T07:22:05.629Z",
+      "entropy": 0
+    },
+    {
+      "date": "2026-02-20T07:27:05.567Z",
+      "entropy": 0
     }
   ],
   "fileHashes": {
@@ -104,8 +104,8 @@
     "src\\components\\NavLink.tsx": 1769881918580.4404,
     "src\\components\\pokedex\\PokedexCard.tsx": 1771537974282.2244,
     "src\\components\\settings\\ColorPicker.tsx": 1769982034778.8323,
-    "src\\components\\ui\\accordion.tsx": 1769818179562.0288,
     "src\\components\\ui\\alert-dialog.tsx": 1769818179251.7563,
+    "src\\components\\ui\\accordion.tsx": 1769818179562.0288,
     "src\\components\\ui\\alert.tsx": 1769818179519.5784,
     "src\\components\\ui\\aspect-ratio.tsx": 1769818179137.069,
     "src\\components\\ui\\avatar.tsx": 1769818179063.0676,
