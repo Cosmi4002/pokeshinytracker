@@ -26,7 +26,6 @@ import { MethodSelector } from '@/components/counter/MethodSelector';
 import { POKEBALLS, GAMES, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON } from '@/lib/pokemon-data';
 import { usePokemonDetails, usePokemonList, formatPokemonName } from '@/hooks/use-pokemon';
 import { getPokemonSpriteUrl } from '@/lib/pokemon-data';
-import { GenderSelector } from '@/components/ui/GenderSelector';
 import { Sparkles } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
 
@@ -220,7 +219,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
                 {/* Form Selector (Compact) */}
                 {formOptions.length > 0 && (
                   <Select value={form || 'default'} onValueChange={(v) => setForm(v === 'default' ? '' : v)}>
-                    <SelectTrigger className="h-10 w-[180px] bg-background/50 backdrop-blur-sm border-primary/20 hover:border-primary/50 transition-colors">
+                    <SelectTrigger className="h-8 w-[200px] rounded-full bg-background/50 backdrop-blur-sm border-primary/20 hover:border-primary/50 transition-colors text-xs">
                       <Sparkles className="mr-2 h-4 w-4 text-amber-400 fill-amber-400/20" />
                       <SelectValue placeholder="Forma base" />
                     </SelectTrigger>
@@ -235,8 +234,18 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
                   </Select>
                 )}
 
-                {/* Gender Toggle */}
-                <GenderSelector value={gender} onChange={setGender} />
+                {/* Gender Selector */}
+                {pokemonDetails?.hasGenderDifference && (
+                  <Select value={gender || 'male'} onValueChange={(v) => setGender(v === 'female' ? 'female' : '')}>
+                    <SelectTrigger className="h-8 w-[120px] rounded-full text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="male">Maschio</SelectItem>
+                      <SelectItem value="female">Femmina</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
             </div>
           )}
