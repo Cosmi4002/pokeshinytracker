@@ -11,7 +11,7 @@ import { getPokemonSpriteUrl } from '@/hooks/use-pokemon';
 type ProfileRow = Pick<Tables<'profiles'>, 'user_id' | 'username'>;
 type PublicCaughtRow = Pick<
   Tables<'caught_shinies'>,
-  'id' | 'pokemon_id' | 'pokemon_name' | 'form' | 'gender' | 'caught_date' | 'sprite_url' | 'game'
+  'id' | 'pokemon_id' | 'pokemon_name' | 'form' | 'gender' | 'caught_date' | 'sprite_url' | 'game' | 'is_fail'
 >;
 
 export default function UserCollectionsSearch() {
@@ -72,7 +72,7 @@ export default function UserCollectionsSearch() {
     try {
       const { data, error } = await supabase
         .from('caught_shinies')
-        .select('id, pokemon_id, pokemon_name, form, gender, caught_date, sprite_url, game')
+        .select('id, pokemon_id, pokemon_name, form, gender, caught_date, sprite_url, game, is_fail')
         .eq('user_id', profile.user_id)
         .order('caught_date', { ascending: false })
         .limit(500);
@@ -240,6 +240,7 @@ export default function UserCollectionsSearch() {
                             <div className="min-w-0">
                               <p className="font-medium truncate">{entry.pokemon_name}</p>
                               <p className="text-xs text-muted-foreground truncate">{entry.form || 'Forma base'}</p>
+                              {entry.is_fail && <p className="text-xs font-bold text-red-500">FAIL</p>}
                               <p className="text-xs text-muted-foreground">{new Date(entry.caught_date).toLocaleDateString('it-IT')}</p>
                             </div>
                           </div>

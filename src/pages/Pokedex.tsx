@@ -37,7 +37,8 @@ export default function Pokedex() {
             const { data, error } = await supabase
                 .from('caught_shinies')
                 .select('pokemon_id, gender, form')
-                .eq('user_id', user.id);
+                .eq('user_id', user.id)
+                .or('is_fail.is.false,is_fail.is.null');
             if (error) throw error;
 
             const caught: CaughtDataMap = {};
