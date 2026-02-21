@@ -115,13 +115,13 @@ export function ThemeCustomizer() {
         <Button
           variant="outline"
           size="icon"
-          className="dark:bg-gray-800 dark:text-gray-100 transition-all duration-300"
+          className="h-12 w-12 rounded-xl border-2 dark:bg-gray-800 dark:text-gray-100 transition-all duration-300"
           style={{
             borderColor: accentColor,
-            boxShadow: `0 0 10px ${accentColor}40`
+            boxShadow: `0 0 12px ${accentColor}40`
           }}
         >
-          {colorScheme === 'dark' ? <Moon className="h-[1.2rem] w-[1.2rem]" /> : <Sun className="h-[1.2rem] w-[1.2rem]" />}
+          {colorScheme === 'dark' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DialogTrigger>

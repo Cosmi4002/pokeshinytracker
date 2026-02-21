@@ -343,16 +343,16 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
             <div className="mt-2 pt-2 border-t flex items-center justify-between" style={{ borderTopColor: `${theme.primary}20` }}>
               <div className="flex items-center gap-2">
                 {entry.is_fail ? (
-                  <div className="relative overflow-hidden rounded border border-red-500/50 bg-red-950/40 pl-2 pr-3 py-0.5 shadow-[0_0_10px_rgba(239,68,68,0.2)] inset-shadow-sm">
+                  <div className="relative overflow-hidden rounded border border-red-500/50 bg-red-950/40 pl-2 pr-3 py-1 shadow-[0_0_10px_rgba(239,68,68,0.2)] inset-shadow-sm">
                     <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_45%,rgba(239,68,68,0.2)_50%,transparent_55%)] bg-[length:200%_200%] animate-[shimmer_3s_infinite]" />
                     <div className="flex items-center gap-1.5">
-                      <div className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_5px_rgba(239,68,68,0.8)]" />
-                      <span className="text-red-400 font-black text-[10px] tracking-[0.15em] uppercase drop-shadow-sm">FAIL</span>
+                      <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_5px_rgba(239,68,68,0.8)]" />
+                      <span className="text-red-400 font-black text-[11px] tracking-[0.15em] uppercase drop-shadow-sm">FAIL</span>
                     </div>
                   </div>
                 ) : pokeball ? (
                   <>
-                    <img src={pokeball.sprite} loading="lazy" decoding="async" className="w-4 h-4 object-contain" alt="pokeball" />
+                    <img src={pokeball.sprite} loading="lazy" decoding="async" className="w-5 h-5 object-contain" alt="pokeball" />
                     <span className="text-[9px] text-white/50 font-semibold uppercase tracking-wide">{pokeball.name}</span>
                   </>
                 ) : (
@@ -366,7 +366,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                     src="/img/items/shiny-charm.png"
                     loading="lazy"
                     decoding="async"
-                    className="w-7 h-7 object-contain animate-pulse drop-shadow-[0_0_8px_rgba(234,179,8,0.6)]"
+                    className="w-8 h-8 object-contain animate-pulse drop-shadow-[0_0_8px_rgba(234,179,8,0.6)]"
                     alt="Shiny Charm"
                   />
                 </div>

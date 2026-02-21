@@ -76,6 +76,15 @@
 
     body {
         @apply bg-background text-foreground;
+        zoom: 0.9;
+    }
+
+    @supports not (zoom: 1) {
+        body {
+            transform: scale(0.9);
+            transform-origin: top left;
+            width: 111.111111%;
+        }
     }
 
 

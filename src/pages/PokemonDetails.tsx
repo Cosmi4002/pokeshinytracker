@@ -77,6 +77,7 @@ export default function PokemonDetails() {
                 .from('caught_shinies')
                 .select('pokemon_id, gender, form')
                 .eq('user_id', user.id)
+                .or('is_fail.is.false,is_fail.is.null')
                 .in('pokemon_id', variantIds);
 
             if (error) throw error;

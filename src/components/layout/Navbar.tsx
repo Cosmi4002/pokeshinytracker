@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Calculator, Search, Grid3X3, LogOut, User, Sparkles, Settings2, FileText, Pencil, Users } from 'lucide-react';
+import { Calculator, Search, Grid3X3, LogOut, Sparkles, Settings2, FileText, Pencil, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { supabaseProjectRef } from '@/integrations/supabase/client';
@@ -10,12 +10,30 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ThemeCustomizer } from '@/components/layout/ThemeCustomizer';
 import { useRandomColor } from '@/lib/random-color-context';
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+
+const trainerAvatars = [
+  { id: 'red', label: 'Red', src: '/img/trainers/red.png' },
+  { id: 'green', label: 'Green', src: '/img/trainers/green.png' },
+  { id: 'ethan', label: 'Ethan', src: '/img/trainers/ethan.png' },
+  { id: 'lyra', label: 'Lyra', src: '/img/trainers/lyra.png' },
+  { id: 'brendan', label: 'Brendan', src: '/img/trainers/brendan.png' },
+  { id: 'may', label: 'May', src: '/img/trainers/may.png' },
+  { id: 'lucas', label: 'Lucas', src: '/img/trainers/lucas.png' },
+  { id: 'dawn', label: 'Dawn', src: '/img/trainers/dawn.png' },
+  { id: 'hilbert', label: 'Hilbert', src: '/img/trainers/hilbert.png' },
+  { id: 'hilda', label: 'Hilda', src: '/img/trainers/hilda.png' },
+  { id: 'calem', label: 'Calem', src: '/img/trainers/calem.png' },
+  { id: 'serena', label: 'Serena', src: '/img/trainers/serena.png' },
+] as const;
 
 export function Navbar() {
   const location = useLocation();
@@ -24,6 +42,7 @@ export function Navbar() {
   const { accentColor } = useRandomColor();
   const { toast } = useToast();
   const [profileUsername, setProfileUsername] = useState<string | null>(null);
+  const [selectedAvatarId, setSelectedAvatarId] = useState<(typeof trainerAvatars)[number]['id']>('red');
 
   const navLinks = [
     { to: '/counter', label: 'Counter', icon: Calculator },
@@ -39,6 +58,8 @@ export function Navbar() {
   }, [user?.user_metadata]);
 
   const displayUsername = profileUsername || metadataUsername;
+  const selectedAvatar =
+    trainerAvatars.find((avatar) => avatar.id === selectedAvatarId) ?? trainerAvatars[0];
 
   const handleSetUsername = async () => {
     if (!user) return;
@@ -90,6 +111,23 @@ export function Navbar() {
       });
     }
   };
+
+  useEffect(() => {
+    if (!user) {
+      setSelectedAvatarId('red');
+      return;
+    }
+
+    const storageKey = `trainer-avatar-${user.id}`;
+    const stored = window.localStorage.getItem(storageKey);
+    const exists = trainerAvatars.some((avatar) => avatar.id === stored);
+    setSelectedAvatarId(exists ? (stored as (typeof trainerAvatars)[number]['id']) : 'red');
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (!user) return;
+    window.localStorage.setItem(`trainer-avatar-${user.id}`, selectedAvatarId);
+  }, [selectedAvatarId, user?.id]);
 
   useEffect(() => {
     let active = true;
@@ -166,8 +204,20 @@ export function Navbar() {
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-9 w-9">
-                  <User className="h-5 w-5" />
+                <Button variant="ghost" size="icon" className="h-12 w-12">
+                  <span
+                    className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl border-2 bg-gradient-to-br from-white/30 to-white/10 ring-1 ring-white/40"
+                    style={{
+                      borderColor: accentColor,
+                      boxShadow: `0 0 12px ${accentColor}40`,
+                    }}
+                  >
+                    <img
+                      src={selectedAvatar.src}
+                      alt={selectedAvatar.label}
+                      className="h-full w-full origin-top scale-[1.58] object-cover object-[50%_10%] [image-rendering:pixelated]"
+                    />
+                  </span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -197,6 +247,43 @@ export function Navbar() {
                   <Pencil className="mr-2 h-4 w-4" />
                   Imposta username
                 </DropdownMenuItem>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>
+                    <img
+                      src={selectedAvatar.src}
+                      alt={selectedAvatar.label}
+                      className="mr-2 h-4 w-4 rounded-md border border-primary/70 bg-gradient-to-br from-white/30 to-white/10 p-0.5 object-contain"
+                    />
+                    Avatar
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent className="w-72 p-3">
+                    <div className="grid grid-cols-4 gap-2">
+                      {trainerAvatars.map((avatar) => (
+                        <DropdownMenuItem
+                          key={avatar.id}
+                          onClick={() => setSelectedAvatarId(avatar.id)}
+                          className="p-0 focus:bg-transparent"
+                        >
+                          <span
+                            className={cn(
+                              'flex h-14 w-14 items-center justify-center overflow-hidden rounded-xl border-2 bg-gradient-to-br from-white/30 to-white/10 shadow-[0_4px_10px_rgba(0,0,0,0.15)] transition-all',
+                              selectedAvatarId === avatar.id
+                                ? 'border-primary ring-1 ring-primary/60'
+                                : 'border-border hover:border-primary/60'
+                            )}
+                          >
+                            <img
+                              src={avatar.src}
+                              alt={avatar.label}
+                              title={avatar.label}
+                              className="h-full w-full origin-top scale-[1.58] object-cover object-[50%_10%] [image-rendering:pixelated]"
+                            />
+                          </span>
+                        </DropdownMenuItem>
+                      ))}
+                    </div>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="text-muted-foreground text-xs flex flex-col items-start gap-1">
                   <span className="font-semibold text-foreground">
