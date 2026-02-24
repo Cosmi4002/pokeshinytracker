@@ -102,9 +102,10 @@ export default function Memo() {
   const handleEditorClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;
     if (target.tagName === 'INPUT') {
-      const input = target as HTMLInputElement;
-      input.checked = !input.checked;
-      syncFromEditor();
+      // Let the browser handle checkbox toggle, then sync the resulting HTML.
+      window.setTimeout(() => {
+        syncFromEditor();
+      }, 0);
     }
   };
 
