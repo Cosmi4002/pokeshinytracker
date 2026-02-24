@@ -11,7 +11,7 @@ import { getPokemonSpriteUrl } from '@/hooks/use-pokemon';
 type ProfileRow = Pick<Tables<'profiles'>, 'user_id' | 'username'>;
 type PublicCaughtRow = Pick<
   Tables<'caught_shinies'>,
-  'id' | 'pokemon_id' | 'pokemon_name' | 'form' | 'gender' | 'caught_date' | 'sprite_url' | 'game' | 'is_fail'
+  'id' | 'pokemon_id' | 'pokemon_name' | 'form' | 'gender' | 'caught_date' | 'sprite_url' | 'game' | 'is_fail' | 'hunt_start_date' | 'method' | 'attempts'
 >;
 type PublicRecentRow = PublicCaughtRow & { user_id: string; username: string | null };
 
@@ -82,7 +82,7 @@ export default function UserCollectionsSearch() {
     try {
       const { data, error } = await supabase
         .from('caught_shinies')
-        .select('id, pokemon_id, pokemon_name, form, gender, caught_date, sprite_url, game, is_fail')
+        .select('id, pokemon_id, pokemon_name, form, gender, caught_date, sprite_url, game, is_fail, hunt_start_date, method, attempts')
         .eq('user_id', profile.user_id)
         .order('caught_date', { ascending: false })
         .limit(500);
@@ -108,7 +108,7 @@ export default function UserCollectionsSearch() {
       const cutoff = getFourDaysAgoDate();
       const { data, error } = await supabase
         .from('caught_shinies')
-        .select('id, user_id, pokemon_id, pokemon_name, form, gender, caught_date, sprite_url, game, is_fail')
+        .select('id, user_id, pokemon_id, pokemon_name, form, gender, caught_date, sprite_url, game, is_fail, hunt_start_date, method, attempts')
         .gte('caught_date', cutoff)
         .order('caught_date', { ascending: false })
         .limit(120);
@@ -304,6 +304,10 @@ export default function UserCollectionsSearch() {
                               <p className="text-xs text-muted-foreground truncate">{entry.form || 'Forma base'}</p>
                               {entry.is_fail && <p className="text-xs font-bold text-red-500">FAIL</p>}
                               <p className="text-xs text-muted-foreground">{new Date(entry.caught_date).toLocaleDateString('it-IT')}</p>
+                              <p className="text-xs text-muted-foreground truncate">Gioco: {entry.game || '-'}</p>
+                              <p className="text-xs text-muted-foreground">Inizio: {entry.hunt_start_date ? new Date(entry.hunt_start_date).toLocaleDateString('it-IT') : '-'}</p>
+                              <p className="text-xs text-muted-foreground truncate">Metodo: {entry.method || '-'}</p>
+                              <p className="text-xs text-muted-foreground">Encounters: {entry.attempts ?? '-'}</p>
                             </div>
                           </div>
                         </div>
@@ -342,6 +346,10 @@ export default function UserCollectionsSearch() {
                             <p className="text-xs text-muted-foreground truncate">{entry.form || 'Forma base'}</p>
                             <p className="text-xs text-muted-foreground truncate">@{entry.username || 'utente'}</p>
                             <p className="text-xs text-muted-foreground">{new Date(entry.caught_date).toLocaleDateString('it-IT')}</p>
+                            <p className="text-xs text-muted-foreground truncate">Gioco: {entry.game || '-'}</p>
+                            <p className="text-xs text-muted-foreground">Inizio: {entry.hunt_start_date ? new Date(entry.hunt_start_date).toLocaleDateString('it-IT') : '-'}</p>
+                            <p className="text-xs text-muted-foreground truncate">Metodo: {entry.method || '-'}</p>
+                            <p className="text-xs text-muted-foreground">Encounters: {entry.attempts ?? '-'}</p>
                           </div>
                         </div>
                       </div>
@@ -409,6 +417,10 @@ export default function UserCollectionsSearch() {
                               <p className="text-xs text-muted-foreground truncate">{entry.form || 'Forma base'}</p>
                               {entry.is_fail && <p className="text-xs font-bold text-red-500">FAIL</p>}
                               <p className="text-xs text-muted-foreground">{new Date(entry.caught_date).toLocaleDateString('it-IT')}</p>
+                              <p className="text-xs text-muted-foreground truncate">Gioco: {entry.game || '-'}</p>
+                              <p className="text-xs text-muted-foreground">Inizio: {entry.hunt_start_date ? new Date(entry.hunt_start_date).toLocaleDateString('it-IT') : '-'}</p>
+                              <p className="text-xs text-muted-foreground truncate">Metodo: {entry.method || '-'}</p>
+                              <p className="text-xs text-muted-foreground">Encounters: {entry.attempts ?? '-'}</p>
                             </div>
                           </div>
                         </div>
