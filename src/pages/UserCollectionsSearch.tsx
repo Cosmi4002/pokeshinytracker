@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+﻿import { useEffect, useMemo, useState } from 'react';
 import { Search, Radio, UserRound, Users } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Input } from '@/components/ui/input';
@@ -234,8 +234,8 @@ export default function UserCollectionsSearch() {
   }, [entries]);
 
   const renderGenderIcon = (gender: string | null) => {
-    if (gender === 'male') return <span className="text-blue-500">♂</span>;
-    if (gender === 'female') return <span className="text-pink-500">♀</span>;
+    if (gender === 'male') return <span className="text-blue-500">{'\u2642'}</span>;
+    if (gender === 'female') return <span className="text-pink-500">{'\u2640'}</span>;
     return null;
   };
 
@@ -320,7 +320,7 @@ export default function UserCollectionsSearch() {
                               <p className="text-xs text-muted-foreground">Encounters: {entry.attempts ?? '-'}</p>
                               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                                 <img src={SHINY_CHARM_ICON} alt="Cromamuleto" className="h-3 w-3 object-contain" />
-                                <span>Cromamuleto: {entry.has_shiny_charm ? 'Sì' : 'No'}</span>
+                                <span>Cromamuleto: {entry.has_shiny_charm ? 'Si' : 'No'}</span>
                               </div>
                             </div>
                           </div>
@@ -332,7 +332,6 @@ export default function UserCollectionsSearch() {
               </div>
             )}
 
-            {!selectedProfile && query.trim().length === 0 && (
             <div className="space-y-2 pt-2 border-t">
               <h3 className="font-semibold">Anteprima tutti gli utenti (ultimi 4 giorni)</h3>
               {globalRecentLoading && <p className="text-sm text-muted-foreground">Caricamento anteprima globale...</p>}
@@ -370,7 +369,7 @@ export default function UserCollectionsSearch() {
                             <p className="text-xs text-muted-foreground">Encounters: {entry.attempts ?? '-'}</p>
                             <div className="flex items-center gap-1 text-xs text-muted-foreground">
                               <img src={SHINY_CHARM_ICON} alt="Cromamuleto" className="h-3 w-3 object-contain" />
-                              <span>Cromamuleto: {entry.has_shiny_charm ? 'Sì' : 'No'}</span>
+                              <span>Cromamuleto: {entry.has_shiny_charm ? 'Si' : 'No'}</span>
                             </div>
                           </div>
                         </div>
@@ -380,7 +379,6 @@ export default function UserCollectionsSearch() {
                 </div>
               )}
             </div>
-            )}
           </CardContent>
         </Card>
 
@@ -449,7 +447,7 @@ export default function UserCollectionsSearch() {
                               <p className="text-xs text-muted-foreground">Encounters: {entry.attempts ?? '-'}</p>
                               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                                 <img src={SHINY_CHARM_ICON} alt="Cromamuleto" className="h-3 w-3 object-contain" />
-                                <span>Cromamuleto: {entry.has_shiny_charm ? 'Sì' : 'No'}</span>
+                                <span>Cromamuleto: {entry.has_shiny_charm ? 'Si' : 'No'}</span>
                               </div>
                             </div>
                           </div>

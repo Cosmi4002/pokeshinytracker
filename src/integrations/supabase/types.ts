@@ -22,6 +22,7 @@ export type Database = {
           has_shiny_charm: boolean | null
           id: string
           increment_amount: number | null
+          increment_hotkey: string | null
           is_visible_on_counter: boolean | null
           method: string
           pokemon_id: number | null
@@ -35,6 +36,7 @@ export type Database = {
           has_shiny_charm?: boolean | null
           id?: string
           increment_amount?: number | null
+          increment_hotkey?: string | null
           is_visible_on_counter?: boolean | null
           method: string
           pokemon_id?: number | null
@@ -48,6 +50,7 @@ export type Database = {
           has_shiny_charm?: boolean | null
           id?: string
           increment_amount?: number | null
+          increment_hotkey?: string | null
           is_visible_on_counter?: boolean | null
           method?: string
           pokemon_id?: number | null

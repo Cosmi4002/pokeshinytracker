@@ -5,6 +5,16 @@ import { Navbar } from '@/components/layout/Navbar';
 import { ShinyCounter } from '@/components/counter/ShinyCounter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { useAuth } from '@/lib/auth-context';
 import { useRandomColor } from '@/lib/random-color-context';
 import { supabase } from '@/integrations/supabase/client';
@@ -20,6 +30,7 @@ export default function Counter() {
   const navigate = useNavigate();
   const [activeHunts, setActiveHunts] = useState<ActiveHunt[]>([]);
   const [loading, setLoading] = useState(true);
+  const [huntToHideId, setHuntToHideId] = useState<string | null>(null);
   const isAbortLikeError = (err: unknown) => {
     if (!err || typeof err !== 'object') return false;
     const maybe = err as { name?: string; message?: string };
@@ -99,6 +110,7 @@ export default function Counter() {
       counter: 0,
       has_shiny_charm: false,
       increment_amount: 1,
+      increment_hotkey: null,
       is_visible_on_counter: true, // Visibile nel multi-counter
       created_at: new Date().toISOString(), // Auto start date
     }).select('id').single();
@@ -199,7 +211,7 @@ export default function Counter() {
                         className="h-8 w-8 text-muted-foreground hover:text-destructive"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleHideHunt(hunt.id);
+                          setHuntToHideId(hunt.id);
                         }}
                         title="Chiudi (Nascondi)"
                       >
@@ -245,6 +257,28 @@ export default function Counter() {
           </div>
         )}
       </main>
+
+      <AlertDialog open={!!huntToHideId} onOpenChange={(open) => !open && setHuntToHideId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Conferma eliminazione counter</AlertDialogTitle>
+            <AlertDialogDescription>
+              Vuoi davvero rimuovere questo counter dalla vista multipla? Potrai riaggiungerlo in seguito.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setHuntToHideId(null)}>Annulla</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (huntToHideId) void handleHideHunt(huntToHideId);
+                setHuntToHideId(null);
+              }}
+            >
+              Elimina
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

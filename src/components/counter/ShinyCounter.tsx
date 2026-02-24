@@ -40,6 +40,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
   const { accentColor } = useRandomColor();
   const [counter, setCounter] = useState(0);
   const [incrementAmount, setIncrementAmount] = useState(1);
+  const [incrementHotkey, setIncrementHotkey] = useState('');
   const [selectedPokemonId, setSelectedPokemonId] = useState<number | null>(null);
   const [selectedPokemonName, setSelectedPokemonName] = useState<string>('');
   const [selectedMethod, setSelectedMethod] = useState<HuntingMethod>(HUNTING_METHODS[0]);
@@ -54,6 +55,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
   const [tempCounterValue, setTempCounterValue] = useState('');
   const [isFinishDialogOpen, setIsFinishDialogOpen] = useState(false);
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
+  const [isAssigningHotkey, setIsAssigningHotkey] = useState(false);
   const [playlists, setPlaylists] = useState<{ id: string; name: string }[]>([]);
   const [huntCreatedAt, setHuntCreatedAt] = useState<string | null>(null);
   const isInitialLoadRef = useRef(true);
@@ -66,6 +68,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
     counter: 0,
     hasShinyCharm: false,
     incrementAmount: 1,
+    incrementHotkey: '',
     form: '',
     gender: '',
   });
@@ -113,10 +116,11 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
       counter,
       hasShinyCharm,
       incrementAmount,
+      incrementHotkey,
       form: selectedForm || '',
       gender: selectedGender || '',
     };
-  }, [selectedPokemonId, selectedPokemonName, selectedMethod.id, counter, hasShinyCharm, incrementAmount, selectedForm, selectedGender]);
+  }, [selectedPokemonId, selectedPokemonName, selectedMethod.id, counter, hasShinyCharm, incrementAmount, incrementHotkey, selectedForm, selectedGender]);
 
   // Load active hunt and playlists from Supabase when user is logged in
   useEffect(() => {
@@ -156,6 +160,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
           activeHuntIdRef.current = data.id;
           setCounter(data.counter ?? 0);
           setIncrementAmount(data.increment_amount ?? 1);
+          setIncrementHotkey(data.increment_hotkey ?? '');
           setSelectedPokemonId(data.pokemon_id ?? null);
           setSelectedPokemonName(data.pokemon_name ?? '');
           setSelectedMethod(HUNTING_METHODS.find((m) => m.id === data.method) ?? HUNTING_METHODS[0]);
@@ -168,6 +173,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
           activeHuntIdRef.current = null;
           setCounter(0);
           setIncrementAmount(1);
+          setIncrementHotkey('');
           setSelectedPokemonId(null);
           setSelectedPokemonName('');
           setSelectedMethod(HUNTING_METHODS[0]);
@@ -246,6 +252,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
           counter,
           has_shiny_charm: hasShinyCharm,
           increment_amount: incrementAmount,
+          increment_hotkey: incrementHotkey || null,
           form: selectedForm || null,
           gender: selectedGender || null,
           updated_at: new Date().toISOString(),
@@ -273,7 +280,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [user?.id, loading, counter, incrementAmount, selectedPokemonId, selectedPokemonName, selectedMethod, hasShinyCharm, selectedForm, selectedGender]);
+  }, [user?.id, loading, counter, incrementAmount, incrementHotkey, selectedPokemonId, selectedPokemonName, selectedMethod, hasShinyCharm, selectedForm, selectedGender]);
 
   // Fast-sync variant/name changes so Hunts page reflects them immediately after navigation.
   useEffect(() => {
@@ -319,6 +326,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
           counter: latest.counter,
           has_shiny_charm: latest.hasShinyCharm,
           increment_amount: latest.incrementAmount,
+          increment_hotkey: latest.incrementHotkey || null,
           form: latest.form || null,
           gender: latest.gender || null,
           updated_at: new Date().toISOString(),
@@ -336,6 +344,44 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
 
   const increment = () => setCounter((prev) => prev + incrementAmount);
   const decrement = () => setCounter((prev) => Math.max(0, prev - incrementAmount));
+
+  const normalizeHotkey = useCallback((rawKey: string) => {
+    if (rawKey === ' ') return 'space';
+    return rawKey.toLowerCase();
+  }, []);
+
+  const formatHotkeyLabel = useCallback((hotkey: string) => {
+    if (!hotkey) return 'Nessuno';
+    if (hotkey === 'space') return 'Space';
+    if (hotkey.length === 1) return hotkey.toUpperCase();
+    return hotkey.charAt(0).toUpperCase() + hotkey.slice(1);
+  }, []);
+
+  const handleHotkeyAssignment = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Tab') {
+      setIsAssigningHotkey(false);
+      return;
+    }
+
+    e.preventDefault();
+
+    if (e.key === 'Escape') {
+      setIsAssigningHotkey(false);
+      return;
+    }
+
+    if (e.key === 'Backspace' || e.key === 'Delete') {
+      setIncrementHotkey('');
+      setIsAssigningHotkey(false);
+      return;
+    }
+
+    if (e.ctrlKey || e.altKey || e.metaKey) return;
+    if (['Shift', 'Control', 'Alt', 'Meta', 'CapsLock'].includes(e.key)) return;
+
+    setIncrementHotkey(normalizeHotkey(e.key));
+    setIsAssigningHotkey(false);
+  }, [normalizeHotkey]);
 
   // Ensure selectedMethod is never null in render
   const safeSelectedMethod = selectedMethod || HUNTING_METHODS[0];
@@ -371,7 +417,14 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement) return;
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLSelectElement) return;
+
+      const pressedKey = normalizeHotkey(e.key);
+      if (incrementHotkey && pressedKey === incrementHotkey) {
+        e.preventDefault();
+        increment();
+        return;
+      }
 
       if (e.key === '+' || e.key === '=') {
         e.preventDefault();
@@ -384,7 +437,7 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [incrementAmount]);
+  }, [incrementAmount, incrementHotkey, normalizeHotkey]);
 
   if (loading) {
     return (
@@ -540,6 +593,30 @@ export function ShinyCounter({ huntId }: ShinyCounterProps) {
               onChange={(e) => setIncrementAmount(Math.max(1, parseInt(e.target.value) || 1))}
               className="w-16 h-8 text-center bg-white text-black border-2 border-input"
             />
+          </div>
+
+          <div className="flex items-center justify-center gap-2">
+            <Label htmlFor="increment-hotkey" className="text-xs text-muted-foreground">
+              Tasto +1:
+            </Label>
+            <Input
+              id="increment-hotkey"
+              value={isAssigningHotkey ? 'Premi un tasto...' : formatHotkeyLabel(incrementHotkey)}
+              readOnly
+              onFocus={() => setIsAssigningHotkey(true)}
+              onBlur={() => setIsAssigningHotkey(false)}
+              onKeyDown={handleHotkeyAssignment}
+              className="w-36 h-8 text-center bg-white text-black border-2 border-input"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="h-8 px-3"
+              onClick={() => setIncrementHotkey('')}
+            >
+              Reset
+            </Button>
           </div>
 
           {user && (
