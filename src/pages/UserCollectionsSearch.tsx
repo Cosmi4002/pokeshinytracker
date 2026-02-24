@@ -7,11 +7,12 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import type { Tables } from '@/integrations/supabase/types';
 import { getPokemonSpriteUrl } from '@/hooks/use-pokemon';
+import { SHINY_CHARM_ICON } from '@/lib/pokemon-data';
 
 type ProfileRow = Pick<Tables<'profiles'>, 'user_id' | 'username'>;
 type PublicCaughtRow = Pick<
   Tables<'caught_shinies'>,
-  'id' | 'pokemon_id' | 'pokemon_name' | 'form' | 'gender' | 'caught_date' | 'sprite_url' | 'game' | 'is_fail' | 'hunt_start_date' | 'method' | 'attempts'
+  'id' | 'pokemon_id' | 'pokemon_name' | 'form' | 'gender' | 'caught_date' | 'sprite_url' | 'game' | 'is_fail' | 'hunt_start_date' | 'method' | 'attempts' | 'has_shiny_charm'
 >;
 type PublicRecentRow = PublicCaughtRow & { user_id: string; username: string | null };
 
@@ -82,7 +83,7 @@ export default function UserCollectionsSearch() {
     try {
       const { data, error } = await supabase
         .from('caught_shinies')
-        .select('id, pokemon_id, pokemon_name, form, gender, caught_date, sprite_url, game, is_fail, hunt_start_date, method, attempts')
+        .select('id, pokemon_id, pokemon_name, form, gender, caught_date, sprite_url, game, is_fail, hunt_start_date, method, attempts, has_shiny_charm')
         .eq('user_id', profile.user_id)
         .order('caught_date', { ascending: false })
         .limit(500);
@@ -108,7 +109,7 @@ export default function UserCollectionsSearch() {
       const cutoff = getFourDaysAgoDate();
       const { data, error } = await supabase
         .from('caught_shinies')
-        .select('id, user_id, pokemon_id, pokemon_name, form, gender, caught_date, sprite_url, game, is_fail, hunt_start_date, method, attempts')
+        .select('id, user_id, pokemon_id, pokemon_name, form, gender, caught_date, sprite_url, game, is_fail, hunt_start_date, method, attempts, has_shiny_charm')
         .gte('caught_date', cutoff)
         .order('caught_date', { ascending: false })
         .limit(120);
@@ -232,6 +233,12 @@ export default function UserCollectionsSearch() {
       .sort((a, b) => new Date(b.caught_date).getTime() - new Date(a.caught_date).getTime());
   }, [entries]);
 
+  const renderGenderIcon = (gender: string | null) => {
+    if (gender === 'male') return <span className="text-blue-500">♂</span>;
+    if (gender === 'female') return <span className="text-pink-500">♀</span>;
+    return null;
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -300,7 +307,10 @@ export default function UserCollectionsSearch() {
                               }}
                             />
                             <div className="min-w-0">
-                              <p className="font-medium truncate">{entry.pokemon_name}</p>
+                              <p className="font-medium truncate flex items-center gap-1">
+                                <span className="truncate">{entry.pokemon_name}</span>
+                                {renderGenderIcon(entry.gender)}
+                              </p>
                               <p className="text-xs text-muted-foreground truncate">{entry.form || 'Forma base'}</p>
                               {entry.is_fail && <p className="text-xs font-bold text-red-500">FAIL</p>}
                               <p className="text-xs text-muted-foreground">{new Date(entry.caught_date).toLocaleDateString('it-IT')}</p>
@@ -308,6 +318,10 @@ export default function UserCollectionsSearch() {
                               <p className="text-xs text-muted-foreground">Inizio: {entry.hunt_start_date ? new Date(entry.hunt_start_date).toLocaleDateString('it-IT') : '-'}</p>
                               <p className="text-xs text-muted-foreground truncate">Metodo: {entry.method || '-'}</p>
                               <p className="text-xs text-muted-foreground">Encounters: {entry.attempts ?? '-'}</p>
+                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                <img src={SHINY_CHARM_ICON} alt="Cromamuleto" className="h-3 w-3 object-contain" />
+                                <span>Cromamuleto: {entry.has_shiny_charm ? 'Sì' : 'No'}</span>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -318,6 +332,7 @@ export default function UserCollectionsSearch() {
               </div>
             )}
 
+            {!selectedProfile && query.trim().length === 0 && (
             <div className="space-y-2 pt-2 border-t">
               <h3 className="font-semibold">Anteprima tutti gli utenti (ultimi 4 giorni)</h3>
               {globalRecentLoading && <p className="text-sm text-muted-foreground">Caricamento anteprima globale...</p>}
@@ -342,7 +357,10 @@ export default function UserCollectionsSearch() {
                             }}
                           />
                           <div className="min-w-0">
-                            <p className="font-medium truncate">{entry.pokemon_name}</p>
+                            <p className="font-medium truncate flex items-center gap-1">
+                              <span className="truncate">{entry.pokemon_name}</span>
+                              {renderGenderIcon(entry.gender)}
+                            </p>
                             <p className="text-xs text-muted-foreground truncate">{entry.form || 'Forma base'}</p>
                             <p className="text-xs text-muted-foreground truncate">@{entry.username || 'utente'}</p>
                             <p className="text-xs text-muted-foreground">{new Date(entry.caught_date).toLocaleDateString('it-IT')}</p>
@@ -350,6 +368,10 @@ export default function UserCollectionsSearch() {
                             <p className="text-xs text-muted-foreground">Inizio: {entry.hunt_start_date ? new Date(entry.hunt_start_date).toLocaleDateString('it-IT') : '-'}</p>
                             <p className="text-xs text-muted-foreground truncate">Metodo: {entry.method || '-'}</p>
                             <p className="text-xs text-muted-foreground">Encounters: {entry.attempts ?? '-'}</p>
+                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                              <img src={SHINY_CHARM_ICON} alt="Cromamuleto" className="h-3 w-3 object-contain" />
+                              <span>Cromamuleto: {entry.has_shiny_charm ? 'Sì' : 'No'}</span>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -358,6 +380,7 @@ export default function UserCollectionsSearch() {
                 </div>
               )}
             </div>
+            )}
           </CardContent>
         </Card>
 
@@ -413,7 +436,10 @@ export default function UserCollectionsSearch() {
                               }}
                             />
                             <div className="min-w-0">
-                              <p className="font-medium truncate">{entry.pokemon_name}</p>
+                              <p className="font-medium truncate flex items-center gap-1">
+                                <span className="truncate">{entry.pokemon_name}</span>
+                                {renderGenderIcon(entry.gender)}
+                              </p>
                               <p className="text-xs text-muted-foreground truncate">{entry.form || 'Forma base'}</p>
                               {entry.is_fail && <p className="text-xs font-bold text-red-500">FAIL</p>}
                               <p className="text-xs text-muted-foreground">{new Date(entry.caught_date).toLocaleDateString('it-IT')}</p>
@@ -421,6 +447,10 @@ export default function UserCollectionsSearch() {
                               <p className="text-xs text-muted-foreground">Inizio: {entry.hunt_start_date ? new Date(entry.hunt_start_date).toLocaleDateString('it-IT') : '-'}</p>
                               <p className="text-xs text-muted-foreground truncate">Metodo: {entry.method || '-'}</p>
                               <p className="text-xs text-muted-foreground">Encounters: {entry.attempts ?? '-'}</p>
+                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                <img src={SHINY_CHARM_ICON} alt="Cromamuleto" className="h-3 w-3 object-contain" />
+                                <span>Cromamuleto: {entry.has_shiny_charm ? 'Sì' : 'No'}</span>
+                              </div>
                             </div>
                           </div>
                         </div>
