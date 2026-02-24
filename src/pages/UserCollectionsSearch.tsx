@@ -13,6 +13,7 @@ type PublicCaughtRow = Pick<
   Tables<'caught_shinies'>,
   'id' | 'pokemon_id' | 'pokemon_name' | 'form' | 'gender' | 'caught_date' | 'sprite_url' | 'game' | 'is_fail'
 >;
+type PublicRecentRow = PublicCaughtRow & { user_id: string; username: string | null };
 
 export default function UserCollectionsSearch() {
   const [query, setQuery] = useState('');
@@ -25,6 +26,15 @@ export default function UserCollectionsSearch() {
   const [entriesLoading, setEntriesLoading] = useState(false);
   const [entriesError, setEntriesError] = useState<string | null>(null);
   const [isRealtimeActive, setIsRealtimeActive] = useState(false);
+  const [globalRecentEntries, setGlobalRecentEntries] = useState<PublicRecentRow[]>([]);
+  const [globalRecentLoading, setGlobalRecentLoading] = useState(true);
+  const [globalRecentError, setGlobalRecentError] = useState<string | null>(null);
+
+  const getFourDaysAgoDate = () => {
+    const d = new Date();
+    d.setDate(d.getDate() - 4);
+    return d.toISOString().slice(0, 10);
+  };
 
   useEffect(() => {
     const term = query.trim();
@@ -88,10 +98,79 @@ export default function UserCollectionsSearch() {
     }
   };
 
+  const loadGlobalRecent = async (silent = false) => {
+    if (!silent) {
+      setGlobalRecentLoading(true);
+      setGlobalRecentError(null);
+    }
+
+    try {
+      const cutoff = getFourDaysAgoDate();
+      const { data, error } = await supabase
+        .from('caught_shinies')
+        .select('id, user_id, pokemon_id, pokemon_name, form, gender, caught_date, sprite_url, game, is_fail')
+        .gte('caught_date', cutoff)
+        .order('caught_date', { ascending: false })
+        .limit(120);
+
+      if (error) throw error;
+
+      const rows = data || [];
+      const userIds = Array.from(new Set(rows.map((r) => r.user_id)));
+      let usernameByUserId = new Map<string, string | null>();
+
+      if (userIds.length > 0) {
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('user_id, username')
+          .in('user_id', userIds);
+        if (profileError) throw profileError;
+        usernameByUserId = new Map((profileData || []).map((p) => [p.user_id, p.username]));
+      }
+
+      const enriched: PublicRecentRow[] = rows.map((r) => ({
+        ...r,
+        username: usernameByUserId.get(r.user_id) ?? null,
+      }));
+      setGlobalRecentEntries(enriched);
+    } catch (err: any) {
+      if (!silent) {
+        setGlobalRecentError(err?.message || 'Impossibile caricare anteprima utenti.');
+      }
+    } finally {
+      if (!silent) setGlobalRecentLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void loadGlobalRecent();
+  }, []);
+
   useEffect(() => {
     if (!selectedProfile) return;
     void loadCollection(selectedProfile);
   }, [selectedProfile?.user_id]);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('public-caught-global-recent')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'caught_shinies',
+        },
+        () => {
+          void loadGlobalRecent(true);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, []);
 
   useEffect(() => {
     if (!selectedProfile) {
@@ -142,6 +221,17 @@ export default function UserCollectionsSearch() {
     return Array.from(map.values()).sort((a, b) => b.count - a.count);
   }, [entries]);
 
+  const recentEntries = useMemo(() => {
+    const now = Date.now();
+    const fourDaysMs = 4 * 24 * 60 * 60 * 1000;
+    return entries
+      .filter((entry) => {
+        const capturedAt = new Date(entry.caught_date).getTime();
+        return Number.isFinite(capturedAt) && now - capturedAt <= fourDaysMs;
+      })
+      .sort((a, b) => new Date(b.caught_date).getTime() - new Date(a.caught_date).getTime());
+  }, [entries]);
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -183,6 +273,83 @@ export default function UserCollectionsSearch() {
                 ))}
               </div>
             )}
+
+            {selectedProfile && (
+              <div className="space-y-2 pt-2 border-t">
+                <h3 className="font-semibold">
+                  Anteprima ultime catture (4 giorni) di @{selectedProfile.username}
+                </h3>
+                {entriesLoading && <p className="text-sm text-muted-foreground">Caricamento anteprima...</p>}
+                {!entriesLoading && recentEntries.length === 0 && (
+                  <p className="text-sm text-muted-foreground">Nessuna cattura negli ultimi 4 giorni.</p>
+                )}
+                {!entriesLoading && recentEntries.length > 0 && (
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                    {recentEntries.map((entry) => {
+                      const sprite = entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, { shiny: true, name: entry.form || entry.pokemon_name });
+                      return (
+                        <div key={`preview-${entry.id}`} className="rounded-lg border p-3 bg-card">
+                          <div className="flex items-center gap-3">
+                            <img
+                              src={sprite}
+                              alt={entry.pokemon_name}
+                              className="h-14 w-14 object-contain"
+                              loading="lazy"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = '/placeholder.svg';
+                              }}
+                            />
+                            <div className="min-w-0">
+                              <p className="font-medium truncate">{entry.pokemon_name}</p>
+                              <p className="text-xs text-muted-foreground truncate">{entry.form || 'Forma base'}</p>
+                              {entry.is_fail && <p className="text-xs font-bold text-red-500">FAIL</p>}
+                              <p className="text-xs text-muted-foreground">{new Date(entry.caught_date).toLocaleDateString('it-IT')}</p>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="space-y-2 pt-2 border-t">
+              <h3 className="font-semibold">Anteprima tutti gli utenti (ultimi 4 giorni)</h3>
+              {globalRecentLoading && <p className="text-sm text-muted-foreground">Caricamento anteprima globale...</p>}
+              {globalRecentError && <p className="text-sm text-destructive">{globalRecentError}</p>}
+              {!globalRecentLoading && !globalRecentError && globalRecentEntries.length === 0 && (
+                <p className="text-sm text-muted-foreground">Nessuna cattura pubblica negli ultimi 4 giorni.</p>
+              )}
+              {!globalRecentLoading && globalRecentEntries.length > 0 && (
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                  {globalRecentEntries.map((entry) => {
+                    const sprite = entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, { shiny: true, name: entry.form || entry.pokemon_name });
+                    return (
+                      <div key={`global-${entry.id}`} className="rounded-lg border p-3 bg-card">
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={sprite}
+                            alt={entry.pokemon_name}
+                            className="h-14 w-14 object-contain"
+                            loading="lazy"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = '/placeholder.svg';
+                            }}
+                          />
+                          <div className="min-w-0">
+                            <p className="font-medium truncate">{entry.pokemon_name}</p>
+                            <p className="text-xs text-muted-foreground truncate">{entry.form || 'Forma base'}</p>
+                            <p className="text-xs text-muted-foreground truncate">@{entry.username || 'utente'}</p>
+                            <p className="text-xs text-muted-foreground">{new Date(entry.caught_date).toLocaleDateString('it-IT')}</p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
 
