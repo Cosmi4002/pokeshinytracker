@@ -10,42 +10,12 @@ import { supabase } from '@/integrations/supabase/client';
 import type { Tables } from '@/integrations/supabase/types';
 
 type CaughtShinyRow = Tables<'caught_shinies'>;
-const EVOLVED_FROM_LOCAL_KEY = 'collection_evolved_from_v1';
-
-type EvolvedFromLocalMap = Record<string, { id: number; name: string }>;
-
-function readEvolvedFromLocalMap(): EvolvedFromLocalMap {
-  try {
-    const raw = localStorage.getItem(EVOLVED_FROM_LOCAL_KEY);
-    if (!raw) return {};
-    const parsed = JSON.parse(raw) as EvolvedFromLocalMap;
-    return parsed && typeof parsed === 'object' ? parsed : {};
-  } catch {
-    return {};
-  }
-}
-
-function writeEvolvedFromLocalMap(next: EvolvedFromLocalMap) {
-  try {
-    localStorage.setItem(EVOLVED_FROM_LOCAL_KEY, JSON.stringify(next));
-  } catch {
-    // ignore storage errors
-  }
-}
 
 interface SetEvolutionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   entry: CaughtShinyRow | null;
   onSuccess: () => void;
-}
-
-function isMissingEvolvedFromColumns(error: unknown): boolean {
-  const message =
-    typeof error === 'object' && error !== null && 'message' in error
-      ? String((error as { message?: string }).message || '')
-      : '';
-  return message.includes('evolved_from_') && message.toLowerCase().includes('column');
 }
 
 export function SetEvolutionDialog({ open, onOpenChange, entry, onSuccess }: SetEvolutionDialogProps) {
@@ -58,17 +28,8 @@ export function SetEvolutionDialog({ open, onOpenChange, entry, onSuccess }: Set
 
   useEffect(() => {
     if (!entry || !open) return;
-    const existingId = (entry as any).evolved_from_id as number | null | undefined;
-    const existingName = (entry as any).evolved_from_name as string | null | undefined;
-    if (existingId) {
-      setEvolvedFromId(existingId ?? null);
-      setEvolvedFromName(existingName ?? '');
-      return;
-    }
-
-    const local = readEvolvedFromLocalMap()[entry.id];
-    setEvolvedFromId(local?.id ?? null);
-    setEvolvedFromName(local?.name ?? '');
+    setEvolvedFromId(entry.evolved_from_id ?? null);
+    setEvolvedFromName(entry.evolved_from_name ?? '');
   }, [entry, open]);
 
   const handleSave = async () => {
@@ -84,34 +45,15 @@ export function SetEvolutionDialog({ open, onOpenChange, entry, onSuccess }: Set
 
     setLoading(true);
     try {
-      const localMap = readEvolvedFromLocalMap();
-      localMap[entry.id] = { id: evolvedFromId, name: evolvedFromName };
-      writeEvolvedFromLocalMap(localMap);
-
-      let { error } = await supabase
+      const { error } = await supabase
         .from('caught_shinies')
         .update({
           is_evolved: true,
           evolved_from_id: evolvedFromId,
           evolved_from_name: evolvedFromName,
-        } as any)
+        })
         .eq('id', entry.id)
         .eq('user_id', user.id);
-
-      if (error && isMissingEvolvedFromColumns(error)) {
-        const fallback = await supabase
-          .from('caught_shinies')
-          .update({ is_evolved: true } as any)
-          .eq('id', entry.id)
-          .eq('user_id', user.id);
-        error = fallback.error;
-        if (!error) {
-          toast({
-            title: 'Salvato in locale',
-            description: 'Colonne DB evolved_from_* mancanti: mini-sprite visibile solo su questo browser.',
-          });
-        }
-      }
 
       if (error) throw error;
 
@@ -136,17 +78,13 @@ export function SetEvolutionDialog({ open, onOpenChange, entry, onSuccess }: Set
     if (!entry || !user) return;
     setLoading(true);
     try {
-      const localMap = readEvolvedFromLocalMap();
-      delete localMap[entry.id];
-      writeEvolvedFromLocalMap(localMap);
-
       const { error } = await supabase
         .from('caught_shinies')
         .update({
           is_evolved: false,
           evolved_from_id: null,
           evolved_from_name: null,
-        } as any)
+        })
         .eq('id', entry.id)
         .eq('user_id', user.id);
 

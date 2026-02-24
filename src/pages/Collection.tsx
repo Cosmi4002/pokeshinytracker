@@ -25,20 +25,6 @@ import type { Tables } from '@/integrations/supabase/types';
 
 type CaughtShinyRow = Tables<'caught_shinies'>;
 type PlaylistRow = Tables<'shiny_playlists'>;
-const EVOLVED_FROM_LOCAL_KEY = 'collection_evolved_from_v1';
-
-type EvolvedFromLocalMap = Record<string, { id: number; name: string }>;
-
-function readEvolvedFromLocalMap(): EvolvedFromLocalMap {
-  try {
-    const raw = localStorage.getItem(EVOLVED_FROM_LOCAL_KEY);
-    if (!raw) return {};
-    const parsed = JSON.parse(raw) as EvolvedFromLocalMap;
-    return parsed && typeof parsed === 'object' ? parsed : {};
-  } catch {
-    return {};
-  }
-}
 
 export default function Collection() {
   const { user, loading: authLoading } = useAuth();
@@ -98,19 +84,7 @@ export default function Collection() {
       if (shiniesRes.error) throw shiniesRes.error;
       if (playlistsRes.error) throw playlistsRes.error;
 
-      const localMap = readEvolvedFromLocalMap();
-      const merged = (shiniesRes.data || []).map((row) => {
-        const local = localMap[row.id];
-        if (!local) return row;
-        if ((row as any).evolved_from_id) return row;
-        return {
-          ...row,
-          evolved_from_id: local.id,
-          evolved_from_name: local.name,
-        } as any;
-      });
-
-      setEntries(merged as CaughtShinyRow[]);
+      setEntries((shiniesRes.data || []) as CaughtShinyRow[]);
       setPlaylists(playlistsRes.data || []);
     } catch (err: any) {
       if (isAbortLikeError(err)) {

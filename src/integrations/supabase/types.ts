@@ -62,6 +62,8 @@ export type Database = {
           attempts: number | null
           caught_date: string
           created_at: string
+          evolved_from_id: number | null
+          evolved_from_name: string | null
           form: string | null
           game: string
           gender: string | null
@@ -91,9 +93,12 @@ export type Database = {
           has_shiny_charm?: boolean | null
           hunt_start_date?: string | null
           id?: string
+          is_evolved?: boolean
           is_fail?: boolean
           method: string
           notes?: string | null
+          evolved_from_id?: number | null
+          evolved_from_name?: string | null
           phase_number?: number | null
           playlist_id?: string | null
           pokeball?: string
@@ -113,9 +118,12 @@ export type Database = {
           has_shiny_charm?: boolean | null
           hunt_start_date?: string | null
           id?: string
+          is_evolved?: boolean
           is_fail?: boolean
           method?: string
           notes?: string | null
+          evolved_from_id?: number | null
+          evolved_from_name?: string | null
           phase_number?: number | null
           playlist_id?: string | null
           pokeball?: string
