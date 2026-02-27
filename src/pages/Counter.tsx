@@ -173,11 +173,11 @@ export default function Counter() {
                 <LayoutGrid className="mr-2 h-4 w-4" /> Torna alla vista Multipla
               </Button>
             </div>
-            <ShinyCounter huntId={huntId} />
+            <ShinyCounter huntId={huntId} enableKeyboardShortcuts />
           </div>
         ) : !user ? (
           /* Guest View (Single Demo) */
-          <ShinyCounter />
+          <ShinyCounter enableKeyboardShortcuts />
         ) : (
           /* Multi Counter Grid */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -220,7 +220,11 @@ export default function Counter() {
                     </div>
                     {/* Minimal variant could be created, but standard is fine currently as it fits in columns */}
                     <div className="scale-100 sm:scale-95 origin-top text-xs">
-                      <ShinyCounter huntId={hunt.id} />
+                      <ShinyCounter
+                        huntId={hunt.id}
+                        enableKeyboardShortcuts
+                        allowGlobalPlusMinusHotkeys={false}
+                      />
                     </div>
                   </div>
                 ))}
