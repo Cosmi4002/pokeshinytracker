@@ -67,12 +67,18 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
     <div
       className={cn(
         'group relative h-full flex flex-col overflow-hidden rounded-xl border bg-[#232323] shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1',
-        entry.is_fail ? 'border-red-500/80 shadow-[0_0_20px_rgba(239,68,68,0.25)] ring-1 ring-red-500/50' : 'border-white/10'
+        entry.is_fail
+          ? 'border-red-500/80 shadow-[0_0_20px_rgba(239,68,68,0.25)] ring-1 ring-red-500/50'
+          : entry.is_unobtainable
+            ? 'border-amber-500/80 shadow-[0_0_20px_rgba(245,158,11,0.25)] ring-1 ring-amber-500/50'
+            : 'border-white/10'
       )}
       style={{
-        borderColor: entry.is_fail ? '#ef4444' : `${theme.primary}95`,
+        borderColor: entry.is_fail ? '#ef4444' : entry.is_unobtainable ? '#f59e0b' : `${theme.primary}95`,
         boxShadow: entry.is_fail
           ? undefined
+          : entry.is_unobtainable
+            ? undefined
           : applyBlackEffect
             ? `0 16px 36px color-mix(in srgb, #191f3f, ${theme.secondary} 55%), inset 0 1px 0 rgba(255,255,255,0.06)`
             : `0 14px 30px ${theme.secondary}44`,
@@ -339,16 +345,29 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
             </div>
           </div>
 
-          {(pokeball || entry.has_shiny_charm) && (
+          {(pokeball || entry.has_shiny_charm || entry.is_fail || entry.is_unobtainable) && (
             <div className="mt-2 pt-2 border-t flex items-center justify-between" style={{ borderTopColor: `${theme.primary}20` }}>
               <div className="flex items-center gap-2">
-                {entry.is_fail ? (
-                  <div className="relative overflow-hidden rounded border border-red-500/50 bg-red-950/40 pl-2 pr-3 py-1 shadow-[0_0_10px_rgba(239,68,68,0.2)] inset-shadow-sm">
-                    <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_45%,rgba(239,68,68,0.2)_50%,transparent_55%)] bg-[length:200%_200%] animate-[shimmer_3s_infinite]" />
-                    <div className="flex items-center gap-1.5">
-                      <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_5px_rgba(239,68,68,0.8)]" />
-                      <span className="text-red-400 font-black text-[11px] tracking-[0.15em] uppercase drop-shadow-sm">FAIL</span>
-                    </div>
+                {(entry.is_fail || entry.is_unobtainable) ? (
+                  <div className="flex items-center gap-1.5">
+                    {entry.is_fail && (
+                      <div className="relative overflow-hidden rounded border border-red-500/50 bg-red-950/40 pl-2 pr-3 py-1 shadow-[0_0_10px_rgba(239,68,68,0.2)] inset-shadow-sm">
+                        <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_45%,rgba(239,68,68,0.2)_50%,transparent_55%)] bg-[length:200%_200%] animate-[shimmer_3s_infinite]" />
+                        <div className="flex items-center gap-1.5">
+                          <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_5px_rgba(239,68,68,0.8)]" />
+                          <span className="text-red-400 font-black text-[11px] tracking-[0.15em] uppercase drop-shadow-sm">FAIL</span>
+                        </div>
+                      </div>
+                    )}
+                    {entry.is_unobtainable && (
+                      <div className="relative overflow-hidden rounded border border-amber-500/50 bg-amber-950/40 pl-2 pr-3 py-1 shadow-[0_0_10px_rgba(245,158,11,0.2)] inset-shadow-sm">
+                        <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_45%,rgba(245,158,11,0.2)_50%,transparent_55%)] bg-[length:200%_200%] animate-[shimmer_3s_infinite]" />
+                        <div className="flex items-center gap-1.5">
+                          <div className="h-2 w-2 rounded-full bg-amber-500 animate-pulse shadow-[0_0_5px_rgba(245,158,11,0.8)]" />
+                          <span className="text-amber-300 font-black text-[11px] tracking-[0.15em] uppercase drop-shadow-sm">NON OTTENIBILE</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ) : pokeball ? (
                   <>

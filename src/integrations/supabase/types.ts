@@ -75,6 +75,7 @@ export type Database = {
           id: string
           is_evolved: boolean
           is_fail: boolean
+          is_unobtainable: boolean
           method: string
           notes: string | null
           phase_number: number | null
@@ -98,6 +99,7 @@ export type Database = {
           id?: string
           is_evolved?: boolean
           is_fail?: boolean
+          is_unobtainable?: boolean
           method: string
           notes?: string | null
           evolved_from_id?: number | null
@@ -123,6 +125,7 @@ export type Database = {
           id?: string
           is_evolved?: boolean
           is_fail?: boolean
+          is_unobtainable?: boolean
           method?: string
           notes?: string | null
           evolved_from_id?: number | null

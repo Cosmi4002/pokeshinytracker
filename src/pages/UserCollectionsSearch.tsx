@@ -12,7 +12,7 @@ import { SHINY_CHARM_ICON } from '@/lib/pokemon-data';
 type ProfileRow = Pick<Tables<'profiles'>, 'user_id' | 'username'>;
 type PublicCaughtRow = Pick<
   Tables<'caught_shinies'>,
-  'id' | 'pokemon_id' | 'pokemon_name' | 'form' | 'gender' | 'caught_date' | 'sprite_url' | 'game' | 'is_fail' | 'hunt_start_date' | 'method' | 'attempts' | 'has_shiny_charm'
+  'id' | 'pokemon_id' | 'pokemon_name' | 'form' | 'gender' | 'caught_date' | 'created_at' | 'sprite_url' | 'game' | 'is_fail' | 'is_unobtainable' | 'hunt_start_date' | 'method' | 'attempts' | 'has_shiny_charm'
 >;
 type PublicRecentRow = PublicCaughtRow & { user_id: string; username: string | null };
 
@@ -83,9 +83,10 @@ export default function UserCollectionsSearch() {
     try {
       const { data, error } = await supabase
         .from('caught_shinies')
-        .select('id, pokemon_id, pokemon_name, form, gender, caught_date, sprite_url, game, is_fail, hunt_start_date, method, attempts, has_shiny_charm')
+        .select('id, pokemon_id, pokemon_name, form, gender, caught_date, created_at, sprite_url, game, is_fail, is_unobtainable, hunt_start_date, method, attempts, has_shiny_charm')
         .eq('user_id', profile.user_id)
         .order('caught_date', { ascending: false })
+        .order('created_at', { ascending: false })
         .limit(500);
 
       if (error) throw error;
@@ -109,9 +110,10 @@ export default function UserCollectionsSearch() {
       const cutoff = getFourDaysAgoDate();
       const { data, error } = await supabase
         .from('caught_shinies')
-        .select('id, user_id, pokemon_id, pokemon_name, form, gender, caught_date, sprite_url, game, is_fail, hunt_start_date, method, attempts, has_shiny_charm')
+        .select('id, user_id, pokemon_id, pokemon_name, form, gender, caught_date, created_at, sprite_url, game, is_fail, is_unobtainable, hunt_start_date, method, attempts, has_shiny_charm')
         .gte('caught_date', cutoff)
         .order('caught_date', { ascending: false })
+        .order('created_at', { ascending: false })
         .limit(120);
 
       if (error) throw error;
@@ -230,7 +232,11 @@ export default function UserCollectionsSearch() {
         const capturedAt = new Date(entry.caught_date).getTime();
         return Number.isFinite(capturedAt) && now - capturedAt <= fourDaysMs;
       })
-      .sort((a, b) => new Date(b.caught_date).getTime() - new Date(a.caught_date).getTime());
+      .sort((a, b) => {
+        const byCaughtDate = new Date(b.caught_date).getTime() - new Date(a.caught_date).getTime();
+        if (byCaughtDate !== 0) return byCaughtDate;
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      });
   }, [entries]);
 
   const renderGenderIcon = (gender: string | null) => {
@@ -313,6 +319,7 @@ export default function UserCollectionsSearch() {
                               </p>
                               <p className="text-xs text-muted-foreground truncate">{entry.form || 'Forma base'}</p>
                               {entry.is_fail && <p className="text-xs font-bold text-red-500">FAIL</p>}
+                              {entry.is_unobtainable && <p className="text-xs font-bold text-amber-500">NON OTTENIBILE</p>}
                               <p className="text-xs text-muted-foreground">{new Date(entry.caught_date).toLocaleDateString('it-IT')}</p>
                               <p className="text-xs text-muted-foreground truncate">Gioco: {entry.game || '-'}</p>
                               <p className="text-xs text-muted-foreground">Inizio: {entry.hunt_start_date ? new Date(entry.hunt_start_date).toLocaleDateString('it-IT') : '-'}</p>
@@ -362,6 +369,8 @@ export default function UserCollectionsSearch() {
                             </p>
                             <p className="text-xs text-muted-foreground truncate">{entry.form || 'Forma base'}</p>
                             <p className="text-xs text-muted-foreground truncate">@{entry.username || 'utente'}</p>
+                            {entry.is_fail && <p className="text-xs font-bold text-red-500">FAIL</p>}
+                            {entry.is_unobtainable && <p className="text-xs font-bold text-amber-500">NON OTTENIBILE</p>}
                             <p className="text-xs text-muted-foreground">{new Date(entry.caught_date).toLocaleDateString('it-IT')}</p>
                             <p className="text-xs text-muted-foreground truncate">Gioco: {entry.game || '-'}</p>
                             <p className="text-xs text-muted-foreground">Inizio: {entry.hunt_start_date ? new Date(entry.hunt_start_date).toLocaleDateString('it-IT') : '-'}</p>
@@ -440,6 +449,7 @@ export default function UserCollectionsSearch() {
                               </p>
                               <p className="text-xs text-muted-foreground truncate">{entry.form || 'Forma base'}</p>
                               {entry.is_fail && <p className="text-xs font-bold text-red-500">FAIL</p>}
+                              {entry.is_unobtainable && <p className="text-xs font-bold text-amber-500">NON OTTENIBILE</p>}
                               <p className="text-xs text-muted-foreground">{new Date(entry.caught_date).toLocaleDateString('it-IT')}</p>
                               <p className="text-xs text-muted-foreground truncate">Gioco: {entry.game || '-'}</p>
                               <p className="text-xs text-muted-foreground">Inizio: {entry.hunt_start_date ? new Date(entry.hunt_start_date).toLocaleDateString('it-IT') : '-'}</p>

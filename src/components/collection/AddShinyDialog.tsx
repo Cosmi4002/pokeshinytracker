@@ -53,6 +53,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
   const [huntStartDate, setHuntStartDate] = useState('');
   const [caughtDate, setCaughtDate] = useState(new Date().toISOString().split('T')[0]);
   const [isFail, setIsFail] = useState(false);
+  const [isUnobtainable, setIsUnobtainable] = useState(false);
   const [phaseNumber, setPhaseNumber] = useState<number | null>(null);
   const [playlistId, setPlaylistId] = useState<string>('');
   const [notes, setNotes] = useState('');
@@ -114,6 +115,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
     setHuntStartDate('');
     setCaughtDate(new Date().toISOString().split('T')[0]);
     setIsFail(false);
+    setIsUnobtainable(false);
     setPhaseNumber(null);
     setPlaylistId('');
     setNotes('');
@@ -157,6 +159,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
         hunt_start_date: huntStartDate || null,
         caught_date: caughtDate,
         is_fail: isFail,
+        is_unobtainable: isUnobtainable,
         phase_number: phaseNumber,
         playlist_id: playlistId || null,
         notes: notes || null,
@@ -360,6 +363,11 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
           <div className="flex items-center justify-between p-3 rounded-lg border border-destructive/30 bg-destructive/5">
             <Label>FAIL (caccia fallita)</Label>
             <Switch checked={isFail} onCheckedChange={setIsFail} />
+          </div>
+
+          <div className="flex items-center justify-between p-3 rounded-lg border border-amber-500/30 bg-amber-500/5">
+            <Label>NON OTTENIBILE</Label>
+            <Switch checked={isUnobtainable} onCheckedChange={setIsUnobtainable} />
           </div>
 
           {/* 10. Playlist */}
