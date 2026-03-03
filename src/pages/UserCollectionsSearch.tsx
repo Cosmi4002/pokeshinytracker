@@ -1,5 +1,5 @@
 ﻿import { useEffect, useMemo, useState } from 'react';
-import { Search, Radio, UserRound, Users } from 'lucide-react';
+import { Search, Radio, UserRound, Users, ArrowUpCircle } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,7 +12,7 @@ import { SHINY_CHARM_ICON } from '@/lib/pokemon-data';
 type ProfileRow = Pick<Tables<'profiles'>, 'user_id' | 'username'>;
 type PublicCaughtRow = Pick<
   Tables<'caught_shinies'>,
-  'id' | 'pokemon_id' | 'pokemon_name' | 'form' | 'gender' | 'caught_date' | 'created_at' | 'sprite_url' | 'game' | 'is_fail' | 'is_unobtainable' | 'hunt_start_date' | 'method' | 'attempts' | 'has_shiny_charm'
+  'id' | 'pokemon_id' | 'pokemon_name' | 'form' | 'gender' | 'caught_date' | 'created_at' | 'sprite_url' | 'game' | 'is_fail' | 'is_unobtainable' | 'hunt_start_date' | 'method' | 'attempts' | 'has_shiny_charm' | 'is_evolved'
 >;
 type PublicRecentRow = PublicCaughtRow & { user_id: string; username: string | null };
 
@@ -83,7 +83,7 @@ export default function UserCollectionsSearch() {
     try {
       const { data, error } = await supabase
         .from('caught_shinies')
-        .select('id, pokemon_id, pokemon_name, form, gender, caught_date, created_at, sprite_url, game, is_fail, is_unobtainable, hunt_start_date, method, attempts, has_shiny_charm')
+        .select('id, pokemon_id, pokemon_name, form, gender, caught_date, created_at, sprite_url, game, is_fail, is_unobtainable, hunt_start_date, method, attempts, has_shiny_charm, is_evolved')
         .eq('user_id', profile.user_id)
         .order('caught_date', { ascending: false })
         .order('created_at', { ascending: false })
@@ -110,7 +110,7 @@ export default function UserCollectionsSearch() {
       const cutoff = getFourDaysAgoDate();
       const { data, error } = await supabase
         .from('caught_shinies')
-        .select('id, user_id, pokemon_id, pokemon_name, form, gender, caught_date, created_at, sprite_url, game, is_fail, is_unobtainable, hunt_start_date, method, attempts, has_shiny_charm')
+        .select('id, user_id, pokemon_id, pokemon_name, form, gender, caught_date, created_at, sprite_url, game, is_fail, is_unobtainable, hunt_start_date, method, attempts, has_shiny_charm, is_evolved')
         .gte('caught_date', cutoff)
         .order('caught_date', { ascending: false })
         .order('created_at', { ascending: false })
@@ -245,6 +245,18 @@ export default function UserCollectionsSearch() {
     return null;
   };
 
+  const renderEvolutionBadge = (isEvolved: boolean | null) => {
+    if (!isEvolved) return null;
+    return (
+      <div
+        className="absolute top-2 right-2 h-6 w-6 rounded-full bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 flex items-center justify-center backdrop-blur-sm"
+        title="Pokemon evoluto"
+      >
+        <ArrowUpCircle className="h-3.5 w-3.5" />
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -301,7 +313,8 @@ export default function UserCollectionsSearch() {
                     {recentEntries.map((entry) => {
                       const sprite = entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, { shiny: true, name: entry.form || entry.pokemon_name });
                       return (
-                        <div key={`preview-${entry.id}`} className="rounded-lg border p-3 bg-card">
+                        <div key={`preview-${entry.id}`} className="relative rounded-lg border p-3 bg-card">
+                          {renderEvolutionBadge(entry.is_evolved)}
                           <div className="flex items-center gap-3">
                             <img
                               src={sprite}
@@ -351,7 +364,8 @@ export default function UserCollectionsSearch() {
                   {globalRecentEntries.map((entry) => {
                     const sprite = entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, { shiny: true, name: entry.form || entry.pokemon_name });
                     return (
-                      <div key={`global-${entry.id}`} className="rounded-lg border p-3 bg-card">
+                      <div key={`global-${entry.id}`} className="relative rounded-lg border p-3 bg-card">
+                        {renderEvolutionBadge(entry.is_evolved)}
                         <div className="flex items-center gap-3">
                           <img
                             src={sprite}
@@ -431,7 +445,8 @@ export default function UserCollectionsSearch() {
                     {entries.map((entry) => {
                       const sprite = entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, { shiny: true, name: entry.form || entry.pokemon_name });
                       return (
-                        <div key={entry.id} className="rounded-lg border p-3 bg-card">
+                        <div key={entry.id} className="relative rounded-lg border p-3 bg-card">
+                          {renderEvolutionBadge(entry.is_evolved)}
                           <div className="flex items-center gap-3">
                             <img
                               src={sprite}

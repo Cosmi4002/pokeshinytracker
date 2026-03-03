@@ -19,12 +19,14 @@ import { Button } from '@/components/ui/button';
 const MEMO_HTML_KEY = 'memo_richtext_html_v1';
 const LEGACY_TEXT_KEY = 'main_memo_text_v1';
 const LEGACY_ITEMS_KEY = 'main_memo_items_v2';
+const MEMO_CALC_KEY = 'memo_calculator_input_v1';
 
 export default function Memo() {
   const editorRef = useRef<HTMLDivElement | null>(null);
   const [html, setHtml] = useState('');
   const [textColor, setTextColor] = useState('#ffffff');
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
+  const [calcInput, setCalcInput] = useState('0');
 
   useEffect(() => {
     let initialHtml = '';
@@ -73,6 +75,25 @@ export default function Memo() {
     }, 250);
     return () => window.clearTimeout(timer);
   }, [html]);
+
+  useEffect(() => {
+    try {
+      const savedCalc = localStorage.getItem(MEMO_CALC_KEY);
+      if (savedCalc) {
+        setCalcInput(savedCalc);
+      }
+    } catch {
+      // Ignore read errors.
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(MEMO_CALC_KEY, calcInput);
+    } catch {
+      // Ignore storage errors.
+    }
+  }, [calcInput]);
 
   const syncFromEditor = () => {
     if (!editorRef.current) return;
@@ -156,6 +177,55 @@ export default function Memo() {
     URL.revokeObjectURL(url);
   };
 
+  const evaluateExpression = (raw: string): string => {
+    const normalized = raw.replace(/x/g, '*').replace(/\u00f7/g, '/').replace(/\s+/g, '');
+    if (!normalized) return '0';
+    if (!/^[0-9+\-*/().]+$/.test(normalized)) {
+      throw new Error('Invalid expression');
+    }
+    const result = Function(`"use strict"; return (${normalized});`)() as number;
+    if (typeof result !== 'number' || !Number.isFinite(result)) {
+      throw new Error('Invalid result');
+    }
+    return Number.isInteger(result) ? String(result) : String(Number(result.toFixed(10)));
+  };
+
+  const handleCalcPress = (value: string) => {
+    if (value === 'C') {
+      setCalcInput('0');
+      return;
+    }
+    if (value === 'DEL') {
+      setCalcInput((prev) => {
+        if (prev.length <= 1) return '0';
+        return prev.slice(0, -1);
+      });
+      return;
+    }
+    if (value === '=') {
+      try {
+        setCalcInput((prev) => evaluateExpression(prev));
+      } catch {
+        setCalcInput('Errore');
+      }
+      return;
+    }
+
+    setCalcInput((prev) => {
+      if (prev === 'Errore') return value;
+      if (prev === '0' && !['+', '-', 'x', '\u00f7', '.', ')'].includes(value)) return value;
+      return prev + value;
+    });
+  };
+
+  const calcButtons = [
+    ['C', '(', ')', 'DEL'],
+    ['7', '8', '9', '\u00f7'],
+    ['4', '5', '6', 'x'],
+    ['1', '2', '3', '-'],
+    ['0', '.', '=', '+'],
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -218,6 +288,30 @@ export default function Memo() {
               onClick={handleEditorClick}
               className="min-h-[65vh] w-full rounded-md border border-input bg-background px-4 py-3 text-base leading-relaxed focus:outline-none focus:ring-2 focus:ring-ring overflow-auto"
             />
+
+            <Card className="border-input">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Calcolatrice</CardTitle>
+                <CardDescription>Operazioni rapide direttamente nella pagina Memo.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="rounded-md border border-input bg-background px-3 py-2 text-right text-xl font-mono break-all min-h-12">
+                  {calcInput}
+                </div>
+                <div className="grid grid-cols-4 gap-2">
+                  {calcButtons.flat().map((button) => (
+                    <Button
+                      key={button}
+                      type="button"
+                      variant={button === '=' ? 'default' : 'outline'}
+                      onClick={() => handleCalcPress(button)}
+                    >
+                      {button}
+                    </Button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
 
             <div className="flex flex-wrap items-center gap-2">
               <Button type="button" variant="outline" onClick={handleDownloadTxt}>

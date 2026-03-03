@@ -118,7 +118,12 @@ export const getDynamicOdds = (methodId: string, encounters: number, hasShinyCha
     return Math.round(4096 / totalRolls);
   }
 
-  if (methodId === 'gen4-double-encounter' || methodId === 'gen5-double-encounter') {
+  if (
+    methodId === 'gen4-double-encounter' ||
+    methodId === 'gen5-double-encounter' ||
+    methodId === 'gen5-double-rustling-grass' ||
+    methodId === 'gen5-double-dust-clouds'
+  ) {
     const totalRolls = 2 + (hasShinyCharm ? (method.generation >= 5 ? 2 : 0) : 0);
     return Math.round(8192 / totalRolls);
   }
@@ -173,6 +178,8 @@ export const HUNTING_METHODS: HuntingMethod[] = [
 
   // --- Gen 5 ---
   { id: 'gen5-double-encounter', name: 'Double Encounter', baseOdds: 4096, generation: 5, supportsShinyCharm: true },
+  { id: 'gen5-double-rustling-grass', name: 'Double Rustling Grass', baseOdds: 4096, generation: 5, supportsShinyCharm: true },
+  { id: 'gen5-double-dust-clouds', name: 'Double Dust Clouds', baseOdds: 4096, generation: 5, supportsShinyCharm: true },
   { id: 'gen5-dust-clouds', name: 'Dust Clouds', baseOdds: 8192, generation: 5, supportsShinyCharm: true },
   { id: 'gen5-fossil-restore', name: 'Fossil Restore', baseOdds: 8192, generation: 5, supportsShinyCharm: true },
   { id: 'gen5-gift', name: 'Gift Pokémon', baseOdds: 8192, generation: 5, supportsShinyCharm: true },
