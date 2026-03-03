@@ -30,6 +30,7 @@ interface ShinyCardProps {
 }
 
 export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverride, applyBlackEffect = false, spriteName }: ShinyCardProps) {
+  const isFail = entry.is_fail === true;
   const isEvolved = entry.is_evolved === true;
   const evolvedFromId = (entry as any).evolved_from_id as number | null | undefined;
   const evolvedFromName = (entry as any).evolved_from_name as string | null | undefined;
@@ -67,15 +68,15 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
     <div
       className={cn(
         'group relative h-full flex flex-col overflow-hidden rounded-xl border bg-[#232323] shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1',
-        entry.is_fail
+        isFail
           ? 'border-red-500/80 shadow-[0_0_20px_rgba(239,68,68,0.25)] ring-1 ring-red-500/50'
           : entry.is_unobtainable
             ? 'border-amber-500/80 shadow-[0_0_20px_rgba(245,158,11,0.25)] ring-1 ring-amber-500/50'
             : 'border-white/10'
       )}
       style={{
-        borderColor: entry.is_fail ? '#ef4444' : entry.is_unobtainable ? '#f59e0b' : `${theme.primary}95`,
-        boxShadow: entry.is_fail
+        borderColor: isFail ? '#ef4444' : entry.is_unobtainable ? '#f59e0b' : `${theme.primary}95`,
+        boxShadow: isFail
           ? undefined
           : entry.is_unobtainable
             ? undefined
@@ -119,8 +120,16 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
               loading="lazy"
               decoding="async"
               alt={entry.pokemon_name}
-              className="h-full w-full object-contain pokemon-sprite drop-shadow-[0_8px_16px_rgba(0,0,0,0.75)] transition-all duration-300 group-hover:scale-105 relative z-10"
-              style={{ imageRendering: 'auto' }}
+              className={cn(
+                "h-full w-full object-contain pokemon-sprite transition-all duration-300 group-hover:scale-105 relative z-10",
+                isFail
+                  ? "drop-shadow-[0_0_12px_rgba(255,255,255,0.25)]"
+                  : "drop-shadow-[0_8px_16px_rgba(0,0,0,0.75)]"
+              )}
+              style={{
+                imageRendering: 'auto',
+                filter: isFail ? 'brightness(0) contrast(1.3)' : undefined,
+              }}
               onError={(e) => {
                 e.currentTarget.src = '/fallback-sprite.png';
               }}

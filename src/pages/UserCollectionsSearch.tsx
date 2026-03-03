@@ -257,6 +257,13 @@ export default function UserCollectionsSearch() {
     );
   };
 
+  const getFailSpriteStyle = (isFail: boolean | null) => {
+    if (!isFail) return undefined;
+    return {
+      filter: 'brightness(0) contrast(1.3)',
+    } as const;
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -319,7 +326,8 @@ export default function UserCollectionsSearch() {
                             <img
                               src={sprite}
                               alt={entry.pokemon_name}
-                              className="h-14 w-14 object-contain"
+                              className={entry.is_fail ? 'h-14 w-14 object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.25)]' : 'h-14 w-14 object-contain'}
+                              style={getFailSpriteStyle(entry.is_fail)}
                               loading="lazy"
                               onError={(e) => {
                                 (e.target as HTMLImageElement).src = '/placeholder.svg';
@@ -370,7 +378,8 @@ export default function UserCollectionsSearch() {
                           <img
                             src={sprite}
                             alt={entry.pokemon_name}
-                            className="h-14 w-14 object-contain"
+                            className={entry.is_fail ? 'h-14 w-14 object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.25)]' : 'h-14 w-14 object-contain'}
+                            style={getFailSpriteStyle(entry.is_fail)}
                             loading="lazy"
                             onError={(e) => {
                               (e.target as HTMLImageElement).src = '/placeholder.svg';
@@ -451,7 +460,8 @@ export default function UserCollectionsSearch() {
                             <img
                               src={sprite}
                               alt={entry.pokemon_name}
-                              className="h-16 w-16 object-contain"
+                              className={entry.is_fail ? 'h-16 w-16 object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.25)]' : 'h-16 w-16 object-contain'}
+                              style={getFailSpriteStyle(entry.is_fail)}
                               loading="lazy"
                               onError={(e) => {
                                 (e.target as HTMLImageElement).src = '/placeholder.svg';
