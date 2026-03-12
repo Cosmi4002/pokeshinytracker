@@ -366,7 +366,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
           </div>
 
           <div className="flex items-center justify-between p-3 rounded-lg border border-amber-500/30 bg-amber-500/5">
-            <Label>NON OTTENIBILE</Label>
+            <Label>UNCATCHABLE</Label>
             <Switch checked={isUnobtainable} onCheckedChange={setIsUnobtainable} />
           </div>
 
@@ -409,3 +409,4 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
     </Dialog >
   );
 }
+

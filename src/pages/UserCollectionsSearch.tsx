@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Search, Radio, UserRound, Users, ArrowUpCircle } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Input } from '@/components/ui/input';
@@ -340,7 +340,7 @@ export default function UserCollectionsSearch() {
                               </p>
                               <p className="text-xs text-muted-foreground truncate">{entry.form || 'Forma base'}</p>
                               {entry.is_fail && <p className="text-xs font-bold text-red-500">FAIL</p>}
-                              {entry.is_unobtainable && <p className="text-xs font-bold text-amber-500">NON OTTENIBILE</p>}
+                              {entry.is_unobtainable && <p className="text-xs font-bold text-amber-500">UNCATCHABLE</p>}
                               <p className="text-xs text-muted-foreground">{new Date(entry.caught_date).toLocaleDateString('it-IT')}</p>
                               <p className="text-xs text-muted-foreground truncate">Gioco: {entry.game || '-'}</p>
                               <p className="text-xs text-muted-foreground">Inizio: {entry.hunt_start_date ? new Date(entry.hunt_start_date).toLocaleDateString('it-IT') : '-'}</p>
@@ -393,7 +393,7 @@ export default function UserCollectionsSearch() {
                             <p className="text-xs text-muted-foreground truncate">{entry.form || 'Forma base'}</p>
                             <p className="text-xs text-muted-foreground truncate">@{entry.username || 'utente'}</p>
                             {entry.is_fail && <p className="text-xs font-bold text-red-500">FAIL</p>}
-                            {entry.is_unobtainable && <p className="text-xs font-bold text-amber-500">NON OTTENIBILE</p>}
+                            {entry.is_unobtainable && <p className="text-xs font-bold text-amber-500">UNCATCHABLE</p>}
                             <p className="text-xs text-muted-foreground">{new Date(entry.caught_date).toLocaleDateString('it-IT')}</p>
                             <p className="text-xs text-muted-foreground truncate">Gioco: {entry.game || '-'}</p>
                             <p className="text-xs text-muted-foreground">Inizio: {entry.hunt_start_date ? new Date(entry.hunt_start_date).toLocaleDateString('it-IT') : '-'}</p>
@@ -474,7 +474,7 @@ export default function UserCollectionsSearch() {
                               </p>
                               <p className="text-xs text-muted-foreground truncate">{entry.form || 'Forma base'}</p>
                               {entry.is_fail && <p className="text-xs font-bold text-red-500">FAIL</p>}
-                              {entry.is_unobtainable && <p className="text-xs font-bold text-amber-500">NON OTTENIBILE</p>}
+                              {entry.is_unobtainable && <p className="text-xs font-bold text-amber-500">UNCATCHABLE</p>}
                               <p className="text-xs text-muted-foreground">{new Date(entry.caught_date).toLocaleDateString('it-IT')}</p>
                               <p className="text-xs text-muted-foreground truncate">Gioco: {entry.game || '-'}</p>
                               <p className="text-xs text-muted-foreground">Inizio: {entry.hunt_start_date ? new Date(entry.hunt_start_date).toLocaleDateString('it-IT') : '-'}</p>
@@ -499,3 +499,4 @@ export default function UserCollectionsSearch() {
     </div>
   );
 }
+

@@ -373,7 +373,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                         <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_45%,rgba(245,158,11,0.2)_50%,transparent_55%)] bg-[length:200%_200%] animate-[shimmer_3s_infinite]" />
                         <div className="flex items-center gap-1.5">
                           <div className="h-2 w-2 rounded-full bg-amber-500 animate-pulse shadow-[0_0_5px_rgba(245,158,11,0.8)]" />
-                          <span className="text-amber-300 font-black text-[11px] tracking-[0.15em] uppercase drop-shadow-sm">NON OTTENIBILE</span>
+                          <span className="text-amber-300 font-black text-[11px] tracking-[0.15em] uppercase drop-shadow-sm">UNCATCHABLE</span>
                         </div>
                       </div>
                     )}
@@ -406,3 +406,4 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
     </div>
   );
 }
+
