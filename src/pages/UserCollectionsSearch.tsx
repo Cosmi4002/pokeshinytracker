@@ -257,11 +257,18 @@ export default function UserCollectionsSearch() {
     );
   };
 
-  const getFailSpriteStyle = (isFail: boolean | null) => {
-    if (!isFail) return undefined;
-    return {
-      filter: 'brightness(0) contrast(1.3)',
-    } as const;
+  const getSpriteStyle = (isFail: boolean | null, isUnobtainable: boolean | null) => {
+    if (isFail) {
+      return {
+        filter: 'brightness(0) contrast(1.3)',
+      } as const;
+    }
+    if (isUnobtainable) {
+      return {
+        filter: 'grayscale(1) brightness(1.05) contrast(0.95)',
+      } as const;
+    }
+    return undefined;
   };
 
   return (
@@ -327,7 +334,7 @@ export default function UserCollectionsSearch() {
                               src={sprite}
                               alt={entry.pokemon_name}
                               className={entry.is_fail ? 'h-14 w-14 object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.25)]' : 'h-14 w-14 object-contain'}
-                              style={getFailSpriteStyle(entry.is_fail)}
+                              style={getSpriteStyle(entry.is_fail, entry.is_unobtainable)}
                               loading="lazy"
                               onError={(e) => {
                                 (e.target as HTMLImageElement).src = '/placeholder.svg';
@@ -379,7 +386,7 @@ export default function UserCollectionsSearch() {
                             src={sprite}
                             alt={entry.pokemon_name}
                             className={entry.is_fail ? 'h-14 w-14 object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.25)]' : 'h-14 w-14 object-contain'}
-                            style={getFailSpriteStyle(entry.is_fail)}
+                            style={getSpriteStyle(entry.is_fail, entry.is_unobtainable)}
                             loading="lazy"
                             onError={(e) => {
                               (e.target as HTMLImageElement).src = '/placeholder.svg';
@@ -461,7 +468,7 @@ export default function UserCollectionsSearch() {
                               src={sprite}
                               alt={entry.pokemon_name}
                               className={entry.is_fail ? 'h-16 w-16 object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.25)]' : 'h-16 w-16 object-contain'}
-                              style={getFailSpriteStyle(entry.is_fail)}
+                              style={getSpriteStyle(entry.is_fail, entry.is_unobtainable)}
                               loading="lazy"
                               onError={(e) => {
                                 (e.target as HTMLImageElement).src = '/placeholder.svg';

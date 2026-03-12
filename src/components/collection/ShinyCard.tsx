@@ -128,7 +128,11 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
               )}
               style={{
                 imageRendering: 'auto',
-                filter: isFail ? 'brightness(0) contrast(1.3)' : undefined,
+                filter: isFail
+                  ? 'brightness(0) contrast(1.3)'
+                  : entry.is_unobtainable
+                    ? 'grayscale(1) brightness(1.05) contrast(0.95)'
+                    : undefined,
               }}
               onError={(e) => {
                 e.currentTarget.src = '/fallback-sprite.png';
