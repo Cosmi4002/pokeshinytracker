@@ -21,7 +21,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { Tables } from '@/integrations/supabase/types';
 
 type ActiveHunt = Tables<'active_hunts'>;
-const MAX_ACTIVE_COUNTERS = 9;
+const MAX_ACTIVE_COUNTERS = 15;
 
 export default function Counter() {
   const { huntId } = useParams<{ huntId?: string }>();
@@ -58,7 +58,7 @@ export default function Counter() {
           .eq('is_visible_on_counter', true) // Solo cacce visibili
           .order('order_index', { ascending: true }) // Ordina per indice
           .order('updated_at', { ascending: false })
-          .limit(MAX_ACTIVE_COUNTERS); // Fetch up to 9 most recent hunts
+          .limit(MAX_ACTIVE_COUNTERS); // Fetch up to 15 most recent hunts
 
         if (error && !isAbortLikeError(error)) {
           console.error('Error fetching hunts:', error);

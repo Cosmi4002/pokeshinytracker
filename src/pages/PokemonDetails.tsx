@@ -78,6 +78,7 @@ export default function PokemonDetails() {
                 .select('pokemon_id, gender, form')
                 .eq('user_id', user.id)
                 .or('is_fail.is.false,is_fail.is.null')
+                .or('is_unobtainable.is.false,is_unobtainable.is.null')
                 .in('pokemon_id', variantIds);
 
             if (error) throw error;
