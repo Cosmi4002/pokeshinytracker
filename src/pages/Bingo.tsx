@@ -99,44 +99,48 @@ export default function Bingo() {
 
   useEffect(() => {
     if (loading) return;
-    try {
-      const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw) as {
-        gridSize?: number;
-        gridIds?: number[];
-        markedIds?: number[];
-        generations?: number[];
-      };
-      if (parsed.gridSize && SIZE_OPTIONS.includes(parsed.gridSize as any)) {
-        const size = parsed.gridSize as (typeof SIZE_OPTIONS)[number];
-        setGridSize(size);
-        setPendingGridSize(size);
-      }
-      if (Array.isArray(parsed.generations) && parsed.generations.length > 0) {
-        setIncludedGenerations(new Set(parsed.generations));
-        setPendingGenerations(new Set(parsed.generations));
-        setGensTouched(true);
-      }
-      if (
-        Array.isArray(parsed.gridIds) &&
-        parsed.gridIds.length > 0 &&
-        (!parsed.gridSize || parsed.gridIds.length === (parsed.gridSize as number) * (parsed.gridSize as number))
-      ) {
-        const byId = new Map(pokemon.map((p) => [p.id, p]));
-        const nextGrid = parsed.gridIds.map((id) => byId.get(id)).filter(Boolean) as PokemonBasic[];
-        if (nextGrid.length === parsed.gridIds.length) {
-          setGrid(nextGrid);
-          if (Array.isArray(parsed.markedIds)) {
-            setMarked(new Set(parsed.markedIds));
-          }
-          setRestored(true);
+    if (user) return;
+    const loadLocal = () => {
+      try {
+        const raw = window.localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw) as {
+          gridSize?: number;
+          gridIds?: number[];
+          markedIds?: number[];
+          generations?: number[];
+        };
+        if (parsed.gridSize && SIZE_OPTIONS.includes(parsed.gridSize as any)) {
+          const size = parsed.gridSize as (typeof SIZE_OPTIONS)[number];
+          setGridSize(size);
+          setPendingGridSize(size);
         }
+        if (Array.isArray(parsed.generations) && parsed.generations.length > 0) {
+          setIncludedGenerations(new Set(parsed.generations));
+          setPendingGenerations(new Set(parsed.generations));
+          setGensTouched(true);
+        }
+        if (
+          Array.isArray(parsed.gridIds) &&
+          parsed.gridIds.length > 0 &&
+          (!parsed.gridSize || parsed.gridIds.length === (parsed.gridSize as number) * (parsed.gridSize as number))
+        ) {
+          const byId = new Map(pokemon.map((p) => [p.id, p]));
+          const nextGrid = parsed.gridIds.map((id) => byId.get(id)).filter(Boolean) as PokemonBasic[];
+          if (nextGrid.length === parsed.gridIds.length) {
+            setGrid(nextGrid);
+            if (Array.isArray(parsed.markedIds)) {
+              setMarked(new Set(parsed.markedIds));
+            }
+            setRestored(true);
+          }
+        }
+      } catch {
+        // ignore corrupted storage
       }
-    } catch {
-      // ignore corrupted storage
-    }
-  }, [loading, pokemon]);
+    };
+    loadLocal();
+  }, [loading, pokemon, user]);
 
   useEffect(() => {
     if (!user || loading) return;
@@ -148,7 +152,47 @@ export default function Bingo() {
         .eq('user_id', user.id)
         .maybeSingle();
       if (!active) return;
-      if (error || !data) return;
+      if (error || !data) {
+        // fallback to local if remote not found
+        try {
+          const raw = window.localStorage.getItem(STORAGE_KEY);
+          if (!raw) return;
+          const parsed = JSON.parse(raw) as {
+            gridSize?: number;
+            gridIds?: number[];
+            markedIds?: number[];
+            generations?: number[];
+          };
+          if (parsed.gridSize && SIZE_OPTIONS.includes(parsed.gridSize as any)) {
+            const size = parsed.gridSize as (typeof SIZE_OPTIONS)[number];
+            setGridSize(size);
+            setPendingGridSize(size);
+          }
+          if (Array.isArray(parsed.generations) && parsed.generations.length > 0) {
+            setIncludedGenerations(new Set(parsed.generations));
+            setPendingGenerations(new Set(parsed.generations));
+            setGensTouched(true);
+          }
+          if (
+            Array.isArray(parsed.gridIds) &&
+            parsed.gridIds.length > 0 &&
+            (!parsed.gridSize || parsed.gridIds.length === (parsed.gridSize as number) * (parsed.gridSize as number))
+          ) {
+            const byId = new Map(pokemon.map((p) => [p.id, p]));
+            const nextGrid = parsed.gridIds.map((id) => byId.get(id)).filter(Boolean) as PokemonBasic[];
+            if (nextGrid.length === parsed.gridIds.length) {
+              setGrid(nextGrid);
+              if (Array.isArray(parsed.markedIds)) {
+                setMarked(new Set(parsed.markedIds));
+              }
+              setRestored(true);
+            }
+          }
+        } catch {
+          // ignore corrupted storage
+        }
+        return;
+      }
       const { grid_size, grid_ids, marked_ids, generations } = data;
       if (grid_size && SIZE_OPTIONS.includes(grid_size as any)) {
         setGridSize(grid_size as (typeof SIZE_OPTIONS)[number]);
@@ -360,7 +404,7 @@ export default function Bingo() {
           </div>
         ) : (
           <div className="flex justify-center">
-            <div className="w-full max-w-[920px] aspect-square max-h-[72vh] overflow-hidden rounded-2xl border border-white/10 bg-card/70 shadow-lg">
+            <div className="w-full max-w-[840px] aspect-square max-h-[70vh] overflow-hidden rounded-2xl border border-white/20 bg-card/70 shadow-lg">
               <table className="w-full h-full table-fixed border-collapse">
                 <tbody>
                   {Array.from({ length: gridSize }).map((_, row) => (
@@ -379,7 +423,7 @@ export default function Bingo() {
                         return (
                           <td
                             key={`cell-${row}-${col}`}
-                            className={`border border-white/10 ${isAlt ? 'bg-black/25' : 'bg-black/15'} align-middle`}
+                            className={`border-2 border-white/20 ${isAlt ? 'bg-black/25' : 'bg-black/15'} align-middle`}
                           >
                             <div
                               onClick={() => {
@@ -398,18 +442,26 @@ export default function Bingo() {
                               className="group relative aspect-square w-full focus:outline-none focus:ring-2 focus:ring-offset-2"
                               style={{ outlineColor: accentColor }}
                             >
+                              {isMarked && (
+                                <div
+                                  className="absolute inset-0 pointer-events-none"
+                                  style={{
+                                    background: `radial-gradient(circle at 50% 50%, ${accentColor}32, transparent 70%)`,
+                                  }}
+                                />
+                              )}
                               <div
-                                className="absolute inset-0 opacity-30"
+                                className="absolute inset-0 opacity-20"
                                 style={{
                                   background: `radial-gradient(circle at 50% 15%, ${accentColor}18, transparent 60%)`,
                                 }}
                               />
                               <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.06),transparent_45%)]" />
-                              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-2">
+                              <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 p-1">
                                 <img
                                   src={sprite}
                                   alt={p.displayName || p.name}
-                                  className="h-14 w-14 sm:h-18 sm:w-18 object-contain drop-shadow-[0_10px_14px_rgba(0,0,0,0.45)]"
+                                  className="h-12 w-12 sm:h-16 sm:w-16 object-contain drop-shadow-[0_8px_12px_rgba(0,0,0,0.45)]"
                                   loading="lazy"
                                   decoding="async"
                                   onError={(e) => {
@@ -421,7 +473,7 @@ export default function Bingo() {
                                       : 'grayscale(0.2) brightness(0.95)',
                                   }}
                                 />
-                                <div className="text-[11px] sm:text-xs font-semibold text-center leading-tight">
+                                <div className="text-[10px] sm:text-[11px] font-semibold text-center leading-tight">
                                   {p.displayName || p.name}
                                 </div>
                               </div>
@@ -430,7 +482,7 @@ export default function Bingo() {
                                   <div
                                     className="absolute inset-0 pointer-events-none"
                                     style={{
-                                      boxShadow: `inset 0 0 0 2px ${accentColor}, 0 0 18px ${accentColor}55`,
+                                      boxShadow: `inset 0 0 0 2px ${accentColor}, 0 0 22px ${accentColor}66`,
                                     }}
                                   />
                                   <div
@@ -440,7 +492,7 @@ export default function Bingo() {
                                     }}
                                   />
                                   <div
-                                    className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-[0.12em] border"
+                                    className="absolute bottom-1.5 left-1/2 -translate-x-1/2 text-[9px] px-1.5 py-0.5 rounded-full font-bold uppercase tracking-[0.12em] border"
                                     style={{
                                       color: accentColor,
                                       borderColor: `${accentColor}99`,
