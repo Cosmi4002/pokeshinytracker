@@ -24,6 +24,7 @@ export default function Bingo() {
   const [restored, setRestored] = useState(false);
   const [gensTouched, setGensTouched] = useState(false);
   const [replaceMode, setReplaceMode] = useState(false);
+  const [syncReady, setSyncReady] = useState(false);
 
   const basePool = useMemo(() => {
     const byBase = new Map<number, PokemonBasic>();
@@ -141,6 +142,7 @@ export default function Bingo() {
       }
     };
     loadLocal();
+    setSyncReady(true);
   }, [loading, pokemon, user]);
 
   useEffect(() => {
@@ -157,7 +159,10 @@ export default function Bingo() {
         // fallback to local if remote not found
         try {
           const raw = window.localStorage.getItem(STORAGE_KEY);
-          if (!raw) return;
+          if (!raw) {
+            setSyncReady(true);
+            return;
+          }
           const parsed = JSON.parse(raw) as {
             gridSize?: number;
             gridIds?: number[];
@@ -189,9 +194,21 @@ export default function Bingo() {
               setRestored(true);
             }
           }
+          // push local to remote so all devices match
+          await supabase.from('bingo_boards').upsert(
+            {
+              user_id: user.id,
+              grid_size: parsed.gridSize ?? gridSize,
+              grid_ids: parsed.gridIds ?? [],
+              marked_ids: parsed.markedIds ?? [],
+              generations: parsed.generations ?? [],
+            },
+            { onConflict: 'user_id' }
+          );
         } catch {
           // ignore corrupted storage
         }
+        setSyncReady(true);
         return;
       }
       const { grid_size, grid_ids, marked_ids, generations } = data;
@@ -215,6 +232,7 @@ export default function Bingo() {
           setRestored(true);
         }
       }
+      setSyncReady(true);
     };
     fetchRemote();
     return () => {
@@ -223,7 +241,7 @@ export default function Bingo() {
   }, [user?.id, loading, pokemon]);
 
   useEffect(() => {
-    if (loading || grid.length === 0) return;
+    if (loading || grid.length === 0 || !syncReady) return;
     try {
       const payload = {
         gridSize,
@@ -249,7 +267,7 @@ export default function Bingo() {
           { onConflict: 'user_id' }
         );
     }
-  }, [gridSize, grid, marked, includedGenerations, loading, user?.id]);
+  }, [gridSize, grid, marked, includedGenerations, loading, user?.id, syncReady]);
 
   const toggleMark = (pokemonId: number) => {
     setMarked((prev) => {
@@ -401,7 +419,7 @@ export default function Bingo() {
           </div>
         ) : (
           <div className="flex justify-center">
-            <div className="w-full max-w-[840px] rounded-2xl border border-white/20 bg-card/70 shadow-lg">
+            <div className="w-full max-w-[720px] rounded-2xl border border-white/20 bg-card/70 shadow-lg">
               <table className="w-full table-fixed border-collapse">
                 <tbody>
                   {Array.from({ length: gridSize }).map((_, row) => (
