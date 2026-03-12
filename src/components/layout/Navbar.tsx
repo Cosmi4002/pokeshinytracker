@@ -49,6 +49,7 @@ export function Navbar() {
     { to: '/pokedex', label: 'Pokedex', icon: Search },
     { to: '/collection', label: 'Collection', icon: Grid3X3 },
     { to: '/memo', label: 'Memo', icon: FileText },
+    { to: '/bingo', label: 'Bingo', icon: Sparkles },
     { to: '/users', label: 'Users', icon: Users },
   ];
 
