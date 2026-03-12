@@ -274,6 +274,51 @@ export default function Bingo() {
 
   useEffect(() => {
     if (!user) return;
+    const channel = supabase
+      .channel(`bingo-boards-${user.id}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'bingo_boards', filter: `user_id=eq.${user.id}` },
+        async () => {
+          const { data, error } = await supabase
+            .from('bingo_boards')
+            .select('grid_size, grid_ids, marked_ids, generations, updated_at')
+            .eq('user_id', user.id)
+            .maybeSingle();
+          if (error || !data) return;
+          if (lastRemoteUpdatedAt && data.updated_at && data.updated_at <= lastRemoteUpdatedAt) return;
+          setLastRemoteUpdatedAt(data.updated_at ?? null);
+          const { grid_size, grid_ids, marked_ids, generations } = data;
+          if (grid_size && SIZE_OPTIONS.includes(grid_size as any)) {
+            setGridSize(grid_size as (typeof SIZE_OPTIONS)[number]);
+            setPendingGridSize(grid_size as (typeof SIZE_OPTIONS)[number]);
+          }
+          if (Array.isArray(generations) && generations.length > 0) {
+            setIncludedGenerations(new Set(generations));
+            setPendingGenerations(new Set(generations));
+            setGensTouched(true);
+          }
+          if (Array.isArray(grid_ids) && grid_ids.length > 0) {
+            const byId = new Map(pokemon.map((p) => [p.id, p]));
+            const nextGrid = grid_ids.map((id) => byId.get(id)).filter(Boolean) as PokemonBasic[];
+            if (nextGrid.length === grid_ids.length) {
+              setGrid(nextGrid);
+              if (Array.isArray(marked_ids)) {
+                setMarked(new Set(marked_ids));
+              }
+              setRestored(true);
+            }
+          }
+        }
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id, pokemon, lastRemoteUpdatedAt]);
+
+  useEffect(() => {
+    if (!user) return;
     const onFocus = () => {
       // refetch on focus to keep devices aligned
       supabase
