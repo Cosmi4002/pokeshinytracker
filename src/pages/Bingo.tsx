@@ -4,6 +4,8 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
 import { usePokemonList, getPokemonSpriteUrl, PokemonBasic } from '@/hooks/use-pokemon';
 import { useRandomColor } from '@/lib/random-color-context';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/lib/auth-context';
 
 const SIZE_OPTIONS = [4, 5, 6] as const;
 const STORAGE_KEY = 'bingo-shiny-state';
@@ -11,6 +13,7 @@ const STORAGE_KEY = 'bingo-shiny-state';
 export default function Bingo() {
   const { pokemon, loading } = usePokemonList();
   const { accentColor } = useRandomColor();
+  const { user } = useAuth();
   const [gridSize, setGridSize] = useState<(typeof SIZE_OPTIONS)[number]>(4);
   const [pendingGridSize, setPendingGridSize] = useState<(typeof SIZE_OPTIONS)[number]>(4);
   const [grid, setGrid] = useState<PokemonBasic[]>([]);
@@ -19,6 +22,7 @@ export default function Bingo() {
   const [pendingGenerations, setPendingGenerations] = useState<Set<number>>(new Set());
   const [restored, setRestored] = useState(false);
   const [gensTouched, setGensTouched] = useState(false);
+  const [replaceMode, setReplaceMode] = useState(false);
 
   const basePool = useMemo(() => {
     const byBase = new Map<number, PokemonBasic>();
@@ -135,6 +139,45 @@ export default function Bingo() {
   }, [loading, pokemon]);
 
   useEffect(() => {
+    if (!user || loading) return;
+    let active = true;
+    const fetchRemote = async () => {
+      const { data, error } = await supabase
+        .from('bingo_boards')
+        .select('grid_size, grid_ids, marked_ids, generations')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (!active) return;
+      if (error || !data) return;
+      const { grid_size, grid_ids, marked_ids, generations } = data;
+      if (grid_size && SIZE_OPTIONS.includes(grid_size as any)) {
+        setGridSize(grid_size as (typeof SIZE_OPTIONS)[number]);
+        setPendingGridSize(grid_size as (typeof SIZE_OPTIONS)[number]);
+      }
+      if (Array.isArray(generations) && generations.length > 0) {
+        setIncludedGenerations(new Set(generations));
+        setPendingGenerations(new Set(generations));
+        setGensTouched(true);
+      }
+      if (Array.isArray(grid_ids) && grid_ids.length > 0) {
+        const byId = new Map(pokemon.map((p) => [p.id, p]));
+        const nextGrid = grid_ids.map((id) => byId.get(id)).filter(Boolean) as PokemonBasic[];
+        if (nextGrid.length === grid_ids.length) {
+          setGrid(nextGrid);
+          if (Array.isArray(marked_ids)) {
+            setMarked(new Set(marked_ids));
+          }
+          setRestored(true);
+        }
+      }
+    };
+    fetchRemote();
+    return () => {
+      active = false;
+    };
+  }, [user?.id, loading, pokemon]);
+
+  useEffect(() => {
     if (loading || grid.length === 0) return;
     try {
       const payload = {
@@ -147,7 +190,21 @@ export default function Bingo() {
     } catch {
       // ignore storage errors
     }
-  }, [gridSize, grid, marked, includedGenerations, loading]);
+    if (user) {
+      void supabase
+        .from('bingo_boards')
+        .upsert(
+          {
+            user_id: user.id,
+            grid_size: gridSize,
+            grid_ids: grid.map((p) => p.id),
+            marked_ids: Array.from(marked),
+            generations: Array.from(includedGenerations),
+          },
+          { onConflict: 'user_id' }
+        );
+    }
+  }, [gridSize, grid, marked, includedGenerations, loading, user?.id]);
 
   const toggleMark = (pokemonId: number) => {
     setMarked((prev) => {
@@ -213,69 +270,79 @@ export default function Bingo() {
     >
       <Navbar />
       <main className="container mx-auto py-8 px-4 space-y-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-center text-center">
-          <div className="sm:pr-4">
-            <h1 className="text-2xl font-bold flex items-center gap-2 justify-center">
-              <Sparkles className="h-5 w-5" />
-              Bingo Shiny
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Genera una griglia casuale di Pokemon shiny da trovare. Clicca una casella per segnare.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2 justify-center sm:justify-end">
-            <div className="flex items-center gap-2 rounded-lg border border-border/60 bg-card/60 p-1">
-              {SIZE_OPTIONS.map((size) => (
-                <Button
-                  key={size}
-                  variant={pendingGridSize === size ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => {
-                    setPendingGridSize(size);
-                    setRestored(false);
-                  }}
-                  className="h-8 px-3"
-                >
-                  {size}x{size}
-                </Button>
-              ))}
+        <div className="rounded-2xl border border-white/10 bg-card/60 p-4 sm:p-5">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="text-center sm:text-left">
+              <h1 className="text-2xl font-bold flex items-center gap-2 justify-center sm:justify-start">
+                <Sparkles className="h-5 w-5" />
+                Bingo Shiny
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                Genera una griglia casuale di Pokemon shiny da trovare. Clicca una casella per segnare.
+              </p>
             </div>
-            <Button variant="outline" onClick={generateGrid} className="h-8 px-3">
-              <RefreshCcw className="mr-2 h-4 w-4" />
-              Rigenera
-            </Button>
-            <Button variant="ghost" onClick={resetMarks} className="h-8 px-3">
-              Reset
-            </Button>
-          </div>
-        </div>
 
-        <div className="flex flex-wrap items-center gap-2 justify-center">
-          <div className="text-sm text-muted-foreground">Generazioni:</div>
-          <div className="flex flex-wrap items-center gap-1.5 justify-center">
-            {availableGenerations.map((gen) => {
-              const isActive = pendingGenerations.has(gen);
-              return (
-                <Button
-                  key={gen}
-                  variant={isActive ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => toggleGeneration(gen)}
-                  className="h-7 px-2.5"
-                >
-                  Gen {gen}
-                </Button>
-              );
-            })}
+            <div className="flex flex-wrap items-center gap-2 justify-center sm:justify-end">
+              <div className="flex items-center gap-2 rounded-lg border border-border/60 bg-card/60 p-1">
+                {SIZE_OPTIONS.map((size) => (
+                  <Button
+                    key={size}
+                    variant={pendingGridSize === size ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => {
+                      setPendingGridSize(size);
+                      setRestored(false);
+                    }}
+                    className="h-8 px-3"
+                  >
+                    {size}x{size}
+                  </Button>
+                ))}
+              </div>
+              <Button
+                variant={replaceMode ? 'default' : 'outline'}
+                onClick={() => setReplaceMode((prev) => !prev)}
+                className="h-8 px-3"
+                title="Attiva per cambiare una casella alla volta"
+              >
+                {replaceMode ? 'Cambia: ON' : 'Cambia: OFF'}
+              </Button>
+              <Button variant="outline" onClick={generateGrid} className="h-8 px-3">
+                <RefreshCcw className="mr-2 h-4 w-4" />
+                Rigenera
+              </Button>
+              <Button variant="ghost" onClick={resetMarks} className="h-8 px-3">
+                Reset
+              </Button>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={selectAllGenerations} className="h-7 px-2.5">
-              Tutte
-            </Button>
-            <Button variant="ghost" size="sm" onClick={clearGenerations} className="h-7 px-2.5">
-              Nessuna
-            </Button>
+
+          <div className="mt-4 flex flex-wrap items-center gap-2 justify-center">
+            <div className="text-sm text-muted-foreground">Generazioni:</div>
+            <div className="flex flex-wrap items-center gap-1.5 justify-center">
+              {availableGenerations.map((gen) => {
+                const isActive = pendingGenerations.has(gen);
+                return (
+                  <Button
+                    key={gen}
+                    variant={isActive ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => toggleGeneration(gen)}
+                    className="h-7 px-2.5"
+                  >
+                    Gen {gen}
+                  </Button>
+                );
+              })}
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" onClick={selectAllGenerations} className="h-7 px-2.5">
+                Tutte
+              </Button>
+              <Button variant="ghost" size="sm" onClick={clearGenerations} className="h-7 px-2.5">
+                Nessuna
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -293,8 +360,8 @@ export default function Bingo() {
           </div>
         ) : (
           <div className="flex justify-center">
-            <div className="w-full max-w-5xl overflow-hidden rounded-2xl border border-white/10 bg-card/70 shadow-lg">
-              <table className="w-full table-fixed border-collapse">
+            <div className="w-full max-w-[920px] aspect-square max-h-[72vh] overflow-hidden rounded-2xl border border-white/10 bg-card/70 shadow-lg">
+              <table className="w-full h-full table-fixed border-collapse">
                 <tbody>
                   {Array.from({ length: gridSize }).map((_, row) => (
                     <tr key={`row-${row}`}>
@@ -315,11 +382,15 @@ export default function Bingo() {
                             className={`border border-white/10 ${isAlt ? 'bg-black/25' : 'bg-black/15'} align-middle`}
                           >
                             <div
-                              onClick={() => toggleMark(p.id)}
+                              onClick={() => {
+                                if (replaceMode) replaceCell(index);
+                                else toggleMark(p.id);
+                              }}
                               onKeyDown={(e) => {
                                 if (e.key === 'Enter' || e.key === ' ') {
                                   e.preventDefault();
-                                  toggleMark(p.id);
+                                  if (replaceMode) replaceCell(index);
+                                  else toggleMark(p.id);
                                 }
                               }}
                               role="button"
@@ -380,17 +451,6 @@ export default function Bingo() {
                                   </div>
                                 </>
                               )}
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  replaceCell(index);
-                                }}
-                                className="absolute top-2 right-2 h-7 w-7 rounded-full border border-white/10 bg-black/40 text-white/80 backdrop-blur hover:text-white hover:bg-black/60 transition-opacity opacity-0 group-hover:opacity-100"
-                                title="Cambia Pokemon"
-                              >
-                                <RefreshCcw className="h-3.5 w-3.5 mx-auto" />
-                              </button>
                             </div>
                           </td>
                         );

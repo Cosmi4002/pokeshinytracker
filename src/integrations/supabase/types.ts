@@ -15,6 +15,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      bingo_boards: {
+        Row: {
+          created_at: string
+          generations: number[]
+          grid_ids: number[]
+          grid_size: number
+          marked_ids: number[]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          generations?: number[]
+          grid_ids?: number[]
+          grid_size?: number
+          marked_ids?: number[]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          generations?: number[]
+          grid_ids?: number[]
+          grid_size?: number
+          marked_ids?: number[]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       active_hunts: {
         Row: {
           counter: number
