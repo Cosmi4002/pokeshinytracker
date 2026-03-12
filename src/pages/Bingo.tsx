@@ -1,11 +1,19 @@
 import { useCallback, useMemo, useState, useEffect, useRef } from 'react';
-import { Sparkles, RefreshCcw } from 'lucide-react';
+import { Sparkles, RefreshCcw, Pencil } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
 import { usePokemonList, getPokemonSpriteUrl, PokemonBasic } from '@/hooks/use-pokemon';
 import { useRandomColor } from '@/lib/random-color-context';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth-context';
+import { PokemonSelector } from '@/components/counter/PokemonSelector';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 
 const SIZE_OPTIONS = [5] as const;
 const MARK_COLOR = '#22c55e';
@@ -27,6 +35,10 @@ export default function Bingo() {
   const [syncReady, setSyncReady] = useState(false);
   const [lastRemoteUpdatedAt, setLastRemoteUpdatedAt] = useState<string | null>(null);
   const saveTimerRef = useRef<number | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerTargetIndex, setPickerTargetIndex] = useState<number | null>(null);
+  const [pickerValue, setPickerValue] = useState<number | null>(null);
+  const [pickerValueName, setPickerValueName] = useState<string | undefined>(undefined);
 
   const applyBoardState = useCallback((state: {
     gridSize?: number;
@@ -321,6 +333,35 @@ export default function Bingo() {
     });
   };
 
+  const openPickerForCell = (index: number) => {
+    const current = grid[index];
+    setPickerTargetIndex(index);
+    setPickerValue(current?.id ?? null);
+    setPickerValueName(current?.name);
+    setPickerOpen(true);
+  };
+
+  const applySelectedPokemon = (pokemonId: number | null, pokemonName: string) => {
+    if (pokemonId === null || pickerTargetIndex === null) return;
+    const selected = pokemon.find((p) => p.id === pokemonId && p.name === pokemonName) ?? pokemon.find((p) => p.id === pokemonId);
+    if (!selected) return;
+    const target = pickerTargetIndex;
+    let removedId: number | undefined;
+    setGrid((prev) => {
+      if (target < 0 || target >= prev.length) return prev;
+      const next = [...prev];
+      removedId = next[target]?.id;
+      next[target] = selected;
+      return next;
+    });
+    setMarked((prev) => {
+      const next = new Set(prev);
+      if (removedId) next.delete(removedId);
+      return next;
+    });
+    setPickerOpen(false);
+  };
+
 
   const toggleGeneration = (gen: number) => {
     setGensTouched(true);
@@ -517,6 +558,17 @@ export default function Bingo() {
                                   </div>
                                 </>
                               )}
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openPickerForCell(index);
+                                }}
+                                className="absolute top-1.5 right-1.5 h-6 w-6 rounded-full border border-white/20 bg-black/50 text-white/80 backdrop-blur hover:text-white hover:bg-black/70 transition-opacity opacity-0 group-hover:opacity-100"
+                                title="Scegli Pokemon"
+                              >
+                                <Pencil className="h-3.5 w-3.5 mx-auto" />
+                              </button>
                             </div>
                           </td>
                         );
@@ -529,6 +581,26 @@ export default function Bingo() {
           </div>
         )}
       </main>
+
+      <Dialog open={pickerOpen} onOpenChange={setPickerOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Scegli Pokemon</DialogTitle>
+            <DialogDescription>Seleziona il Pokemon da inserire nella casella.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <PokemonSelector
+              value={pickerValue}
+              valueName={pickerValueName}
+              onChange={(id, name) => {
+                setPickerValue(id);
+                setPickerValueName(name);
+                applySelectedPokemon(id, name);
+              }}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
