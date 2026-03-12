@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState, useEffect } from 'react';
+import { useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { Sparkles, RefreshCcw } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,6 @@ import { useAuth } from '@/lib/auth-context';
 const SIZE_OPTIONS = [5] as const;
 const MARK_COLOR = '#22c55e';
 const STORAGE_KEY = 'bingo-shiny-state';
-const STORAGE_TIME_KEY = 'bingo-shiny-saved-at';
 
 export default function Bingo() {
   const { pokemon, loading } = usePokemonList();
@@ -27,6 +26,41 @@ export default function Bingo() {
   const [replaceMode, setReplaceMode] = useState(false);
   const [syncReady, setSyncReady] = useState(false);
   const [lastRemoteUpdatedAt, setLastRemoteUpdatedAt] = useState<string | null>(null);
+  const saveTimerRef = useRef<number | null>(null);
+
+  const applyBoardState = useCallback((state: {
+    gridSize?: number;
+    gridIds?: number[];
+    markedIds?: number[];
+    generations?: number[];
+    updatedAt?: string | null;
+  }) => {
+    const { gridSize: size, gridIds, markedIds, generations, updatedAt } = state;
+    if (size && SIZE_OPTIONS.includes(size as any)) {
+      const safe = size as (typeof SIZE_OPTIONS)[number];
+      setGridSize(safe);
+      setPendingGridSize(safe);
+    }
+    if (Array.isArray(generations) && generations.length > 0) {
+      setIncludedGenerations(new Set(generations));
+      setPendingGenerations(new Set(generations));
+      setGensTouched(true);
+    }
+    if (Array.isArray(gridIds) && gridIds.length > 0 && (!size || gridIds.length === (size as number) * (size as number))) {
+      const byId = new Map(pokemon.map((p) => [p.id, p]));
+      const nextGrid = gridIds.map((id) => byId.get(id)).filter(Boolean) as PokemonBasic[];
+      if (nextGrid.length === gridIds.length) {
+        setGrid(nextGrid);
+        if (Array.isArray(markedIds)) {
+          setMarked(new Set(markedIds));
+        }
+        setRestored(true);
+      }
+    }
+    if (updatedAt) {
+      setLastRemoteUpdatedAt(updatedAt);
+    }
+  }, [pokemon]);
 
   const basePool = useMemo(() => {
     const byBase = new Map<number, PokemonBasic>();
@@ -104,48 +138,27 @@ export default function Bingo() {
   useEffect(() => {
     if (loading) return;
     if (user) return;
-    const loadLocal = () => {
-      try {
-        const raw = window.localStorage.getItem(STORAGE_KEY);
-        if (!raw) return;
-        const parsed = JSON.parse(raw) as {
-          gridSize?: number;
-          gridIds?: number[];
-          markedIds?: number[];
-          generations?: number[];
-        };
-        if (parsed.gridSize && SIZE_OPTIONS.includes(parsed.gridSize as any)) {
-          const size = parsed.gridSize as (typeof SIZE_OPTIONS)[number];
-          setGridSize(size);
-          setPendingGridSize(size);
-        }
-        if (Array.isArray(parsed.generations) && parsed.generations.length > 0) {
-          setIncludedGenerations(new Set(parsed.generations));
-          setPendingGenerations(new Set(parsed.generations));
-          setGensTouched(true);
-        }
-        if (
-          Array.isArray(parsed.gridIds) &&
-          parsed.gridIds.length > 0 &&
-          (!parsed.gridSize || parsed.gridIds.length === (parsed.gridSize as number) * (parsed.gridSize as number))
-        ) {
-          const byId = new Map(pokemon.map((p) => [p.id, p]));
-          const nextGrid = parsed.gridIds.map((id) => byId.get(id)).filter(Boolean) as PokemonBasic[];
-          if (nextGrid.length === parsed.gridIds.length) {
-            setGrid(nextGrid);
-            if (Array.isArray(parsed.markedIds)) {
-              setMarked(new Set(parsed.markedIds));
-            }
-            setRestored(true);
-          }
-        }
-      } catch {
-        // ignore corrupted storage
-      }
-    };
-    loadLocal();
-    setSyncReady(true);
-  }, [loading, pokemon, user]);
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as {
+        gridSize?: number;
+        gridIds?: number[];
+        markedIds?: number[];
+        generations?: number[];
+      };
+      applyBoardState({
+        gridSize: parsed.gridSize,
+        gridIds: parsed.gridIds,
+        markedIds: parsed.markedIds,
+        generations: parsed.generations,
+      });
+    } catch {
+      // ignore corrupted storage
+    } finally {
+      setSyncReady(true);
+    }
+  }, [loading, user, applyBoardState]);
 
   useEffect(() => {
     if (!user || loading) return;
@@ -158,66 +171,6 @@ export default function Bingo() {
         .maybeSingle();
       if (!active) return;
       if (error || !data) {
-        // fallback to local if remote not found
-        try {
-          const raw = window.localStorage.getItem(STORAGE_KEY);
-          if (!raw) {
-            setSyncReady(true);
-            return;
-          }
-          const parsed = JSON.parse(raw) as {
-            gridSize?: number;
-            gridIds?: number[];
-            markedIds?: number[];
-            generations?: number[];
-          };
-          if (parsed.gridSize && SIZE_OPTIONS.includes(parsed.gridSize as any)) {
-            const size = parsed.gridSize as (typeof SIZE_OPTIONS)[number];
-            setGridSize(size);
-            setPendingGridSize(size);
-          }
-          if (Array.isArray(parsed.generations) && parsed.generations.length > 0) {
-            setIncludedGenerations(new Set(parsed.generations));
-            setPendingGenerations(new Set(parsed.generations));
-            setGensTouched(true);
-          }
-          if (
-            Array.isArray(parsed.gridIds) &&
-            parsed.gridIds.length > 0 &&
-            (!parsed.gridSize || parsed.gridIds.length === (parsed.gridSize as number) * (parsed.gridSize as number))
-          ) {
-            const byId = new Map(pokemon.map((p) => [p.id, p]));
-            const nextGrid = parsed.gridIds.map((id) => byId.get(id)).filter(Boolean) as PokemonBasic[];
-            if (nextGrid.length === parsed.gridIds.length) {
-              setGrid(nextGrid);
-              if (Array.isArray(parsed.markedIds)) {
-                setMarked(new Set(parsed.markedIds));
-              }
-              setRestored(true);
-            }
-          }
-          // push local to remote so all devices match
-          await supabase.from('bingo_boards').upsert(
-            {
-              user_id: user.id,
-              grid_size: parsed.gridSize ?? gridSize,
-              grid_ids: parsed.gridIds ?? [],
-              marked_ids: parsed.markedIds ?? [],
-              generations: parsed.generations ?? [],
-            },
-            { onConflict: 'user_id' }
-          );
-        } catch {
-          // ignore corrupted storage
-        }
-        setSyncReady(true);
-        return;
-      }
-      const { grid_size, grid_ids, marked_ids, generations, updated_at } = data;
-      setLastRemoteUpdatedAt(updated_at ?? null);
-      const localSavedAt = window.localStorage.getItem(STORAGE_TIME_KEY);
-      if (localSavedAt && updated_at && new Date(localSavedAt) > new Date(updated_at)) {
-        // local is newer, push it
         try {
           const raw = window.localStorage.getItem(STORAGE_KEY);
           if (raw) {
@@ -227,6 +180,12 @@ export default function Bingo() {
               markedIds?: number[];
               generations?: number[];
             };
+            applyBoardState({
+              gridSize: parsed.gridSize,
+              gridIds: parsed.gridIds,
+              markedIds: parsed.markedIds,
+              generations: parsed.generations,
+            });
             await supabase.from('bingo_boards').upsert(
               {
                 user_id: user.id,
@@ -240,37 +199,25 @@ export default function Bingo() {
           }
         } catch {
           // ignore
+        } finally {
+          setSyncReady(true);
         }
-        setSyncReady(true);
         return;
       }
-      if (grid_size && SIZE_OPTIONS.includes(grid_size as any)) {
-        setGridSize(grid_size as (typeof SIZE_OPTIONS)[number]);
-        setPendingGridSize(grid_size as (typeof SIZE_OPTIONS)[number]);
-      }
-      if (Array.isArray(generations) && generations.length > 0) {
-        setIncludedGenerations(new Set(generations));
-        setPendingGenerations(new Set(generations));
-        setGensTouched(true);
-      }
-      if (Array.isArray(grid_ids) && grid_ids.length > 0) {
-        const byId = new Map(pokemon.map((p) => [p.id, p]));
-        const nextGrid = grid_ids.map((id) => byId.get(id)).filter(Boolean) as PokemonBasic[];
-        if (nextGrid.length === grid_ids.length) {
-          setGrid(nextGrid);
-          if (Array.isArray(marked_ids)) {
-            setMarked(new Set(marked_ids));
-          }
-          setRestored(true);
-        }
-      }
+      applyBoardState({
+        gridSize: data.grid_size,
+        gridIds: data.grid_ids ?? [],
+        markedIds: data.marked_ids ?? [],
+        generations: data.generations ?? [],
+        updatedAt: data.updated_at ?? null,
+      });
       setSyncReady(true);
     };
     fetchRemote();
     return () => {
       active = false;
     };
-  }, [user?.id, loading, pokemon]);
+  }, [user?.id, loading, applyBoardState]);
 
   useEffect(() => {
     if (!user) return;
@@ -286,76 +233,21 @@ export default function Bingo() {
             .eq('user_id', user.id)
             .maybeSingle();
           if (error || !data) return;
-          if (lastRemoteUpdatedAt && data.updated_at && data.updated_at <= lastRemoteUpdatedAt) return;
-          setLastRemoteUpdatedAt(data.updated_at ?? null);
-          const { grid_size, grid_ids, marked_ids, generations } = data;
-          if (grid_size && SIZE_OPTIONS.includes(grid_size as any)) {
-            setGridSize(grid_size as (typeof SIZE_OPTIONS)[number]);
-            setPendingGridSize(grid_size as (typeof SIZE_OPTIONS)[number]);
-          }
-          if (Array.isArray(generations) && generations.length > 0) {
-            setIncludedGenerations(new Set(generations));
-            setPendingGenerations(new Set(generations));
-            setGensTouched(true);
-          }
-          if (Array.isArray(grid_ids) && grid_ids.length > 0) {
-            const byId = new Map(pokemon.map((p) => [p.id, p]));
-            const nextGrid = grid_ids.map((id) => byId.get(id)).filter(Boolean) as PokemonBasic[];
-            if (nextGrid.length === grid_ids.length) {
-              setGrid(nextGrid);
-              if (Array.isArray(marked_ids)) {
-                setMarked(new Set(marked_ids));
-              }
-              setRestored(true);
-            }
-          }
+          if (lastRemoteUpdatedAt && data.updated_at && new Date(data.updated_at) <= new Date(lastRemoteUpdatedAt)) return;
+          applyBoardState({
+            gridSize: data.grid_size,
+            gridIds: data.grid_ids ?? [],
+            markedIds: data.marked_ids ?? [],
+            generations: data.generations ?? [],
+            updatedAt: data.updated_at ?? null,
+          });
         }
       )
       .subscribe();
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user?.id, pokemon, lastRemoteUpdatedAt]);
-
-  useEffect(() => {
-    if (!user) return;
-    const onFocus = () => {
-      // refetch on focus to keep devices aligned
-      supabase
-        .from('bingo_boards')
-        .select('grid_size, grid_ids, marked_ids, generations, updated_at')
-        .eq('user_id', user.id)
-        .maybeSingle()
-        .then(({ data, error }) => {
-          if (error || !data) return;
-          if (lastRemoteUpdatedAt && data.updated_at && data.updated_at === lastRemoteUpdatedAt) return;
-          setLastRemoteUpdatedAt(data.updated_at ?? null);
-          const { grid_size, grid_ids, marked_ids, generations } = data;
-          if (grid_size && SIZE_OPTIONS.includes(grid_size as any)) {
-            setGridSize(grid_size as (typeof SIZE_OPTIONS)[number]);
-            setPendingGridSize(grid_size as (typeof SIZE_OPTIONS)[number]);
-          }
-          if (Array.isArray(generations) && generations.length > 0) {
-            setIncludedGenerations(new Set(generations));
-            setPendingGenerations(new Set(generations));
-            setGensTouched(true);
-          }
-          if (Array.isArray(grid_ids) && grid_ids.length > 0) {
-            const byId = new Map(pokemon.map((p) => [p.id, p]));
-            const nextGrid = grid_ids.map((id) => byId.get(id)).filter(Boolean) as PokemonBasic[];
-            if (nextGrid.length === grid_ids.length) {
-              setGrid(nextGrid);
-              if (Array.isArray(marked_ids)) {
-                setMarked(new Set(marked_ids));
-              }
-              setRestored(true);
-            }
-          }
-        });
-    };
-    window.addEventListener('focus', onFocus);
-    return () => window.removeEventListener('focus', onFocus);
-  }, [user?.id, pokemon, lastRemoteUpdatedAt]);
+  }, [user?.id, applyBoardState, lastRemoteUpdatedAt]);
 
   useEffect(() => {
     if (loading || grid.length === 0 || !syncReady) return;
@@ -367,23 +259,32 @@ export default function Bingo() {
         generations: Array.from(includedGenerations),
       };
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-      window.localStorage.setItem(STORAGE_TIME_KEY, new Date().toISOString());
     } catch {
       // ignore storage errors
     }
     if (user) {
-      void supabase
-        .from('bingo_boards')
-        .upsert(
-          {
-            user_id: user.id,
-            grid_size: gridSize,
-            grid_ids: grid.map((p) => p.id),
-            marked_ids: Array.from(marked),
-            generations: Array.from(includedGenerations),
-          },
-          { onConflict: 'user_id' }
-        );
+      if (saveTimerRef.current) {
+        window.clearTimeout(saveTimerRef.current);
+      }
+      saveTimerRef.current = window.setTimeout(() => {
+        void supabase
+          .from('bingo_boards')
+          .upsert(
+            {
+              user_id: user.id,
+              grid_size: gridSize,
+              grid_ids: grid.map((p) => p.id),
+              marked_ids: Array.from(marked),
+              generations: Array.from(includedGenerations),
+            },
+            { onConflict: 'user_id' }
+          )
+          .then(({ error }) => {
+            if (!error) {
+              setLastRemoteUpdatedAt(new Date().toISOString());
+            }
+          });
+      }, 300);
     }
   }, [gridSize, grid, marked, includedGenerations, loading, user?.id, syncReady]);
 
@@ -537,7 +438,7 @@ export default function Bingo() {
           </div>
         ) : (
           <div className="flex justify-center">
-            <div className="w-full max-w-[640px] rounded-2xl border border-white/20 bg-card/70 shadow-lg">
+            <div className="w-full max-w-[600px] rounded-2xl border border-white/20 bg-card/70 shadow-lg">
               <table className="w-full table-fixed border-collapse">
                 <tbody>
                   {Array.from({ length: gridSize }).map((_, row) => (
