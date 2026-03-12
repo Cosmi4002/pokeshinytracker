@@ -55,7 +55,8 @@ export default function Bingo() {
     const filterActive = pendingGenerations.size > 0;
     const matchesGen = (p: PokemonBasic) => {
       if (!filterActive) return false;
-      return typeof p.generation !== 'number' ? true : pendingGenerations.has(p.generation);
+      if (typeof p.generation !== 'number') return false;
+      return pendingGenerations.has(p.generation);
     };
     const filteredBase = basePool.filter(matchesGen);
     const filteredAll = pokemon.filter((p) => !p.hideFromPokedex && matchesGen(p));
@@ -76,7 +77,8 @@ export default function Bingo() {
 
   const getActivePool = useCallback(() => {
     const matchesGen = (p: PokemonBasic) => {
-      return typeof p.generation !== 'number' ? true : includedGenerations.has(p.generation);
+      if (typeof p.generation !== 'number') return false;
+      return includedGenerations.has(p.generation);
     };
     const filteredBase = basePool.filter((p) => includedGenerations.size > 0 && matchesGen(p));
     const filteredAll = pokemon.filter((p) => !p.hideFromPokedex && includedGenerations.size > 0 && matchesGen(p));
@@ -291,74 +293,112 @@ export default function Bingo() {
           </div>
         ) : (
           <div className="flex justify-center">
-            <div
-              className="grid gap-2 sm:gap-3 w-full max-w-5xl"
-              style={{ gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))` }}
-            >
-            {grid.map((p, index) => {
-              const isMarked = marked.has(p.id);
-              const sprite = getPokemonSpriteUrl(p.id, { shiny: true, name: p.name });
-              return (
-                <div
-                  key={`${p.id}-${index}`}
-                  onClick={() => toggleMark(p.id)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      toggleMark(p.id);
-                    }
-                  }}
-                  role="button"
-                  tabIndex={0}
-                  className="group relative overflow-hidden rounded-2xl border bg-card/70 p-2 text-left transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg aspect-square focus:outline-none focus:ring-2 focus:ring-offset-2"
-                  style={{
-                    borderColor: isMarked ? accentColor : 'rgba(255,255,255,0.08)',
-                    boxShadow: isMarked ? `0 0 18px ${accentColor}40` : undefined,
-                    outlineColor: accentColor,
-                  }}
-                >
-                  <div
-                    className="absolute inset-0 opacity-40"
-                    style={{
-                      background: `radial-gradient(circle at 50% 15%, ${accentColor}18, transparent 60%)`,
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.06),transparent_45%)]" />
-                  <div className="relative flex flex-col items-center gap-2">
-                    <img
-                      src={sprite}
-                      alt={p.displayName || p.name}
-                      className="h-16 w-16 sm:h-20 sm:w-20 object-contain drop-shadow-[0_12px_18px_rgba(0,0,0,0.45)]"
-                      loading="lazy"
-                      decoding="async"
-                      onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).src = '/placeholder.svg';
-                      }}
-                      style={{
-                        filter: isMarked ? 'grayscale(0) brightness(1.08) saturate(1.15)' : 'grayscale(0.2) brightness(0.95)',
-                      }}
-                    />
-                    <div className="text-[11px] sm:text-xs font-semibold text-center leading-tight">
-                      {p.displayName || p.name}
-                    </div>
-                  </div>
-                  {isMarked && (
-                    <div className="absolute inset-0 border-2 pointer-events-none" style={{ borderColor: accentColor }} />
-                  )}
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      replaceCell(index);
-                    }}
-                    className="absolute top-2 right-2 h-7 w-7 rounded-full border border-white/10 bg-black/40 text-white/80 backdrop-blur hover:text-white hover:bg-black/60 transition-opacity opacity-0 group-hover:opacity-100"
-                    title="Cambia Pokemon"
-                  >
-                    <RefreshCcw className="h-3.5 w-3.5 mx-auto" />
-                  </button>
-                </div>
-              );
-            })}
+            <div className="w-full max-w-5xl overflow-hidden rounded-2xl border border-white/10 bg-card/70 shadow-lg">
+              <table className="w-full table-fixed border-collapse">
+                <tbody>
+                  {Array.from({ length: gridSize }).map((_, row) => (
+                    <tr key={`row-${row}`}>
+                      {Array.from({ length: gridSize }).map((__, col) => {
+                        const index = row * gridSize + col;
+                        const p = grid[index];
+                        if (!p) {
+                          return (
+                            <td key={`cell-${row}-${col}`} className="border border-white/10 bg-black/20 aspect-square" />
+                          );
+                        }
+                        const isMarked = marked.has(p.id);
+                        const sprite = getPokemonSpriteUrl(p.id, { shiny: true, name: p.name });
+                        const isAlt = (row + col) % 2 === 1;
+                        return (
+                          <td
+                            key={`cell-${row}-${col}`}
+                            className={`border border-white/10 ${isAlt ? 'bg-black/25' : 'bg-black/15'} align-middle`}
+                          >
+                            <div
+                              onClick={() => toggleMark(p.id)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                  e.preventDefault();
+                                  toggleMark(p.id);
+                                }
+                              }}
+                              role="button"
+                              tabIndex={0}
+                              className="group relative aspect-square w-full focus:outline-none focus:ring-2 focus:ring-offset-2"
+                              style={{ outlineColor: accentColor }}
+                            >
+                              <div
+                                className="absolute inset-0 opacity-30"
+                                style={{
+                                  background: `radial-gradient(circle at 50% 15%, ${accentColor}18, transparent 60%)`,
+                                }}
+                              />
+                              <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.06),transparent_45%)]" />
+                              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-2">
+                                <img
+                                  src={sprite}
+                                  alt={p.displayName || p.name}
+                                  className="h-14 w-14 sm:h-18 sm:w-18 object-contain drop-shadow-[0_10px_14px_rgba(0,0,0,0.45)]"
+                                  loading="lazy"
+                                  decoding="async"
+                                  onError={(e) => {
+                                    (e.currentTarget as HTMLImageElement).src = '/placeholder.svg';
+                                  }}
+                                  style={{
+                                    filter: isMarked
+                                      ? 'grayscale(0) brightness(1.12) saturate(1.2)'
+                                      : 'grayscale(0.2) brightness(0.95)',
+                                  }}
+                                />
+                                <div className="text-[11px] sm:text-xs font-semibold text-center leading-tight">
+                                  {p.displayName || p.name}
+                                </div>
+                              </div>
+                              {isMarked && (
+                                <>
+                                  <div
+                                    className="absolute inset-0 pointer-events-none"
+                                    style={{
+                                      boxShadow: `inset 0 0 0 2px ${accentColor}, 0 0 18px ${accentColor}55`,
+                                    }}
+                                  />
+                                  <div
+                                    className="absolute inset-0 pointer-events-none"
+                                    style={{
+                                      background: `radial-gradient(circle at 50% 55%, ${accentColor}25, transparent 65%)`,
+                                    }}
+                                  />
+                                  <div
+                                    className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-[0.12em] border"
+                                    style={{
+                                      color: accentColor,
+                                      borderColor: `${accentColor}99`,
+                                      backgroundColor: 'rgba(0,0,0,0.45)',
+                                    }}
+                                  >
+                                    Trovato
+                                  </div>
+                                </>
+                              )}
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  replaceCell(index);
+                                }}
+                                className="absolute top-2 right-2 h-7 w-7 rounded-full border border-white/10 bg-black/40 text-white/80 backdrop-blur hover:text-white hover:bg-black/60 transition-opacity opacity-0 group-hover:opacity-100"
+                                title="Cambia Pokemon"
+                              >
+                                <RefreshCcw className="h-3.5 w-3.5 mx-auto" />
+                              </button>
+                            </div>
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
