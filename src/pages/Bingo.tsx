@@ -404,8 +404,8 @@ export default function Bingo() {
           </div>
         ) : (
           <div className="flex justify-center">
-            <div className="w-full max-w-[840px] aspect-square max-h-[70vh] overflow-hidden rounded-2xl border border-white/20 bg-card/70 shadow-lg">
-              <table className="w-full h-full table-fixed border-collapse">
+            <div className="w-full max-w-[840px] max-h-[75vh] overflow-auto rounded-2xl border border-white/20 bg-card/70 shadow-lg">
+              <table className="w-full table-fixed border-collapse">
                 <tbody>
                   {Array.from({ length: gridSize }).map((_, row) => (
                     <tr key={`row-${row}`}>
@@ -446,7 +446,7 @@ export default function Bingo() {
                                 <div
                                   className="absolute inset-0 pointer-events-none"
                                   style={{
-                                    background: `radial-gradient(circle at 50% 50%, ${accentColor}32, transparent 70%)`,
+                                    background: `radial-gradient(circle at 50% 50%, ${accentColor}42, transparent 68%)`,
                                   }}
                                 />
                               )}
@@ -457,11 +457,11 @@ export default function Bingo() {
                                 }}
                               />
                               <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.06),transparent_45%)]" />
-                              <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 p-1">
+                              <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 p-0.5">
                                 <img
                                   src={sprite}
                                   alt={p.displayName || p.name}
-                                  className="h-12 w-12 sm:h-16 sm:w-16 object-contain drop-shadow-[0_8px_12px_rgba(0,0,0,0.45)]"
+                                  className="h-10 w-10 sm:h-14 sm:w-14 object-contain drop-shadow-[0_6px_10px_rgba(0,0,0,0.45)]"
                                   loading="lazy"
                                   decoding="async"
                                   onError={(e) => {
@@ -469,11 +469,11 @@ export default function Bingo() {
                                   }}
                                   style={{
                                     filter: isMarked
-                                      ? 'grayscale(0) brightness(1.12) saturate(1.2)'
+                                      ? 'grayscale(0) brightness(1.15) saturate(1.25)'
                                       : 'grayscale(0.2) brightness(0.95)',
                                   }}
                                 />
-                                <div className="text-[10px] sm:text-[11px] font-semibold text-center leading-tight">
+                                <div className="text-[9px] sm:text-[10px] font-semibold text-center leading-tight">
                                   {p.displayName || p.name}
                                 </div>
                               </div>
@@ -482,17 +482,17 @@ export default function Bingo() {
                                   <div
                                     className="absolute inset-0 pointer-events-none"
                                     style={{
-                                      boxShadow: `inset 0 0 0 2px ${accentColor}, 0 0 22px ${accentColor}66`,
+                                      boxShadow: `inset 0 0 0 3px ${accentColor}, 0 0 26px ${accentColor}77`,
                                     }}
                                   />
                                   <div
                                     className="absolute inset-0 pointer-events-none"
                                     style={{
-                                      background: `radial-gradient(circle at 50% 55%, ${accentColor}25, transparent 65%)`,
+                                      background: `radial-gradient(circle at 50% 55%, ${accentColor}28, transparent 65%)`,
                                     }}
                                   />
                                   <div
-                                    className="absolute bottom-1.5 left-1/2 -translate-x-1/2 text-[9px] px-1.5 py-0.5 rounded-full font-bold uppercase tracking-[0.12em] border"
+                                    className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[8px] px-1.5 py-0.5 rounded-full font-bold uppercase tracking-[0.12em] border"
                                     style={{
                                       color: accentColor,
                                       borderColor: `${accentColor}99`,
