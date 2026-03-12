@@ -7,15 +7,16 @@ import { useRandomColor } from '@/lib/random-color-context';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth-context';
 
-const SIZE_OPTIONS = [4, 5, 6] as const;
+const SIZE_OPTIONS = [5] as const;
+const MARK_COLOR = '#22c55e';
 const STORAGE_KEY = 'bingo-shiny-state';
 
 export default function Bingo() {
   const { pokemon, loading } = usePokemonList();
   const { accentColor } = useRandomColor();
   const { user } = useAuth();
-  const [gridSize, setGridSize] = useState<(typeof SIZE_OPTIONS)[number]>(4);
-  const [pendingGridSize, setPendingGridSize] = useState<(typeof SIZE_OPTIONS)[number]>(4);
+  const [gridSize, setGridSize] = useState<(typeof SIZE_OPTIONS)[number]>(5);
+  const [pendingGridSize, setPendingGridSize] = useState<(typeof SIZE_OPTIONS)[number]>(5);
   const [grid, setGrid] = useState<PokemonBasic[]>([]);
   const [marked, setMarked] = useState<Set<number>>(new Set());
   const [includedGenerations, setIncludedGenerations] = useState<Set<number>>(new Set());
@@ -283,7 +284,6 @@ export default function Bingo() {
     });
   };
 
-  const resetMarks = () => setMarked(new Set());
 
   const toggleGeneration = (gen: number) => {
     setGensTouched(true);
@@ -355,9 +355,6 @@ export default function Bingo() {
                 <RefreshCcw className="mr-2 h-4 w-4" />
                 Rigenera
               </Button>
-              <Button variant="ghost" onClick={resetMarks} className="h-8 px-3">
-                Reset
-              </Button>
             </div>
           </div>
 
@@ -404,7 +401,7 @@ export default function Bingo() {
           </div>
         ) : (
           <div className="flex justify-center">
-            <div className="w-full max-w-[840px] max-h-[75vh] overflow-auto rounded-2xl border border-white/20 bg-card/70 shadow-lg">
+            <div className="w-full max-w-[840px] rounded-2xl border border-white/20 bg-card/70 shadow-lg">
               <table className="w-full table-fixed border-collapse">
                 <tbody>
                   {Array.from({ length: gridSize }).map((_, row) => (
@@ -440,23 +437,8 @@ export default function Bingo() {
                               role="button"
                               tabIndex={0}
                               className="group relative aspect-square w-full focus:outline-none focus:ring-2 focus:ring-offset-2"
-                              style={{ outlineColor: accentColor }}
+                              style={{ outlineColor: MARK_COLOR }}
                             >
-                              {isMarked && (
-                                <div
-                                  className="absolute inset-0 pointer-events-none"
-                                  style={{
-                                    background: `radial-gradient(circle at 50% 50%, ${accentColor}42, transparent 68%)`,
-                                  }}
-                                />
-                              )}
-                              <div
-                                className="absolute inset-0 opacity-20"
-                                style={{
-                                  background: `radial-gradient(circle at 50% 15%, ${accentColor}18, transparent 60%)`,
-                                }}
-                              />
-                              <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.06),transparent_45%)]" />
                               <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 p-0.5">
                                 <img
                                   src={sprite}
@@ -469,7 +451,7 @@ export default function Bingo() {
                                   }}
                                   style={{
                                     filter: isMarked
-                                      ? 'grayscale(0) brightness(1.15) saturate(1.25)'
+                                      ? 'grayscale(0) brightness(1.05) saturate(1.05)'
                                       : 'grayscale(0.2) brightness(0.95)',
                                   }}
                                 />
@@ -482,20 +464,15 @@ export default function Bingo() {
                                   <div
                                     className="absolute inset-0 pointer-events-none"
                                     style={{
-                                      boxShadow: `inset 0 0 0 3px ${accentColor}, 0 0 26px ${accentColor}77`,
-                                    }}
-                                  />
-                                  <div
-                                    className="absolute inset-0 pointer-events-none"
-                                    style={{
-                                      background: `radial-gradient(circle at 50% 55%, ${accentColor}28, transparent 65%)`,
+                                      boxShadow: `inset 0 0 0 3px ${MARK_COLOR}`,
+                                      backgroundColor: `${MARK_COLOR}22`,
                                     }}
                                   />
                                   <div
                                     className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[8px] px-1.5 py-0.5 rounded-full font-bold uppercase tracking-[0.12em] border"
                                     style={{
-                                      color: accentColor,
-                                      borderColor: `${accentColor}99`,
+                                      color: MARK_COLOR,
+                                      borderColor: `${MARK_COLOR}99`,
                                       backgroundColor: 'rgba(0,0,0,0.45)',
                                     }}
                                   >
