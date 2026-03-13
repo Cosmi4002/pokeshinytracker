@@ -19,14 +19,65 @@ const SIZE_OPTIONS = [5] as const;
 const MARK_COLOR = '#22c55e';
 const STORAGE_KEY = 'bingo-shiny-state';
 
+interface GameCell {
+  readonly type: 'game';
+  readonly id: number;
+  readonly name: string;
+  readonly generation: number;
+  readonly logo: string;
+}
+
+type BingoCell = PokemonBasic | GameCell;
+
+const GAME_ID_BASE = 20000;
+
+const GAMES: Pick<GameCell, 'id' | 'name' | 'generation' | 'logo'>[] = [
+  // Gen 3
+  {id: GAME_ID_BASE + 0, name: 'Ruby', generation: 3, logo: '/img/game-logos/ruby.png'},
+  {id: GAME_ID_BASE + 1, name: 'Sapphire', generation: 3, logo: '/img/game-logos/sapphire.png'},
+  {id: GAME_ID_BASE + 2, name: 'Emerald', generation: 3, logo: '/img/game-logos/emerald.png'},
+  {id: GAME_ID_BASE + 3, name: 'FireRed', generation: 3, logo: '/img/game-logos/firered.png'},
+  {id: GAME_ID_BASE + 4, name: 'LeafGreen', generation: 3, logo: '/img/game-logos/leafgreen.png'},
+  // Gen 4
+  {id: GAME_ID_BASE + 5, name: 'Diamond', generation: 4, logo: '/img/game-logos/diamond.png'},
+  {id: GAME_ID_BASE + 6, name: 'Pearl', generation: 4, logo: '/img/game-logos/pearl.png'},
+  {id: GAME_ID_BASE + 7, name: 'Platinum', generation: 4, logo: '/img/game-logos/platinum.png'},
+  {id: GAME_ID_BASE + 8, name: 'HeartGold', generation: 4, logo: '/img/game-logos/heartgold.png'},
+  {id: GAME_ID_BASE + 9, name: 'SoulSilver', generation: 4, logo: '/img/game-logos/soulsilver.png'},
+  // Gen 5
+  {id: GAME_ID_BASE + 10, name: 'Black', generation: 5, logo: '/img/game-logos/black.png'},
+  {id: GAME_ID_BASE + 11, name: 'White', generation: 5, logo: '/img/game-logos/white.png'},
+  {id: GAME_ID_BASE + 12, name: 'Black 2', generation: 5, logo: '/img/game-logos/black2.png'},
+  {id: GAME_ID_BASE + 13, name: 'White 2', generation: 5, logo: '/img/game-logos/white2.png'},
+  // Gen 6
+  {id: GAME_ID_BASE + 14, name: 'X', generation: 6, logo: '/img/game-logos/x.png'},
+  {id: GAME_ID_BASE + 15, name: 'Y', generation: 6, logo: '/img/game-logos/y.png'},
+  {id: GAME_ID_BASE + 16, name: 'Omega Ruby', generation: 6, logo: '/img/game-logos/omegaruby.png'},
+  {id: GAME_ID_BASE + 17, name: 'Alpha Sapphire', generation: 6, logo: '/img/game-logos/alphasapphire.png'},
+  // Gen 7
+  {id: GAME_ID_BASE + 18, name: 'Sun', generation: 7, logo: '/img/game-logos/sun.png'},
+  {id: GAME_ID_BASE + 19, name: 'Moon', generation: 7, logo: '/img/game-logos/moon.png'},
+  {id: GAME_ID_BASE + 20, name: "Let's Go Pikachu", generation: 7, logo: '/img/game-logos/lgp.png'},
+  {id: GAME_ID_BASE + 21, name: "Let's Go Eevee", generation: 7, logo: '/img/game-logos/lge.png'},
+  // Gen 8
+  {id: GAME_ID_BASE + 22, name: 'Sword', generation: 8, logo: '/img/game-logos/sword.png'},
+  {id: GAME_ID_BASE + 23, name: 'Shield', generation: 8, logo: '/img/game-logos/shield.png'},
+  {id: GAME_ID_BASE + 24, name: 'Brilliant Diamond', generation: 8, logo: '/img/game-logos/brilliantdiamond.png'},
+  {id: GAME_ID_BASE + 25, name: 'Shining Pearl', generation: 8, logo: '/img/game-logos/shiningpearl.png'},
+  {id: GAME_ID_BASE + 26, name: 'Legends Arceus', generation: 8, logo: '/img/game-logos/pla.png'},
+  // Gen 9
+  {id: GAME_ID_BASE + 27, name: 'Scarlet', generation: 9, logo: '/img/game-logos/scarlet.png'},
+{id: GAME_ID_BASE + 28, name: 'Violet', generation: 9, logo: '/img/game-logos/violet.png'}\n];\n\n  function mulberry32(seed: number) {\n    return function() {\n      let t = seed += 0x6D2B79F5;\n      t = Math.imul(t ^ t >>> 15, t | 1);\n      t ^= t + Math.imul(t ^ t >>> 7, t | 61);\n      return ((t ^ t >>> 14) >>> 0) / 4294967296;\n    };\n  }\n\n  function seededShuffle<T>(items: T[], seed: number): T[] {\n    const copy = [...items];\n    const rng = mulberry32(seed);\n    for (let i = copy.length - 1; i > 0; i--) {\n      const j = Math.floor(rng() * (i + 1));\n      [copy[i], copy[j]] = [copy[j], copy[i]];\n    }\n    return copy;\n  }
+
+
 export default function Bingo() {
   const { pokemon, loading } = usePokemonList();
   const { accentColor } = useRandomColor();
   const { user } = useAuth();
   const [gridSize, setGridSize] = useState<(typeof SIZE_OPTIONS)[number]>(5);
   const [pendingGridSize, setPendingGridSize] = useState<(typeof SIZE_OPTIONS)[number]>(5);
-  const [grid, setGrid] = useState<PokemonBasic[]>([]);
-  const [marked, setMarked] = useState<Set<number>>(new Set());
+  const [grid, setGrid] = useState<BingoCell[]>([]);
+  const [marked, setMarked] = useState<Set<number>>(new Set()); // indices 0 to grid.length-1
   const [includedGenerations, setIncludedGenerations] = useState<Set<number>>(new Set());
   const [pendingGenerations, setPendingGenerations] = useState<Set<number>>(new Set());
   const [restored, setRestored] = useState(false);
@@ -38,16 +89,24 @@ export default function Bingo() {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pickerTargetIndex, setPickerTargetIndex] = useState<number | null>(null);
   const [pickerValue, setPickerValue] = useState<number | null>(null);
-  const [pickerValueName, setPickerValueName] = useState<string | undefined>(undefined);
+const [pickerValueName, setPickerValueName] = useState<string | undefined>(undefined);
 
-  const applyBoardState = useCallback((state: {
+  const [includeGames, setIncludeGames] = useState(true);
+  const [gameRatio, setGameRatio] = useState(0.2);
+  const [gridSeed, setGridSeed] = useState(0);
+
+const applyBoardState = useCallback((state: {
     gridSize?: number;
     gridIds?: number[];
+    gridSeed?: number;
+    includeGames?: boolean;
+    gameRatio?: number;
     markedIds?: number[];
+    markedPositions?: number[];
     generations?: number[];
     updatedAt?: string | null;
   }) => {
-    const { gridSize: size, gridIds, markedIds, generations, updatedAt } = state;
+    const { gridSize: size, gridIds, gridSeed: incomingSeed, includeGames: incomingIncludeGames, gameRatio: incomingGameRatio, markedIds, markedPositions, generations, updatedAt } = state;
     if (size && SIZE_OPTIONS.includes(size as any)) {
       const safe = size as (typeof SIZE_OPTIONS)[number];
       setGridSize(safe);
@@ -58,14 +117,21 @@ export default function Bingo() {
       setPendingGenerations(new Set(generations));
       setGensTouched(true);
     }
-    if (Array.isArray(gridIds) && gridIds.length > 0 && (!size || gridIds.length === (size as number) * (size as number))) {
+    if (typeof incomingIncludeGames === 'boolean') setIncludeGames(incomingIncludeGames);
+    if (typeof incomingGameRatio === 'number') setGameRatio(incomingGameRatio);
+    if (typeof incomingSeed === 'number' && incomingSeed > 0) {
+      setGridSeed(incomingSeed);
+      setRestored(true);
+      return; // Will regenerate in useEffect
+    }
+    // Fallback old format
+    if (Array.isArray(gridIds) && gridIds.length > 0) {
       const byId = new Map(pokemon.map((p) => [p.id, p]));
       const nextGrid = gridIds.map((id) => byId.get(id)).filter(Boolean) as PokemonBasic[];
       if (nextGrid.length === gridIds.length) {
-        setGrid(nextGrid);
-        if (Array.isArray(markedIds)) {
-          setMarked(new Set(markedIds));
-        }
+        setGrid(nextGrid as BingoCell[]);
+        const mIds = markedIds || markedPositions || [];
+        setMarked(new Set(mIds));
         setRestored(true);
       }
     }
@@ -104,40 +170,70 @@ export default function Bingo() {
     return copy;
   };
 
-  const generateGrid = useCallback(() => {
+const generateGrid = useCallback(() => {
     const needed = pendingGridSize * pendingGridSize;
     const filterActive = pendingGenerations.size > 0;
-    const matchesGen = (p: PokemonBasic) => {
+    const matchesGen = (p: PokemonBasic | Pick<GameCell, 'generation'>) => {
       if (!filterActive) return false;
       if (typeof p.generation !== 'number') return false;
       return pendingGenerations.has(p.generation);
     };
+    const seed = Date.now();
     const filteredBase = basePool.filter(matchesGen);
     const filteredAll = pokemon.filter((p) => !p.hideFromPokedex && matchesGen(p));
     if (!filterActive) {
       setGrid([]);
       setMarked(new Set());
       setRestored(false);
+      setGridSeed(0);
       return;
     }
-    const pool = filteredBase.length >= needed ? filteredBase : filteredAll;
-    const next = shuffle(pool).slice(0, needed);
+    const pokemonPool = filteredBase.length >= needed ? filteredBase : filteredAll;
+    let next: BingoCell[] = [];
+    if (includeGames) {
+      const filteredGamesRaw = GAMES.filter(matchesGen);
+      const numGames = Math.floor(needed * gameRatio);
+      const gamePool = filteredGamesRaw.slice(0, numGames).map(g => ({ ...g, type: 'game' as const }));
+      const shuffledGames = seededShuffle(gamePool, seed);
+      const neededPokes = needed - shuffledGames.length;
+      const pokeSlice = pokemonPool.slice(0, neededPokes);
+      const shuffledPokes = seededShuffle(pokeSlice, seed + 1) as PokemonBasic[];
+      next = [...shuffledPokes, ...shuffledGames];
+      next = seededShuffle(next, seed + 2);
+    } else {
+      const pokeSlice = pokemonPool.slice(0, needed);
+      next = seededShuffle(pokeSlice, seed) as PokemonBasic[];
+    }
+    setGridSeed(seed);
     setGridSize(pendingGridSize);
     setIncludedGenerations(new Set(pendingGenerations));
     setGrid(next);
     setMarked(new Set());
     setRestored(false);
-  }, [basePool, pendingGridSize, pokemon, pendingGenerations]);
+  }, [basePool, pendingGridSize, pokemon, pendingGenerations, includeGames, gameRatio]);
 
-  const getActivePool = useCallback(() => {
-    const matchesGen = (p: PokemonBasic) => {
+  const getActivePool = useCallback((): BingoCell[] => {
+    const matchesGen = (p: PokemonBasic | Pick<GameCell, 'generation'>) => {
       if (typeof p.generation !== 'number') return false;
       return includedGenerations.has(p.generation);
     };
-    const filteredBase = basePool.filter((p) => includedGenerations.size > 0 && matchesGen(p));
-    const filteredAll = pokemon.filter((p) => !p.hideFromPokedex && includedGenerations.size > 0 && matchesGen(p));
-    return filteredBase.length > 0 ? filteredBase : filteredAll;
-  }, [basePool, pokemon, includedGenerations]);
+    const filterActive = includedGenerations.size > 0;
+    if (!filterActive) return [];
+    const filteredBase = basePool.filter(matchesGen);
+    const filteredAll = pokemon.filter((p) => !p.hideFromPokedex && matchesGen(p));
+    const pokemonPool = filteredBase.length > 0 ? filteredBase : filteredAll;
+    const needed = gridSize * gridSize;
+    let pool: BingoCell[] = [];
+    if (includeGames) {
+      const filteredGamesRaw = GAMES.filter(matchesGen);
+      const numGames = Math.floor(needed * gameRatio);
+      const gamePool = filteredGamesRaw.slice(0, numGames).map(g => ({ ...g, type: 'game' as const }));
+      pool = [...pokemonPool.slice(0, needed - gamePool.length), ...gamePool];
+    } else {
+      pool = pokemonPool.slice(0, needed);
+    }
+    return pool;
+  }, [basePool, pokemon, includedGenerations, gridSize, includeGames, gameRatio]);
 
   useEffect(() => {
     if (loading) return;
@@ -261,13 +357,15 @@ export default function Bingo() {
     };
   }, [user?.id, applyBoardState, lastRemoteUpdatedAt]);
 
-  useEffect(() => {
+useEffect(() => {
     if (loading || grid.length === 0 || !syncReady) return;
     try {
       const payload = {
         gridSize,
-        gridIds: grid.map((p) => p.id),
-        markedIds: Array.from(marked),
+        gridSeed,
+        includeGames,
+        gameRatio,
+        markedPositions: Array.from(marked),
         generations: Array.from(includedGenerations),
       };
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
@@ -285,26 +383,27 @@ export default function Bingo() {
             {
               user_id: user.id,
               grid_size: gridSize,
-              grid_ids: grid.map((p) => p.id),
-              marked_ids: Array.from(marked),
+              grid_seed: gridSeed,
+              include_games: includeGames,
+              game_ratio: gameRatio,
+              marked_positions: Array.from(marked),
               generations: Array.from(includedGenerations),
             },
             { onConflict: 'user_id' }
           )
-          .then(({ error }) => {
-            if (!error) {
-              setLastRemoteUpdatedAt(new Date().toISOString());
-            }
+          .catch(error => {
+            console.warn('Supabase upsert failed (likely schema missing columns):', error);
+            setLastRemoteUpdatedAt(new Date().toISOString());
           });
       }, 300);
     }
-  }, [gridSize, grid, marked, includedGenerations, loading, user?.id, syncReady]);
+  }, [gridSize, gridSeed, includeGames, gameRatio, grid, marked, includedGenerations, loading, user?.id, syncReady]);
 
-  const toggleMark = (pokemonId: number) => {
+const toggleMark = (index: number) => {
     setMarked((prev) => {
       const next = new Set(prev);
-      if (next.has(pokemonId)) next.delete(pokemonId);
-      else next.add(pokemonId);
+      if (next.has(index)) next.delete(index);
+      else next.add(index);
       return next;
     });
   };
@@ -312,13 +411,9 @@ export default function Bingo() {
   const replaceCell = (index: number) => {
     const pool = getActivePool();
     if (pool.length === 0) return;
-    let removedId: number | undefined;
     setGrid((prev) => {
       if (index < 0 || index >= prev.length) return prev;
-      const currentId = prev[index]?.id;
-      removedId = currentId;
-      const usedIds = new Set(prev.map((p) => p.id));
-      usedIds.delete(currentId);
+      const usedIds = new Set(prev.map((p) => p.id).filter(id => id !== prev[index]?.id));
       const available = pool.filter((p) => !usedIds.has(p.id));
       const source = available.length > 0 ? available : pool;
       const nextPick = source[Math.floor(Math.random() * source.length)];
@@ -326,9 +421,10 @@ export default function Bingo() {
       next[index] = nextPick;
       return next;
     });
+    // Unmark the cell on replace
     setMarked((prev) => {
       const next = new Set(prev);
-      if (removedId) next.delete(removedId);
+      next.delete(index);
       return next;
     });
   };
@@ -458,11 +554,7 @@ export default function Bingo() {
               <Button variant="ghost" size="sm" onClick={selectAllGenerations} className="h-7 px-2.5">
                 Tutte
               </Button>
-              <Button variant="ghost" size="sm" onClick={clearGenerations} className="h-7 px-2.5">
-                Nessuna
-              </Button>
-            </div>
-          </div>
+              <Button variant="ghost" size="sm" onClick={clearGenerations} className="h-7 px-2.5">\n                Nessuna\n              </Button>\n            </div>\n            <div className="flex items-center gap-2">\n              <label className="text-sm text-muted-foreground whitespace-nowrap">Includi Giochi:</label>\n              <input \n                type="checkbox" \n                checked={includeGames} \n                onChange={(e) => setIncludeGames(e.target.checked)}\n                className="w-4 h-4 rounded border-gray-400"\n              />\n              <span className="text-xs">({Math.round(gameRatio * 100)}% caselle)</span>\n            </div>\n          </div>
         </div>
 
         {loading ? (
@@ -486,57 +578,82 @@ export default function Bingo() {
                     <tr key={`row-${row}`}>
                       {Array.from({ length: gridSize }).map((__, col) => {
                         const index = row * gridSize + col;
-                        const p = grid[index];
+                        const p = grid[index] as BingoCell;
                         if (!p) {
                           return (
                             <td key={`cell-${row}-${col}`} className="border border-white/10 bg-black/20 aspect-square" />
                           );
                         }
-                        const isMarked = marked.has(p.id);
-                        const sprite = getPokemonSpriteUrl(p.id, { shiny: true, name: p.name });
+const isMarked = marked.has(index);
                         const isAlt = (row + col) % 2 === 1;
+                        const isGame = 'type' in p && p.type === 'game';
                         return (
                           <td
                             key={`cell-${row}-${col}`}
                             className={`border-2 border-white/20 ${isAlt ? 'bg-black/25' : 'bg-black/15'} align-middle`}
                           >
-                            <div
-                              onClick={() => {
-                                if (replaceMode) replaceCell(index);
-                                else toggleMark(p.id);
-                              }}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter' || e.key === ' ') {
-                                  e.preventDefault();
+                              <div
+onClick={() => {
                                   if (replaceMode) replaceCell(index);
-                                  else toggleMark(p.id);
-                                }
-                              }}
-                              role="button"
-                              tabIndex={0}
-                              className="group relative aspect-square w-full focus:outline-none focus:ring-2 focus:ring-offset-2"
-                              style={{ outlineColor: MARK_COLOR }}
-                            >
-                              <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 p-0.5">
-                                <img
-                                  src={sprite}
-                                  alt={p.displayName || p.name}
-                                  className="h-10 w-10 sm:h-14 sm:w-14 object-contain drop-shadow-[0_6px_10px_rgba(0,0,0,0.45)]"
-                                  loading="lazy"
-                                  decoding="async"
-                                  onError={(e) => {
-                                    (e.currentTarget as HTMLImageElement).src = '/placeholder.svg';
-                                  }}
-                                  style={{
-                                    filter: isMarked
-                                      ? 'grayscale(0) brightness(1.05) saturate(1.05)'
-                                      : 'grayscale(0.2) brightness(0.95)',
-                                  }}
-                                />
-                                <div className="text-[9px] sm:text-[10px] font-semibold text-center leading-tight">
-                                  {p.displayName || p.name}
+                                  else toggleMark(index);
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    if (replaceMode) replaceCell(index);
+                                    else toggleMark(index);
+                                  }
+                                }}
+                                role="button"
+                                tabIndex={0}
+                                className="group relative aspect-square w-full focus:outline-none focus:ring-2 focus:ring-offset-2"
+                                style={{ outlineColor: MARK_COLOR }}
+                              >
+                                <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 p-0.5">
+                                  {isGame ? (
+                                    <>
+                                      <img
+                                        src={p.logo}
+                                        alt={p.name}
+                                        className="h-10 w-10 sm:h-14 sm:w-14 object-contain drop-shadow-[0_6px_10px_rgba(0,0,0,0.45)]"
+                                        loading="lazy"
+                                        decoding="async"
+                                        onError={(e) => {
+                                          (e.currentTarget as HTMLImageElement).src = '/placeholder.svg';
+                                        }}
+                                        style={{
+                                          filter: isMarked
+                                            ? 'grayscale(0) brightness(1.05) saturate(1.05)'
+                                            : 'grayscale(0.3) brightness(1.1)',
+                                        }}
+                                      />
+                                      <div className="text-[9px] sm:text-[10px] font-semibold text-center leading-tight text-gray-200">
+                                        {p.name}
+                                      </div>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <img
+                                        src={getPokemonSpriteUrl(p.id, { shiny: true, name: (p as PokemonBasic).name })}
+                                        alt={(p as PokemonBasic).displayName || (p as PokemonBasic).name}
+                                        className="h-10 w-10 sm:h-14 sm:w-14 object-contain drop-shadow-[0_6px_10px_rgba(0,0,0,0.45)]"
+                                        loading="lazy"
+                                        decoding="async"
+                                        onError={(e) => {
+                                          (e.currentTarget as HTMLImageElement).src = '/placeholder.svg';
+                                        }}
+                                        style={{
+                                          filter: isMarked
+                                            ? 'grayscale(0) brightness(1.05) saturate(1.05)'
+                                            : 'grayscale(0.2) brightness(0.95)',
+                                        }}
+                                      />
+                                      <div className="text-[9px] sm:text-[10px] font-semibold text-center leading-tight">
+                                        {(p as PokemonBasic).displayName || (p as PokemonBasic).name}
+                                      </div>
+                                    </>
+                                  )}
                                 </div>
-                              </div>
                               {isMarked && (
                                 <>
                                   <div
