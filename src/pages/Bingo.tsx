@@ -67,7 +67,9 @@ const GAMES: Pick<GameCell, 'id' | 'name' | 'generation' | 'logo'>[] = [
   {id: GAME_ID_BASE + 26, name: 'Legends Arceus', generation: 8, logo: '/img/game-logos/pla.png'},
   // Gen 9
   {id: GAME_ID_BASE + 27, name: 'Scarlet', generation: 9, logo: '/img/game-logos/scarlet.png'},
-{id: GAME_ID_BASE + 28, name: 'Violet', generation: 9, logo: '/img/game-logos/violet.png'}\n];\n\n  function mulberry32(seed: number) {\n    return function() {\n      let t = seed += 0x6D2B79F5;\n      t = Math.imul(t ^ t >>> 15, t | 1);\n      t ^= t + Math.imul(t ^ t >>> 7, t | 61);\n      return ((t ^ t >>> 14) >>> 0) / 4294967296;\n    };\n  }\n\n  function seededShuffle<T>(items: T[], seed: number): T[] {\n    const copy = [...items];\n    const rng = mulberry32(seed);\n    for (let i = copy.length - 1; i > 0; i--) {\n      const j = Math.floor(rng() * (i + 1));\n      [copy[i], copy[j]] = [copy[j], copy[i]];\n    }\n    return copy;\n  }
+{id: GAME_ID_BASE + 28, name: 'Violet', generation: 9, logo: '/img/game-logos/violet.png'},
+];
+\n\n  function mulberry32(seed: number) {\n    return function() {\n      let t = seed += 0x6D2B79F5;\n      t = Math.imul(t ^ t >>> 15, t | 1);\n      t ^= t + Math.imul(t ^ t >>> 7, t | 61);\n      return ((t ^ t >>> 14) >>> 0) / 4294967296;\n    };\n  }\n\n  function seededShuffle<T>(items: T[], seed: number): T[] {\n    const copy = [...items];\n    const rng = mulberry32(seed);\n    for (let i = copy.length - 1; i > 0; i--) {\n      const j = Math.floor(rng() * (i + 1));\n      [copy[i], copy[j]] = [copy[j], copy[i]];\n    }\n    return copy;\n  }
 
 
 export default function Bingo() {
