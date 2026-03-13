@@ -554,7 +554,7 @@ const toggleMark = (index: number) => {
               <Button variant="ghost" size="sm" onClick={selectAllGenerations} className="h-7 px-2.5">
                 Tutte
               </Button>
-              <Button variant="ghost" size="sm" onClick={clearGenerations} className="h-7 px-2.5">\n                Nessuna\n              </Button>\n            </div>\n            <div className="flex items-center gap-2">\n              <label className="text-sm text-muted-foreground whitespace-nowrap">Includi Giochi:</label>\n              <input \n                type="checkbox" \n                checked={includeGames} \n                onChange={(e) => setIncludeGames(e.target.checked)}\n                className="w-4 h-4 rounded border-gray-400"\n              />\n              <span className="text-xs">({Math.round(gameRatio * 100)}% caselle)</span>\n            </div>\n          </div>
+              <Button variant="ghost" size="sm" onClick={clearGenerations} className="h-7 px-2.5">                Nessuna              </Button>\n            </div>\n            <div className="flex items-center gap-2">\n              <label className="text-sm text-muted-foreground whitespace-nowrap">Includi Giochi:</label>\n              <input \n                type="checkbox" \n                checked={includeGames} \n                onChange={(e) => setIncludeGames(e.target.checked)}\n                className="w-4 h-4 rounded border-gray-400"\n              />\n              <span className="text-xs">({Math.round(gameRatio * 100)}% caselle)</span>\n            </div>\n          </div>
         </div>
 
         {loading ? (
