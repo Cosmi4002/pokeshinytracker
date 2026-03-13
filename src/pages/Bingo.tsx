@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState, useEffect, useRef } from 'react';
+﻿import { useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { Sparkles, RefreshCcw, Pencil } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
@@ -721,5 +721,6 @@ onClick={() => {
     </div>
   );
 }
+
 
 
