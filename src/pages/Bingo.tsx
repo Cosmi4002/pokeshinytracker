@@ -115,6 +115,40 @@ const [pickerValueName, setPickerValueName] = useState<string | undefined>(undef
   const [gameRatio, setGameRatio] = useState(0.2);
   const [gridSeed, setGridSeed] = useState(0);
 
+  const persistBoard = useCallback((payload: {
+    gridSize: number;
+    gridIds: number[];
+    markedIds: number[];
+    generations: number[];
+    gridSeed: number;
+    includeGames: boolean;
+    gameRatio: number;
+  }) => {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    } catch {
+      // ignore storage errors
+    }
+
+    if (!user) return;
+    void supabase
+      .from('bingo_boards')
+      .upsert(
+        {
+          user_id: user.id,
+          grid_size: payload.gridSize,
+          grid_ids: payload.gridIds,
+          marked_ids: payload.markedIds,
+          generations: payload.generations,
+        },
+        { onConflict: 'user_id' }
+      )
+      .catch((error) => {
+        console.warn('Supabase upsert failed:', error);
+        setLastRemoteUpdatedAt(new Date().toISOString());
+      });
+  }, [user]);
+
 const applyBoardState = useCallback((state: {
     gridSize?: number;
     gridIds?: number[];
@@ -231,6 +265,17 @@ const generateGrid = useCallback(() => {
     setGrid(next);
     setMarked(new Set());
     setRestored(false);
+
+    // Save immediately so changing page right after "Rigenera" keeps the new board.
+    persistBoard({
+      gridSize: pendingGridSize,
+      gridIds: next.map((c) => c.id),
+      markedIds: [],
+      generations: Array.from(pendingGenerations),
+      gridSeed: seed,
+      includeGames,
+      gameRatio,
+    });
   }, [basePool, pendingGridSize, pokemon, pendingGenerations, includeGames, gameRatio]);
 
   const getActivePool = useCallback((): BingoCell[] => {
@@ -386,44 +431,29 @@ const generateGrid = useCallback(() => {
 
 useEffect(() => {
     if (loading || grid.length === 0 || !syncReady) return;
-    try {
-      const payload = {
+    if (saveTimerRef.current) {
+      window.clearTimeout(saveTimerRef.current);
+    }
+
+    saveTimerRef.current = window.setTimeout(() => {
+      persistBoard({
         gridSize,
         gridIds: grid.map((c) => c.id),
+        markedIds: Array.from(marked),
+        generations: Array.from(includedGenerations),
         gridSeed,
         includeGames,
         gameRatio,
-        markedIds: Array.from(marked),
-        generations: Array.from(includedGenerations),
-      };
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-    } catch {
-      // ignore storage errors
-    }
-    if (user) {
+      });
+    }, 300);
+
+    return () => {
       if (saveTimerRef.current) {
         window.clearTimeout(saveTimerRef.current);
+        saveTimerRef.current = null;
       }
-      saveTimerRef.current = window.setTimeout(() => {
-        void supabase
-          .from('bingo_boards')
-          .upsert(
-            {
-              user_id: user.id,
-              grid_size: gridSize,
-              grid_ids: grid.map((c) => c.id),
-              marked_ids: Array.from(marked),
-              generations: Array.from(includedGenerations),
-            },
-            { onConflict: 'user_id' }
-          )
-          .catch(error => {
-            console.warn('Supabase upsert failed (likely schema missing columns):', error);
-            setLastRemoteUpdatedAt(new Date().toISOString());
-          });
-      }, 300);
-    }
-  }, [gridSize, gridSeed, includeGames, gameRatio, grid, marked, includedGenerations, loading, user?.id, syncReady]);
+    };
+  }, [gridSize, gridSeed, includeGames, gameRatio, grid, marked, includedGenerations, loading, syncReady, persistBoard]);
 
 const toggleMark = (index: number) => {
     setMarked((prev) => {
