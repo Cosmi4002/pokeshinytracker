@@ -345,7 +345,7 @@ export function calculateShinyStats(encounters: number, methodId: string, hasShi
 }
 
 export const SHINY_CHARM_ICON = '/img/items/shiny-charm.png';
-export const GIGAMAX_ICON = '/img/items/gigamax-mark.svg';
+export const GIGAMAX_ICON = '/img/items/dynamax-icon.png';
 export const supportsGigamaxMark = (game: string) => game === 'sword' || game === 'shield';
 
 
