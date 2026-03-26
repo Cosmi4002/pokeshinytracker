@@ -226,6 +226,13 @@ const applyBoardState = useCallback((state: {
   };
 
 const generateGrid = useCallback(() => {
+    // If there's a pending debounced save from previous interactions, cancel it.
+    // Otherwise it can overwrite the freshly generated board a moment later.
+    if (saveTimerRef.current) {
+      window.clearTimeout(saveTimerRef.current);
+      saveTimerRef.current = null;
+    }
+
     const needed = pendingGridSize * pendingGridSize;
     const filterActive = pendingGenerations.size > 0;
     const matchesGen = (p: PokemonBasic | Pick<GameCell, 'generation'>) => {
