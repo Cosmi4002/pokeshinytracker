@@ -141,15 +141,16 @@ const applyBoardState = useCallback((state: {
     if (typeof incomingGameRatio === 'number') setGameRatio(incomingGameRatio);
     if (typeof incomingSeed === 'number' && incomingSeed > 0) {
       setGridSeed(incomingSeed);
-      setRestored(true);
-      return; // Will regenerate in useEffect
     }
     // Fallback old format
     if (Array.isArray(gridIds) && gridIds.length > 0) {
-      const byId = new Map(pokemon.map((p) => [p.id, p]));
-      const nextGrid = gridIds.map((id) => byId.get(id)).filter(Boolean) as PokemonBasic[];
+      const byId = new Map<number, BingoCell>();
+      pokemon.forEach((p) => byId.set(p.id, p as BingoCell));
+      GAMES.forEach((g) => byId.set(g.id, { ...g, type: 'game' as const }));
+
+      const nextGrid = gridIds.map((id) => byId.get(id)).filter(Boolean) as BingoCell[];
       if (nextGrid.length === gridIds.length) {
-        setGrid(nextGrid as BingoCell[]);
+        setGrid(nextGrid);
         const mIds = markedIds || markedPositions || [];
         setMarked(new Set(mIds));
         setRestored(true);
@@ -267,11 +268,17 @@ const generateGrid = useCallback(() => {
         gridSize?: number;
         gridIds?: number[];
         markedIds?: number[];
+        gridSeed?: number;
+        includeGames?: boolean;
+        gameRatio?: number;
         generations?: number[];
       };
       applyBoardState({
         gridSize: parsed.gridSize,
         gridIds: parsed.gridIds,
+        gridSeed: parsed.gridSeed,
+        includeGames: parsed.includeGames,
+        gameRatio: parsed.gameRatio,
         markedIds: parsed.markedIds,
         generations: parsed.generations,
       });
@@ -300,11 +307,17 @@ const generateGrid = useCallback(() => {
               gridSize?: number;
               gridIds?: number[];
               markedIds?: number[];
+              gridSeed?: number;
+              includeGames?: boolean;
+              gameRatio?: number;
               generations?: number[];
             };
             applyBoardState({
               gridSize: parsed.gridSize,
               gridIds: parsed.gridIds,
+              gridSeed: parsed.gridSeed,
+              includeGames: parsed.includeGames,
+              gameRatio: parsed.gameRatio,
               markedIds: parsed.markedIds,
               generations: parsed.generations,
             });
@@ -376,10 +389,11 @@ useEffect(() => {
     try {
       const payload = {
         gridSize,
+        gridIds: grid.map((c) => c.id),
         gridSeed,
         includeGames,
         gameRatio,
-        markedPositions: Array.from(marked),
+        markedIds: Array.from(marked),
         generations: Array.from(includedGenerations),
       };
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
@@ -397,10 +411,8 @@ useEffect(() => {
             {
               user_id: user.id,
               grid_size: gridSize,
-              grid_seed: gridSeed,
-              include_games: includeGames,
-              game_ratio: gameRatio,
-              marked_positions: Array.from(marked),
+              grid_ids: grid.map((c) => c.id),
+              marked_ids: Array.from(marked),
               generations: Array.from(includedGenerations),
             },
             { onConflict: 'user_id' }
