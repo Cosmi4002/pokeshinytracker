@@ -105,6 +105,7 @@ export type Database = {
           id: string
           is_evolved: boolean
           is_fail: boolean
+          is_gigamax: boolean
           is_unobtainable: boolean
           method: string
           notes: string | null
@@ -129,6 +130,7 @@ export type Database = {
           id?: string
           is_evolved?: boolean
           is_fail?: boolean
+          is_gigamax?: boolean
           is_unobtainable?: boolean
           method: string
           notes?: string | null
@@ -155,6 +157,7 @@ export type Database = {
           id?: string
           is_evolved?: boolean
           is_fail?: boolean
+          is_gigamax?: boolean
           is_unobtainable?: boolean
           method?: string
           notes?: string | null

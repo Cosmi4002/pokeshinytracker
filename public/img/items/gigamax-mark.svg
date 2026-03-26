@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">Gigamax Mark</title>
+  <desc id="desc">Stylized Gigantamax X mark</desc>
+  <defs>
+    <linearGradient id="outer" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff7fbd" />
+      <stop offset="100%" stop-color="#e11d48" />
+    </linearGradient>
+    <linearGradient id="inner" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6b021f" />
+      <stop offset="100%" stop-color="#3f0012" />
+    </linearGradient>
+  </defs>
+  <path fill="url(#outer)" d="M14 7h10l8 11 8-11h10L39 24l12 18H40L32 31l-8 11H13l12-18z"/>
+  <path fill="url(#inner)" d="M22 13h4l6 8 6-8h4l-8 12 9 13h-4l-7-10-7 10h-4l9-13z"/>
+</svg>

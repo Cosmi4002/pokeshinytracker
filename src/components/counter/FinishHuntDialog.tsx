@@ -24,7 +24,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
-import { POKEBALLS, GAMES, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, getPokemonSpriteUrl } from '@/lib/pokemon-data';
+import { POKEBALLS, GAMES, GIGAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, getPokemonSpriteUrl, supportsGigamaxMark } from '@/lib/pokemon-data';
 import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
 import { MethodSelector } from '@/components/counter/MethodSelector';
 
@@ -74,12 +74,20 @@ export function FinishHuntDialog({
   const [huntStartDate, setHuntStartDate] = useState(startDate ? startDate.split('T')[0] : '');
   const [caughtDate, setCaughtDate] = useState(new Date().toISOString().split('T')[0]);
   const [isFail, setIsFail] = useState(false);
+  const [isGigamax, setIsGigamax] = useState(false);
   const [isUnobtainable, setIsUnobtainable] = useState(false);
   const [phaseNumber, setPhaseNumber] = useState<number | null>(null);
   const [playlistId, setPlaylistId] = useState<string>('');
   const [notes, setNotes] = useState('');
 
   const { pokemon: pokemonDetails } = usePokemonDetails(pokemonId);
+  const canMarkGigamax = supportsGigamaxMark(game);
+
+  useEffect(() => {
+    if (!canMarkGigamax) {
+      setIsGigamax(false);
+    }
+  }, [canMarkGigamax]);
 
   // Build all forms/varieties from pokemon details without exclusion filters.
   const formOptions = useMemo(() => {
@@ -177,6 +185,7 @@ export function FinishHuntDialog({
         hunt_start_date: huntStartDate || null,
         caught_date: caughtDate,
         is_fail: isFail,
+        is_gigamax: isGigamax,
         is_unobtainable: isUnobtainable,
         phase_number: phaseNumber,
         playlist_id: playlistId || null,
@@ -319,6 +328,16 @@ export function FinishHuntDialog({
               </SelectContent>
             </Select>
           </div>
+
+          {canMarkGigamax && (
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
+              <div className="flex items-center gap-2">
+                <img src={GIGAMAX_ICON} alt="Gigamax" className="h-6 w-6 object-contain" />
+                <Label>Gigamax</Label>
+              </div>
+              <Switch checked={isGigamax} onCheckedChange={setIsGigamax} />
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label>Metodo *</Label>

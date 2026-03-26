@@ -23,7 +23,7 @@ import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
 import { PokemonSelector } from '@/components/counter/PokemonSelector';
 import { MethodSelector } from '@/components/counter/MethodSelector';
-import { POKEBALLS, GAMES, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON } from '@/lib/pokemon-data';
+import { POKEBALLS, GAMES, GIGAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, supportsGigamaxMark } from '@/lib/pokemon-data';
 import { usePokemonDetails, usePokemonList, formatPokemonName, MANUAL_VARIETIES } from '@/hooks/use-pokemon';
 import { getPokemonSpriteUrl } from '@/lib/pokemon-data';
 import { GenderSelector } from '@/components/ui/GenderSelector';
@@ -57,6 +57,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
   const [huntStartDate, setHuntStartDate] = useState('');
   const [caughtDate, setCaughtDate] = useState(new Date().toISOString().split('T')[0]);
   const [isFail, setIsFail] = useState(false);
+  const [isGigamax, setIsGigamax] = useState(false);
   const [isUnobtainable, setIsUnobtainable] = useState(false);
   const [phaseNumber, setPhaseNumber] = useState<number | null>(null);
   const [playlistId, setPlaylistId] = useState<string>('');
@@ -64,6 +65,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
 
   const { pokemon: pokemonDetails } = usePokemonDetails(pokemonId);
   const { pokemon: pokemonList } = usePokemonList();
+  const canMarkGigamax = supportsGigamaxMark(game);
 
   // Build form/variant options exactly like counter/pokedex details (forms + varieties).
   const formOptions = useMemo(() => {
@@ -165,12 +167,19 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
       setHuntStartDate(entry.hunt_start_date ?? '');
       setCaughtDate(entry.caught_date ?? new Date().toISOString().split('T')[0]);
       setIsFail(entry.is_fail ?? false);
+      setIsGigamax(entry.is_gigamax ?? false);
       setIsUnobtainable(entry.is_unobtainable ?? false);
       setPhaseNumber(entry.phase_number ?? null);
       setPlaylistId(entry.playlist_id ?? '');
       setNotes(entry.notes ?? '');
     }
   }, [open, entry, pokemonList]);
+
+  useEffect(() => {
+    if (!canMarkGigamax) {
+      setIsGigamax(false);
+    }
+  }, [canMarkGigamax]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -212,6 +221,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
           hunt_start_date: huntStartDate || null,
           caught_date: caughtDate,
           is_fail: isFail,
+          is_gigamax: isGigamax,
           is_unobtainable: isUnobtainable,
           phase_number: phaseNumber,
           playlist_id: playlistId || null,
@@ -369,6 +379,16 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
               </SelectContent>
             </Select>
           </div>
+
+          {canMarkGigamax && (
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
+              <div className="flex items-center gap-2">
+                <img src={GIGAMAX_ICON} alt="Gigamax" className="h-6 w-6 object-contain" />
+                <Label>Gigamax</Label>
+              </div>
+              <Switch checked={isGigamax} onCheckedChange={setIsGigamax} />
+            </div>
+          )}
 
           {/* 8. Metodo */}
           <div className="space-y-2">

@@ -1,7 +1,7 @@
 import { Pencil, Trash2, Calendar, ArrowUpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getGameTheme, GAME_LOGOS, type GameTheme } from '@/lib/game-themes';
-import { POKEBALLS, HUNTING_METHODS, getPokemonSpriteUrl } from '@/lib/pokemon-data';
+import { GIGAMAX_ICON, POKEBALLS, HUNTING_METHODS, getPokemonSpriteUrl, supportsGigamaxMark } from '@/lib/pokemon-data';
 import type { Tables } from '@/integrations/supabase/types';
 import { useMemo, useCallback } from 'react';
 import { cn } from '@/lib/utils';
@@ -32,6 +32,7 @@ interface ShinyCardProps {
 export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverride, applyBlackEffect = false, spriteName }: ShinyCardProps) {
   const isFail = entry.is_fail === true;
   const isEvolved = entry.is_evolved === true;
+  const isGigamax = entry.is_gigamax === true && supportsGigamaxMark(entry.game);
   const evolvedFromId = (entry as any).evolved_from_id as number | null | undefined;
   const evolvedFromName = (entry as any).evolved_from_name as string | null | undefined;
 
@@ -358,7 +359,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
             </div>
           </div>
 
-          {(pokeball || entry.has_shiny_charm || entry.is_fail || entry.is_unobtainable) && (
+          {(pokeball || entry.has_shiny_charm || isGigamax || entry.is_fail || entry.is_unobtainable) && (
             <div className="mt-2 pt-2 border-t flex items-center justify-between" style={{ borderTopColor: `${theme.primary}20` }}>
               <div className="flex items-center gap-2">
                 {(entry.is_fail || entry.is_unobtainable) ? (
@@ -392,17 +393,30 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                 )}
               </div>
 
-              {entry.has_shiny_charm && (
-                <div className="flex items-center" title="Shiny Charm Active">
-                  <img
-                    src="/img/items/shiny-charm.png"
-                    loading="lazy"
-                    decoding="async"
-                    className="w-8 h-8 object-contain animate-pulse drop-shadow-[0_0_8px_rgba(234,179,8,0.6)]"
-                    alt="Shiny Charm"
-                  />
-                </div>
-              )}
+              <div className="flex items-center gap-2">
+                {isGigamax && (
+                  <div className="flex items-center" title="Gigamax">
+                    <img
+                      src={GIGAMAX_ICON}
+                      loading="lazy"
+                      decoding="async"
+                      className="w-7 h-7 object-contain drop-shadow-[0_0_8px_rgba(244,114,182,0.5)]"
+                      alt="Gigamax"
+                    />
+                  </div>
+                )}
+                {entry.has_shiny_charm && (
+                  <div className="flex items-center" title="Shiny Charm Active">
+                    <img
+                      src="/img/items/shiny-charm.png"
+                      loading="lazy"
+                      decoding="async"
+                      className="w-8 h-8 object-contain animate-pulse drop-shadow-[0_0_8px_rgba(234,179,8,0.6)]"
+                      alt="Shiny Charm"
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
