@@ -67,9 +67,27 @@ const GAMES: Pick<GameCell, 'id' | 'name' | 'generation' | 'logo'>[] = [
   {id: GAME_ID_BASE + 26, name: 'Legends Arceus', generation: 8, logo: '/img/game-logos/pla.png'},
   // Gen 9
   {id: GAME_ID_BASE + 27, name: 'Scarlet', generation: 9, logo: '/img/game-logos/scarlet.png'},
-{id: GAME_ID_BASE + 28, name: 'Violet', generation: 9, logo: '/img/game-logos/violet.png'},
+  {id: GAME_ID_BASE + 28, name: 'Violet', generation: 9, logo: '/img/game-logos/violet.png'},
 ];
-\n\n  function mulberry32(seed: number) {\n    return function() {\n      let t = seed += 0x6D2B79F5;\n      t = Math.imul(t ^ t >>> 15, t | 1);\n      t ^= t + Math.imul(t ^ t >>> 7, t | 61);\n      return ((t ^ t >>> 14) >>> 0) / 4294967296;\n    };\n  }\n\n  function seededShuffle<T>(items: T[], seed: number): T[] {\n    const copy = [...items];\n    const rng = mulberry32(seed);\n    for (let i = copy.length - 1; i > 0; i--) {\n      const j = Math.floor(rng() * (i + 1));\n      [copy[i], copy[j]] = [copy[j], copy[i]];\n    }\n    return copy;\n  }
+
+function mulberry32(seed: number) {
+  return function () {
+    let t = (seed += 0x6D2B79F5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function seededShuffle<T>(items: T[], seed: number): T[] {
+  const copy = [...items];
+  const rng = mulberry32(seed);
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
 
 
 export default function Bingo() {
@@ -556,7 +574,22 @@ const toggleMark = (index: number) => {
               <Button variant="ghost" size="sm" onClick={selectAllGenerations} className="h-7 px-2.5">
                 Tutte
               </Button>
-              <Button variant="ghost" size="sm" onClick={clearGenerations} className="h-7 px-2.5">                Nessuna              </Button>\n            </div>\n            <div className="flex items-center gap-2">\n              <label className="text-sm text-muted-foreground whitespace-nowrap">Includi Giochi:</label>\n              <input \n                type="checkbox" \n                checked={includeGames} \n                onChange={(e) => setIncludeGames(e.target.checked)}\n                className="w-4 h-4 rounded border-gray-400"\n              />\n              <span className="text-xs">({Math.round(gameRatio * 100)}% caselle)</span>\n            </div>\n          </div>
+              <Button variant="ghost" size="sm" onClick={clearGenerations} className="h-7 px-2.5">
+                Nessuna
+              </Button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <label className="text-sm text-muted-foreground whitespace-nowrap">Includi Giochi:</label>
+              <input
+                type="checkbox"
+                checked={includeGames}
+                onChange={(e) => setIncludeGames(e.target.checked)}
+                className="w-4 h-4 rounded border-gray-400"
+              />
+              <span className="text-xs">({Math.round(gameRatio * 100)}% caselle)</span>
+            </div>
+          </div>
         </div>
 
         {loading ? (
