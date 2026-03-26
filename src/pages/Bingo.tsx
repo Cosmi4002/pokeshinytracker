@@ -56,17 +56,19 @@ const GAMES: Pick<GameCell, 'id' | 'name' | 'generation' | 'logo'>[] = [
   // Gen 7
   { id: GAME_ID_BASE + 18, name: 'Sun', generation: 7, logo: '/img/game-logos/sun.png' },
   { id: GAME_ID_BASE + 19, name: 'Moon', generation: 7, logo: '/img/game-logos/moon.png' },
-  { id: GAME_ID_BASE + 20, name: "Let's Go Pikachu", generation: 7, logo: '/img/game-logos/lgp.png' },
-  { id: GAME_ID_BASE + 21, name: "Let's Go Eevee", generation: 7, logo: '/img/game-logos/lge.png' },
+  { id: GAME_ID_BASE + 20, name: 'Ultra Sun', generation: 7, logo: '/img/game-logos/ultrasun.png' },
+  { id: GAME_ID_BASE + 21, name: 'Ultra Moon', generation: 7, logo: '/img/game-logos/ultramoon.png' },
+  { id: GAME_ID_BASE + 22, name: "Let's Go Pikachu", generation: 7, logo: '/img/game-logos/lgp.png' },
+  { id: GAME_ID_BASE + 23, name: "Let's Go Eevee", generation: 7, logo: '/img/game-logos/lge.png' },
   // Gen 8
-  { id: GAME_ID_BASE + 22, name: 'Sword', generation: 8, logo: '/img/game-logos/sword.png' },
-  { id: GAME_ID_BASE + 23, name: 'Shield', generation: 8, logo: '/img/game-logos/shield.png' },
-  { id: GAME_ID_BASE + 24, name: 'Brilliant Diamond', generation: 8, logo: '/img/game-logos/brilliantdiamond.png' },
-  { id: GAME_ID_BASE + 25, name: 'Shining Pearl', generation: 8, logo: '/img/game-logos/shiningpearl.png' },
-  { id: GAME_ID_BASE + 26, name: 'Legends Arceus', generation: 8, logo: '/img/game-logos/pla.png' },
+  { id: GAME_ID_BASE + 24, name: 'Sword', generation: 8, logo: '/img/game-logos/sword.png' },
+  { id: GAME_ID_BASE + 25, name: 'Shield', generation: 8, logo: '/img/game-logos/shield.png' },
+  { id: GAME_ID_BASE + 26, name: 'Brilliant Diamond', generation: 8, logo: '/img/game-logos/brilliantdiamond.png' },
+  { id: GAME_ID_BASE + 27, name: 'Shining Pearl', generation: 8, logo: '/img/game-logos/shiningpearl.png' },
+  { id: GAME_ID_BASE + 28, name: 'Legends Arceus', generation: 8, logo: '/img/game-logos/pla.png' },
   // Gen 9
-  { id: GAME_ID_BASE + 27, name: 'Scarlet', generation: 9, logo: '/img/game-logos/scarlet.png' },
-  { id: GAME_ID_BASE + 28, name: 'Violet', generation: 9, logo: '/img/game-logos/violet.png' },
+  { id: GAME_ID_BASE + 29, name: 'Scarlet', generation: 9, logo: '/img/game-logos/scarlet.png' },
+  { id: GAME_ID_BASE + 30, name: 'Violet', generation: 9, logo: '/img/game-logos/violet.png' },
 ];
 
 function shuffleInPlace<T>(arr: T[]) {
@@ -93,6 +95,7 @@ type PersistedState = {
   generations?: number[];
   includeGames?: boolean;
   gameRatio?: number;
+  selectedGameIds?: number[];
 };
 
 export default function Bingo() {
@@ -106,6 +109,8 @@ export default function Bingo() {
   const [includeGames, setIncludeGames] = useState(true);
   const [gameRatio, setGameRatio] = useState(0.2);
   const [replaceMode, setReplaceMode] = useState(false);
+  const [selectedGameIds, setSelectedGameIds] = useState<Set<number>>(() => new Set(GAMES.map((g) => g.id)));
+  const [gamePickerOpen, setGamePickerOpen] = useState(false);
 
   const [includedGenerations, setIncludedGenerations] = useState<Set<number>>(new Set());
   const [pendingGenerations, setPendingGenerations] = useState<Set<number>>(new Set());
@@ -193,6 +198,11 @@ export default function Bingo() {
       setGensTouched(true);
     }
 
+    if (Array.isArray(parsed.selectedGameIds) && parsed.selectedGameIds.length > 0) {
+      const next = parsed.selectedGameIds.filter((id) => GAMES.some((g) => g.id === id));
+      if (next.length > 0) setSelectedGameIds(new Set(next));
+    }
+
     if (Array.isArray(parsed.gridIds) && parsed.gridIds.length > 0) {
       const nextGridIds = parsed.gridIds.filter((id) => idToCell.has(id));
       if (nextGridIds.length === parsed.gridIds.length) {
@@ -210,9 +220,9 @@ export default function Bingo() {
     const filteredBase = basePool.filter(matchesGen);
     const filteredAll = pokemon.filter((p) => !p.hideFromPokedex && matchesGen(p));
     const pokemonPool = filteredBase.length > 0 ? filteredBase : filteredAll;
-    const gamesPool = GAMES.filter(matchesGen).map((g) => ({ ...g, type: 'game' as const }));
+    const gamesPool = GAMES.filter((g) => matchesGen(g) && selectedGameIds.has(g.id)).map((g) => ({ ...g, type: 'game' as const }));
     return { pokemonPool, gamesPool };
-  }, [basePool, pokemon]);
+  }, [basePool, pokemon, selectedGameIds]);
 
   const generateGrid = useCallback(() => {
     if (saveTimerRef.current) {
@@ -249,8 +259,9 @@ export default function Bingo() {
       generations: Array.from(pendingGenerations),
       includeGames,
       gameRatio,
+      selectedGameIds: Array.from(selectedGameIds),
     });
-  }, [pendingGenerations, pendingGridSize, includeGames, gameRatio, persist, buildPools]);
+  }, [pendingGenerations, pendingGridSize, includeGames, gameRatio, persist, buildPools, selectedGameIds]);
 
   const toggleMark = useCallback((index: number) => {
     setMarked((prev) => {
@@ -402,6 +413,7 @@ export default function Bingo() {
         generations: Array.from(includedGenerations),
         includeGames,
         gameRatio,
+        selectedGameIds: Array.from(selectedGameIds),
       });
     }, 250);
 
@@ -411,7 +423,7 @@ export default function Bingo() {
         saveTimerRef.current = null;
       }
     };
-  }, [loading, gridSize, gridIds, marked, includedGenerations, includeGames, gameRatio, persist]);
+  }, [loading, gridSize, gridIds, marked, includedGenerations, includeGames, gameRatio, persist, selectedGameIds]);
 
   return (
     <div
@@ -498,6 +510,17 @@ export default function Bingo() {
                 className="w-4 h-4 rounded border-gray-400"
               />
               <span className="text-xs">({Math.round(gameRatio * 100)}% caselle)</span>
+              {includeGames && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2.5"
+                  onClick={() => setGamePickerOpen(true)}
+                  title="Scegli quali loghi possono uscire"
+                >
+                  Seleziona loghi
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -667,7 +690,73 @@ export default function Bingo() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={gamePickerOpen} onOpenChange={setGamePickerOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Seleziona Loghi</DialogTitle>
+            <DialogDescription>Scegli quali giochi possono comparire nel bingo.</DialogDescription>
+          </DialogHeader>
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSelectedGameIds(new Set(GAMES.map((g) => g.id)))}
+              className="h-8"
+            >
+              Tutti
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSelectedGameIds(new Set())}
+              className="h-8"
+            >
+              Nessuno
+            </Button>
+            <div className="text-xs text-muted-foreground">
+              Selezionati: {selectedGameIds.size}
+            </div>
+          </div>
+
+          <div className="mt-3 max-h-[55vh] overflow-y-auto rounded-lg border border-white/10 p-3 space-y-2">
+            {GAMES.map((g) => {
+              const checked = selectedGameIds.has(g.id);
+              return (
+                <label key={g.id} className="flex items-center justify-between gap-3">
+                  <span className="flex items-center gap-3">
+                    <img
+                      src={g.logo}
+                      alt={g.name}
+                      className="h-8 w-8 object-contain"
+                      loading="lazy"
+                      decoding="async"
+                      onError={(e) => ((e.currentTarget as HTMLImageElement).src = '/placeholder.svg')}
+                    />
+                    <span className="text-sm">{g.name}</span>
+                  </span>
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={(e) => {
+                      const next = new Set(selectedGameIds);
+                      if (e.target.checked) next.add(g.id);
+                      else next.delete(g.id);
+                      setSelectedGameIds(next);
+                    }}
+                    className="w-4 h-4 rounded border-gray-400"
+                  />
+                </label>
+              );
+            })}
+          </div>
+
+          <div className="mt-3 flex justify-end">
+            <Button onClick={() => setGamePickerOpen(false)}>Chiudi</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
-
