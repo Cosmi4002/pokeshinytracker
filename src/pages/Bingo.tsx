@@ -213,16 +213,16 @@ const generateGrid = useCallback(() => {
     if (includeGames) {
       const filteredGamesRaw = GAMES.filter(matchesGen);
       const numGames = Math.floor(needed * gameRatio);
-      const gamePool = filteredGamesRaw.slice(0, numGames).map(g => ({ ...g, type: 'game' as const }));
-      const shuffledGames = seededShuffle(gamePool, seed);
-      const neededPokes = needed - shuffledGames.length;
-      const pokeSlice = pokemonPool.slice(0, neededPokes);
-      const shuffledPokes = seededShuffle(pokeSlice, seed + 1) as PokemonBasic[];
-      next = [...shuffledPokes, ...shuffledGames];
+      const gamesAll = filteredGamesRaw.map((g) => ({ ...g, type: 'game' as const }));
+      const pickedGames = seededShuffle(gamesAll, seed).slice(0, numGames);
+
+      const neededPokes = needed - pickedGames.length;
+      const pickedPokes = seededShuffle(pokemonPool, seed + 1).slice(0, neededPokes) as PokemonBasic[];
+
+      next = [...pickedPokes, ...pickedGames];
       next = seededShuffle(next, seed + 2);
     } else {
-      const pokeSlice = pokemonPool.slice(0, needed);
-      next = seededShuffle(pokeSlice, seed) as PokemonBasic[];
+      next = seededShuffle(pokemonPool, seed).slice(0, needed) as PokemonBasic[];
     }
     setGridSeed(seed);
     setGridSize(pendingGridSize);
@@ -242,17 +242,11 @@ const generateGrid = useCallback(() => {
     const filteredBase = basePool.filter(matchesGen);
     const filteredAll = pokemon.filter((p) => !p.hideFromPokedex && matchesGen(p));
     const pokemonPool = filteredBase.length > 0 ? filteredBase : filteredAll;
-    const needed = gridSize * gridSize;
-    let pool: BingoCell[] = [];
     if (includeGames) {
-      const filteredGamesRaw = GAMES.filter(matchesGen);
-      const numGames = Math.floor(needed * gameRatio);
-      const gamePool = filteredGamesRaw.slice(0, numGames).map(g => ({ ...g, type: 'game' as const }));
-      pool = [...pokemonPool.slice(0, needed - gamePool.length), ...gamePool];
-    } else {
-      pool = pokemonPool.slice(0, needed);
+      const gamesAll = GAMES.filter(matchesGen).map((g) => ({ ...g, type: 'game' as const }));
+      return [...pokemonPool, ...gamesAll];
     }
-    return pool;
+    return pokemonPool;
   }, [basePool, pokemon, includedGenerations, gridSize, includeGames, gameRatio]);
 
   useEffect(() => {
