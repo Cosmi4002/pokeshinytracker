@@ -16,6 +16,7 @@ import Memo from "./pages/Memo";
 import UserCollectionsSearch from "./pages/UserCollectionsSearch";
 import Bingo from "./pages/Bingo";
 import { ScrollRestoration } from "@/components/layout/ScrollRestoration";
+import { Analytics } from "@vercel/analytics/react";
 
 import NotFound from "./pages/NotFound";
 import Debug from "./pages/Debug";
@@ -51,6 +52,7 @@ function AppContent() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
+      <Analytics />
     </>
   );
 }
