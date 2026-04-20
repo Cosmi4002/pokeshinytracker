@@ -16,6 +16,7 @@ import Memo from "./pages/Memo";
 import UserCollectionsSearch from "./pages/UserCollectionsSearch";
 import Bingo from "./pages/Bingo";
 import { ScrollRestoration } from "@/components/layout/ScrollRestoration";
+import { ApplyAppearance } from "@/components/layout/ApplyAppearance";
 
 import NotFound from "./pages/NotFound";
 import Debug from "./pages/Debug";
@@ -29,6 +30,7 @@ function AppContent() {
 
   return (
     <>
+      <ApplyAppearance />
       <Toaster />
       <Sonner />
       <BrowserRouter>
