@@ -25,6 +25,7 @@ import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
 import { PokemonSelector } from '@/components/counter/PokemonSelector';
 import { MethodSelector } from '@/components/counter/MethodSelector';
+import { Checkbox } from '@/components/ui/checkbox';
 import { POKEBALLS, GAMES, GIGAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, supportsGigamaxMark } from '@/lib/pokemon-data';
 import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
 import { getPokemonSpriteUrl } from '@/lib/pokemon-data';
@@ -56,6 +57,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
   const [isGigamax, setIsGigamax] = useState(false);
   const [isUnobtainable, setIsUnobtainable] = useState(false);
   const [phaseNumber, setPhaseNumber] = useState<number | null>(null);
+  const [showTotal, setShowTotal] = useState(false);
   const [playlistId, setPlaylistId] = useState<string>('');
   const [notes, setNotes] = useState('');
 
@@ -171,6 +173,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
         is_gigamax: isGigamax,
         is_unobtainable: isUnobtainable,
         phase_number: phaseNumber,
+        show_total: showTotal,
         playlist_id: playlistId || null,
         notes: notes || null,
       });
@@ -361,6 +364,17 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
                 onChange={(e) => setPhaseNumber(e.target.value ? parseInt(e.target.value) || null : null)}
               />
             </div>
+          </div>
+
+          <div className="flex items-center gap-2 px-1">
+            <Checkbox
+              id="show-total"
+              checked={showTotal}
+              onCheckedChange={(v) => setShowTotal(v === true)}
+            />
+            <Label htmlFor="show-total" className="cursor-pointer select-none">
+              Mostra “Total” nel riquadro in collezione
+            </Label>
           </div>
 
           {/* 8. Data inizio e fine */}

@@ -1,4 +1,4 @@
-import { Pencil, Trash2, Calendar, ArrowUpCircle } from 'lucide-react';
+import { Pencil, Trash2, Calendar, ArrowUpCircle, Crosshair } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getGameTheme, GAME_LOGOS, type GameTheme } from '@/lib/game-themes';
 import { GIGAMAX_ICON, POKEBALLS, HUNTING_METHODS, getPokemonSpriteUrl, supportsGigamaxMark } from '@/lib/pokemon-data';
@@ -353,6 +353,19 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                     }}
                   >
                     PHASE #{entry.phase_number}
+                  </span>
+                </div>
+              )}
+              {entry.show_total && (
+                <div className="mt-1.5 pt-1.5 border-t border-white/15 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1">
+                    <Crosshair className="w-3 h-3 text-white/70" />
+                    <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em]">
+                      Total
+                    </span>
+                  </div>
+                  <span className="text-[10px] sm:text-[11px] font-black tabular-nums text-white/95">
+                    {entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-'}
                   </span>
                 </div>
               )}

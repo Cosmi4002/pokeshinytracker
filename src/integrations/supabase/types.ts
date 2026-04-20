@@ -114,6 +114,7 @@ export type Database = {
           pokeball: string
           pokemon_id: number
           pokemon_name: string
+          show_total: boolean
           sprite_url: string | null
           updated_at: string
           user_id: string
@@ -141,6 +142,7 @@ export type Database = {
           pokeball?: string
           pokemon_id: number
           pokemon_name: string
+          show_total?: boolean
           sprite_url?: string | null
           updated_at?: string
           user_id: string
@@ -168,6 +170,7 @@ export type Database = {
           pokeball?: string
           pokemon_id?: number
           pokemon_name?: string
+          show_total?: boolean
           sprite_url?: string | null
           updated_at?: string
           user_id?: string

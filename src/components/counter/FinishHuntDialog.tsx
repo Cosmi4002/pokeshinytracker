@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, Sparkles } from 'lucide-react';
 import { GenderSelector } from '@/components/ui/GenderSelector';
@@ -27,6 +27,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { POKEBALLS, GAMES, GIGAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, getPokemonSpriteUrl, supportsGigamaxMark } from '@/lib/pokemon-data';
 import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
 import { MethodSelector } from '@/components/counter/MethodSelector';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface FinishHuntDialogProps {
   open: boolean;
@@ -71,12 +72,15 @@ export function FinishHuntDialog({
   const [game, setGame] = useState('');
   const [method, setMethod] = useState<HuntingMethod>(initialMethod);
   const [attempts, setAttempts] = useState(counter);
+  const [attemptsDirty, setAttemptsDirty] = useState(false);
+  const prevOpenRef = useRef(false);
   const [huntStartDate, setHuntStartDate] = useState(startDate ? startDate.split('T')[0] : '');
   const [caughtDate, setCaughtDate] = useState(new Date().toISOString().split('T')[0]);
   const [isFail, setIsFail] = useState(false);
   const [isGigamax, setIsGigamax] = useState(false);
   const [isUnobtainable, setIsUnobtainable] = useState(false);
   const [phaseNumber, setPhaseNumber] = useState<number | null>(null);
+  const [showTotal, setShowTotal] = useState(false);
   const [playlistId, setPlaylistId] = useState<string>('');
   const [notes, setNotes] = useState('');
 
@@ -88,6 +92,22 @@ export function FinishHuntDialog({
       setIsGigamax(false);
     }
   }, [canMarkGigamax]);
+
+  useEffect(() => {
+    const wasOpen = prevOpenRef.current;
+    prevOpenRef.current = open;
+
+    if (!open || wasOpen) return;
+
+    setAttemptsDirty(false);
+    setAttempts(counter);
+  }, [open, counter]);
+
+  useEffect(() => {
+    if (!open) return;
+    if (attemptsDirty) return;
+    setAttempts(counter);
+  }, [counter, open, attemptsDirty]);
 
   // Build all forms/varieties from pokemon details without exclusion filters.
   const formOptions = useMemo(() => {
@@ -188,6 +208,7 @@ export function FinishHuntDialog({
         is_gigamax: isGigamax,
         is_unobtainable: isUnobtainable,
         phase_number: phaseNumber,
+        show_total: showTotal,
         playlist_id: playlistId || null,
         notes: notes || null,
       });
@@ -351,7 +372,10 @@ export function FinishHuntDialog({
                 type="number"
                 min={1}
                 value={attempts}
-                onChange={(e) => setAttempts(Math.max(1, parseInt(e.target.value) || 1))}
+                onChange={(e) => {
+                  setAttemptsDirty(true);
+                  setAttempts(Math.max(1, parseInt(e.target.value) || 1));
+                }}
               />
             </div>
             <div className="space-y-2">
@@ -364,6 +388,17 @@ export function FinishHuntDialog({
                 onChange={(e) => setPhaseNumber(e.target.value ? parseInt(e.target.value) || null : null)}
               />
             </div>
+          </div>
+
+          <div className="flex items-center gap-2 px-1">
+            <Checkbox
+              id="show-total"
+              checked={showTotal}
+              onCheckedChange={(v) => setShowTotal(v === true)}
+            />
+            <Label htmlFor="show-total" className="cursor-pointer select-none">
+              Mostra “Total” nel riquadro in collezione
+            </Label>
           </div>
 
           <div className="grid grid-cols-2 gap-4">

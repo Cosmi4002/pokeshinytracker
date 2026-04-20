@@ -29,6 +29,7 @@ import { getPokemonSpriteUrl } from '@/lib/pokemon-data';
 import { GenderSelector } from '@/components/ui/GenderSelector';
 import { Sparkles } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
+import { Checkbox } from '@/components/ui/checkbox';
 
 type CaughtShinyRow = Tables<'caught_shinies'>;
 
@@ -60,6 +61,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
   const [isGigamax, setIsGigamax] = useState(false);
   const [isUnobtainable, setIsUnobtainable] = useState(false);
   const [phaseNumber, setPhaseNumber] = useState<number | null>(null);
+  const [showTotal, setShowTotal] = useState(false);
   const [playlistId, setPlaylistId] = useState<string>('');
   const [notes, setNotes] = useState('');
 
@@ -170,6 +172,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
       setIsGigamax(entry.is_gigamax ?? false);
       setIsUnobtainable(entry.is_unobtainable ?? false);
       setPhaseNumber(entry.phase_number ?? null);
+      setShowTotal(entry.show_total ?? false);
       setPlaylistId(entry.playlist_id ?? '');
       setNotes(entry.notes ?? '');
     }
@@ -224,6 +227,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
           is_gigamax: isGigamax,
           is_unobtainable: isUnobtainable,
           phase_number: phaseNumber,
+          show_total: showTotal,
           playlist_id: playlistId || null,
           notes: notes || null,
         })
@@ -417,6 +421,17 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
                 onChange={(e) => setPhaseNumber(e.target.value ? parseInt(e.target.value) || null : null)}
               />
             </div>
+          </div>
+
+          <div className="flex items-center gap-2 px-1">
+            <Checkbox
+              id="show-total"
+              checked={showTotal}
+              onCheckedChange={(v) => setShowTotal(v === true)}
+            />
+            <Label htmlFor="show-total" className="cursor-pointer select-none">
+              Mostra “Total” nel riquadro in collezione
+            </Label>
           </div>
 
           {/* 10. Date */}
