@@ -365,7 +365,9 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                     </span>
                   </div>
                   <span className="text-[10px] sm:text-[11px] font-black tabular-nums text-white/95">
-                    {entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-'}
+                    {entry.total_value && entry.total_value > 0
+                      ? entry.total_value.toLocaleString()
+                      : (entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-')}
                   </span>
                 </div>
               )}

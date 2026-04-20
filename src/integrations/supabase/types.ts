@@ -115,6 +115,7 @@ export type Database = {
           pokemon_id: number
           pokemon_name: string
           show_total: boolean
+          total_value: number | null
           sprite_url: string | null
           updated_at: string
           user_id: string
@@ -143,6 +144,7 @@ export type Database = {
           pokemon_id: number
           pokemon_name: string
           show_total?: boolean
+          total_value?: number | null
           sprite_url?: string | null
           updated_at?: string
           user_id: string
@@ -171,6 +173,7 @@ export type Database = {
           pokemon_id?: number
           pokemon_name?: string
           show_total?: boolean
+          total_value?: number | null
           sprite_url?: string | null
           updated_at?: string
           user_id?: string

@@ -62,6 +62,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
   const [isUnobtainable, setIsUnobtainable] = useState(false);
   const [phaseNumber, setPhaseNumber] = useState<number | null>(null);
   const [showTotal, setShowTotal] = useState(false);
+  const [totalValue, setTotalValue] = useState<number | null>(null);
   const [playlistId, setPlaylistId] = useState<string>('');
   const [notes, setNotes] = useState('');
 
@@ -173,6 +174,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
       setIsUnobtainable(entry.is_unobtainable ?? false);
       setPhaseNumber(entry.phase_number ?? null);
       setShowTotal(entry.show_total ?? false);
+      setTotalValue(entry.total_value ?? null);
       setPlaylistId(entry.playlist_id ?? '');
       setNotes(entry.notes ?? '');
     }
@@ -228,6 +230,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
           is_unobtainable: isUnobtainable,
           phase_number: phaseNumber,
           show_total: showTotal,
+          total_value: showTotal ? (totalValue ?? attempts) : null,
           playlist_id: playlistId || null,
           notes: notes || null,
         })
@@ -423,15 +426,37 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
             </div>
           </div>
 
-          <div className="flex items-center gap-2 px-1">
-            <Checkbox
-              id="show-total"
-              checked={showTotal}
-              onCheckedChange={(v) => setShowTotal(v === true)}
-            />
-            <Label htmlFor="show-total" className="cursor-pointer select-none">
-              Mostra “Total” nel riquadro in collezione
-            </Label>
+          <div className="grid grid-cols-2 gap-4 items-end">
+            <div className="flex items-center gap-2 px-1">
+              <Checkbox
+                id="show-total"
+                checked={showTotal}
+                onCheckedChange={(v) => {
+                  const enabled = v === true;
+                  setShowTotal(enabled);
+                  if (enabled && totalValue === null) {
+                    setTotalValue(attempts);
+                  }
+                  if (!enabled) {
+                    setTotalValue(null);
+                  }
+                }}
+              />
+              <Label htmlFor="show-total" className="cursor-pointer select-none">
+                Mostra “Total” in collezione
+              </Label>
+            </div>
+            <div className="space-y-2">
+              <Label>Total</Label>
+              <Input
+                type="number"
+                min={1}
+                disabled={!showTotal}
+                value={showTotal ? (totalValue ?? attempts) : ''}
+                placeholder="Es: 1234"
+                onChange={(e) => setTotalValue(e.target.value ? Math.max(1, parseInt(e.target.value) || 1) : null)}
+              />
+            </div>
           </div>
 
           {/* 10. Date */}
