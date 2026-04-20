@@ -32,6 +32,7 @@ export function ThemeCustomizer() {
   const [themeColor, setThemeColor] = useState(preferences?.theme_color || '#8b5cf6');
   const [backgroundColor, setBackgroundColor] = useState(preferences?.background_color || '#0f172a');
   const [layoutStyle, setLayoutStyle] = useState(preferences?.layout_style || 'grid');
+  const [presetId, setPresetId] = useState('custom');
   const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -39,6 +40,7 @@ export function ThemeCustomizer() {
   useEffect(() => {
     if (open) {
       if (preferences) {
+        setPresetId('custom');
         if (isRandom) {
           setThemeColor(accentColor);
         } else {
@@ -98,6 +100,28 @@ export function ThemeCustomizer() {
     setOpen(false);
   };
 
+  const themePresets = [
+    { id: 'neon-violet', name: 'Neon Violet', themeColor: '#a855f7', backgroundColor: '#0b1020', layoutStyle: 'grid' },
+    { id: 'emerald-night', name: 'Emerald Night', themeColor: '#10b981', backgroundColor: '#071a12', layoutStyle: 'grid' },
+    { id: 'sunset', name: 'Sunset', themeColor: '#fb7185', backgroundColor: '#1b0b10', layoutStyle: 'grid' },
+    { id: 'ice', name: 'Ice', themeColor: '#38bdf8', backgroundColor: '#07111a', layoutStyle: 'grid' },
+    { id: 'amoled', name: 'AMOLED', themeColor: '#fbbf24', backgroundColor: '#000000', layoutStyle: 'compact' },
+    { id: 'classic', name: 'Classic', themeColor: '#8b5cf6', backgroundColor: '#0f172a', layoutStyle: 'grid' },
+  ] as const;
+
+  const applyPreset = (id: string) => {
+    if (id === 'custom') {
+      setPresetId('custom');
+      return;
+    }
+    const preset = themePresets.find((p) => p.id === id);
+    if (!preset) return;
+    setPresetId(id);
+    setThemeColor(preset.themeColor);
+    setBackgroundColor(preset.backgroundColor);
+    setLayoutStyle(preset.layoutStyle);
+  };
+
   const backgroundPresets = [
     '#0f172a', // Slate dark
     '#1e1b4b', // Indigo dark
@@ -134,6 +158,27 @@ export function ThemeCustomizer() {
         </DialogHeader>
 
         <div className="space-y-6 py-4">
+          {/* Presets */}
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4" />
+              Temi Rapidi
+            </Label>
+            <Select value={presetId} onValueChange={applyPreset}>
+              <SelectTrigger>
+                <SelectValue placeholder="Seleziona un tema" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="custom">Personalizzato</SelectItem>
+                {themePresets.map((p) => (
+                  <SelectItem key={p.id} value={p.id}>
+                    {p.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Theme Mode */}
           <div className="space-y-2">
             <Label>Modalità</Label>

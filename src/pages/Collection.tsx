@@ -21,6 +21,8 @@ import { SetEvolutionDialog } from '@/components/collection/SetEvolutionDialog';
 import { ShinyCard } from '@/components/collection/ShinyCard';
 import { useGlobalCollectionThemes } from '@/hooks/use-global-collection-themes';
 import { isFormEliminated } from '@/lib/form-filters';
+import { useUserPreferences } from '@/hooks/use-user-preferences';
+import { cn } from '@/lib/utils';
 import type { Tables } from '@/integrations/supabase/types';
 
 type CaughtShinyRow = Tables<'caught_shinies'>;
@@ -31,6 +33,7 @@ export default function Collection() {
   const { accentColor } = useRandomColor();
   const { pokemon } = usePokemonList();
   const { mergedThemes, effects } = useGlobalCollectionThemes();
+  const { preferences } = useUserPreferences();
   const { toast } = useToast();
 
   const [entries, setEntries] = useState<CaughtShinyRow[]>([]);
@@ -57,6 +60,17 @@ export default function Collection() {
       .replace(/[()]/g, '')
       .replace(/\s+/g, '-')
       .replace(/_+/g, '-');
+
+  const collectionLayoutStyle = preferences?.layout_style || 'grid';
+  const collectionLayoutClassName = useMemo(() => {
+    if (collectionLayoutStyle === 'list') {
+      return 'flex flex-col gap-4';
+    }
+    if (collectionLayoutStyle === 'compact') {
+      return 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 xl:grid-cols-7 gap-3';
+    }
+    return 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4';
+  }, [collectionLayoutStyle]);
 
   const isAbortLikeError = (err: unknown) => {
     if (!err || typeof err !== 'object') return false;
@@ -462,7 +476,7 @@ export default function Collection() {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className={cn(collectionLayoutClassName)}>
               {filteredEntries.map((entry) => {
                 const resolved = resolveEntryPokemon(entry);
                 return (
