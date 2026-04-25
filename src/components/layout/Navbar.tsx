@@ -33,6 +33,18 @@ const trainerAvatars = [
   { id: 'hilda', label: 'Hilda', src: '/img/trainers/hilda.png' },
   { id: 'calem', label: 'Calem', src: '/img/trainers/calem.png' },
   { id: 'serena', label: 'Serena', src: '/img/trainers/serena.png' },
+  { id: 'leaf', label: 'Leaf', src: '/img/trainers/leaf.svg' },
+  { id: 'kris', label: 'Kris', src: '/img/trainers/kris.svg' },
+  { id: 'gold', label: 'Gold', src: '/img/trainers/gold.svg' },
+  { id: 'silver', label: 'Silver', src: '/img/trainers/silver.svg' },
+  { id: 'ruby', label: 'Ruby', src: '/img/trainers/ruby.svg' },
+  { id: 'sapphire', label: 'Sapphire', src: '/img/trainers/sapphire.svg' },
+  { id: 'emerald', label: 'Emerald', src: '/img/trainers/emerald.svg' },
+  { id: 'diamond', label: 'Diamond', src: '/img/trainers/diamond.svg' },
+  { id: 'pearl', label: 'Pearl', src: '/img/trainers/pearl.svg' },
+  { id: 'black', label: 'Black', src: '/img/trainers/black.svg' },
+  { id: 'scarlet', label: 'Scarlet', src: '/img/trainers/scarlet.svg' },
+  { id: 'violet', label: 'Violet', src: '/img/trainers/violet.svg' },
 ] as const;
 
 export function Navbar() {
