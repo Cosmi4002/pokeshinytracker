@@ -230,6 +230,7 @@ export const HUNTING_METHODS: HuntingMethod[] = [
   { id: 'gen9-random', name: 'Random Encounter', baseOdds: 4096, generation: 9, supportsShinyCharm: true },
   { id: 'gen9-sandwich-lv3', name: 'Sandwich (Sparkling Power)', baseOdds: 1024, generation: 9, supportsShinyCharm: true },
   { id: 'gen9-soft-reset', name: 'Soft Reset', baseOdds: 4096, generation: 9, supportsShinyCharm: true },
+  { id: 'gen9-tera-raid', name: 'Tera Raid', baseOdds: 4096, generation: 9, supportsShinyCharm: true },
 
   // --- Event & Custom ---
   { id: 'event', name: 'Event', baseOdds: 4096, generation: 0, supportsShinyCharm: false },
