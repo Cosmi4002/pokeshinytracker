@@ -352,7 +352,13 @@ export default function UserCollectionsSearch() {
                               <p className="text-xs text-muted-foreground truncate">Gioco: {entry.game || '-'}</p>
                               <p className="text-xs text-muted-foreground">Inizio: {entry.hunt_start_date ? new Date(entry.hunt_start_date).toLocaleDateString('it-IT') : '-'}</p>
                               <p className="text-xs text-muted-foreground truncate">Metodo: {entry.method || '-'}</p>
-                              <p className="text-xs text-muted-foreground">Encounters: {entry.attempts ?? '-'}</p>
+                              {(() => {
+                                const raw = (entry.method || '').toString().trim().toLowerCase();
+                                const showEncounters = raw !== 'gen9-outbreak-sandwich' && raw !== 'outbreak + sandwich lv3';
+                                return showEncounters ? (
+                                  <p className="text-xs text-muted-foreground">Encounters: {entry.attempts ?? '-'}</p>
+                                ) : null;
+                              })()}
                               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                                 <img src={SHINY_CHARM_ICON} alt="Cromamuleto" className="h-3 w-3 object-contain" />
                                 <span>Cromamuleto: {entry.has_shiny_charm ? 'Si' : 'No'}</span>
@@ -486,7 +492,13 @@ export default function UserCollectionsSearch() {
                               <p className="text-xs text-muted-foreground truncate">Gioco: {entry.game || '-'}</p>
                               <p className="text-xs text-muted-foreground">Inizio: {entry.hunt_start_date ? new Date(entry.hunt_start_date).toLocaleDateString('it-IT') : '-'}</p>
                               <p className="text-xs text-muted-foreground truncate">Metodo: {entry.method || '-'}</p>
-                              <p className="text-xs text-muted-foreground">Encounters: {entry.attempts ?? '-'}</p>
+                              {(() => {
+                                const raw = (entry.method || '').toString().trim().toLowerCase();
+                                const showEncounters = raw !== 'gen9-outbreak-sandwich' && raw !== 'outbreak + sandwich lv3';
+                                return showEncounters ? (
+                                  <p className="text-xs text-muted-foreground">Encounters: {entry.attempts ?? '-'}</p>
+                                ) : null;
+                              })()}
                               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                                 <img src={SHINY_CHARM_ICON} alt="Cromamuleto" className="h-3 w-3 object-contain" />
                                 <span>Cromamuleto: {entry.has_shiny_charm ? 'Si' : 'No'}</span>

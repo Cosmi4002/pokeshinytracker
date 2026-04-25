@@ -39,6 +39,10 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   const theme = useMemo(() => themeOverride || getGameTheme(entry.game), [entry.game, themeOverride]);
   const pokeball = useMemo(() => POKEBALLS.find((b) => b.id === entry.pokeball), [entry.pokeball]);
   const method = useMemo(() => HUNTING_METHODS.find((m) => m.id === entry.method), [entry.method]);
+  const showEncounters = useMemo(() => {
+    const raw = (entry.method || '').toString().trim().toLowerCase();
+    return raw !== 'gen9-outbreak-sandwich' && raw !== 'outbreak + sandwich lv3';
+  }, [entry.method]);
 
   const spriteUrl = useMemo(() => {
     const spriteSlug = entry.form || spriteName || entry.pokemon_name;
@@ -301,7 +305,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-2 mt-2">
+          <div className={cn('grid gap-2 mt-2', showEncounters ? 'grid-cols-2' : 'grid-cols-1')}>
             <div
               className="rounded-lg p-2 border shadow-lg"
               style={{
@@ -329,49 +333,51 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
               </div>
             </div>
 
-            <div
-              className="rounded-lg p-2 border shadow-lg flex flex-col"
-              style={{
-                background: `linear-gradient(145deg, color-mix(in srgb, ${theme.primary} 46%, #101010), color-mix(in srgb, ${theme.secondary} 38%, #0f0f0f))`,
-                borderColor: `${theme.accent}66`,
-              }}
-            >
-              <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em] block mb-1.5">Encounters</span>
-              <div className="flex-1 flex items-center justify-center rounded-md bg-black/25 px-1.5 py-2">
-                <span className="text-2xl sm:text-[1.75rem] font-black tabular-nums tracking-tight text-white leading-none">
-                  {entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-'}
-                </span>
-              </div>
-              {entry.phase_number && (
-                <div className="mt-1.5 pt-1.5 border-t border-white/15">
-                  <span
-                    className="text-[9px] font-black uppercase tracking-[0.12em] px-1.5 py-0.5 rounded border"
-                    style={{
-                      color: theme.accent,
-                      backgroundColor: `color-mix(in srgb, ${theme.accent} 20%, #0d0d0d)`,
-                      borderColor: `${theme.accent}88`,
-                    }}
-                  >
-                    PHASE #{entry.phase_number}
+            {showEncounters && (
+              <div
+                className="rounded-lg p-2 border shadow-lg flex flex-col"
+                style={{
+                  background: `linear-gradient(145deg, color-mix(in srgb, ${theme.primary} 46%, #101010), color-mix(in srgb, ${theme.secondary} 38%, #0f0f0f))`,
+                  borderColor: `${theme.accent}66`,
+                }}
+              >
+                <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em] block mb-1.5">Encounters</span>
+                <div className="flex-1 flex items-center justify-center rounded-md bg-black/25 px-1.5 py-2">
+                  <span className="text-2xl sm:text-[1.75rem] font-black tabular-nums tracking-tight text-white leading-none">
+                    {entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-'}
                   </span>
                 </div>
-              )}
-              {entry.show_total && (
-                <div className="mt-1.5 pt-1.5 border-t border-white/15 flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-1">
-                    <Crosshair className="w-3 h-3 text-white/70" />
-                    <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em]">
-                      Total
+                {entry.phase_number && (
+                  <div className="mt-1.5 pt-1.5 border-t border-white/15">
+                    <span
+                      className="text-[9px] font-black uppercase tracking-[0.12em] px-1.5 py-0.5 rounded border"
+                      style={{
+                        color: theme.accent,
+                        backgroundColor: `color-mix(in srgb, ${theme.accent} 20%, #0d0d0d)`,
+                        borderColor: `${theme.accent}88`,
+                      }}
+                    >
+                      PHASE #{entry.phase_number}
                     </span>
                   </div>
-                  <span className="text-[10px] sm:text-[11px] font-black tabular-nums text-white/95">
-                    {entry.total_value && entry.total_value > 0
-                      ? entry.total_value.toLocaleString()
-                      : (entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-')}
-                  </span>
-                </div>
-              )}
-            </div>
+                )}
+                {entry.show_total && (
+                  <div className="mt-1.5 pt-1.5 border-t border-white/15 flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1">
+                      <Crosshair className="w-3 h-3 text-white/70" />
+                      <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em]">
+                        Total
+                      </span>
+                    </div>
+                    <span className="text-[10px] sm:text-[11px] font-black tabular-nums text-white/95">
+                      {entry.total_value && entry.total_value > 0
+                        ? entry.total_value.toLocaleString()
+                        : (entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-')}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {(pokeball || entry.has_shiny_charm || isGigamax || entry.is_fail || entry.is_unobtainable) && (
