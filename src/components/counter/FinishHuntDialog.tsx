@@ -202,7 +202,7 @@ export function FinishHuntDialog({
         pokeball,
         game,
         method: method.id,
-        attempts,
+        attempts: method.id === 'gen9-tera-raid' ? null : attempts,
         hunt_start_date: huntStartDate || null,
         caught_date: caughtDate,
         is_fail: isFail,
@@ -368,18 +368,25 @@ export function FinishHuntDialog({
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Numero tentativi</Label>
-              <Input
-                type="number"
-                min={1}
-                value={attempts}
-                onChange={(e) => {
-                  setAttemptsDirty(true);
-                  setAttempts(Math.max(1, parseInt(e.target.value) || 1));
-                }}
-              />
-            </div>
+            {method.id !== 'gen9-tera-raid' ? (
+              <div className="space-y-2">
+                <Label>Numero tentativi</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  value={attempts}
+                  onChange={(e) => {
+                    setAttemptsDirty(true);
+                    setAttempts(Math.max(1, parseInt(e.target.value) || 1));
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="space-y-2 opacity-70">
+                <Label>Numero tentativi</Label>
+                <Input type="text" disabled value="N/A (Tera Raid)" />
+              </div>
+            )}
             <div className="space-y-2">
               <Label>Phase Number (opzionale)</Label>
               <Input

@@ -222,7 +222,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
           pokeball,
           game,
           method: method.id,
-          attempts,
+          attempts: method.id === 'gen9-tera-raid' ? null : attempts,
           hunt_start_date: huntStartDate || null,
           caught_date: caughtDate,
           is_fail: isFail,
@@ -405,15 +405,22 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
 
           {/* 9. Counter and Phase Number - Grid Layout */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Numero tentativi (counter)</Label>
-              <Input
-                type="number"
-                min={1}
-                value={attempts}
-                onChange={(e) => setAttempts(Math.max(1, parseInt(e.target.value) || 1))}
-              />
-            </div>
+            {method.id !== 'gen9-tera-raid' ? (
+              <div className="space-y-2">
+                <Label>Numero tentativi (counter)</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  value={attempts}
+                  onChange={(e) => setAttempts(Math.max(1, parseInt(e.target.value) || 1))}
+                />
+              </div>
+            ) : (
+              <div className="space-y-2 opacity-70">
+                <Label>Numero tentativi (counter)</Label>
+                <Input type="text" disabled value="N/A (Tera Raid)" />
+              </div>
+            )}
             <div className="space-y-2">
               <Label>Phase Number (opzionale)</Label>
               <Input

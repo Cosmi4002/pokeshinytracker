@@ -42,6 +42,8 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   const showEncounters = useMemo(() => {
     const raw = (entry.method || '').toString().trim().toLowerCase();
     return (
+      raw !== 'gen9-tera-raid' &&
+      raw !== 'tera raid' &&
       raw !== 'gen9-outbreak' &&
       raw !== 'mass outbreak' &&
       raw !== 'gen9-sandwich-lv3' &&

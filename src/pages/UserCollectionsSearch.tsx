@@ -355,6 +355,8 @@ export default function UserCollectionsSearch() {
                               {(() => {
                                 const raw = (entry.method || '').toString().trim().toLowerCase();
                                 const showEncounters =
+                                  raw !== 'gen9-tera-raid' &&
+                                  raw !== 'tera raid' &&
                                   raw !== 'gen9-outbreak' &&
                                   raw !== 'mass outbreak' &&
                                   raw !== 'gen9-sandwich-lv3' &&
@@ -501,6 +503,8 @@ export default function UserCollectionsSearch() {
                               {(() => {
                                 const raw = (entry.method || '').toString().trim().toLowerCase();
                                 const showEncounters =
+                                  raw !== 'gen9-tera-raid' &&
+                                  raw !== 'tera raid' &&
                                   raw !== 'gen9-outbreak' &&
                                   raw !== 'mass outbreak' &&
                                   raw !== 'gen9-sandwich-lv3' &&
