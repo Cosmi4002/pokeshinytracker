@@ -113,10 +113,6 @@ export const getDynamicOdds = (methodId: string, encounters: number, hasShinyCha
     const totalRolls = 1 + 3 + (hasShinyCharm ? 2 : 0);
     return Math.round(4096 / totalRolls);
   }
-  if (methodId === 'gen9-outbreak-sandwich') {
-    const totalRolls = 1 + 2 + 3 + (hasShinyCharm ? 2 : 0);
-    return Math.round(4096 / totalRolls);
-  }
 
   if (
     methodId === 'gen4-double-encounter' ||
@@ -231,9 +227,8 @@ export const HUNTING_METHODS: HuntingMethod[] = [
   // --- Gen 9 ---
   { id: 'gen9-outbreak', name: 'Mass Outbreak', baseOdds: 4096, generation: 9, supportsShinyCharm: true, description: 'KO 60+' },
   { id: 'gen9-masuda', name: 'Masuda Method', baseOdds: 683, generation: 9, supportsShinyCharm: true },
-  { id: 'gen9-outbreak-sandwich', name: 'Outbreak + Sandwich Lv3', baseOdds: 683, generation: 9, supportsShinyCharm: true },
   { id: 'gen9-random', name: 'Random Encounter', baseOdds: 4096, generation: 9, supportsShinyCharm: true },
-  { id: 'gen9-sandwich-lv3', name: 'Sandwich (Sparkling Power 3)', baseOdds: 1024, generation: 9, supportsShinyCharm: true },
+  { id: 'gen9-sandwich-lv3', name: 'Sandwich (Sparkling Power)', baseOdds: 1024, generation: 9, supportsShinyCharm: true },
   { id: 'gen9-soft-reset', name: 'Soft Reset', baseOdds: 4096, generation: 9, supportsShinyCharm: true },
 
   // --- Event & Custom ---
