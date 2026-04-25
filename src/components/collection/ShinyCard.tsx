@@ -41,7 +41,14 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   const method = useMemo(() => HUNTING_METHODS.find((m) => m.id === entry.method), [entry.method]);
   const showEncounters = useMemo(() => {
     const raw = (entry.method || '').toString().trim().toLowerCase();
-    return raw !== 'gen9-outbreak-sandwich' && raw !== 'outbreak + sandwich lv3';
+    return (
+      raw !== 'gen9-outbreak' &&
+      raw !== 'mass outbreak' &&
+      raw !== 'gen9-sandwich-lv3' &&
+      raw !== 'sandwich (sparkling power)' &&
+      raw !== 'gen9-outbreak-sandwich' &&
+      raw !== 'outbreak + sandwich lv3'
+    );
   }, [entry.method]);
 
   const spriteUrl = useMemo(() => {

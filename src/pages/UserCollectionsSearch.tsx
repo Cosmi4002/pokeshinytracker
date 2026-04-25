@@ -354,7 +354,13 @@ export default function UserCollectionsSearch() {
                               <p className="text-xs text-muted-foreground truncate">Metodo: {entry.method || '-'}</p>
                               {(() => {
                                 const raw = (entry.method || '').toString().trim().toLowerCase();
-                                const showEncounters = raw !== 'gen9-outbreak-sandwich' && raw !== 'outbreak + sandwich lv3';
+                                const showEncounters =
+                                  raw !== 'gen9-outbreak' &&
+                                  raw !== 'mass outbreak' &&
+                                  raw !== 'gen9-sandwich-lv3' &&
+                                  raw !== 'sandwich (sparkling power)' &&
+                                  raw !== 'gen9-outbreak-sandwich' &&
+                                  raw !== 'outbreak + sandwich lv3';
                                 return showEncounters ? (
                                   <p className="text-xs text-muted-foreground">Encounters: {entry.attempts ?? '-'}</p>
                                 ) : null;
@@ -494,7 +500,13 @@ export default function UserCollectionsSearch() {
                               <p className="text-xs text-muted-foreground truncate">Metodo: {entry.method || '-'}</p>
                               {(() => {
                                 const raw = (entry.method || '').toString().trim().toLowerCase();
-                                const showEncounters = raw !== 'gen9-outbreak-sandwich' && raw !== 'outbreak + sandwich lv3';
+                                const showEncounters =
+                                  raw !== 'gen9-outbreak' &&
+                                  raw !== 'mass outbreak' &&
+                                  raw !== 'gen9-sandwich-lv3' &&
+                                  raw !== 'sandwich (sparkling power)' &&
+                                  raw !== 'gen9-outbreak-sandwich' &&
+                                  raw !== 'outbreak + sandwich lv3';
                                 return showEncounters ? (
                                   <p className="text-xs text-muted-foreground">Encounters: {entry.attempts ?? '-'}</p>
                                 ) : null;
