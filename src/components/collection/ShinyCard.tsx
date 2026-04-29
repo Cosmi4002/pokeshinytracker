@@ -93,7 +93,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
               : 'border-white/10'
       )}
       style={{
-        borderColor: isFail ? '#ef4444' : entry.is_unobtainable ? '#f59e0b' : `${theme.primary}95`,
+        borderColor: isFail ? '#ef4444' : entry.is_unobtainable ? '#f59e0b' : isEvent ? 'rgba(217,70,239,0.75)' : `${theme.primary}95`,
         boxShadow: isFail
           ? undefined
           : entry.is_unobtainable
@@ -103,6 +103,19 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
             : `0 14px 30px ${theme.secondary}44`,
       }}
     >
+      {isEvent && (
+        <div className="pointer-events-none absolute inset-0 z-[1]">
+          <div className="absolute left-0 right-0 top-0 h-2 bg-gradient-to-r from-fuchsia-500/70 via-pink-300/70 to-fuchsia-500/70" />
+          <div className="absolute top-0 bottom-0 left-1/2 w-2 -translate-x-1/2 bg-gradient-to-b from-fuchsia-500/55 via-pink-300/35 to-fuchsia-500/55" />
+          <div className="absolute top-1 left-1/2 -translate-x-1/2 flex items-center">
+            <div className="relative h-5 w-12">
+              <div className="absolute left-0 top-1 h-4 w-6 -rotate-12 rounded-full border border-fuchsia-300/60 bg-fuchsia-500/10 shadow-[0_0_14px_rgba(217,70,239,0.18)]" />
+              <div className="absolute right-0 top-1 h-4 w-6 rotate-12 rounded-full border border-fuchsia-300/60 bg-fuchsia-500/10 shadow-[0_0_14px_rgba(217,70,239,0.18)]" />
+              <div className="absolute left-1/2 top-[9px] h-2.5 w-2.5 -translate-x-1/2 rotate-45 rounded-sm border border-fuchsia-300/60 bg-fuchsia-400/20" />
+            </div>
+          </div>
+        </div>
+      )}
       <div className="relative w-full h-40 sm:h-44 overflow-hidden bg-black/40">
         <div
           className="absolute inset-0 z-0"
