@@ -33,7 +33,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   const isFail = entry.is_fail === true;
   const isEvolved = entry.is_evolved === true;
   const isGigamax = entry.is_gigamax === true && supportsGigamaxMark(entry.game);
-  const isEvent = (entry.method || '').toString().trim().toLowerCase() === 'event';
+  const isEvent = (entry.method || '').toString().trim().toLowerCase() === 'distribution/event';
   const evolvedFromId = (entry as any).evolved_from_id as number | null | undefined;
   const evolvedFromName = (entry as any).evolved_from_name as string | null | undefined;
 
@@ -105,15 +105,8 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
     >
       {isEvent && (
         <div className="pointer-events-none absolute inset-0 z-[1]">
-          <div className="absolute left-0 right-0 top-0 h-2 bg-gradient-to-r from-fuchsia-500/70 via-pink-300/70 to-fuchsia-500/70" />
-          <div className="absolute top-0 bottom-0 left-1/2 w-2 -translate-x-1/2 bg-gradient-to-b from-fuchsia-500/55 via-pink-300/35 to-fuchsia-500/55" />
-          <div className="absolute top-1 left-1/2 -translate-x-1/2 flex items-center">
-            <div className="relative h-5 w-12">
-              <div className="absolute left-0 top-1 h-4 w-6 -rotate-12 rounded-full border border-fuchsia-300/60 bg-fuchsia-500/10 shadow-[0_0_14px_rgba(217,70,239,0.18)]" />
-              <div className="absolute right-0 top-1 h-4 w-6 rotate-12 rounded-full border border-fuchsia-300/60 bg-fuchsia-500/10 shadow-[0_0_14px_rgba(217,70,239,0.18)]" />
-              <div className="absolute left-1/2 top-[9px] h-2.5 w-2.5 -translate-x-1/2 rotate-45 rounded-sm border border-fuchsia-300/60 bg-fuchsia-400/20" />
-            </div>
-          </div>
+          <div className="absolute -inset-[1px] rounded-xl ring-2 ring-fuchsia-400/25" />
+          <div className="absolute left-0 right-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-fuchsia-300/70 to-transparent" />
         </div>
       )}
       <div className="relative w-full h-40 sm:h-44 overflow-hidden bg-black/40">
@@ -329,7 +322,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                 }}
               >
                 {isEvent && <Sparkles className="w-3 h-3 mr-1.5" />}
-                {isEvent ? 'Evento' : method.name}
+                {isEvent ? 'Distribution / Event' : method.name}
               </div>
             </div>
           )}

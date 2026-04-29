@@ -124,7 +124,7 @@ export const getDynamicOdds = (methodId: string, encounters: number, hasShinyCha
     return Math.round(8192 / totalRolls);
   }
 
-  if (methodId.includes('gift') || methodId.includes('event')) {
+  if (methodId.includes('gift') || methodId.includes('/event') || methodId.endsWith('event')) {
     return method.baseOdds;
   }
 
@@ -232,8 +232,8 @@ export const HUNTING_METHODS: HuntingMethod[] = [
   { id: 'gen9-soft-reset', name: 'Soft Reset', baseOdds: 4096, generation: 9, supportsShinyCharm: true },
   { id: 'gen9-tera-raid', name: 'Tera Raid', baseOdds: 4096, generation: 9, supportsShinyCharm: true },
 
-  // --- Event & Custom ---
-  { id: 'event', name: 'Event', baseOdds: 4096, generation: 0, supportsShinyCharm: false },
+  // --- Distribution / Event & Custom ---
+  { id: 'distribution/event', name: 'Distribution / Event', baseOdds: 4096, generation: 0, supportsShinyCharm: false },
   { id: 'custom', name: 'Custom Odds', baseOdds: 4096, generation: 0, supportsShinyCharm: false },
 ];
 

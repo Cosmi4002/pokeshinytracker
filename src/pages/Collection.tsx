@@ -206,7 +206,7 @@ export default function Collection({ mode = 'all' }: CollectionProps) {
 
   const scopedEntries = useMemo(() => {
     if (mode === 'events') {
-      return entries.filter((entry) => entry.method === 'event');
+      return entries.filter((entry) => entry.method === 'distribution/event');
     }
     return entries;
   }, [entries, mode]);
@@ -501,7 +501,7 @@ export default function Collection({ mode = 'all' }: CollectionProps) {
                   ? 'Accedi per vedere e salvare la tua collezione.'
                   : scopedEntries.length === 0
                     ? mode === 'events'
-                      ? 'Nessun shiny evento ancora! Aggiungi una cattura con metodo “Event”.'
+                      ? 'Nessun shiny evento ancora! Aggiungi una cattura con metodo “Distribution / Event”.'
                       : 'Nessuno shiny ancora! Inizia a cacciare e aggiungi le tue catture.'
                     : 'Nessuno shiny corrisponde ai filtri.'}
               </CardContent>
