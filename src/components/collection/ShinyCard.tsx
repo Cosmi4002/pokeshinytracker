@@ -321,27 +321,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
             </div>
           )}
 
-          {isEvent ? (
-            <div
-              className="mt-2 rounded-lg p-2 border shadow-lg"
-              style={{
-                background: 'linear-gradient(145deg, rgba(217,70,239,0.14), rgba(0,0,0,0.18))',
-                borderColor: 'rgba(217, 70, 239, 0.40)',
-              }}
-            >
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-fuchsia-300" />
-                  <span className="text-[10px] font-black uppercase tracking-[0.14em] text-fuchsia-200">
-                    Pokémon Evento
-                  </span>
-                </div>
-                <span className="text-[10px] font-semibold text-white/65">
-                  Sezione eventi
-                </span>
-              </div>
-            </div>
-          ) : (
+          {isEvent ? null : (
             <div className={cn('grid gap-2 mt-2', showEncounters ? 'grid-cols-2' : 'grid-cols-1')}>
               <div
                 className="rounded-lg p-2 border shadow-lg"
