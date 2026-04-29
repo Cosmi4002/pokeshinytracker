@@ -1,4 +1,4 @@
-import { Pencil, Trash2, Calendar, ArrowUpCircle, Crosshair } from 'lucide-react';
+import { Pencil, Trash2, Calendar, ArrowUpCircle, Crosshair, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getGameTheme, GAME_LOGOS, type GameTheme } from '@/lib/game-themes';
 import { GIGAMAX_ICON, POKEBALLS, HUNTING_METHODS, getPokemonSpriteUrl, supportsGigamaxMark } from '@/lib/pokemon-data';
@@ -33,6 +33,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   const isFail = entry.is_fail === true;
   const isEvolved = entry.is_evolved === true;
   const isGigamax = entry.is_gigamax === true && supportsGigamaxMark(entry.game);
+  const isEvent = (entry.method || '').toString().trim().toLowerCase() === 'event';
   const evolvedFromId = (entry as any).evolved_from_id as number | null | undefined;
   const evolvedFromName = (entry as any).evolved_from_name as string | null | undefined;
 
@@ -40,6 +41,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   const pokeball = useMemo(() => POKEBALLS.find((b) => b.id === entry.pokeball), [entry.pokeball]);
   const method = useMemo(() => HUNTING_METHODS.find((m) => m.id === entry.method), [entry.method]);
   const showEncounters = useMemo(() => {
+    if (isEvent) return false;
     const raw = (entry.method || '').toString().trim().toLowerCase();
     return (
       raw !== 'gen9-tera-raid' &&
@@ -51,7 +53,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
       raw !== 'gen9-outbreak-sandwich' &&
       raw !== 'outbreak + sandwich lv3'
     );
-  }, [entry.method]);
+  }, [entry.method, isEvent]);
 
   const spriteUrl = useMemo(() => {
     const spriteSlug = entry.form || spriteName || entry.pokemon_name;
@@ -86,7 +88,9 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
           ? 'border-red-500/80 shadow-[0_0_20px_rgba(239,68,68,0.25)] ring-1 ring-red-500/50'
           : entry.is_unobtainable
             ? 'border-amber-500/80 shadow-[0_0_20px_rgba(245,158,11,0.25)] ring-1 ring-amber-500/50'
-            : 'border-white/10'
+            : isEvent
+              ? 'border-fuchsia-400/60 shadow-[0_0_22px_rgba(217,70,239,0.18)] ring-1 ring-fuchsia-400/25'
+              : 'border-white/10'
       )}
       style={{
         borderColor: isFail ? '#ef4444' : entry.is_unobtainable ? '#f59e0b' : `${theme.primary}95`,
@@ -304,90 +308,115 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
               <div
                 className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.12em] border shadow-sm"
                 style={{
-                  backgroundColor: `color-mix(in srgb, ${theme.accent} 20%, #0d0d0d)`,
-                  borderColor: `${theme.accent}88`,
-                  color: theme.accent,
+                  backgroundColor: isEvent
+                    ? 'rgba(217, 70, 239, 0.12)'
+                    : `color-mix(in srgb, ${theme.accent} 20%, #0d0d0d)`,
+                  borderColor: isEvent ? 'rgba(217, 70, 239, 0.65)' : `${theme.accent}88`,
+                  color: isEvent ? 'rgb(232, 121, 249)' : theme.accent,
                 }}
               >
-                {method.name}
+                {isEvent && <Sparkles className="w-3 h-3 mr-1.5" />}
+                {isEvent ? 'Evento' : method.name}
               </div>
             </div>
           )}
 
-          <div className={cn('grid gap-2 mt-2', showEncounters ? 'grid-cols-2' : 'grid-cols-1')}>
+          {isEvent ? (
             <div
-              className="rounded-lg p-2 border shadow-lg"
+              className="mt-2 rounded-lg p-2 border shadow-lg"
               style={{
-                background: `linear-gradient(145deg, color-mix(in srgb, ${theme.secondary} 48%, #101010), color-mix(in srgb, ${theme.primary} 42%, #0f0f0f))`,
-                borderColor: `${theme.accent}66`,
+                background: 'linear-gradient(145deg, rgba(217,70,239,0.14), rgba(0,0,0,0.18))',
+                borderColor: 'rgba(217, 70, 239, 0.40)',
               }}
             >
-              <div className="flex items-center gap-1 mb-1.5">
-                <Calendar className="w-3 h-3 text-white/70" />
-                <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em]">Hunt Dates</span>
-              </div>
-              <div className="space-y-1">
-                <div className="flex items-center justify-between gap-1 rounded-md bg-black/25 px-1.5 py-1">
-                  <span className="text-[8px] sm:text-[9px] text-white/55 font-bold uppercase tracking-wider">Start</span>
-                  <span className="text-[9px] sm:text-[10px] font-semibold text-white/95 tabular-nums text-right">
-                    {entry.hunt_start_date ? formatDate(entry.hunt_start_date) : '--'}
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-fuchsia-300" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.14em] text-fuchsia-200">
+                    Pokémon Evento
                   </span>
                 </div>
-                <div className="flex items-center justify-between gap-1 rounded-md bg-black/25 px-1.5 py-1">
-                  <span className="text-[8px] sm:text-[9px] text-white/55 font-bold uppercase tracking-wider">Caught</span>
-                  <span className="text-[9px] sm:text-[10px] font-semibold text-white/95 tabular-nums text-right">
-                    {formatDate(entry.caught_date)}
-                  </span>
-                </div>
+                <span className="text-[10px] font-semibold text-white/65">
+                  Sezione eventi
+                </span>
               </div>
             </div>
-
-            {showEncounters && (
+          ) : (
+            <div className={cn('grid gap-2 mt-2', showEncounters ? 'grid-cols-2' : 'grid-cols-1')}>
               <div
-                className="rounded-lg p-2 border shadow-lg flex flex-col"
+                className="rounded-lg p-2 border shadow-lg"
                 style={{
-                  background: `linear-gradient(145deg, color-mix(in srgb, ${theme.primary} 46%, #101010), color-mix(in srgb, ${theme.secondary} 38%, #0f0f0f))`,
+                  background: `linear-gradient(145deg, color-mix(in srgb, ${theme.secondary} 48%, #101010), color-mix(in srgb, ${theme.primary} 42%, #0f0f0f))`,
                   borderColor: `${theme.accent}66`,
                 }}
               >
-                <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em] block mb-1.5">Encounters</span>
-                <div className="flex-1 flex items-center justify-center rounded-md bg-black/25 px-1.5 py-2">
-                  <span className="text-2xl sm:text-[1.75rem] font-black tabular-nums tracking-tight text-white leading-none">
-                    {entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-'}
-                  </span>
+                <div className="flex items-center gap-1 mb-1.5">
+                  <Calendar className="w-3 h-3 text-white/70" />
+                  <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em]">Hunt Dates</span>
                 </div>
-                {entry.phase_number && (
-                  <div className="mt-1.5 pt-1.5 border-t border-white/15">
-                    <span
-                      className="text-[9px] font-black uppercase tracking-[0.12em] px-1.5 py-0.5 rounded border"
-                      style={{
-                        color: theme.accent,
-                        backgroundColor: `color-mix(in srgb, ${theme.accent} 20%, #0d0d0d)`,
-                        borderColor: `${theme.accent}88`,
-                      }}
-                    >
-                      PHASE #{entry.phase_number}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between gap-1 rounded-md bg-black/25 px-1.5 py-1">
+                    <span className="text-[8px] sm:text-[9px] text-white/55 font-bold uppercase tracking-wider">Start</span>
+                    <span className="text-[9px] sm:text-[10px] font-semibold text-white/95 tabular-nums text-right">
+                      {entry.hunt_start_date ? formatDate(entry.hunt_start_date) : '--'}
                     </span>
                   </div>
-                )}
-                {entry.show_total && (
-                  <div className="mt-1.5 pt-1.5 border-t border-white/15 flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-1">
-                      <Crosshair className="w-3 h-3 text-white/70" />
-                      <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em]">
-                        Total
+                  <div className="flex items-center justify-between gap-1 rounded-md bg-black/25 px-1.5 py-1">
+                    <span className="text-[8px] sm:text-[9px] text-white/55 font-bold uppercase tracking-wider">Caught</span>
+                    <span className="text-[9px] sm:text-[10px] font-semibold text-white/95 tabular-nums text-right">
+                      {formatDate(entry.caught_date)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {showEncounters && (
+                <div
+                  className="rounded-lg p-2 border shadow-lg flex flex-col"
+                  style={{
+                    background: `linear-gradient(145deg, color-mix(in srgb, ${theme.primary} 46%, #101010), color-mix(in srgb, ${theme.secondary} 38%, #0f0f0f))`,
+                    borderColor: `${theme.accent}66`,
+                  }}
+                >
+                  <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em] block mb-1.5">Encounters</span>
+                  <div className="flex-1 flex items-center justify-center rounded-md bg-black/25 px-1.5 py-2">
+                    <span className="text-2xl sm:text-[1.75rem] font-black tabular-nums tracking-tight text-white leading-none">
+                      {entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-'}
+                    </span>
+                  </div>
+                  {entry.phase_number && (
+                    <div className="mt-1.5 pt-1.5 border-t border-white/15">
+                      <span
+                        className="text-[9px] font-black uppercase tracking-[0.12em] px-1.5 py-0.5 rounded border"
+                        style={{
+                          color: theme.accent,
+                          backgroundColor: `color-mix(in srgb, ${theme.accent} 20%, #0d0d0d)`,
+                          borderColor: `${theme.accent}88`,
+                        }}
+                      >
+                        PHASE #{entry.phase_number}
                       </span>
                     </div>
-                    <span className="text-[10px] sm:text-[11px] font-black tabular-nums text-white/95">
-                      {entry.total_value && entry.total_value > 0
-                        ? entry.total_value.toLocaleString()
-                        : (entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-')}
-                    </span>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+                  )}
+                  {entry.show_total && (
+                    <div className="mt-1.5 pt-1.5 border-t border-white/15 flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1">
+                        <Crosshair className="w-3 h-3 text-white/70" />
+                        <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em]">
+                          Total
+                        </span>
+                      </div>
+                      <span className="text-[10px] sm:text-[11px] font-black tabular-nums text-white/95">
+                        {entry.total_value && entry.total_value > 0
+                          ? entry.total_value.toLocaleString()
+                          : (entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-')}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           {(pokeball || entry.has_shiny_charm || isGigamax || entry.is_fail || entry.is_unobtainable) && (
             <div className="mt-2 pt-2 border-t flex items-center justify-between" style={{ borderTopColor: `${theme.primary}20` }}>
