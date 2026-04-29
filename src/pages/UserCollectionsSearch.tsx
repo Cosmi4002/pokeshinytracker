@@ -37,6 +37,40 @@ export default function UserCollectionsSearch() {
     return d.toISOString().slice(0, 10);
   };
 
+  const formatDate = (value?: string | null) => {
+    if (!value) return '--';
+    const day = value.slice(0, 10);
+    const parsed = new Date(`${day}T00:00:00Z`);
+    if (Number.isNaN(parsed.getTime())) return '--';
+    return parsed.toLocaleDateString('it-IT');
+  };
+
+  const normalizeMethod = (value?: string | null) => (value || '').toString().trim().toLowerCase();
+  const isDistributionEvent = (method?: string | null) => {
+    const raw = normalizeMethod(method);
+    return raw === 'distribution/event' || raw === 'event';
+  };
+
+  const shouldShowEncounters = (method?: string | null) => {
+    if (isDistributionEvent(method)) return false;
+    const raw = normalizeMethod(method);
+    return (
+      raw !== 'gen9-tera-raid' &&
+      raw !== 'tera raid' &&
+      raw !== 'gen9-outbreak' &&
+      raw !== 'mass outbreak' &&
+      raw !== 'gen9-sandwich-lv3' &&
+      raw !== 'sandwich (sparkling power)' &&
+      raw !== 'gen9-outbreak-sandwich' &&
+      raw !== 'outbreak + sandwich lv3'
+    );
+  };
+
+  const formatMethodLabel = (method?: string | null) => {
+    if (isDistributionEvent(method)) return 'Distribution / Event';
+    return method || '-';
+  };
+
   useEffect(() => {
     const term = query.trim();
     if (!term) {
@@ -227,13 +261,24 @@ export default function UserCollectionsSearch() {
   const recentEntries = useMemo(() => {
     const now = Date.now();
     const fourDaysMs = 4 * 24 * 60 * 60 * 1000;
+
+    const toDayValue = (value?: string | null) => {
+      if (!value) return Number.NaN;
+      const day = value.slice(0, 10);
+      return new Date(`${day}T00:00:00Z`).getTime();
+    };
+
     return entries
       .filter((entry) => {
-        const capturedAt = new Date(entry.caught_date).getTime();
+        const capturedAt = Number.isFinite(toDayValue(entry.caught_date))
+          ? toDayValue(entry.caught_date)
+          : toDayValue(entry.created_at);
         return Number.isFinite(capturedAt) && now - capturedAt <= fourDaysMs;
       })
       .sort((a, b) => {
-        const byCaughtDate = new Date(b.caught_date).getTime() - new Date(a.caught_date).getTime();
+        const aDay = Number.isFinite(toDayValue(a.caught_date)) ? toDayValue(a.caught_date) : toDayValue(a.created_at);
+        const bDay = Number.isFinite(toDayValue(b.caught_date)) ? toDayValue(b.caught_date) : toDayValue(b.created_at);
+        const byCaughtDate = bDay - aDay;
         if (byCaughtDate !== 0) return byCaughtDate;
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       });
@@ -326,6 +371,7 @@ export default function UserCollectionsSearch() {
                   <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                     {recentEntries.map((entry) => {
                       const sprite = entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, { shiny: true, name: entry.form || entry.pokemon_name });
+                      const isEvent = isDistributionEvent(entry.method);
                       return (
                         <div key={`preview-${entry.id}`} className="relative rounded-lg border p-3 bg-card">
                           {renderEvolutionBadge(entry.is_evolved)}
@@ -348,25 +394,15 @@ export default function UserCollectionsSearch() {
                               <p className="text-xs text-muted-foreground truncate">{entry.form || 'Forma base'}</p>
                               {entry.is_fail && <p className="text-xs font-bold text-red-500">FAIL</p>}
                               {entry.is_unobtainable && <p className="text-xs font-bold text-amber-500">UNCATCHABLE</p>}
-                              <p className="text-xs text-muted-foreground">{new Date(entry.caught_date).toLocaleDateString('it-IT')}</p>
+                              {!isEvent && <p className="text-xs text-muted-foreground">{formatDate(entry.caught_date)}</p>}
                               <p className="text-xs text-muted-foreground truncate">Gioco: {entry.game || '-'}</p>
-                              <p className="text-xs text-muted-foreground">Inizio: {entry.hunt_start_date ? new Date(entry.hunt_start_date).toLocaleDateString('it-IT') : '-'}</p>
-                              <p className="text-xs text-muted-foreground truncate">Metodo: {entry.method || '-'}</p>
-                              {(() => {
-                                const raw = (entry.method || '').toString().trim().toLowerCase();
-                                const showEncounters =
-                                  raw !== 'gen9-tera-raid' &&
-                                  raw !== 'tera raid' &&
-                                  raw !== 'gen9-outbreak' &&
-                                  raw !== 'mass outbreak' &&
-                                  raw !== 'gen9-sandwich-lv3' &&
-                                  raw !== 'sandwich (sparkling power)' &&
-                                  raw !== 'gen9-outbreak-sandwich' &&
-                                  raw !== 'outbreak + sandwich lv3';
-                                return showEncounters ? (
-                                  <p className="text-xs text-muted-foreground">Encounters: {entry.attempts ?? '-'}</p>
-                                ) : null;
-                              })()}
+                              {!isEvent && (
+                                <p className="text-xs text-muted-foreground">Inizio: {entry.hunt_start_date ? formatDate(entry.hunt_start_date) : '--'}</p>
+                              )}
+                              <p className="text-xs text-muted-foreground truncate">Metodo: {formatMethodLabel(entry.method)}</p>
+                              {shouldShowEncounters(entry.method) ? (
+                                <p className="text-xs text-muted-foreground">Encounters: {entry.attempts ?? '-'}</p>
+                              ) : null}
                               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                                 <img src={SHINY_CHARM_ICON} alt="Cromamuleto" className="h-3 w-3 object-contain" />
                                 <span>Cromamuleto: {entry.has_shiny_charm ? 'Si' : 'No'}</span>
@@ -392,6 +428,7 @@ export default function UserCollectionsSearch() {
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                   {globalRecentEntries.map((entry) => {
                     const sprite = entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, { shiny: true, name: entry.form || entry.pokemon_name });
+                    const isEvent = isDistributionEvent(entry.method);
                     return (
                       <div key={`global-${entry.id}`} className="relative rounded-lg border p-3 bg-card">
                         {renderEvolutionBadge(entry.is_evolved)}
@@ -415,11 +452,15 @@ export default function UserCollectionsSearch() {
                             <p className="text-xs text-muted-foreground truncate">@{entry.username || 'utente'}</p>
                             {entry.is_fail && <p className="text-xs font-bold text-red-500">FAIL</p>}
                             {entry.is_unobtainable && <p className="text-xs font-bold text-amber-500">UNCATCHABLE</p>}
-                            <p className="text-xs text-muted-foreground">{new Date(entry.caught_date).toLocaleDateString('it-IT')}</p>
+                            {!isEvent && <p className="text-xs text-muted-foreground">{formatDate(entry.caught_date)}</p>}
                             <p className="text-xs text-muted-foreground truncate">Gioco: {entry.game || '-'}</p>
-                            <p className="text-xs text-muted-foreground">Inizio: {entry.hunt_start_date ? new Date(entry.hunt_start_date).toLocaleDateString('it-IT') : '-'}</p>
-                            <p className="text-xs text-muted-foreground truncate">Metodo: {entry.method || '-'}</p>
-                            <p className="text-xs text-muted-foreground">Encounters: {entry.attempts ?? '-'}</p>
+                            {!isEvent && (
+                              <p className="text-xs text-muted-foreground">Inizio: {entry.hunt_start_date ? formatDate(entry.hunt_start_date) : '--'}</p>
+                            )}
+                            <p className="text-xs text-muted-foreground truncate">Metodo: {formatMethodLabel(entry.method)}</p>
+                            {shouldShowEncounters(entry.method) ? (
+                              <p className="text-xs text-muted-foreground">Encounters: {entry.attempts ?? '-'}</p>
+                            ) : null}
                             <div className="flex items-center gap-1 text-xs text-muted-foreground">
                               <img src={SHINY_CHARM_ICON} alt="Cromamuleto" className="h-3 w-3 object-contain" />
                               <span>Cromamuleto: {entry.has_shiny_charm ? 'Si' : 'No'}</span>
@@ -474,6 +515,7 @@ export default function UserCollectionsSearch() {
                   <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                     {entries.map((entry) => {
                       const sprite = entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, { shiny: true, name: entry.form || entry.pokemon_name });
+                      const isEvent = isDistributionEvent(entry.method);
                       return (
                         <div key={entry.id} className="relative rounded-lg border p-3 bg-card">
                           {renderEvolutionBadge(entry.is_evolved)}
@@ -496,25 +538,15 @@ export default function UserCollectionsSearch() {
                               <p className="text-xs text-muted-foreground truncate">{entry.form || 'Forma base'}</p>
                               {entry.is_fail && <p className="text-xs font-bold text-red-500">FAIL</p>}
                               {entry.is_unobtainable && <p className="text-xs font-bold text-amber-500">UNCATCHABLE</p>}
-                              <p className="text-xs text-muted-foreground">{new Date(entry.caught_date).toLocaleDateString('it-IT')}</p>
+                              {!isEvent && <p className="text-xs text-muted-foreground">{formatDate(entry.caught_date)}</p>}
                               <p className="text-xs text-muted-foreground truncate">Gioco: {entry.game || '-'}</p>
-                              <p className="text-xs text-muted-foreground">Inizio: {entry.hunt_start_date ? new Date(entry.hunt_start_date).toLocaleDateString('it-IT') : '-'}</p>
-                              <p className="text-xs text-muted-foreground truncate">Metodo: {entry.method || '-'}</p>
-                              {(() => {
-                                const raw = (entry.method || '').toString().trim().toLowerCase();
-                                const showEncounters =
-                                  raw !== 'gen9-tera-raid' &&
-                                  raw !== 'tera raid' &&
-                                  raw !== 'gen9-outbreak' &&
-                                  raw !== 'mass outbreak' &&
-                                  raw !== 'gen9-sandwich-lv3' &&
-                                  raw !== 'sandwich (sparkling power)' &&
-                                  raw !== 'gen9-outbreak-sandwich' &&
-                                  raw !== 'outbreak + sandwich lv3';
-                                return showEncounters ? (
-                                  <p className="text-xs text-muted-foreground">Encounters: {entry.attempts ?? '-'}</p>
-                                ) : null;
-                              })()}
+                              {!isEvent && (
+                                <p className="text-xs text-muted-foreground">Inizio: {entry.hunt_start_date ? formatDate(entry.hunt_start_date) : '--'}</p>
+                              )}
+                              <p className="text-xs text-muted-foreground truncate">Metodo: {formatMethodLabel(entry.method)}</p>
+                              {shouldShowEncounters(entry.method) ? (
+                                <p className="text-xs text-muted-foreground">Encounters: {entry.attempts ?? '-'}</p>
+                              ) : null}
                               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                                 <img src={SHINY_CHARM_ICON} alt="Cromamuleto" className="h-3 w-3 object-contain" />
                                 <span>Cromamuleto: {entry.has_shiny_charm ? 'Si' : 'No'}</span>
