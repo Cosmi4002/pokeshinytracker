@@ -28,7 +28,13 @@ import type { Tables } from '@/integrations/supabase/types';
 type CaughtShinyRow = Tables<'caught_shinies'>;
 type PlaylistRow = Tables<'shiny_playlists'>;
 
-export default function Collection() {
+type CollectionMode = 'all' | 'events';
+
+interface CollectionProps {
+  mode?: CollectionMode;
+}
+
+export default function Collection({ mode = 'all' }: CollectionProps) {
   const { user, loading: authLoading } = useAuth();
   const { accentColor } = useRandomColor();
   const { pokemon } = usePokemonList();
@@ -198,6 +204,13 @@ export default function Collection() {
     return candidates[0];
   };
 
+  const scopedEntries = useMemo(() => {
+    if (mode === 'events') {
+      return entries.filter((entry) => entry.method === 'event');
+    }
+    return entries;
+  }, [entries, mode]);
+
   const filteredEntries = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
 
@@ -209,7 +222,7 @@ export default function Collection() {
       return parsed;
     };
 
-    return entries
+    return scopedEntries
       .filter((entry) => {
         if (entry.form && isFormEliminated(entry.form)) return false;
         const poke = resolveEntryPokemon(entry);
@@ -251,7 +264,7 @@ export default function Collection() {
         const bCreated = new Date(b.created_at).getTime();
         return sortByDate === 'desc' ? bCreated - aCreated : aCreated - bCreated;
       });
-  }, [entries, searchQuery, filterGen, filterGame, filterPlaylist, playlistMap, pokemonById, pokemonByName, pokemonByDisplayName, sortByDate]);
+  }, [scopedEntries, searchQuery, filterGen, filterGame, filterPlaylist, playlistMap, pokemonById, pokemonByName, pokemonByDisplayName, sortByDate]);
 
   if (authLoading || (user && loading)) {
     return (
@@ -319,8 +332,24 @@ export default function Collection() {
               >
                 La mia collezione Shiny
               </h1>
+              <div className="mt-3 flex flex-wrap justify-center md:justify-start gap-2">
+                <Button
+                  variant={mode === 'all' ? 'default' : 'outline'}
+                  size="sm"
+                  asChild
+                >
+                  <Link to="/collection">Tutti</Link>
+                </Button>
+                <Button
+                  variant={mode === 'events' ? 'default' : 'outline'}
+                  size="sm"
+                  asChild
+                >
+                  <Link to="/collection/events">Eventi</Link>
+                </Button>
+              </div>
               <p className="text-muted-foreground mt-1 font-medium">
-                {filteredEntries.length} mostrati su {entries.length} shiny Pokemon
+                {filteredEntries.length} mostrati su {scopedEntries.length} shiny Pokemon
               </p>
             </div>
 
@@ -470,8 +499,10 @@ export default function Collection() {
               <CardContent className="py-12 text-center text-muted-foreground">
                 {!user
                   ? 'Accedi per vedere e salvare la tua collezione.'
-                  : entries.length === 0
-                    ? 'Nessuno shiny ancora! Inizia a cacciare e aggiungi le tue catture.'
+                  : scopedEntries.length === 0
+                    ? mode === 'events'
+                      ? 'Nessun shiny evento ancora! Aggiungi una cattura con metodo “Event”.'
+                      : 'Nessuno shiny ancora! Inizia a cacciare e aggiungi le tue catture.'
                     : 'Nessuno shiny corrisponde ai filtri.'}
               </CardContent>
             </Card>

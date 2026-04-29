@@ -12,6 +12,7 @@ import Pokedex from "./pages/Pokedex";
 import PokemonDetails from "./pages/PokemonDetails";
 import PokedexManager from "./pages/PokedexManager";
 import Collection from "./pages/Collection";
+import CollectionEvents from "./pages/CollectionEvents";
 import Memo from "./pages/Memo";
 import UserCollectionsSearch from "./pages/UserCollectionsSearch";
 import Bingo from "./pages/Bingo";
@@ -44,6 +45,7 @@ function AppContent() {
           <Route path="/pokedex/:pokemonId" element={<PokemonDetails />} />
           <Route path="/pokedex/manage" element={<PokedexManager />} />
           <Route path="/collection" element={<Collection />} />
+          <Route path="/collection/events" element={<CollectionEvents />} />
           <Route path="/memo" element={<Memo />} />
           <Route path="/users" element={<UserCollectionsSearch />} />
           <Route path="/bingo" element={<Bingo />} />
