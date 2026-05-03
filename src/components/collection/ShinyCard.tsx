@@ -43,7 +43,9 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   const showEncounters = useMemo(() => {
     if (isEvent) return false;
     const raw = (entry.method || '').toString().trim().toLowerCase();
+    const rawGame = (entry.game || '').toString().trim().toLowerCase();
     return (
+      !(raw === 'gen9-random' && (rawGame === 'scarlet' || rawGame === 'violet')) &&
       raw !== 'gen9-tera-raid' &&
       raw !== 'tera raid' &&
       raw !== 'gen9-outbreak' &&
@@ -53,7 +55,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
       raw !== 'gen9-outbreak-sandwich' &&
       raw !== 'outbreak + sandwich lv3'
     );
-  }, [entry.method, isEvent]);
+  }, [entry.method, entry.game, isEvent]);
 
   const spriteUrl = useMemo(() => {
     const spriteSlug = entry.form || spriteName || entry.pokemon_name;
