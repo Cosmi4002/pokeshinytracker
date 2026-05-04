@@ -365,7 +365,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
                   <Link to="/collection">Ottenuti</Link>
                 </Button>
                 <Button variant={mode === 'special' ? 'default' : 'outline'} size="sm" asChild>
-                  <Link to="/collection/special">Static Overworld Game Gift</Link>
+                  <Link to="/collection/special">Static Overworld / Game Gift</Link>
                 </Button>
                 <Button variant={mode === 'distribution_event' ? 'default' : 'outline'} size="sm" asChild>
                   <Link to="/collection/events">Distribution / Event</Link>

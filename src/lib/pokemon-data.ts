@@ -234,7 +234,7 @@ export const HUNTING_METHODS: HuntingMethod[] = [
 
   // --- Distribution / Event & Custom ---
   { id: 'distribution/event', name: 'Distribution / Event', baseOdds: 4096, generation: 0, supportsShinyCharm: false },
-  { id: 'static overworld game gift', name: 'Static Overworld Game Gift', baseOdds: 4096, generation: 0, supportsShinyCharm: false },
+  { id: 'static overworld game gift', name: 'Static Overworld / Game Gift', baseOdds: 4096, generation: 0, supportsShinyCharm: false },
   { id: 'custom', name: 'Custom Odds', baseOdds: 4096, generation: 0, supportsShinyCharm: false },
 ];
 
