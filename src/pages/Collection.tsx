@@ -28,14 +28,13 @@ import type { Tables } from '@/integrations/supabase/types';
 type CaughtShinyRow = Tables<'caught_shinies'>;
 type PlaylistRow = Tables<'shiny_playlists'>;
 
-type CollectionMode = 'all' | 'events';
-type CollectionStatusFilter = 'all' | 'shiny' | 'other';
-
+type CollectionMode = 'obtained' | 'static' | 'overworld' | 'game_gift' | 'distribution_event';
+type CollectionSort = 'date_desc' | 'date_asc' | 'dex_asc' | 'dex_desc';
 interface CollectionProps {
   mode?: CollectionMode;
 }
 
-export default function Collection({ mode = 'all' }: CollectionProps) {
+export default function Collection({ mode = 'obtained' }: CollectionProps) {
   const { user, loading: authLoading } = useAuth();
   const { accentColor } = useRandomColor();
   const { pokemon } = usePokemonList();
@@ -58,9 +57,9 @@ export default function Collection({ mode = 'all' }: CollectionProps) {
   const [filterGen, setFilterGen] = useState<string>('all');
   const [filterGame, setFilterGame] = useState<string>('all');
   const [filterPlaylist, setFilterPlaylist] = useState<string>('all');
-  const [sortByDate, setSortByDate] = useState<'desc' | 'asc'>('desc');
+  const [sortBy, setSortBy] = useState<CollectionSort>('date_desc');
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<CollectionStatusFilter>('all');
+
   const normalize = (value: string | null | undefined) =>
     (value || '')
       .toLowerCase()
@@ -207,21 +206,14 @@ export default function Collection({ mode = 'all' }: CollectionProps) {
   };
 
   const scopedEntries = useMemo(() => {
-    if (mode === 'events') {
-      return entries.filter((entry) => entry.method === 'distribution/event');
-    }
-    return entries;
-  }, [entries, mode]);
+    const method = (entry: CaughtShinyRow) => (entry.method || '').toString().trim().toLowerCase();
 
-  const statusCounts = useMemo(() => {
-    const counts = { shiny: 0, other: 0 };
-    scopedEntries.forEach((e) => {
-      const isOther = !!e.is_fail || !!e.is_unobtainable;
-      if (isOther) counts.other += 1;
-      else counts.shiny += 1;
-    });
-    return counts;
-  }, [scopedEntries]);
+    if (mode === 'obtained') return entries.filter((e) => !e.is_fail && !e.is_unobtainable);
+    if (mode === 'static') return entries.filter((e) => method(e) === 'static');
+    if (mode === 'overworld') return entries.filter((e) => method(e) === 'overworld');
+    if (mode === 'game_gift') return entries.filter((e) => method(e) === 'game gift' || method(e) === 'game-gift' || method(e) === 'gift');
+    return entries.filter((e) => method(e) === 'distribution/event' || method(e) === 'event');
+  }, [entries, mode]);
 
   const filteredEntries = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
@@ -237,11 +229,6 @@ export default function Collection({ mode = 'all' }: CollectionProps) {
     return scopedEntries
       .filter((entry) => {
         if (entry.form && isFormEliminated(entry.form)) return false;
-        if (statusFilter !== 'all') {
-          const isOther = !!entry.is_fail || !!entry.is_unobtainable;
-          if (statusFilter === 'shiny' && isOther) return false;
-          if (statusFilter === 'other' && !isOther) return false;
-        }
         const poke = resolveEntryPokemon(entry);
         if (query) {
           const haystack = [
@@ -264,6 +251,11 @@ export default function Collection({ mode = 'all' }: CollectionProps) {
         return true;
       })
       .sort((a, b) => {
+        const aPoke = resolveEntryPokemon(a);
+        const bPoke = resolveEntryPokemon(b);
+        const aDex = (aPoke?.baseId ?? a.pokemon_id) as number;
+        const bDex = (bPoke?.baseId ?? b.pokemon_id) as number;
+
         const aDay = Number.isFinite(toDayValue(a.caught_date))
           ? toDayValue(a.caught_date)
           : toDayValue(a.created_at);
@@ -271,7 +263,11 @@ export default function Collection({ mode = 'all' }: CollectionProps) {
           ? toDayValue(b.caught_date)
           : toDayValue(b.created_at);
 
-        const primary = sortByDate === 'desc' ? bDay - aDay : aDay - bDay;
+        const primary =
+          sortBy === 'date_desc' ? bDay - aDay :
+          sortBy === 'date_asc' ? aDay - bDay :
+          sortBy === 'dex_asc' ? aDex - bDex :
+          bDex - aDex;
         if (primary !== 0) return primary;
 
         // Tie-break on same capture day:
@@ -279,9 +275,11 @@ export default function Collection({ mode = 'all' }: CollectionProps) {
         // - asc  (old -> recent): older added first
         const aCreated = new Date(a.created_at).getTime();
         const bCreated = new Date(b.created_at).getTime();
-        return sortByDate === 'desc' ? bCreated - aCreated : aCreated - bCreated;
+        if (sortBy === 'date_asc') return aCreated - bCreated;
+        if (sortBy === 'date_desc') return bCreated - aCreated;
+        return bCreated - aCreated;
       });
-  }, [scopedEntries, statusFilter, searchQuery, filterGen, filterGame, filterPlaylist, playlistMap, pokemonById, pokemonByName, pokemonByDisplayName, sortByDate]);
+  }, [scopedEntries, searchQuery, filterGen, filterGame, filterPlaylist, playlistMap, pokemonById, pokemonByName, pokemonByDisplayName, sortBy]);
 
   if (authLoading || (user && loading)) {
     return (
@@ -349,64 +347,22 @@ export default function Collection({ mode = 'all' }: CollectionProps) {
               >
                 La mia collezione Shiny
               </h1>
-              <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-3">
-                <div className="flex items-center rounded-2xl border border-white/10 bg-white/5 p-1 shadow-sm backdrop-blur">
-                  <Button
-                    variant={mode === 'all' ? 'default' : 'ghost'}
-                    size="sm"
-                    className={cn("rounded-xl", mode === 'all' && "shadow-sm")}
-                    asChild
-                  >
-                    <Link to="/collection">Tutti</Link>
-                  </Button>
-                  <Button
-                    variant={mode === 'events' ? 'default' : 'ghost'}
-                    size="sm"
-                    className={cn("rounded-xl", mode === 'events' && "shadow-sm")}
-                    asChild
-                  >
-                    <Link to="/collection/events">Eventi</Link>
-                  </Button>
-                </div>
-
-                <div className="flex items-center rounded-2xl border border-white/10 bg-white/5 p-1 shadow-sm backdrop-blur">
-                  <Button
-                    type="button"
-                    variant={statusFilter === 'all' ? 'default' : 'ghost'}
-                    size="sm"
-                    className={cn("rounded-xl", statusFilter === 'all' && "shadow-sm")}
-                    onClick={() => setStatusFilter('all')}
-                    title="Mostra tutto"
-                  >
-                    Tutti
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={statusFilter === 'shiny' ? 'default' : 'ghost'}
-                    size="sm"
-                    className={cn("rounded-xl", statusFilter === 'shiny' && "shadow-sm")}
-                    onClick={() => setStatusFilter('shiny')}
-                    title="Solo shiny ottenuti"
-                  >
-                    Shiny
-                    <span className="ml-2 rounded-full bg-white/10 px-2 py-0.5 text-[11px] font-bold text-white/90">
-                      {statusCounts.shiny}
-                    </span>
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={statusFilter === 'other' ? 'default' : 'ghost'}
-                    size="sm"
-                    className={cn("rounded-xl", statusFilter === 'other' && "shadow-sm")}
-                    onClick={() => setStatusFilter('other')}
-                    title="Fail e/o non ottenibili"
-                  >
-                    Altri
-                    <span className="ml-2 rounded-full bg-white/10 px-2 py-0.5 text-[11px] font-bold text-white/90">
-                      {statusCounts.other}
-                    </span>
-                  </Button>
-                </div>
+              <div className="mt-3 flex flex-wrap justify-center md:justify-start gap-2">
+                <Button variant={mode === 'obtained' ? 'default' : 'outline'} size="sm" asChild>
+                  <Link to="/collection">Ottenuti</Link>
+                </Button>
+                <Button variant={mode === 'static' ? 'default' : 'outline'} size="sm" asChild>
+                  <Link to="/collection/static">Static</Link>
+                </Button>
+                <Button variant={mode === 'overworld' ? 'default' : 'outline'} size="sm" asChild>
+                  <Link to="/collection/overworld">Overworld</Link>
+                </Button>
+                <Button variant={mode === 'game_gift' ? 'default' : 'outline'} size="sm" asChild>
+                  <Link to="/collection/game-gift">Game Gift</Link>
+                </Button>
+                <Button variant={mode === 'distribution_event' ? 'default' : 'outline'} size="sm" asChild>
+                  <Link to="/collection/events">Distribution / Event</Link>
+                </Button>
               </div>
               <p className="text-muted-foreground mt-1 font-medium">
                 {filteredEntries.length} mostrati su {scopedEntries.length} shiny Pokemon
@@ -520,14 +476,16 @@ export default function Collection({ mode = 'all' }: CollectionProps) {
                   </Select>
                 </div>
                 <div>
-                  <Label>Ordine data</Label>
-                  <Select value={sortByDate} onValueChange={(v) => setSortByDate(v as 'desc' | 'asc')}>
+                  <Label>Ordina</Label>
+                  <Select value={sortBy} onValueChange={(v) => setSortBy(v as CollectionSort)}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="desc">Recenti -&gt; Vecchi</SelectItem>
-                      <SelectItem value="asc">Vecchi -&gt; Recenti</SelectItem>
+                      <SelectItem value="date_desc">Data: recenti -&gt; vecchi</SelectItem>
+                      <SelectItem value="date_asc">Data: vecchi -&gt; recenti</SelectItem>
+                      <SelectItem value="dex_asc">Pokédex: crescente</SelectItem>
+                      <SelectItem value="dex_desc">Pokédex: decrescente</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -560,8 +518,8 @@ export default function Collection({ mode = 'all' }: CollectionProps) {
                 {!user
                   ? 'Accedi per vedere e salvare la tua collezione.'
                   : scopedEntries.length === 0
-                    ? mode === 'events'
-                      ? 'Nessun shiny evento ancora! Aggiungi una cattura con metodo “Distribution / Event”.'
+                    ? mode === 'distribution_event'
+                      ? 'Nessun shiny Distribution / Event ancora! Aggiungi una cattura con metodo “Distribution / Event”.'
                       : 'Nessuno shiny ancora! Inizia a cacciare e aggiungi le tue catture.'
                     : 'Nessuno shiny corrisponde ai filtri.'}
               </CardContent>

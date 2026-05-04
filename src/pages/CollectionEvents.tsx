@@ -1,6 +1,5 @@
 import Collection from './Collection';
 
 export default function CollectionEvents() {
-  return <Collection mode="events" />;
+  return <Collection mode="distribution_event" />;
 }
-
