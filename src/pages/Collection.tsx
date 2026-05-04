@@ -29,6 +29,7 @@ type CaughtShinyRow = Tables<'caught_shinies'>;
 type PlaylistRow = Tables<'shiny_playlists'>;
 
 type CollectionMode = 'all' | 'events';
+type CollectionStatusFilter = 'all' | 'shiny' | 'other';
 
 interface CollectionProps {
   mode?: CollectionMode;
@@ -59,6 +60,7 @@ export default function Collection({ mode = 'all' }: CollectionProps) {
   const [filterPlaylist, setFilterPlaylist] = useState<string>('all');
   const [sortByDate, setSortByDate] = useState<'desc' | 'asc'>('desc');
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<CollectionStatusFilter>('all');
   const normalize = (value: string | null | undefined) =>
     (value || '')
       .toLowerCase()
@@ -211,6 +213,16 @@ export default function Collection({ mode = 'all' }: CollectionProps) {
     return entries;
   }, [entries, mode]);
 
+  const statusCounts = useMemo(() => {
+    const counts = { shiny: 0, other: 0 };
+    scopedEntries.forEach((e) => {
+      const isOther = !!e.is_fail || !!e.is_unobtainable;
+      if (isOther) counts.other += 1;
+      else counts.shiny += 1;
+    });
+    return counts;
+  }, [scopedEntries]);
+
   const filteredEntries = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
 
@@ -225,6 +237,11 @@ export default function Collection({ mode = 'all' }: CollectionProps) {
     return scopedEntries
       .filter((entry) => {
         if (entry.form && isFormEliminated(entry.form)) return false;
+        if (statusFilter !== 'all') {
+          const isOther = !!entry.is_fail || !!entry.is_unobtainable;
+          if (statusFilter === 'shiny' && isOther) return false;
+          if (statusFilter === 'other' && !isOther) return false;
+        }
         const poke = resolveEntryPokemon(entry);
         if (query) {
           const haystack = [
@@ -264,7 +281,7 @@ export default function Collection({ mode = 'all' }: CollectionProps) {
         const bCreated = new Date(b.created_at).getTime();
         return sortByDate === 'desc' ? bCreated - aCreated : aCreated - bCreated;
       });
-  }, [scopedEntries, searchQuery, filterGen, filterGame, filterPlaylist, playlistMap, pokemonById, pokemonByName, pokemonByDisplayName, sortByDate]);
+  }, [scopedEntries, statusFilter, searchQuery, filterGen, filterGame, filterPlaylist, playlistMap, pokemonById, pokemonByName, pokemonByDisplayName, sortByDate]);
 
   if (authLoading || (user && loading)) {
     return (
@@ -332,21 +349,64 @@ export default function Collection({ mode = 'all' }: CollectionProps) {
               >
                 La mia collezione Shiny
               </h1>
-              <div className="mt-3 flex flex-wrap justify-center md:justify-start gap-2">
-                <Button
-                  variant={mode === 'all' ? 'default' : 'outline'}
-                  size="sm"
-                  asChild
-                >
-                  <Link to="/collection">Tutti</Link>
-                </Button>
-                <Button
-                  variant={mode === 'events' ? 'default' : 'outline'}
-                  size="sm"
-                  asChild
-                >
-                  <Link to="/collection/events">Eventi</Link>
-                </Button>
+              <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-3">
+                <div className="flex items-center rounded-2xl border border-white/10 bg-white/5 p-1 shadow-sm backdrop-blur">
+                  <Button
+                    variant={mode === 'all' ? 'default' : 'ghost'}
+                    size="sm"
+                    className={cn("rounded-xl", mode === 'all' && "shadow-sm")}
+                    asChild
+                  >
+                    <Link to="/collection">Tutti</Link>
+                  </Button>
+                  <Button
+                    variant={mode === 'events' ? 'default' : 'ghost'}
+                    size="sm"
+                    className={cn("rounded-xl", mode === 'events' && "shadow-sm")}
+                    asChild
+                  >
+                    <Link to="/collection/events">Eventi</Link>
+                  </Button>
+                </div>
+
+                <div className="flex items-center rounded-2xl border border-white/10 bg-white/5 p-1 shadow-sm backdrop-blur">
+                  <Button
+                    type="button"
+                    variant={statusFilter === 'all' ? 'default' : 'ghost'}
+                    size="sm"
+                    className={cn("rounded-xl", statusFilter === 'all' && "shadow-sm")}
+                    onClick={() => setStatusFilter('all')}
+                    title="Mostra tutto"
+                  >
+                    Tutti
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={statusFilter === 'shiny' ? 'default' : 'ghost'}
+                    size="sm"
+                    className={cn("rounded-xl", statusFilter === 'shiny' && "shadow-sm")}
+                    onClick={() => setStatusFilter('shiny')}
+                    title="Solo shiny ottenuti"
+                  >
+                    Shiny
+                    <span className="ml-2 rounded-full bg-white/10 px-2 py-0.5 text-[11px] font-bold text-white/90">
+                      {statusCounts.shiny}
+                    </span>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={statusFilter === 'other' ? 'default' : 'ghost'}
+                    size="sm"
+                    className={cn("rounded-xl", statusFilter === 'other' && "shadow-sm")}
+                    onClick={() => setStatusFilter('other')}
+                    title="Fail e/o non ottenibili"
+                  >
+                    Altri
+                    <span className="ml-2 rounded-full bg-white/10 px-2 py-0.5 text-[11px] font-bold text-white/90">
+                      {statusCounts.other}
+                    </span>
+                  </Button>
+                </div>
               </div>
               <p className="text-muted-foreground mt-1 font-medium">
                 {filteredEntries.length} mostrati su {scopedEntries.length} shiny Pokemon
