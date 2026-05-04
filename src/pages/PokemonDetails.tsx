@@ -293,6 +293,23 @@ export default function PokemonDetails() {
                                 {(overrides[`${details.id}-${details.name}`] as any)?.custom_display_name || details.displayName}
                             </h1>
 
+                            {details.shinyAvailability && details.shinyAvailability !== 'ok' && (
+                                <div
+                                    className={cn(
+                                        "inline-flex items-center rounded-full border px-3 py-1 text-xs font-bold",
+                                        details.shinyAvailability === 'unobtainable'
+                                            ? "border-rose-300/70 bg-rose-500/15 text-rose-100"
+                                            : "border-sky-300/70 bg-sky-500/15 text-sky-100"
+                                    )}
+                                    title={details.shinyAvailability === 'unobtainable'
+                                        ? 'Shiny non ottenibile al momento'
+                                        : 'Shiny non Own OT (OT esterno)'
+                                    }
+                                >
+                                    {details.shinyAvailability === 'unobtainable' ? 'Shiny non ottenibile al momento' : 'Non Own OT (OT esterno)'}
+                                </div>
+                            )}
+
                             {user && isEditorEnabled && (
                                 <div className="flex items-center gap-2">
                                     <TooltipProvider>

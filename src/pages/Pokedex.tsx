@@ -316,6 +316,7 @@ export default function Pokedex() {
                                         pokemonId={p.id}
                                         baseId={p.baseId}
                                         displayName={p.displayName}
+                                        shinyAvailability={p.shinyAvailability}
                                         spriteUrl={getPokemonSpriteUrl(p.id, { shiny: true, name: p.name })}
                                         secondarySprite={hasMultipleSprites
                                             ? getPokemonSpriteUrl(secondaryForm?.id || femaleId || p.id, {

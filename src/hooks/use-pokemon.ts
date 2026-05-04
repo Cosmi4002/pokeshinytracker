@@ -4,6 +4,7 @@ import { toShowdownSlug, getPokemonSpriteUrl } from '@/lib/pokemon-data';
 export { toShowdownSlug, getPokemonSpriteUrl } from '@/lib/pokemon-data';
 import pokedexData from '@/lib/pokedex.json';
 import { isFormEliminated, POKEMON_DATA_OVERRIDES } from '@/lib/form-filters';
+import { getShinyAvailability, ShinyAvailability } from '@/lib/shiny-availability';
 
 export interface PokemonBasic {
   id: number;
@@ -13,6 +14,7 @@ export interface PokemonBasic {
   generation: number;
   hideFromPokedex?: boolean;
   evolvesTo?: number[]; // Array of Pokémon IDs this Pokémon evolves into
+  shinyAvailability?: ShinyAvailability;
 }
 
 export interface PokemonVariety {
@@ -40,6 +42,7 @@ export interface PokemonDetailed {
   forms: PokemonFormDetailed[];
   varieties: PokemonVariety[];
   hasGenderDifference: boolean;
+  shinyAvailability?: ShinyAvailability;
 }
 
 export interface PokemonFormDetailed {
@@ -600,6 +603,7 @@ export function usePokemonList() {
               generation: p.generation || getGeneration(p.id, p.name, p.baseId),
               displayName: override?.custom_display_name || formatPokemonName(p.name, p.id, p.baseId),
               hideFromPokedex: isExcluded,
+              shinyAvailability: getShinyAvailability({ baseId: p.baseId ?? p.id, name: p.name }),
             };
           });
 
@@ -620,6 +624,7 @@ export function usePokemonList() {
               generation: baseEntry?.generation || getGeneration(v.id, v.name, baseId),
               displayName: override?.custom_display_name || formatPokemonName(v.name, v.id, baseId),
               hideFromPokedex: isExcluded,
+              shinyAvailability: getShinyAvailability({ baseId, name: v.name }),
             };
             list.push(entry);
             listById.set(entry.id, entry);
@@ -763,6 +768,7 @@ export function usePokemonDetails(pokemonId: number | null) {
           forms,
           varieties,
           hasGenderDifference: hasGenderDiff,
+          shinyAvailability: getShinyAvailability({ baseId, name }),
         });
 
       } catch (err) {

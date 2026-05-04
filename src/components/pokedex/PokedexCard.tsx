@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 import { memo } from "react";
 import { useRandomColor } from '@/lib/random-color-context';
+import type { ShinyAvailability } from '@/lib/shiny-availability';
 
 interface PokedexCardProps {
     pokemonId: number;
@@ -14,6 +15,7 @@ interface PokedexCardProps {
     caughtPercentage: number; // 0-100
     hasCaughtAny: boolean;
     isEvolutionSourceHighlighted?: boolean;
+    shinyAvailability?: ShinyAvailability;
     onClick: () => void;
 }
 
@@ -29,6 +31,7 @@ export const PokedexCard = memo(function PokedexCard({
     caughtPercentage,
     hasCaughtAny,
     isEvolutionSourceHighlighted = false,
+    shinyAvailability = 'ok',
     onClick
 }: PokedexCardProps) {
     const { accentColor } = useRandomColor();
@@ -94,6 +97,24 @@ export const PokedexCard = memo(function PokedexCard({
             {isEvolutionSourceHighlighted && (
                 <div className="absolute top-2 left-2 z-20 rounded-full border border-amber-300/70 bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold text-amber-100">
                     EVO
+                </div>
+            )}
+
+            {shinyAvailability !== 'ok' && (
+                <div
+                    className={cn(
+                        "absolute z-20 rounded-full border px-2 py-0.5 text-[10px] font-bold",
+                        isEvolutionSourceHighlighted ? "top-7 left-2" : "top-2 left-2",
+                        shinyAvailability === 'unobtainable'
+                            ? "border-rose-300/70 bg-rose-500/20 text-rose-100"
+                            : "border-sky-300/70 bg-sky-500/20 text-sky-100"
+                    )}
+                    title={shinyAvailability === 'unobtainable'
+                        ? 'Shiny non ottenibile al momento'
+                        : 'Shiny non Own OT (OT esterno)'
+                    }
+                >
+                    {shinyAvailability === 'unobtainable' ? 'NO SHINY' : 'OT'}
                 </div>
             )}
 
