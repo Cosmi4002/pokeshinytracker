@@ -13,9 +13,7 @@ import PokemonDetails from "./pages/PokemonDetails";
 import PokedexManager from "./pages/PokedexManager";
 import Collection from "./pages/Collection";
 import CollectionEvents from "./pages/CollectionEvents";
-import CollectionStatic from "./pages/CollectionStatic";
-import CollectionOverworld from "./pages/CollectionOverworld";
-import CollectionGameGift from "./pages/CollectionGameGift";
+import CollectionSpecial from "./pages/CollectionSpecial";
 import Memo from "./pages/Memo";
 import UserCollectionsSearch from "./pages/UserCollectionsSearch";
 import Bingo from "./pages/Bingo";
@@ -48,9 +46,7 @@ function AppContent() {
           <Route path="/pokedex/:pokemonId" element={<PokemonDetails />} />
           <Route path="/pokedex/manage" element={<PokedexManager />} />
           <Route path="/collection" element={<Collection />} />
-          <Route path="/collection/static" element={<CollectionStatic />} />
-          <Route path="/collection/overworld" element={<CollectionOverworld />} />
-          <Route path="/collection/game-gift" element={<CollectionGameGift />} />
+          <Route path="/collection/special" element={<CollectionSpecial />} />
           <Route path="/collection/events" element={<CollectionEvents />} />
           <Route path="/memo" element={<Memo />} />
           <Route path="/users" element={<UserCollectionsSearch />} />

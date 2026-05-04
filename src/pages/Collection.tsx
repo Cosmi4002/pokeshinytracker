@@ -28,7 +28,7 @@ import type { Tables } from '@/integrations/supabase/types';
 type CaughtShinyRow = Tables<'caught_shinies'>;
 type PlaylistRow = Tables<'shiny_playlists'>;
 
-type CollectionMode = 'obtained' | 'static' | 'overworld' | 'game_gift' | 'distribution_event';
+type CollectionMode = 'obtained' | 'special' | 'distribution_event';
 type CollectionSort = 'date_desc' | 'date_asc' | 'dex_asc' | 'dex_desc';
 interface CollectionProps {
   mode?: CollectionMode;
@@ -207,11 +207,21 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
 
   const scopedEntries = useMemo(() => {
     const method = (entry: CaughtShinyRow) => (entry.method || '').toString().trim().toLowerCase();
+    const isSpecial = (entry: CaughtShinyRow) => {
+      const m = method(entry);
+      return (
+        m === 'static' ||
+        m === 'overworld' ||
+        m === 'game gift' ||
+        m === 'game-gift' ||
+        m === 'gift' ||
+        m === 'static/overworld/game gift' ||
+        m === 'static/overworld/game-gift'
+      );
+    };
 
     if (mode === 'obtained') return entries.filter((e) => !e.is_fail && !e.is_unobtainable);
-    if (mode === 'static') return entries.filter((e) => method(e) === 'static');
-    if (mode === 'overworld') return entries.filter((e) => method(e) === 'overworld');
-    if (mode === 'game_gift') return entries.filter((e) => method(e) === 'game gift' || method(e) === 'game-gift' || method(e) === 'gift');
+    if (mode === 'special') return entries.filter((e) => isSpecial(e));
     return entries.filter((e) => method(e) === 'distribution/event' || method(e) === 'event');
   }, [entries, mode]);
 
@@ -351,14 +361,8 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
                 <Button variant={mode === 'obtained' ? 'default' : 'outline'} size="sm" asChild>
                   <Link to="/collection">Ottenuti</Link>
                 </Button>
-                <Button variant={mode === 'static' ? 'default' : 'outline'} size="sm" asChild>
-                  <Link to="/collection/static">Static</Link>
-                </Button>
-                <Button variant={mode === 'overworld' ? 'default' : 'outline'} size="sm" asChild>
-                  <Link to="/collection/overworld">Overworld</Link>
-                </Button>
-                <Button variant={mode === 'game_gift' ? 'default' : 'outline'} size="sm" asChild>
-                  <Link to="/collection/game-gift">Game Gift</Link>
+                <Button variant={mode === 'special' ? 'default' : 'outline'} size="sm" asChild>
+                  <Link to="/collection/special">Static / Overworld / Game Gift</Link>
                 </Button>
                 <Button variant={mode === 'distribution_event' ? 'default' : 'outline'} size="sm" asChild>
                   <Link to="/collection/events">Distribution / Event</Link>
