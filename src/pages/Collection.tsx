@@ -28,7 +28,7 @@ import type { Tables } from '@/integrations/supabase/types';
 type CaughtShinyRow = Tables<'caught_shinies'>;
 type PlaylistRow = Tables<'shiny_playlists'>;
 
-type CollectionMode = 'obtained' | 'special' | 'distribution_event';
+  type CollectionMode = 'obtained' | 'special' | 'distribution_event';
 type CollectionSort = 'date_desc' | 'date_asc' | 'dex_asc' | 'dex_desc';
 interface CollectionProps {
   mode?: CollectionMode;
@@ -216,7 +216,8 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
         m === 'game-gift' ||
         m === 'gift' ||
         m === 'static/overworld/game gift' ||
-        m === 'static/overworld/game-gift'
+        m === 'static/overworld/game-gift' ||
+        m === 'static overworld game gift'
       );
     };
 
@@ -362,7 +363,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
                   <Link to="/collection">Ottenuti</Link>
                 </Button>
                 <Button variant={mode === 'special' ? 'default' : 'outline'} size="sm" asChild>
-                  <Link to="/collection/special">Static / Overworld / Game Gift</Link>
+                  <Link to="/collection/special">Static Overworld Game Gift</Link>
                 </Button>
                 <Button variant={mode === 'distribution_event' ? 'default' : 'outline'} size="sm" asChild>
                   <Link to="/collection/events">Distribution / Event</Link>
