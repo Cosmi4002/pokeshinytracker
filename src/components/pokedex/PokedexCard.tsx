@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import { memo } from "react";
 import { useRandomColor } from '@/lib/random-color-context';
 import type { ShinyAvailability } from '@/lib/shiny-availability';
+import { Lock, UserX } from "lucide-react";
 
 interface PokedexCardProps {
     pokemonId: number;
@@ -103,18 +104,28 @@ export const PokedexCard = memo(function PokedexCard({
             {shinyAvailability !== 'ok' && (
                 <div
                     className={cn(
-                        "absolute z-20 rounded-full border px-2 py-0.5 text-[10px] font-bold",
+                        "absolute z-20 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold shadow-sm backdrop-blur",
                         isEvolutionSourceHighlighted ? "top-7 left-2" : "top-2 left-2",
                         shinyAvailability === 'unobtainable'
-                            ? "border-rose-300/70 bg-rose-500/20 text-rose-100"
-                            : "border-sky-300/70 bg-sky-500/20 text-sky-100"
+                            ? "border-fuchsia-200/70 bg-fuchsia-500/20 text-fuchsia-50 ring-1 ring-fuchsia-300/30"
+                            : "border-amber-200/70 bg-amber-500/20 text-amber-50 ring-1 ring-amber-300/30"
                     )}
                     title={shinyAvailability === 'unobtainable'
-                        ? 'Shiny non ottenibile al momento'
-                        : 'Shiny non Own OT (OT esterno)'
+                        ? 'Shiny Locked'
+                        : 'No Own OT'
                     }
                 >
-                    {shinyAvailability === 'unobtainable' ? 'NO SHINY' : 'OT'}
+                    {shinyAvailability === 'unobtainable' ? (
+                        <>
+                            <Lock className="h-3 w-3" />
+                            <span>Shiny Locked</span>
+                        </>
+                    ) : (
+                        <>
+                            <UserX className="h-3 w-3" />
+                            <span>No Own OT</span>
+                        </>
+                    )}
                 </div>
             )}
 

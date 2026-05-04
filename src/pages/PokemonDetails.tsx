@@ -14,6 +14,7 @@ import {
     Sparkles,
     CheckCircle2,
     Lock,
+    UserX,
     Edit3,
     EyeOff,
     Trash2
@@ -296,17 +297,27 @@ export default function PokemonDetails() {
                             {details.shinyAvailability && details.shinyAvailability !== 'ok' && (
                                 <div
                                     className={cn(
-                                        "inline-flex items-center rounded-full border px-3 py-1 text-xs font-bold",
+                                        "inline-flex items-center gap-2 rounded-2xl border px-4 py-2 text-sm font-extrabold shadow-sm backdrop-blur",
                                         details.shinyAvailability === 'unobtainable'
-                                            ? "border-rose-300/70 bg-rose-500/15 text-rose-100"
-                                            : "border-sky-300/70 bg-sky-500/15 text-sky-100"
+                                            ? "border-fuchsia-200/70 bg-gradient-to-r from-fuchsia-500/20 to-purple-500/10 text-fuchsia-50 ring-1 ring-fuchsia-300/30"
+                                            : "border-amber-200/70 bg-gradient-to-r from-amber-500/20 to-orange-500/10 text-amber-50 ring-1 ring-amber-300/30"
                                     )}
                                     title={details.shinyAvailability === 'unobtainable'
-                                        ? 'Shiny non ottenibile al momento'
-                                        : 'Shiny non Own OT (OT esterno)'
+                                        ? 'Shiny Locked'
+                                        : 'No Own OT'
                                     }
                                 >
-                                    {details.shinyAvailability === 'unobtainable' ? 'Shiny non ottenibile al momento' : 'Non Own OT (OT esterno)'}
+                                    {details.shinyAvailability === 'unobtainable' ? (
+                                        <>
+                                            <Lock className="h-4 w-4" />
+                                            <span>Shiny Locked</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <UserX className="h-4 w-4" />
+                                            <span>No Own OT</span>
+                                        </>
+                                    )}
                                 </div>
                             )}
 
