@@ -209,6 +209,10 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
 
   const scopedEntries = useMemo(() => {
     const method = (entry: CaughtShinyRow) => (entry.method || '').toString().trim().toLowerCase();
+    const isDistributionEvent = (entry: CaughtShinyRow) => {
+      const m = method(entry);
+      return m === 'distribution/event' || m === 'event';
+    };
     const isSpecial = (entry: CaughtShinyRow) => {
       const m = method(entry);
       return (
@@ -223,9 +227,11 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
       );
     };
 
-    if (mode === 'obtained') return entries.filter((e) => !e.is_fail && !e.is_unobtainable);
+    if (mode === 'obtained') {
+      return entries.filter((e) => !e.is_fail && !e.is_unobtainable && !isSpecial(e) && !isDistributionEvent(e));
+    }
     if (mode === 'special') return entries.filter((e) => isSpecial(e));
-    return entries.filter((e) => method(e) === 'distribution/event' || method(e) === 'event');
+    return entries.filter((e) => isDistributionEvent(e));
   }, [entries, mode]);
 
   const filteredEntries = useMemo(() => {

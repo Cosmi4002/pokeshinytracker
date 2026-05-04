@@ -64,6 +64,10 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
 
   const { pokemon: pokemonDetails } = usePokemonDetails(pokemonId);
   const canMarkGigamax = supportsGigamaxMark(game);
+  const shouldShowAttempts = useMemo(() => {
+    const id = method.id;
+    return id !== 'gen9-tera-raid' && id !== 'distribution/event' && id !== 'static overworld game gift';
+  }, [method.id]);
 
   useEffect(() => {
     if (!canMarkGigamax) {
@@ -167,7 +171,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
         pokeball,
         game,
         method: method.id,
-        attempts: method.id === 'gen9-tera-raid' ? null : attempts,
+        attempts: shouldShowAttempts ? attempts : null,
         hunt_start_date: huntStartDate || null,
         caught_date: caughtDate,
         is_fail: isFail,
@@ -347,7 +351,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
 
           {/* 7. Counter and Phase Number - Grid Layout */}
           <div className="grid grid-cols-2 gap-4">
-            {method.id !== 'gen9-tera-raid' ? (
+            {shouldShowAttempts ? (
               <div className="space-y-2">
                 <Label>Numero tentativi (counter)</Label>
                 <Input
@@ -360,7 +364,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
             ) : (
               <div className="space-y-2 opacity-70">
                 <Label>Numero tentativi (counter)</Label>
-                <Input type="text" disabled value="N/A (Tera Raid)" />
+                <Input type="text" disabled value="N/A" />
               </div>
             )}
             <div className="space-y-2">

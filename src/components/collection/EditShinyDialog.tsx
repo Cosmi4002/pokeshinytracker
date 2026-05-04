@@ -69,6 +69,10 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
   const { pokemon: pokemonDetails } = usePokemonDetails(pokemonId);
   const { pokemon: pokemonList } = usePokemonList();
   const canMarkGigamax = supportsGigamaxMark(game);
+  const shouldShowAttempts = useMemo(() => {
+    const id = method.id;
+    return id !== 'gen9-tera-raid' && id !== 'distribution/event' && id !== 'static overworld game gift';
+  }, [method.id]);
 
   // Build form/variant options exactly like counter/pokedex details (forms + varieties).
   const formOptions = useMemo(() => {
@@ -222,7 +226,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
           pokeball,
           game,
           method: method.id,
-          attempts: method.id === 'gen9-tera-raid' ? null : attempts,
+          attempts: shouldShowAttempts ? attempts : null,
           hunt_start_date: huntStartDate || null,
           caught_date: caughtDate,
           is_fail: isFail,
@@ -405,7 +409,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
 
           {/* 9. Counter and Phase Number - Grid Layout */}
           <div className="grid grid-cols-2 gap-4">
-            {method.id !== 'gen9-tera-raid' ? (
+            {shouldShowAttempts ? (
               <div className="space-y-2">
                 <Label>Numero tentativi (counter)</Label>
                 <Input
@@ -418,7 +422,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
             ) : (
               <div className="space-y-2 opacity-70">
                 <Label>Numero tentativi (counter)</Label>
-                <Input type="text" disabled value="N/A (Tera Raid)" />
+                <Input type="text" disabled value="N/A" />
               </div>
             )}
             <div className="space-y-2">

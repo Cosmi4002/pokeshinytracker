@@ -87,6 +87,10 @@ export function FinishHuntDialog({
 
   const { pokemon: pokemonDetails } = usePokemonDetails(pokemonId);
   const canMarkGigamax = supportsGigamaxMark(game);
+  const shouldShowAttempts = useMemo(() => {
+    const id = method.id;
+    return id !== 'gen9-tera-raid' && id !== 'distribution/event' && id !== 'static overworld game gift';
+  }, [method.id]);
 
   useEffect(() => {
     if (!canMarkGigamax) {
@@ -202,7 +206,7 @@ export function FinishHuntDialog({
         pokeball,
         game,
         method: method.id,
-        attempts: method.id === 'gen9-tera-raid' ? null : attempts,
+        attempts: shouldShowAttempts ? attempts : null,
         hunt_start_date: huntStartDate || null,
         caught_date: caughtDate,
         is_fail: isFail,
@@ -368,7 +372,7 @@ export function FinishHuntDialog({
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            {method.id !== 'gen9-tera-raid' ? (
+            {shouldShowAttempts ? (
               <div className="space-y-2">
                 <Label>Numero tentativi</Label>
                 <Input
@@ -384,7 +388,7 @@ export function FinishHuntDialog({
             ) : (
               <div className="space-y-2 opacity-70">
                 <Label>Numero tentativi</Label>
-                <Input type="text" disabled value="N/A (Tera Raid)" />
+                <Input type="text" disabled value="N/A" />
               </div>
             )}
             <div className="space-y-2">
