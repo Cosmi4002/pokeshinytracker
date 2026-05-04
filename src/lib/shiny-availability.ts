@@ -26,6 +26,10 @@ const RULES: Rule[] = [
   { kind: 'baseId', baseId: 1025, availability: 'unobtainable' }, // Pecharunt
   { kind: 'baseId', baseId: 1009, availability: 'unobtainable' }, // Walking Wake
   { kind: 'baseId', baseId: 1010, availability: 'unobtainable' }, // Iron Leaves
+  { kind: 'baseId', baseId: 1020, availability: 'unobtainable' }, // Gouging Fire
+  { kind: 'baseId', baseId: 1021, availability: 'unobtainable' }, // Raging Bolt
+  { kind: 'baseId', baseId: 1022, availability: 'unobtainable' }, // Iron Boulder
+  { kind: 'baseId', baseId: 1023, availability: 'unobtainable' }, // Iron Crown
 
   // Non Own OT (marcati con OT nella lista)
   { kind: 'baseId', baseId: 647, availability: 'not_own_ot' }, // Keldeo
@@ -58,4 +62,3 @@ export function getShinyAvailability(params: { baseId: number; name: string }): 
   }
   return 'ok';
 }
-
