@@ -29,7 +29,8 @@ type CaughtShinyRow = Tables<'caught_shinies'>;
 type PlaylistRow = Tables<'shiny_playlists'>;
 
   type CollectionMode = 'obtained' | 'special' | 'distribution_event';
-type CollectionSort = 'date_desc' | 'date_asc' | 'dex_asc' | 'dex_desc';
+type CollectionSort = 'date_desc' | 'date_asc';
+type DexOrder = 'none' | 'dex_asc' | 'dex_desc';
 interface CollectionProps {
   mode?: CollectionMode;
 }
@@ -58,6 +59,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
   const [filterGame, setFilterGame] = useState<string>('all');
   const [filterPlaylist, setFilterPlaylist] = useState<string>('all');
   const [sortBy, setSortBy] = useState<CollectionSort>('date_desc');
+  const [dexOrder, setDexOrder] = useState<DexOrder>('none');
   const [searchQuery, setSearchQuery] = useState('');
 
   const normalize = (value: string | null | undefined) =>
@@ -275,10 +277,10 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
           : toDayValue(b.created_at);
 
         const primary =
-          sortBy === 'date_desc' ? bDay - aDay :
+          dexOrder === 'dex_asc' ? aDex - bDex :
+          dexOrder === 'dex_desc' ? bDex - aDex :
           sortBy === 'date_asc' ? aDay - bDay :
-          sortBy === 'dex_asc' ? aDex - bDex :
-          bDex - aDex;
+          bDay - aDay;
         if (primary !== 0) return primary;
 
         // Tie-break on same capture day:
@@ -290,7 +292,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
         if (sortBy === 'date_desc') return bCreated - aCreated;
         return bCreated - aCreated;
       });
-  }, [scopedEntries, searchQuery, filterGen, filterGame, filterPlaylist, playlistMap, pokemonById, pokemonByName, pokemonByDisplayName, sortBy]);
+  }, [scopedEntries, searchQuery, filterGen, filterGame, filterPlaylist, playlistMap, pokemonById, pokemonByName, pokemonByDisplayName, sortBy, dexOrder]);
 
   if (authLoading || (user && loading)) {
     return (
@@ -489,8 +491,19 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
                     <SelectContent>
                       <SelectItem value="date_desc">Data: recenti -&gt; vecchi</SelectItem>
                       <SelectItem value="date_asc">Data: vecchi -&gt; recenti</SelectItem>
-                      <SelectItem value="dex_asc">Pokédex: crescente</SelectItem>
-                      <SelectItem value="dex_desc">Pokédex: decrescente</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Pokédex</Label>
+                  <Select value={dexOrder} onValueChange={(v) => setDexOrder(v as DexOrder)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">—</SelectItem>
+                      <SelectItem value="dex_asc">Crescente</SelectItem>
+                      <SelectItem value="dex_desc">Decrescente</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
