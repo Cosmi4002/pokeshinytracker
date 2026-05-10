@@ -240,6 +240,7 @@ export function Navbar() {
                       src={selectedAvatar.src}
                       alt={selectedAvatar.label}
                       className="mr-2 h-4 w-4 rounded-md border border-primary/70 bg-gradient-to-br from-white/30 to-white/10 p-0.5 object-contain"
+                      onError={(e) => ((e.currentTarget as HTMLImageElement).src = '/placeholder.svg')}
                     />
                     Avatar
                   </DropdownMenuSubTrigger>
@@ -264,6 +265,7 @@ export function Navbar() {
                               alt={avatar.label}
                               title={avatar.label}
                               className="h-full w-full origin-top scale-[1.58] object-cover object-[50%_10%] [image-rendering:pixelated]"
+                              onError={(e) => ((e.currentTarget as HTMLImageElement).src = '/placeholder.svg')}
                             />
                           </span>
                         </DropdownMenuItem>
