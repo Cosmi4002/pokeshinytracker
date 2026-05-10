@@ -108,6 +108,9 @@ export default function Pokedex() {
         // Some species are easier to track as separate entries (each form as its own "base" card).
         // Keep them as individual Pokédex cards instead of a single % card.
         const splitIntoSeparateCardsBaseIds = new Set([
+            201, // Unown
+            412, // Burmy
+            413, // Wormadam
             849, // Toxtricity
             892, // Urshifu
             925, // Maushold
