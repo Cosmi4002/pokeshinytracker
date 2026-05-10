@@ -244,8 +244,8 @@ export function Navbar() {
                     />
                     Avatar
                   </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent className="w-72 p-3">
-                    <div className="grid grid-cols-4 gap-2">
+                  <DropdownMenuSubContent className="w-[92vw] max-w-sm p-3 max-h-[70vh] overflow-y-auto">
+                    <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
                       {trainerAvatars.map((avatar) => (
                         <DropdownMenuItem
                           key={avatar.id}
