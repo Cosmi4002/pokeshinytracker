@@ -106,7 +106,15 @@ export default function Pokedex() {
         const forceVisibleBaseIds = new Set([351, 386, 666]);
         const forceSingleCardBaseIds = new Set([201, 493, 669, 670, 671, 676, 773, 710, 711, 741, 774, 849, 869, 925, 931, 1017, 1024]);
         // Some species are easier to track as separate entries (each form as its own "base" card).
-        const splitIntoSeparateCardsBaseIds = new Set([978]); // Tatsugiri (Curly/Droopy/Stretchy)
+        // Keep them as individual Pokédex cards instead of a single % card.
+        const splitIntoSeparateCardsBaseIds = new Set([
+            849, // Toxtricity
+            892, // Urshifu
+            925, // Maushold
+            931, // Squawkabilly
+            978, // Tatsugiri (Curly/Droopy/Stretchy)
+            982, // Dudunsparce
+        ]);
         pokemon.forEach(p => {
             const isCanonicalBase = p.id === p.baseId;
             const isPreferredBase = preferredBaseForms[p.baseId] === p.name;
@@ -118,7 +126,7 @@ export default function Pokedex() {
             let nameKey = p.name.replace(/-male$|-female$/, '');
 
             // Special grouping for species with major form differences we want on one card
-            if (p.baseId === 892) nameKey = 'urshifu';
+            // (intentionally left empty; some species are handled by splitIntoSeparateCardsBaseIds)
             if (forceSingleCardBaseIds.has(p.baseId)) nameKey = `base-${p.baseId}`;
 
             // Key includes baseId to sort by dex number, but nameKey to distinguish Alola/Galar etc.
@@ -308,7 +316,11 @@ export default function Pokedex() {
 
                                 let totalVars = 1;
                                 if (hasMultipleSprites) totalVars = 2;
-                                const formTotal = group.length > 1 ? (POKEMON_FORM_COUNTS[p.baseId] || POKEMON_FORM_COUNTS[p.id]) : undefined;
+                                // Do not show % completion for these (treat as single entry even if multiple "forms" exist).
+                                const noPercentBaseIds = new Set([964]); // Palafin (Zero/Hero) should not be a % tracker
+                                const formTotal = (!noPercentBaseIds.has(p.baseId) && group.length > 1)
+                                    ? (POKEMON_FORM_COUNTS[p.baseId] || POKEMON_FORM_COUNTS[p.id])
+                                    : undefined;
                                 if (formTotal) totalVars = formTotal;
 
                                 // Species with tracked multi-form totals (e.g. Tatsugiri 978) store each form on its own ID.
