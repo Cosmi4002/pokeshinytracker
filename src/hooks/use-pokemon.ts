@@ -239,7 +239,7 @@ export const MANUAL_VARIETIES: Record<number, { id: number, name: string }[]> = 
     { id: 10249, name: 'enamorus-therian' }
   ],
   916: [ // Oinkologne
-    { id: 10254, name: 'oinkologne-female' }
+    // NOTE: female is rendered via gender-diff sprite; avoid duplicate "form" entry site-wide.
   ],
   925: [ // Maushold
     { id: 10255, name: 'maushold-family-of-three' }
@@ -733,7 +733,15 @@ export function usePokemonDetails(pokemonId: number | null) {
         };
 
         const forms: PokemonFormDetailed[] = relatives
-          .filter(r => r.id !== pokemonId)
+          .filter(r => {
+            if (r.id === pokemonId) return false;
+            // Avoid duplicating gender variants as "forms" (e.g. Oinkologne female id 10254).
+            if (hasGenderDiff && typeof r.name === 'string') {
+              const n = r.name.toLowerCase();
+              if (n.endsWith('-female') || n.endsWith('-male')) return false;
+            }
+            return true;
+          })
           .map(r => ({
             id: r.id,
             formName: r.name,

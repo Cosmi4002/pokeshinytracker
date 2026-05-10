@@ -147,6 +147,11 @@ export default function PokemonDetails() {
 
         // Add all other local forms/varieties (relatives sharing same baseId)
         details.forms.forEach(f => {
+            // Avoid duplicating gender variants as "forms" when gender sprites already exist.
+            if (details.hasGenderDifference) {
+                const fnLower = f.formName.toLowerCase();
+                if (fnLower.endsWith('-female') || fnLower.endsWith('-male')) return;
+            }
             // Inclusion check: static filters + dynamic user overrides
             const isExcluded = isFormEliminated(f.formName) || (overrides[`${f.id}-${f.formName}`] as any)?.is_excluded;
             if (isExcluded) return;
