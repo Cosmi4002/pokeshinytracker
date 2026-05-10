@@ -14,6 +14,7 @@ import PokedexManager from "./pages/PokedexManager";
 import Collection from "./pages/Collection";
 import CollectionEvents from "./pages/CollectionEvents";
 import CollectionSpecial from "./pages/CollectionSpecial";
+import CollectionFailUncatchable from "./pages/CollectionFailUncatchable";
 import Memo from "./pages/Memo";
 import UserCollectionsSearch from "./pages/UserCollectionsSearch";
 import Bingo from "./pages/Bingo";
@@ -48,6 +49,7 @@ function AppContent() {
           <Route path="/collection" element={<Collection />} />
           <Route path="/collection/special" element={<CollectionSpecial />} />
           <Route path="/collection/events" element={<CollectionEvents />} />
+          <Route path="/collection/fail-uncatchable" element={<CollectionFailUncatchable />} />
           <Route path="/memo" element={<Memo />} />
           <Route path="/users" element={<UserCollectionsSearch />} />
           <Route path="/bingo" element={<Bingo />} />

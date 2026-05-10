@@ -28,7 +28,7 @@ import type { Tables } from '@/integrations/supabase/types';
 type CaughtShinyRow = Tables<'caught_shinies'>;
 type PlaylistRow = Tables<'shiny_playlists'>;
 
-  type CollectionMode = 'obtained' | 'special' | 'distribution_event';
+type CollectionMode = 'obtained' | 'special' | 'distribution_event' | 'fail_uncatchable';
 type CollectionSort = 'date_desc' | 'date_asc';
 type DexOrder = 'none' | 'dex_asc' | 'dex_desc';
 interface CollectionProps {
@@ -227,11 +227,14 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
       );
     };
 
+    const isFailOrUncatchable = (entry: CaughtShinyRow) => !!entry.is_fail || !!entry.is_unobtainable;
+
     if (mode === 'obtained') {
-      return entries.filter((e) => !e.is_fail && !e.is_unobtainable && !isSpecial(e) && !isDistributionEvent(e));
+      return entries.filter((e) => !isFailOrUncatchable(e) && !isSpecial(e) && !isDistributionEvent(e));
     }
-    if (mode === 'special') return entries.filter((e) => isSpecial(e));
-    return entries.filter((e) => isDistributionEvent(e));
+    if (mode === 'special') return entries.filter((e) => !isFailOrUncatchable(e) && isSpecial(e));
+    if (mode === 'distribution_event') return entries.filter((e) => !isFailOrUncatchable(e) && isDistributionEvent(e));
+    return entries.filter((e) => isFailOrUncatchable(e));
   }, [entries, mode]);
 
   const filteredEntries = useMemo(() => {
@@ -375,6 +378,9 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
                 </Button>
                 <Button variant={mode === 'distribution_event' ? 'default' : 'outline'} size="sm" asChild>
                   <Link to="/collection/events">Distribution / Event</Link>
+                </Button>
+                <Button variant={mode === 'fail_uncatchable' ? 'default' : 'outline'} size="sm" asChild>
+                  <Link to="/collection/fail-uncatchable">Uncatchable / Fail</Link>
                 </Button>
               </div>
               <p className="text-muted-foreground mt-1 font-medium">
