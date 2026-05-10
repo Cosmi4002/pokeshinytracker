@@ -19,33 +19,7 @@ import { useRandomColor } from '@/lib/random-color-context';
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-
-const trainerAvatars = [
-  { id: 'red', label: 'Red', src: '/img/trainers/red.png' },
-  { id: 'green', label: 'Green', src: '/img/trainers/green.png' },
-  { id: 'ethan', label: 'Ethan', src: '/img/trainers/ethan.png' },
-  { id: 'lyra', label: 'Lyra', src: '/img/trainers/lyra.png' },
-  { id: 'brendan', label: 'Brendan', src: '/img/trainers/brendan.png' },
-  { id: 'may', label: 'May', src: '/img/trainers/may.png' },
-  { id: 'lucas', label: 'Lucas', src: '/img/trainers/lucas.png' },
-  { id: 'dawn', label: 'Dawn', src: '/img/trainers/dawn.png' },
-  { id: 'hilbert', label: 'Hilbert', src: '/img/trainers/hilbert.png' },
-  { id: 'hilda', label: 'Hilda', src: '/img/trainers/hilda.png' },
-  { id: 'calem', label: 'Calem', src: '/img/trainers/calem.png' },
-  { id: 'serena', label: 'Serena', src: '/img/trainers/serena.png' },
-  { id: 'leaf', label: 'Leaf', src: '/img/trainers/leaf.svg' },
-  { id: 'kris', label: 'Kris', src: '/img/trainers/kris.svg' },
-  { id: 'gold', label: 'Gold', src: '/img/trainers/gold.svg' },
-  { id: 'silver', label: 'Silver', src: '/img/trainers/silver.svg' },
-  { id: 'ruby', label: 'Ruby', src: '/img/trainers/ruby.svg' },
-  { id: 'sapphire', label: 'Sapphire', src: '/img/trainers/sapphire.svg' },
-  { id: 'emerald', label: 'Emerald', src: '/img/trainers/emerald.svg' },
-  { id: 'diamond', label: 'Diamond', src: '/img/trainers/diamond.svg' },
-  { id: 'pearl', label: 'Pearl', src: '/img/trainers/pearl.svg' },
-  { id: 'black', label: 'Black', src: '/img/trainers/black.svg' },
-  { id: 'scarlet', label: 'Scarlet', src: '/img/trainers/scarlet.svg' },
-  { id: 'violet', label: 'Violet', src: '/img/trainers/violet.svg' },
-] as const;
+import { trainerAvatars } from '@/lib/trainer-avatars';
 
 export function Navbar() {
   const location = useLocation();
