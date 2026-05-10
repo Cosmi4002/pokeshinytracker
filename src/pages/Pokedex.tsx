@@ -304,9 +304,24 @@ export default function Pokedex() {
 
                                 let totalVars = 1;
                                 if (hasMultipleSprites) totalVars = 2;
-                                if (POKEMON_FORM_COUNTS[p.id]) totalVars = POKEMON_FORM_COUNTS[p.id];
+                                const formTotal = POKEMON_FORM_COUNTS[p.baseId] || POKEMON_FORM_COUNTS[p.id];
+                                if (formTotal) totalVars = formTotal;
 
-                                const caughtCount = (isPrimaryCaught ? 1 : 0) + (isSecondaryCaught ? 1 : 0);
+                                // Species with tracked multi-form totals (e.g. Tatsugiri 978) store each form on its own ID.
+                                // Count caught across the whole species group, with a legacy fallback for older rows saved on base ID.
+                                let caughtCount = (isPrimaryCaught ? 1 : 0) + (isSecondaryCaught ? 1 : 0);
+                                if (formTotal && formTotal > 1) {
+                                    const caughtForms = new Set<string>();
+                                    const legacyFormsForBase = caughtData[p.id]?.forms;
+                                    group.forEach(v => {
+                                        const stats = caughtData[v.id];
+                                        const isFormId = v.id > 10000 || v.id !== v.baseId;
+                                        const formHit = (isFormId ? !!stats?.forms?.has(v.name) : (stats?.count || 0) > 0);
+                                        const legacyHit = !!legacyFormsForBase?.has(v.name);
+                                        if (formHit || legacyHit) caughtForms.add(v.name);
+                                    });
+                                    if (caughtForms.size > 0) caughtCount = caughtForms.size;
+                                }
                                 const pct = Math.min(100, (caughtCount / totalVars) * 100);
 
                                 // Add a safeguard to prevent errors when clicking on non-evolving Pokémon icons
