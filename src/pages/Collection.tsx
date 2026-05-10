@@ -240,11 +240,12 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
   const filteredEntries = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
 
-    const toDayValue = (value?: string | null) => {
+      const toDayValue = (value?: string | null) => {
       if (!value) return Number.NaN;
       // Compare by calendar day (YYYY-MM-DD), ignoring time component.
       const day = value.slice(0, 10);
-      const parsed = new Date(`${day}T00:00:00Z`).getTime();
+      // Use local timezone to avoid off-by-one-day when data is saved as date-only (YYYY-MM-DD).
+      const parsed = new Date(`${day}T00:00:00`).getTime();
       return parsed;
     };
 

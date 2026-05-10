@@ -28,6 +28,7 @@ import { POKEBALLS, GAMES, GIGAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_C
 import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
 import { MethodSelector } from '@/components/counter/MethodSelector';
 import { Checkbox } from '@/components/ui/checkbox';
+import { todayLocalISODate } from '@/lib/date';
 
 interface FinishHuntDialogProps {
   open: boolean;
@@ -75,7 +76,7 @@ export function FinishHuntDialog({
   const [attemptsDirty, setAttemptsDirty] = useState(false);
   const prevOpenRef = useRef(false);
   const [huntStartDate, setHuntStartDate] = useState(startDate ? startDate.split('T')[0] : '');
-  const [caughtDate, setCaughtDate] = useState(new Date().toISOString().split('T')[0]);
+  const [caughtDate, setCaughtDate] = useState(todayLocalISODate());
   const [isFail, setIsFail] = useState(false);
   const [isGigamax, setIsGigamax] = useState(false);
   const [isUnobtainable, setIsUnobtainable] = useState(false);

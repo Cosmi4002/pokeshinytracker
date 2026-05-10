@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { Tables } from '@/integrations/supabase/types';
 import { getPokemonSpriteUrl } from '@/hooks/use-pokemon';
 import { SHINY_CHARM_ICON } from '@/lib/pokemon-data';
+import { toLocalISODate } from '@/lib/date';
 
 type ProfileRow = Pick<Tables<'profiles'>, 'user_id' | 'username'>;
 type PublicCaughtRow = Pick<
@@ -34,13 +35,13 @@ export default function UserCollectionsSearch() {
   const getFourDaysAgoDate = () => {
     const d = new Date();
     d.setDate(d.getDate() - 4);
-    return d.toISOString().slice(0, 10);
+    return toLocalISODate(d);
   };
 
   const formatDate = (value?: string | null) => {
     if (!value) return '--';
     const day = value.slice(0, 10);
-    const parsed = new Date(`${day}T00:00:00Z`);
+    const parsed = new Date(`${day}T00:00:00`);
     if (Number.isNaN(parsed.getTime())) return '--';
     return parsed.toLocaleDateString('it-IT');
   };

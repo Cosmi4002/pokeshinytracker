@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils";
 import { isFormEliminated, POKEMON_DATA_OVERRIDES } from "@/lib/form-filters";
 import { usePokedexOverrides } from "@/hooks/use-pokedex-overrides";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { todayLocalISODate } from "@/lib/date";
 
 interface FormVariant {
     id: number;
@@ -217,7 +218,7 @@ export default function PokemonDetails() {
                         method: 'unknown',
                         game: 'unknown',
                         pokeball: 'pokeball',
-                        caught_date: new Date().toISOString()
+                        caught_date: todayLocalISODate()
                     });
                 if (error) throw error;
 

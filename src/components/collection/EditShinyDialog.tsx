@@ -30,6 +30,7 @@ import { GenderSelector } from '@/components/ui/GenderSelector';
 import { Sparkles } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
 import { Checkbox } from '@/components/ui/checkbox';
+import { todayLocalISODate } from '@/lib/date';
 
 type CaughtShinyRow = Tables<'caught_shinies'>;
 
@@ -56,7 +57,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
   const [method, setMethod] = useState<HuntingMethod>(HUNTING_METHODS[0]);
   const [attempts, setAttempts] = useState(1);
   const [huntStartDate, setHuntStartDate] = useState('');
-  const [caughtDate, setCaughtDate] = useState(new Date().toISOString().split('T')[0]);
+  const [caughtDate, setCaughtDate] = useState(todayLocalISODate());
   const [isFail, setIsFail] = useState(false);
   const [isGigamax, setIsGigamax] = useState(false);
   const [isUnobtainable, setIsUnobtainable] = useState(false);
@@ -172,7 +173,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
       setMethod(m);
       setAttempts(entry.attempts ?? 1);
       setHuntStartDate(entry.hunt_start_date ?? '');
-      setCaughtDate(entry.caught_date ?? new Date().toISOString().split('T')[0]);
+      setCaughtDate(entry.caught_date ?? todayLocalISODate());
       setIsFail(entry.is_fail ?? false);
       setIsGigamax(entry.is_gigamax ?? false);
       setIsUnobtainable(entry.is_unobtainable ?? false);

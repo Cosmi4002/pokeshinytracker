@@ -29,6 +29,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { POKEBALLS, GAMES, GIGAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, supportsGigamaxMark } from '@/lib/pokemon-data';
 import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
 import { getPokemonSpriteUrl } from '@/lib/pokemon-data';
+import { todayLocalISODate } from '@/lib/date';
 
 interface AddShinyDialogProps {
   open: boolean;
@@ -52,7 +53,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
   const [method, setMethod] = useState<HuntingMethod>(HUNTING_METHODS[0]);
   const [attempts, setAttempts] = useState(1);
   const [huntStartDate, setHuntStartDate] = useState('');
-  const [caughtDate, setCaughtDate] = useState(new Date().toISOString().split('T')[0]);
+  const [caughtDate, setCaughtDate] = useState(todayLocalISODate());
   const [isFail, setIsFail] = useState(false);
   const [isGigamax, setIsGigamax] = useState(false);
   const [isUnobtainable, setIsUnobtainable] = useState(false);
@@ -128,7 +129,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
     setMethod(HUNTING_METHODS[0]);
     setAttempts(1);
     setHuntStartDate('');
-    setCaughtDate(new Date().toISOString().split('T')[0]);
+    setCaughtDate(todayLocalISODate());
     setIsFail(false);
     setIsGigamax(false);
     setIsUnobtainable(false);
