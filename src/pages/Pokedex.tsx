@@ -125,11 +125,6 @@ export default function Pokedex() {
             // Clean name key: remove gender suffixes
             let nameKey = p.name.replace(/-male$|-female$/, '');
 
-            // Group Incarnate/Therian forms together on a single card.
-            if ([641, 642, 645].includes(p.baseId)) {
-                nameKey = nameKey.replace(/-therian$|-incarnate$/, '');
-            }
-
             // Special grouping for species with major form differences we want on one card
             // (intentionally left empty; some species are handled by splitIntoSeparateCardsBaseIds)
             if (forceSingleCardBaseIds.has(p.baseId)) nameKey = `base-${p.baseId}`;
@@ -291,9 +286,8 @@ export default function Pokedex() {
                                 const femaleVariant = group.find(v => v.name.endsWith('-female') && v.id !== p.id);
                                 const femaleId = femaleVariant ? femaleVariant.id : undefined;
 
-                                // Form diff logic (e.g. Urshifu 892, Forces of Nature 641/642/645)
-                                const hasFormDiff = (p.baseId === 892 && group.length >= 2) ||
-                                    ([641, 642, 645].includes(p.baseId) && group.length >= 2);
+                                // Form diff logic (e.g. Urshifu 892)
+                                const hasFormDiff = p.baseId === 892 && group.length >= 2;
                                 const secondaryForm = hasFormDiff ? group.find(v => v.id !== p.id) : undefined;
 
                                 const hasMultipleSprites = hasGenderDiff || hasFormDiff;
