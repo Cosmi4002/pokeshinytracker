@@ -123,6 +123,7 @@ export default function Bingo() {
   const [pickerTargetIndex, setPickerTargetIndex] = useState<number | null>(null);
   const [pickerValue, setPickerValue] = useState<number | null>(null);
   const [pickerValueName, setPickerValueName] = useState<string | undefined>(undefined);
+  const [pickerMode, setPickerMode] = useState<'pokemon' | 'logo'>('pokemon');
 
   const saveTimerRef = useRef<number | null>(null);
   const didInitRef = useRef(false);
@@ -131,6 +132,8 @@ export default function Bingo() {
     const byBase = new Map<number, PokemonBasic>();
     pokemon.forEach((p) => {
       if (p.hideFromPokedex) return;
+      // Never include shiny locked / no own OT in bingo.
+      if (p.shinyAvailability && p.shinyAvailability !== 'ok') return;
       const baseId = p.baseId ?? p.id;
       const existing = byBase.get(baseId);
       if (!existing || p.id === baseId) byBase.set(baseId, p);
@@ -218,7 +221,7 @@ export default function Bingo() {
       typeof p.generation === 'number' && gens.has(p.generation);
 
     const filteredBase = basePool.filter(matchesGen);
-    const filteredAll = pokemon.filter((p) => !p.hideFromPokedex && matchesGen(p));
+    const filteredAll = pokemon.filter((p) => !p.hideFromPokedex && (!p.shinyAvailability || p.shinyAvailability === 'ok') && matchesGen(p));
     const pokemonPool = filteredBase.length > 0 ? filteredBase : filteredAll;
     const gamesPool = GAMES.filter((g) => matchesGen(g) && selectedGameIds.has(g.id)).map((g) => ({ ...g, type: 'game' as const }));
     return { pokemonPool, gamesPool };
@@ -306,6 +309,7 @@ export default function Bingo() {
     setPickerTargetIndex(index);
     setPickerValue(cell?.id ?? null);
     setPickerValueName((cell as any)?.name);
+    setPickerMode((cell as any)?.type === 'game' ? 'logo' : 'pokemon');
     setPickerOpen(true);
   }, [grid]);
 
@@ -315,6 +319,7 @@ export default function Bingo() {
       pokemon.find((p) => p.id === pokemonId && p.name === pokemonName) ??
       pokemon.find((p) => p.id === pokemonId);
     if (!selected) return;
+    if (selected.shinyAvailability && selected.shinyAvailability !== 'ok') return;
 
     const idx = pickerTargetIndex;
     setGridIds((prev) => {
@@ -330,6 +335,25 @@ export default function Bingo() {
     });
     setPickerOpen(false);
   }, [pickerTargetIndex, pokemon]);
+
+  const applySelectedGameLogo = useCallback((gameId: number) => {
+    if (pickerTargetIndex === null) return;
+    if (!GAMES.some((g) => g.id === gameId)) return;
+
+    const idx = pickerTargetIndex;
+    setGridIds((prev) => {
+      if (idx < 0 || idx >= prev.length) return prev;
+      const next = [...prev];
+      next[idx] = gameId;
+      return next;
+    });
+    setMarked((prev) => {
+      const next = new Set(prev);
+      next.delete(idx);
+      return next;
+    });
+    setPickerOpen(false);
+  }, [pickerTargetIndex]);
 
   const toggleGeneration = useCallback((gen: number) => {
     setGensTouched(true);
@@ -674,20 +698,70 @@ export default function Bingo() {
       <Dialog open={pickerOpen} onOpenChange={setPickerOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Scegli Pokemon</DialogTitle>
-            <DialogDescription>Seleziona il Pokemon da inserire nella casella.</DialogDescription>
+            <DialogTitle>Scegli contenuto</DialogTitle>
+            <DialogDescription>Puoi inserire un Pokémon o un logo gioco nella casella.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-3">
-            <PokemonSelector
-              value={pickerValue}
-              valueName={pickerValueName}
-              onChange={(id, name) => {
-                setPickerValue(id);
-                setPickerValueName(name);
-                applySelectedPokemon(id, name);
-              }}
-            />
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant={pickerMode === 'pokemon' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setPickerMode('pokemon')}
+              className="h-8"
+            >
+              Pokémon
+            </Button>
+            <Button
+              type="button"
+              variant={pickerMode === 'logo' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setPickerMode('logo')}
+              className="h-8"
+            >
+              Logo
+            </Button>
           </div>
+
+          {pickerMode === 'pokemon' ? (
+            <div className="space-y-3">
+              <PokemonSelector
+                value={pickerValue}
+                valueName={pickerValueName}
+                onChange={(id, name) => {
+                  setPickerValue(id);
+                  setPickerValueName(name);
+                  applySelectedPokemon(id, name);
+                }}
+              />
+              <p className="text-xs text-muted-foreground">
+                Nota: i Pokémon “Shiny Locked” e “No Own OT” non sono disponibili nel Bingo.
+              </p>
+            </div>
+          ) : (
+            <div className="mt-1 max-h-[55vh] overflow-y-auto rounded-lg border border-white/10 p-3 space-y-2">
+              {GAMES.map((g) => (
+                <button
+                  key={g.id}
+                  type="button"
+                  onClick={() => applySelectedGameLogo(g.id)}
+                  className="w-full flex items-center justify-between gap-3 rounded-lg border border-transparent hover:border-white/15 hover:bg-white/5 px-2 py-1.5 text-left transition-colors"
+                >
+                  <span className="flex items-center gap-3">
+                    <img
+                      src={g.logo}
+                      alt={g.name}
+                      className="h-8 w-8 object-contain"
+                      loading="lazy"
+                      decoding="async"
+                      onError={(e) => ((e.currentTarget as HTMLImageElement).src = '/placeholder.svg')}
+                    />
+                    <span className="text-sm">{g.name}</span>
+                  </span>
+                  <span className="text-[11px] text-muted-foreground">Gen {g.generation}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
