@@ -45,19 +45,10 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
     const raw = (entry.method || '').toString().trim().toLowerCase();
     const rawGame = (entry.game || '').toString().trim().toLowerCase();
     
-    // Special case: Show encounters for Dudunsparce and Maushold even on Scarlet/Violet
+    // Special case: Always show encounters for Dudunsparce and Maushold
     const specialPokemonIds = [982, 925]; // Dudunsparce, Maushold
     if (specialPokemonIds.includes(entry.pokemon_id)) {
-      return (
-        raw !== 'gen9-tera-raid' &&
-        raw !== 'tera raid' &&
-        raw !== 'gen9-outbreak' &&
-        raw !== 'mass outbreak' &&
-        raw !== 'gen9-sandwich-lv3' &&
-        raw !== 'sandwich (sparkling power)' &&
-        raw !== 'gen9-outbreak-sandwich' &&
-        raw !== 'outbreak + sandwich lv3'
-      );
+      return !isEvent;
     }
     
     return (
