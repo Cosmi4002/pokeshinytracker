@@ -44,6 +44,22 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
     if (isEvent) return false;
     const raw = (entry.method || '').toString().trim().toLowerCase();
     const rawGame = (entry.game || '').toString().trim().toLowerCase();
+    
+    // Special case: Show encounters for Dudunsparce and Maushold even on Scarlet/Violet
+    const specialPokemonIds = [982, 925]; // Dudunsparce, Maushold
+    if (specialPokemonIds.includes(entry.pokemon_id)) {
+      return (
+        raw !== 'gen9-tera-raid' &&
+        raw !== 'tera raid' &&
+        raw !== 'gen9-outbreak' &&
+        raw !== 'mass outbreak' &&
+        raw !== 'gen9-sandwich-lv3' &&
+        raw !== 'sandwich (sparkling power)' &&
+        raw !== 'gen9-outbreak-sandwich' &&
+        raw !== 'outbreak + sandwich lv3'
+      );
+    }
+    
     return (
       !(raw === 'gen9-random' && (rawGame === 'scarlet' || rawGame === 'violet')) &&
       raw !== 'gen9-tera-raid' &&
@@ -55,7 +71,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
       raw !== 'gen9-outbreak-sandwich' &&
       raw !== 'outbreak + sandwich lv3'
     );
-  }, [entry.method, entry.game, isEvent]);
+  }, [entry.method, entry.game, entry.pokemon_id, isEvent]);
 
   const spriteUrl = useMemo(() => {
     const spriteSlug = entry.form || spriteName || entry.pokemon_name;
@@ -471,4 +487,3 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
     </div>
   );
 }
-
