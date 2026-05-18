@@ -183,14 +183,30 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
   }, [pokemon]);
 
   const resolveEntryPokemon = (entry: CaughtShinyRow) => {
+    const formAliases: Record<string, string> = {
+      // Gen 9 special forms: older saves / localized labels
+      'maushold-famiglia-da-tre': 'maushold-family-of-three',
+      'maushold-family-of-3': 'maushold-family-of-three',
+      'maushold-family-of-three': 'maushold-family-of-three',
+      'dudunsparce-trisegmento': 'dudunsparce-three-segment',
+      'dudunsparce-three-segment': 'dudunsparce-three-segment',
+    };
+
     const formSlug = normalize(entry.form);
     if (formSlug) {
-      const byForm = pokemonByName.get(formSlug);
+      const canonical = formAliases[formSlug] || formSlug;
+      const byForm = pokemonByName.get(canonical);
       if (byForm) return byForm;
     }
 
     const nameSlug = normalize(entry.pokemon_name);
     if (nameSlug) {
+      // Some entries may have the form embedded in pokemon_name (localized display name).
+      const canonicalFromName = formAliases[nameSlug];
+      if (canonicalFromName) {
+        const byAlias = pokemonByName.get(canonicalFromName);
+        if (byAlias) return byAlias;
+      }
       const byName = pokemonByName.get(nameSlug);
       if (byName) return byName;
       const byDisplay = pokemonByDisplayName.get(nameSlug);
