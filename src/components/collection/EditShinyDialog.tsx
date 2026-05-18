@@ -54,6 +54,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
   const [hasShinyCharm, setHasShinyCharm] = useState(false);
   const [pokeball, setPokeball] = useState('pokeball');
   const [game, setGame] = useState('');
+  const [secondaryGame, setSecondaryGame] = useState<string>('');
   const [method, setMethod] = useState<HuntingMethod>(HUNTING_METHODS[0]);
   const [attempts, setAttempts] = useState(1);
   const [huntStartDate, setHuntStartDate] = useState('');
@@ -169,6 +170,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
       setHasShinyCharm(entry.has_shiny_charm ?? false);
       setPokeball(entry.pokeball ?? 'pokeball');
       setGame(entry.game);
+      setSecondaryGame((entry as any).secondary_game ?? '');
       const m = HUNTING_METHODS.find((x) => x.id === entry.method) ?? HUNTING_METHODS[0];
       setMethod(m);
       setAttempts(entry.attempts ?? 1);
@@ -226,6 +228,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
           has_shiny_charm: hasShinyCharm,
           pokeball,
           game,
+          secondary_game: secondaryGame || null,
           method: method.id,
           attempts: shouldShowAttempts ? attempts : null,
           hunt_start_date: huntStartDate || null,
@@ -384,6 +387,24 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
               </SelectTrigger>
               <SelectContent>
                 {GAMES.map((g) => (
+                  <SelectItem key={g.id} value={g.id}>
+                    {g.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* 7b. Secondo gioco (opzionale) */}
+          <div className="space-y-2">
+            <Label>Secondo gioco (opzionale)</Label>
+            <Select value={secondaryGame || 'none'} onValueChange={(v) => setSecondaryGame(v === 'none' ? '' : v)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Nessuno</SelectItem>
+                {GAMES.filter((g) => g.id !== game).map((g) => (
                   <SelectItem key={g.id} value={g.id}>
                     {g.name}
                   </SelectItem>

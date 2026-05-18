@@ -99,6 +99,7 @@ export type Database = {
           evolved_from_name: string | null
           form: string | null
           game: string
+          secondary_game: string | null
           gender: string | null
           has_shiny_charm: boolean | null
           hunt_start_date: string | null
@@ -126,6 +127,7 @@ export type Database = {
           created_at?: string
           form?: string | null
           game: string
+          secondary_game?: string | null
           gender?: string | null
           has_shiny_charm?: boolean | null
           hunt_start_date?: string | null
@@ -155,6 +157,7 @@ export type Database = {
           created_at?: string
           form?: string | null
           game?: string
+          secondary_game?: string | null
           gender?: string | null
           has_shiny_charm?: boolean | null
           hunt_start_date?: string | null

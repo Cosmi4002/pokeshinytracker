@@ -50,6 +50,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
   const [hasShinyCharm, setHasShinyCharm] = useState(false);
   const [pokeball, setPokeball] = useState('pokeball');
   const [game, setGame] = useState(GAMES[GAMES.length - 1].id);
+  const [secondaryGame, setSecondaryGame] = useState<string>('');
   const [method, setMethod] = useState<HuntingMethod>(HUNTING_METHODS[0]);
   const [attempts, setAttempts] = useState(1);
   const [huntStartDate, setHuntStartDate] = useState('');
@@ -126,6 +127,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
     setHasShinyCharm(false);
     setPokeball('pokeball');
     setGame(GAMES[GAMES.length - 1].id);
+    setSecondaryGame('');
     setMethod(HUNTING_METHODS[0]);
     setAttempts(1);
     setHuntStartDate('');
@@ -171,6 +173,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
         has_shiny_charm: hasShinyCharm,
         pokeball,
         game,
+        secondary_game: secondaryGame || null,
         method: method.id,
         attempts: shouldShowAttempts ? attempts : null,
         hunt_start_date: huntStartDate || null,
@@ -326,6 +329,24 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
               </SelectTrigger>
               <SelectContent className="max-h-72 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-muted/20 [&::-webkit-scrollbar-thumb]:bg-primary/40 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-primary/60">
                 {GAMES.map((g) => (
+                  <SelectItem key={g.id} value={g.id}>
+                    {g.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* 5b. Secondo gioco (opzionale) */}
+          <div className="space-y-2">
+            <Label>Secondo gioco (opzionale)</Label>
+            <Select value={secondaryGame || 'none'} onValueChange={(v) => setSecondaryGame(v === 'none' ? '' : v)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="max-h-72 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-muted/20 [&::-webkit-scrollbar-thumb]:bg-primary/40 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-primary/60">
+                <SelectItem value="none">Nessuno</SelectItem>
+                {GAMES.filter((g) => g.id !== game).map((g) => (
                   <SelectItem key={g.id} value={g.id}>
                     {g.name}
                   </SelectItem>

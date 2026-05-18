@@ -1,4 +1,4 @@
-import { Pencil, Trash2, Calendar, ArrowUpCircle, Crosshair, Sparkles } from 'lucide-react';
+import { Pencil, Trash2, Calendar, ArrowUpCircle, Crosshair, Sparkles, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getGameTheme, GAME_LOGOS, type GameTheme } from '@/lib/game-themes';
 import { GIGAMAX_ICON, POKEBALLS, HUNTING_METHODS, getPokemonSpriteUrl, supportsGigamaxMark } from '@/lib/pokemon-data';
@@ -38,6 +38,10 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   const evolvedFromName = (entry as any).evolved_from_name as string | null | undefined;
 
   const theme = useMemo(() => themeOverride || getGameTheme(entry.game), [entry.game, themeOverride]);
+  const secondaryTheme = useMemo(() => {
+    const g = (entry as any).secondary_game as string | null | undefined;
+    return g ? getGameTheme(g) : null;
+  }, [(entry as any).secondary_game]);
   const pokeball = useMemo(() => POKEBALLS.find((b) => b.id === entry.pokeball), [entry.pokeball]);
   const method = useMemo(() => HUNTING_METHODS.find((m) => m.id === entry.method), [entry.method]);
   const showEncounters = useMemo(() => {
@@ -104,14 +108,25 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
               : 'border-white/10'
       )}
       style={{
-        borderColor: isFail ? '#ef4444' : entry.is_unobtainable ? '#f59e0b' : isEvent ? 'rgba(217,70,239,0.75)' : `${theme.primary}95`,
+        borderColor: isFail
+          ? '#ef4444'
+          : entry.is_unobtainable
+            ? '#f59e0b'
+            : isEvent
+              ? 'rgba(217,70,239,0.75)'
+              : secondaryTheme
+                ? `color-mix(in srgb, ${theme.primary} 50%, ${secondaryTheme.primary} 50%)`
+                : `${theme.primary}95`,
         boxShadow: isFail
           ? undefined
           : entry.is_unobtainable
             ? undefined
-          : applyBlackEffect
-            ? `0 16px 36px color-mix(in srgb, #191f3f, ${theme.secondary} 55%), inset 0 1px 0 rgba(255,255,255,0.06)`
-            : `0 14px 30px ${theme.secondary}44`,
+            : applyBlackEffect
+              ? `0 16px 36px color-mix(in srgb, #191f3f, ${theme.secondary} 55%), inset 0 1px 0 rgba(255,255,255,0.06)`
+              : `0 14px 30px ${theme.secondary}44`,
+        backgroundImage: secondaryTheme
+          ? `linear-gradient(90deg, color-mix(in srgb, ${theme.primary} 14%, transparent) 0%, color-mix(in srgb, ${theme.primary} 14%, transparent) 50%, color-mix(in srgb, ${secondaryTheme.primary} 14%, transparent) 50%, color-mix(in srgb, ${secondaryTheme.primary} 14%, transparent) 100%)`
+          : undefined,
       }}
     >
       {isEvent && (
@@ -309,13 +324,27 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
 
             <div className="flex items-center justify-center">
               {GAME_LOGOS[entry.game] && (
-                <img
-                  src={GAME_LOGOS[entry.game]}
-                  loading="lazy"
-                  decoding="async"
-                  alt={entry.game}
-                  className="h-10 sm:h-12 w-auto max-w-[92px] object-contain brightness-110 drop-shadow-lg"
-                />
+                <div className="flex items-center gap-2">
+                  <img
+                    src={GAME_LOGOS[entry.game]}
+                    loading="lazy"
+                    decoding="async"
+                    alt={entry.game}
+                    className="h-10 sm:h-12 w-auto max-w-[92px] object-contain brightness-110 drop-shadow-lg"
+                  />
+                  {(entry as any).secondary_game && GAME_LOGOS[(entry as any).secondary_game] && (
+                    <>
+                      <ArrowRight className="h-4 w-4 text-white/70" />
+                      <img
+                        src={GAME_LOGOS[(entry as any).secondary_game]}
+                        loading="lazy"
+                        decoding="async"
+                        alt={(entry as any).secondary_game}
+                        className="h-10 sm:h-12 w-auto max-w-[92px] object-contain brightness-110 drop-shadow-lg"
+                      />
+                    </>
+                  )}
+                </div>
               )}
             </div>
           </div>
