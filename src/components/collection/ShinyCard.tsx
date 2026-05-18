@@ -48,6 +48,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
 
     // Allow encounters box for this special form even when saved from Pokédex details (method/game "unknown").
     if (formSlug === 'dudunsparce-three-segment') return true;
+    if (formSlug === 'maushold-family-of-three') return true;
     // Keep form-only saves (from Pokédex details) clean: they use method/game "unknown"
     // and should not show the encounters box.
     if (raw === 'unknown' || rawGame === 'unknown') return false;
