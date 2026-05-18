@@ -606,6 +606,11 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
                   key={entry.id}
                   entry={entry}
                   themeOverride={mergedThemes[entry.game]}
+                  secondaryThemeOverride={
+                    (entry as any).secondary_game
+                      ? mergedThemes[(entry as any).secondary_game]
+                      : undefined
+                  }
                   applyBlackEffect={effects.blackEffectEnabled}
                   spriteName={resolved?.name}
                   onEdit={() => {

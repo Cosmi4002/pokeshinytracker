@@ -25,11 +25,12 @@ interface ShinyCardProps {
   onDelete: () => void;
   onToggleEvolved: () => void;
   themeOverride?: GameTheme;
+  secondaryThemeOverride?: GameTheme;
   applyBlackEffect?: boolean;
   spriteName?: string;
 }
 
-export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverride, applyBlackEffect = false, spriteName }: ShinyCardProps) {
+export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverride, secondaryThemeOverride, applyBlackEffect = false, spriteName }: ShinyCardProps) {
   const isFail = entry.is_fail === true;
   const isEvolved = entry.is_evolved === true;
   const isGigamax = entry.is_gigamax === true && supportsGigamaxMark(entry.game);
@@ -40,8 +41,8 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   const theme = useMemo(() => themeOverride || getGameTheme(entry.game), [entry.game, themeOverride]);
   const secondaryTheme = useMemo(() => {
     const g = (entry as any).secondary_game as string | null | undefined;
-    return g ? getGameTheme(g) : null;
-  }, [(entry as any).secondary_game]);
+    return g ? secondaryThemeOverride || getGameTheme(g) : null;
+  }, [(entry as any).secondary_game, secondaryThemeOverride]);
   const pokeball = useMemo(() => POKEBALLS.find((b) => b.id === entry.pokeball), [entry.pokeball]);
   const method = useMemo(() => HUNTING_METHODS.find((m) => m.id === entry.method), [entry.method]);
   const showEncounters = useMemo(() => {
@@ -98,7 +99,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   return (
     <div
       className={cn(
-        'group relative h-full flex flex-col overflow-hidden rounded-xl border bg-[#232323] shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1',
+        'group relative h-full flex flex-col overflow-hidden rounded-xl border bg-transparent shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1',
         isFail
           ? 'border-red-500/80 shadow-[0_0_20px_rgba(239,68,68,0.25)] ring-1 ring-red-500/50'
           : entry.is_unobtainable
@@ -114,7 +115,9 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
             ? '#f59e0b'
             : isEvent
               ? 'rgba(217,70,239,0.75)'
-              : 'transparent',
+              : secondaryTheme
+                ? 'transparent'
+                : theme.accent,
         boxShadow: isFail
           ? undefined
           : entry.is_unobtainable
@@ -124,18 +127,15 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
               : secondaryTheme
                 ? `0 14px 30px ${theme.secondary}44, inset -1px 0 0 ${secondaryTheme.secondary}44`
                 : `0 14px 30px ${theme.secondary}44`,
-        backgroundImage: secondaryTheme
-          ? `linear-gradient(90deg, color-mix(in srgb, ${theme.primary} 14%, transparent) 0%, color-mix(in srgb, ${theme.primary} 14%, transparent) 50%, color-mix(in srgb, ${secondaryTheme.primary} 14%, transparent) 50%, color-mix(in srgb, ${secondaryTheme.primary} 14%, transparent) 100%)`
-          : undefined,
         background: secondaryTheme
-          ? `linear-gradient(90deg, ${theme.primary}95 0%, ${theme.primary}95 50%, ${secondaryTheme.primary}95 50%, ${secondaryTheme.primary}95 100%),
-             linear-gradient(90deg, color-mix(in srgb, ${theme.primary} 14%, transparent) 0%, color-mix(in srgb, ${theme.primary} 14%, transparent) 50%, color-mix(in srgb, ${secondaryTheme.primary} 14%, transparent) 50%, color-mix(in srgb, ${secondaryTheme.primary} 14%, transparent) 100%)`
-          : undefined,
+          ? `linear-gradient(90deg, ${theme.primary} 0%, ${theme.primary} 50%, ${secondaryTheme.primary} 50%, ${secondaryTheme.primary} 100%)`
+          : `linear-gradient(145deg, ${theme.primary} 0%, ${theme.secondary} 38%, #111 100%)`,
         border: secondaryTheme
-          ? `2px solid transparent`
+          ? '2px solid transparent'
           : undefined,
-        backgroundOrigin: secondaryTheme ? 'border-box' : undefined,
-        backgroundClip: secondaryTheme ? 'padding-box, border-box' : undefined,
+        borderImage: secondaryTheme
+          ? `linear-gradient(90deg, ${theme.accent} 0%, ${theme.accent} 50%, ${secondaryTheme.accent} 50%, ${secondaryTheme.accent} 100%) 1`
+          : undefined,
       }}
     >
       {isEvent && (
