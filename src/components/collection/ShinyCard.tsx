@@ -114,19 +114,28 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
             ? '#f59e0b'
             : isEvent
               ? 'rgba(217,70,239,0.75)'
-              : secondaryTheme
-                ? `color-mix(in srgb, ${theme.primary} 50%, ${secondaryTheme.primary} 50%)`
-                : `${theme.primary}95`,
+              : 'transparent',
         boxShadow: isFail
           ? undefined
           : entry.is_unobtainable
             ? undefined
             : applyBlackEffect
               ? `0 16px 36px color-mix(in srgb, #191f3f, ${theme.secondary} 55%), inset 0 1px 0 rgba(255,255,255,0.06)`
-              : `0 14px 30px ${theme.secondary}44`,
+              : secondaryTheme
+                ? `0 14px 30px ${theme.secondary}44, inset -1px 0 0 ${secondaryTheme.secondary}44`
+                : `0 14px 30px ${theme.secondary}44`,
         backgroundImage: secondaryTheme
           ? `linear-gradient(90deg, color-mix(in srgb, ${theme.primary} 14%, transparent) 0%, color-mix(in srgb, ${theme.primary} 14%, transparent) 50%, color-mix(in srgb, ${secondaryTheme.primary} 14%, transparent) 50%, color-mix(in srgb, ${secondaryTheme.primary} 14%, transparent) 100%)`
           : undefined,
+        background: secondaryTheme
+          ? `linear-gradient(90deg, ${theme.primary}95 0%, ${theme.primary}95 50%, ${secondaryTheme.primary}95 50%, ${secondaryTheme.primary}95 100%),
+             linear-gradient(90deg, color-mix(in srgb, ${theme.primary} 14%, transparent) 0%, color-mix(in srgb, ${theme.primary} 14%, transparent) 50%, color-mix(in srgb, ${secondaryTheme.primary} 14%, transparent) 50%, color-mix(in srgb, ${secondaryTheme.primary} 14%, transparent) 100%)`
+          : undefined,
+        border: secondaryTheme
+          ? `2px solid transparent`
+          : undefined,
+        backgroundOrigin: secondaryTheme ? 'border-box' : undefined,
+        backgroundClip: secondaryTheme ? 'padding-box, border-box' : undefined,
       }}
     >
       {isEvent && (
@@ -139,13 +148,30 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
         <div
           className="absolute inset-0 z-0"
           style={{
-            background: `radial-gradient(circle at 50% 30%, ${theme.secondary} 0%, #111 58%, ${theme.primary} 100%)`,
+            background: secondaryTheme
+              ? `linear-gradient(90deg, 
+                   radial-gradient(circle at 25% 30%, ${theme.secondary} 0%, #111 58%, ${theme.primary} 100%) 0%, 
+                   radial-gradient(circle at 25% 30%, ${theme.secondary} 0%, #111 58%, ${theme.primary} 100%) 50%,
+                   radial-gradient(circle at 75% 30%, ${secondaryTheme.secondary} 0%, #111 58%, ${secondaryTheme.primary} 100%) 50%,
+                   radial-gradient(circle at 75% 30%, ${secondaryTheme.secondary} 0%, #111 58%, ${secondaryTheme.primary} 100%) 100%)`
+              : `radial-gradient(circle at 50% 30%, ${theme.secondary} 0%, #111 58%, ${theme.primary} 100%)`,
           }}
         />
         <div
           className="absolute inset-0 z-0 opacity-45"
           style={{
-            background: `radial-gradient(circle at 22% 18%, ${theme.accent}, transparent 42%), radial-gradient(circle at 78% 78%, ${theme.primary}, transparent 52%)`,
+            background: secondaryTheme
+              ? `linear-gradient(90deg, 
+                   radial-gradient(circle at 22% 18%, ${theme.accent}, transparent 42%), 
+                   radial-gradient(circle at 22% 18%, ${theme.accent}, transparent 42%) 50%,
+                   radial-gradient(circle at 78% 18%, ${secondaryTheme.accent}, transparent 42%),
+                   radial-gradient(circle at 78% 18%, ${secondaryTheme.accent}, transparent 42%) 50%),
+                   linear-gradient(90deg, 
+                   radial-gradient(circle at 22% 78%, ${theme.primary}, transparent 52%) 0%,
+                   radial-gradient(circle at 22% 78%, ${theme.primary}, transparent 52%) 50%,
+                   radial-gradient(circle at 78% 78%, ${secondaryTheme.primary}, transparent 52%) 50%,
+                   radial-gradient(circle at 78% 78%, ${secondaryTheme.primary}, transparent 52%) 100%)`
+              : `radial-gradient(circle at 22% 18%, ${theme.accent}, transparent 42%), radial-gradient(circle at 78% 78%, ${theme.primary}, transparent 52%)`,
           }}
         />
         {applyBlackEffect && (
