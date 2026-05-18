@@ -44,6 +44,10 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
     if (isEvent) return false;
     const raw = (entry.method || '').toString().trim().toLowerCase();
     const rawGame = (entry.game || '').toString().trim().toLowerCase();
+    const formSlug = (entry.form || '').toString().trim().toLowerCase();
+
+    // Allow encounters box for this special form even when saved from Pokédex details (method/game "unknown").
+    if (formSlug === 'dudunsparce-three-segment') return true;
     // Keep form-only saves (from Pokédex details) clean: they use method/game "unknown"
     // and should not show the encounters box.
     if (raw === 'unknown' || rawGame === 'unknown') return false;
@@ -59,7 +63,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
       raw !== 'gen9-outbreak-sandwich' &&
       raw !== 'outbreak + sandwich lv3'
     );
-  }, [entry.method, entry.game, isEvent]);
+  }, [entry.method, entry.game, entry.form, isEvent]);
 
   const spriteUrl = useMemo(() => {
     const spriteSlug = entry.form || spriteName || entry.pokemon_name;
