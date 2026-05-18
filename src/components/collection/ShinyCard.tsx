@@ -44,13 +44,10 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
     if (isEvent) return false;
     const raw = (entry.method || '').toString().trim().toLowerCase();
     const rawGame = (entry.game || '').toString().trim().toLowerCase();
-    
-    // Special case: Always show encounters for Dudunsparce and Maushold
-    const specialPokemonIds = [982, 925]; // Dudunsparce, Maushold
-    if (specialPokemonIds.includes(entry.pokemon_id)) {
-      return !isEvent;
-    }
-    
+    // Keep form-only saves (from Pokédex details) clean: they use method/game "unknown"
+    // and should not show the encounters box.
+    if (raw === 'unknown' || rawGame === 'unknown') return false;
+
     return (
       !(raw === 'gen9-random' && (rawGame === 'scarlet' || rawGame === 'violet')) &&
       raw !== 'gen9-tera-raid' &&
@@ -62,7 +59,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
       raw !== 'gen9-outbreak-sandwich' &&
       raw !== 'outbreak + sandwich lv3'
     );
-  }, [entry.method, entry.game, entry.pokemon_id, isEvent]);
+  }, [entry.method, entry.game, isEvent]);
 
   const spriteUrl = useMemo(() => {
     const spriteSlug = entry.form || spriteName || entry.pokemon_name;
