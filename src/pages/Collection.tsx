@@ -182,6 +182,16 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
     return m;
   }, [pokemon]);
 
+  const pokemonByBaseId = useMemo(() => {
+    const m = new Map<number, any[]>();
+    pokemon.forEach((p) => {
+      const baseId = typeof p.baseId === 'number' ? p.baseId : p.id;
+      if (!m.has(baseId)) m.set(baseId, []);
+      m.get(baseId)!.push(p);
+    });
+    return m;
+  }, [pokemon]);
+
   const resolveEntryPokemon = (entry: CaughtShinyRow) => {
     const formAliases: Record<string, string> = {
       // Gen 9 special forms: older saves / localized labels
@@ -190,6 +200,11 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
       'maushold-family-of-three': 'maushold-family-of-three',
       'dudunsparce-trisegmento': 'dudunsparce-three-segment',
       'dudunsparce-three-segment': 'dudunsparce-three-segment',
+    };
+
+    const preferredBaseForms: Record<number, string> = {
+      925: 'maushold-family-of-three',
+      982: 'dudunsparce-three-segment',
     };
 
     const formSlug = normalize(entry.form);
@@ -213,8 +228,19 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
       if (byDisplay) return byDisplay;
     }
 
+    // Fallback: for some species the saved `pokemon_id` is the base form id (e.g. Maushold/Dudunsparce),
+    // but we want to resolve a preferred variant when no explicit form is stored.
+    const baseCandidates = pokemonByBaseId.get(entry.pokemon_id) || [];
+    if (!formSlug && baseCandidates.length > 0) {
+      const preferredName = preferredBaseForms[entry.pokemon_id];
+      if (preferredName) {
+        const preferred = baseCandidates.find((p) => p.name === preferredName);
+        if (preferred) return preferred;
+      }
+    }
+
     const candidates = pokemonById.get(entry.pokemon_id) || [];
-    if (candidates.length === 0) return undefined;
+    if (candidates.length === 0) return baseCandidates[0];
     if (candidates.length === 1) return candidates[0];
 
     const byDisplay = candidates.find((p) => normalize(p.displayName) === nameSlug);
