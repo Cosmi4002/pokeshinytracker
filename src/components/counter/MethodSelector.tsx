@@ -15,7 +15,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { HUNTING_METHODS, HuntingMethod } from '@/lib/pokemon-data';
+import { findHuntingMethod, HUNTING_METHODS, HuntingMethod } from '@/lib/pokemon-data';
 
 interface MethodSelectorProps {
   value: string;
@@ -37,7 +37,7 @@ export function MethodSelector({ value, onChange }: MethodSelectorProps) {
   }, []);
 
   const selectedMethod = useMemo(() => {
-    return HUNTING_METHODS.find((m) => m.id === value);
+    return findHuntingMethod(value);
   }, [value]);
 
   const filteredMethodsByGen = useMemo(() => {

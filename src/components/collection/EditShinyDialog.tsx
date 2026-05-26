@@ -23,7 +23,7 @@ import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
 import { PokemonSelector } from '@/components/counter/PokemonSelector';
 import { MethodSelector } from '@/components/counter/MethodSelector';
-import { POKEBALLS, GAMES, GIGAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, supportsGigamaxMark } from '@/lib/pokemon-data';
+import { POKEBALLS, GAMES, GIGAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, findHuntingMethod, supportsGigamaxMark } from '@/lib/pokemon-data';
 import { usePokemonDetails, usePokemonList, formatPokemonName, MANUAL_VARIETIES } from '@/hooks/use-pokemon';
 import { getPokemonSpriteUrl } from '@/lib/pokemon-data';
 import { GenderSelector } from '@/components/ui/GenderSelector';
@@ -171,7 +171,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
       setPokeball(entry.pokeball ?? 'pokeball');
       setGame(entry.game);
       setSecondaryGame((entry as any).secondary_game ?? '');
-      const m = HUNTING_METHODS.find((x) => x.id === entry.method) ?? HUNTING_METHODS[0];
+      const m = findHuntingMethod(entry.method) ?? HUNTING_METHODS[0];
       setMethod(m);
       setAttempts(entry.attempts ?? 1);
       setHuntStartDate(entry.hunt_start_date ?? '');

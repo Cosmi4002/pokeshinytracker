@@ -24,7 +24,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
-import { POKEBALLS, GAMES, GIGAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, getPokemonSpriteUrl, supportsGigamaxMark } from '@/lib/pokemon-data';
+import { POKEBALLS, GAMES, GIGAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, findHuntingMethod, getPokemonSpriteUrl, supportsGigamaxMark } from '@/lib/pokemon-data';
 import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
 import { MethodSelector } from '@/components/counter/MethodSelector';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -64,7 +64,7 @@ export function FinishHuntDialog({
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  const initialMethod = HUNTING_METHODS.find((m) => m.id === initialMethodId) ?? HUNTING_METHODS[0];
+  const initialMethod = findHuntingMethod(initialMethodId) ?? HUNTING_METHODS[0];
 
   const [form, setForm] = useState(initialForm);
   const [gender, setGender] = useState<string>(initialGender);

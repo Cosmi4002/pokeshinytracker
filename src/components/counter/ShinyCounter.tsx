@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { PokemonSelector } from './PokemonSelector';
 import { MethodSelector } from './MethodSelector';
-import { calculateShinyStats, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, getGameSpecificSpriteUrl } from '@/lib/pokemon-data';
+import { calculateShinyStats, findHuntingMethod, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, getGameSpecificSpriteUrl } from '@/lib/pokemon-data';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
 import { FinishHuntDialog } from './FinishHuntDialog';
@@ -139,7 +139,7 @@ export function ShinyCounter({
           setIncrementHotkey(data.increment_hotkey ?? '');
           setSelectedPokemonId(data.pokemon_id ?? null);
           setSelectedPokemonName(data.pokemon_name ?? '');
-          setSelectedMethod(HUNTING_METHODS.find((m) => m.id === data.method) ?? HUNTING_METHODS[0]);
+          setSelectedMethod(findHuntingMethod(data.method) ?? HUNTING_METHODS[0]);
           setHasShinyCharm(data.has_shiny_charm ?? false);
           setSelectedForm(data.form ?? '');
           setSelectedGender(data.gender ?? '');

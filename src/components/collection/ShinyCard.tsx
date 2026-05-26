@@ -1,7 +1,7 @@
 import { Pencil, Trash2, Calendar, ArrowUpCircle, Crosshair, Sparkles, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getGameTheme, GAME_LOGOS, type GameTheme } from '@/lib/game-themes';
-import { GIGAMAX_ICON, POKEBALLS, HUNTING_METHODS, getPokemonSpriteUrl, supportsGigamaxMark } from '@/lib/pokemon-data';
+import { GIGAMAX_ICON, POKEBALLS, findHuntingMethod, getPokemonSpriteUrl, supportsGigamaxMark } from '@/lib/pokemon-data';
 import type { Tables } from '@/integrations/supabase/types';
 import { useMemo, useCallback } from 'react';
 import { cn } from '@/lib/utils';
@@ -44,7 +44,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
     return g ? secondaryThemeOverride || getGameTheme(g) : null;
   }, [(entry as any).secondary_game, secondaryThemeOverride]);
   const pokeball = useMemo(() => POKEBALLS.find((b) => b.id === entry.pokeball), [entry.pokeball]);
-  const method = useMemo(() => HUNTING_METHODS.find((m) => m.id === entry.method), [entry.method]);
+  const method = useMemo(() => findHuntingMethod(entry.method), [entry.method]);
   const showEncounters = useMemo(() => {
     if (isEvent) return false;
     const raw = (entry.method || '').toString().trim().toLowerCase();
@@ -414,7 +414,9 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                 }}
               >
                 {isEvent && <Sparkles className="w-3 h-3 mr-1.5" />}
-                {isEvent ? 'Distribution / Event' : method.name}
+                {isEvent ? 'Distribution / Event' : method.name === 'Random Encounter' && (entry.method || '').toString().trim().toLowerCase().includes('safari')
+                  ? 'Safari Zone'
+                  : method.name}
               </div>
             </div>
           )}

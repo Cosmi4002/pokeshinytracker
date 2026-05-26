@@ -25,9 +25,33 @@ export interface HuntingMethod {
   description?: string;
 }
 
+const METHOD_ALIASES: Record<string, string> = {
+  'safari zone': 'gen2-safari',
+  'safari zone encounters': 'gen2-safari',
+  'random encounters (safari zone)': 'gen2-safari',
+};
+
+export const normalizeHuntingMethodValue = (value?: string | null) =>
+  (value || '').toString().trim().toLowerCase();
+
+export const findHuntingMethod = (value?: string | null): HuntingMethod | undefined => {
+  const normalized = normalizeHuntingMethodValue(value);
+  if (!normalized) return undefined;
+
+  return HUNTING_METHODS.find((method) => {
+    const normalizedId = normalizeHuntingMethodValue(method.id);
+    const normalizedName = normalizeHuntingMethodValue(method.name);
+    return (
+      normalizedId === normalized ||
+      normalizedName === normalized ||
+      METHOD_ALIASES[normalized] === method.id
+    );
+  });
+};
+
 // Helper to calculate odds based on method mechanics
 export const getDynamicOdds = (methodId: string, encounters: number, hasShinyCharm: boolean): number => {
-  const method = HUNTING_METHODS.find(m => m.id === methodId);
+  const method = findHuntingMethod(methodId);
   if (!method) return 4096;
 
   const charmRolls = hasShinyCharm ? 2 : 0;

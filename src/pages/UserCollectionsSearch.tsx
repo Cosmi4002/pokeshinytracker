@@ -72,7 +72,7 @@ export default function UserCollectionsSearch() {
   const formatMethodLabel = (method?: string | null) => {
     if (isDistributionEvent(method)) return 'Distribution / Event';
     const raw = normalizeMethod(method);
-    if (raw === 'safari zone') return 'Safari Zone Encounters';
+    if (raw === 'safari zone' || raw === 'random encounters (safari zone)') return 'Safari Zone';
     return method || '-';
   };
 
