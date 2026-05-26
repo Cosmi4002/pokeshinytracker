@@ -28,6 +28,7 @@ export interface HuntingMethod {
 const METHOD_ALIASES: Record<string, string> = {
   'safari zone': 'gen2-safari',
   'safari zone encounters': 'gen2-safari',
+  'random encounter (safari zone)': 'gen2-safari',
   'random encounters (safari zone)': 'gen2-safari',
 };
 
@@ -172,7 +173,7 @@ export const HUNTING_METHODS: HuntingMethod[] = [
   { id: 'gen2-odd-egg', name: 'Odd Egg', baseOdds: 128, generation: 2, supportsShinyCharm: false },
   { id: 'gen2-random', name: 'Random Encounter', baseOdds: 8192, generation: 2, supportsShinyCharm: false },
   { id: 'gen2-roaming', name: 'Roaming Encounter', baseOdds: 8192, generation: 2, supportsShinyCharm: false },
-  { id: 'gen2-safari', name: 'Safari Zone', baseOdds: 8192, generation: 2, supportsShinyCharm: false },
+  { id: 'gen2-safari', name: 'Random Encounter (Safari Zone)', baseOdds: 8192, generation: 2, supportsShinyCharm: false },
   { id: 'gen2-soft-reset', name: 'Soft Reset', baseOdds: 8192, generation: 2, supportsShinyCharm: false },
 
   // --- Gen 3 ---
@@ -183,7 +184,7 @@ export const HUNTING_METHODS: HuntingMethod[] = [
   { id: 'gen3-random', name: 'Random Encounter', baseOdds: 8192, generation: 3, supportsShinyCharm: false },
   { id: 'gen3-roaming', name: 'Roaming', baseOdds: 8192, generation: 3, supportsShinyCharm: false },
   { id: 'gen3-runaway', name: 'Runaway', baseOdds: 8192, generation: 3, supportsShinyCharm: false },
-  { id: 'gen3-safari', name: 'Safari Zone', baseOdds: 8192, generation: 3, supportsShinyCharm: false },
+  { id: 'gen3-safari', name: 'Random Encounter (Safari Zone)', baseOdds: 8192, generation: 3, supportsShinyCharm: false },
   { id: 'gen3-soft-reset', name: 'Soft Reset', baseOdds: 8192, generation: 3, supportsShinyCharm: false },
 
   // --- Gen 4 ---
@@ -199,7 +200,7 @@ export const HUNTING_METHODS: HuntingMethod[] = [
   { id: 'gen4-random', name: 'Random Encounter', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
   { id: 'gen4-roaming', name: 'Roaming', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
   { id: 'gen4-runaway', name: 'Runaway', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
-  { id: 'gen4-safari', name: 'Safari Zone', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
+  { id: 'gen4-safari', name: 'Random Encounter (Safari Zone)', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
   { id: 'gen4-soft-reset', name: 'Soft Reset', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
 
   // --- Gen 5 ---

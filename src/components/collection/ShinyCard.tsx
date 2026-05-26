@@ -417,7 +417,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
               >
                 {isEvent && <Sparkles className="w-3 h-3 mr-1.5" />}
                 {isEvent ? 'Distribution / Event' : method.name === 'Random Encounter' && (entry.method || '').toString().trim().toLowerCase().includes('safari')
-                  ? 'Safari Zone'
+                  ? 'Random Encounter (Safari Zone)'
                   : method.name}
               </div>
             </div>
