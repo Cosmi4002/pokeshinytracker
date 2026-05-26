@@ -129,13 +129,10 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                 ? `0 14px 30px ${theme.secondary}44, inset -1px 0 0 ${secondaryTheme!.secondary}44`
                 : `0 14px 30px ${theme.secondary}44`,
         background: hasDualGameTheme
-          ? `linear-gradient(90deg, ${theme.primary} 0%, ${theme.primary} 50%, ${secondaryTheme!.primary} 50%, ${secondaryTheme!.primary} 100%)`
+          ? `linear-gradient(90deg, ${theme.primary} 0%, ${theme.primary} 50%, ${secondaryTheme!.primary} 50%, ${secondaryTheme!.primary} 100%) padding-box, linear-gradient(90deg, ${theme.accent} 0%, ${theme.accent} 50%, ${secondaryTheme!.accent} 50%, ${secondaryTheme!.accent} 100%) border-box`
           : `linear-gradient(145deg, ${theme.primary} 0%, ${theme.secondary} 38%, #111 100%)`,
         border: hasDualGameTheme
           ? '2px solid transparent'
-          : undefined,
-        borderImage: hasDualGameTheme
-          ? `linear-gradient(90deg, ${theme.accent} 0%, ${theme.accent} 50%, ${secondaryTheme!.accent} 50%, ${secondaryTheme!.accent} 100%) 1`
           : undefined,
       }}
     >
