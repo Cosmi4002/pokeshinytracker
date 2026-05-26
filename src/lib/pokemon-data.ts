@@ -166,6 +166,7 @@ export const getDynamicOdds = (methodId: string, encounters: number, hasShinyCha
 export const HUNTING_METHODS: HuntingMethod[] = [
   // --- Gen 2 ---
   { id: 'gen2-breeding-shiny', name: 'Breeding (Shiny Parent)', baseOdds: 64, generation: 2, supportsShinyCharm: false },
+  { id: 'gen2-game-corner', name: 'Game Corner', baseOdds: 8192, generation: 2, supportsShinyCharm: false },
   { id: 'gen2-gift', name: 'Gift Pokémon', baseOdds: 8192, generation: 2, supportsShinyCharm: false },
   { id: 'gen2-headbutt', name: 'Headbutt', baseOdds: 8192, generation: 2, supportsShinyCharm: false },
   { id: 'gen2-odd-egg', name: 'Odd Egg', baseOdds: 128, generation: 2, supportsShinyCharm: false },
@@ -177,6 +178,7 @@ export const HUNTING_METHODS: HuntingMethod[] = [
   // --- Gen 3 ---
   { id: 'gen3-fishing', name: 'Fishing', baseOdds: 8192, generation: 3, supportsShinyCharm: false },
   { id: 'gen3-fossil-restore', name: 'Fossil Restore', baseOdds: 8192, generation: 3, supportsShinyCharm: false },
+  { id: 'gen3-game-corner', name: 'Game Corner', baseOdds: 8192, generation: 3, supportsShinyCharm: false },
   { id: 'gen3-gift', name: 'Gift Pokémon', baseOdds: 8192, generation: 3, supportsShinyCharm: false },
   { id: 'gen3-random', name: 'Random Encounter', baseOdds: 8192, generation: 3, supportsShinyCharm: false },
   { id: 'gen3-roaming', name: 'Roaming', baseOdds: 8192, generation: 3, supportsShinyCharm: false },
@@ -188,6 +190,7 @@ export const HUNTING_METHODS: HuntingMethod[] = [
   { id: 'gen4-double-encounter', name: 'Double Encounter', baseOdds: 4096, generation: 4, supportsShinyCharm: false },
   { id: 'gen4-fishing', name: 'Fishing', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
   { id: 'gen4-fossil-restore', name: 'Fossil Restore', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
+  { id: 'gen4-game-corner', name: 'Game Corner', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
   { id: 'gen4-gift', name: 'Gift Pokémon', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
   { id: 'gen4-headbutt', name: 'Headbutt', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
   { id: 'gen4-honey-tree', name: 'Honey Tree', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
