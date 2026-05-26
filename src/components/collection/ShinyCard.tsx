@@ -81,6 +81,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   }, [entry.pokemon_id, entry.pokemon_name, entry.form, entry.gender, spriteName]);
 
   const displayName = entry.pokemon_name;
+  const hasDualGameTheme = Boolean(secondaryTheme);
   const evolvedFromSpriteUrl = useMemo(() => {
     if (!isEvolved || !evolvedFromId) return '';
     const byName = getPokemonSpriteUrl(evolvedFromId, {
@@ -124,17 +125,17 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
             ? undefined
             : applyBlackEffect
               ? `0 16px 36px color-mix(in srgb, #191f3f, ${theme.secondary} 55%), inset 0 1px 0 rgba(255,255,255,0.06)`
-              : secondaryTheme
-                ? `0 14px 30px ${theme.secondary}44, inset -1px 0 0 ${secondaryTheme.secondary}44`
+              : hasDualGameTheme
+                ? `0 14px 30px ${theme.secondary}44, inset -1px 0 0 ${secondaryTheme!.secondary}44`
                 : `0 14px 30px ${theme.secondary}44`,
-        background: secondaryTheme
-          ? `linear-gradient(90deg, ${theme.primary} 0%, ${theme.primary} 50%, ${secondaryTheme.primary} 50%, ${secondaryTheme.primary} 100%)`
+        background: hasDualGameTheme
+          ? `linear-gradient(90deg, ${theme.primary} 0%, ${theme.primary} 50%, ${secondaryTheme!.primary} 50%, ${secondaryTheme!.primary} 100%)`
           : `linear-gradient(145deg, ${theme.primary} 0%, ${theme.secondary} 38%, #111 100%)`,
-        border: secondaryTheme
+        border: hasDualGameTheme
           ? '2px solid transparent'
           : undefined,
-        borderImage: secondaryTheme
-          ? `linear-gradient(90deg, ${theme.accent} 0%, ${theme.accent} 50%, ${secondaryTheme.accent} 50%, ${secondaryTheme.accent} 100%) 1`
+        borderImage: hasDualGameTheme
+          ? `linear-gradient(90deg, ${theme.accent} 0%, ${theme.accent} 50%, ${secondaryTheme!.accent} 50%, ${secondaryTheme!.accent} 100%) 1`
           : undefined,
       }}
     >
@@ -145,35 +146,54 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
         </div>
       )}
       <div className="relative w-full h-40 sm:h-44 overflow-hidden bg-black/40">
-        <div
-          className="absolute inset-0 z-0"
-          style={{
-            background: secondaryTheme
-              ? `linear-gradient(90deg, 
-                   radial-gradient(circle at 25% 30%, ${theme.secondary} 0%, #111 58%, ${theme.primary} 100%) 0%, 
-                   radial-gradient(circle at 25% 30%, ${theme.secondary} 0%, #111 58%, ${theme.primary} 100%) 50%,
-                   radial-gradient(circle at 75% 30%, ${secondaryTheme.secondary} 0%, #111 58%, ${secondaryTheme.primary} 100%) 50%,
-                   radial-gradient(circle at 75% 30%, ${secondaryTheme.secondary} 0%, #111 58%, ${secondaryTheme.primary} 100%) 100%)`
-              : `radial-gradient(circle at 50% 30%, ${theme.secondary} 0%, #111 58%, ${theme.primary} 100%)`,
-          }}
-        />
-        <div
-          className="absolute inset-0 z-0 opacity-45"
-          style={{
-            background: secondaryTheme
-              ? `linear-gradient(90deg, 
-                   radial-gradient(circle at 22% 18%, ${theme.accent}, transparent 42%), 
-                   radial-gradient(circle at 22% 18%, ${theme.accent}, transparent 42%) 50%,
-                   radial-gradient(circle at 78% 18%, ${secondaryTheme.accent}, transparent 42%),
-                   radial-gradient(circle at 78% 18%, ${secondaryTheme.accent}, transparent 42%) 50%),
-                   linear-gradient(90deg, 
-                   radial-gradient(circle at 22% 78%, ${theme.primary}, transparent 52%) 0%,
-                   radial-gradient(circle at 22% 78%, ${theme.primary}, transparent 52%) 50%,
-                   radial-gradient(circle at 78% 78%, ${secondaryTheme.primary}, transparent 52%) 50%,
-                   radial-gradient(circle at 78% 78%, ${secondaryTheme.primary}, transparent 52%) 100%)`
-              : `radial-gradient(circle at 22% 18%, ${theme.accent}, transparent 42%), radial-gradient(circle at 78% 78%, ${theme.primary}, transparent 52%)`,
-          }}
-        />
+        {hasDualGameTheme ? (
+          <>
+            <div className="absolute inset-y-0 left-0 z-0 w-1/2">
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: `radial-gradient(circle at 50% 30%, ${theme.secondary} 0%, #111 58%, ${theme.primary} 100%)`,
+                }}
+              />
+              <div
+                className="absolute inset-0 opacity-45"
+                style={{
+                  background: `radial-gradient(circle at 35% 18%, ${theme.accent}, transparent 42%), radial-gradient(circle at 65% 78%, ${theme.primary}, transparent 52%)`,
+                }}
+              />
+            </div>
+            <div className="absolute inset-y-0 right-0 z-0 w-1/2">
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: `radial-gradient(circle at 50% 30%, ${secondaryTheme!.secondary} 0%, #111 58%, ${secondaryTheme!.primary} 100%)`,
+                }}
+              />
+              <div
+                className="absolute inset-0 opacity-45"
+                style={{
+                  background: `radial-gradient(circle at 35% 18%, ${secondaryTheme!.accent}, transparent 42%), radial-gradient(circle at 65% 78%, ${secondaryTheme!.primary}, transparent 52%)`,
+                }}
+              />
+            </div>
+            <div className="absolute inset-y-0 left-1/2 z-[1] w-px -translate-x-1/2 bg-white/12" />
+          </>
+        ) : (
+          <>
+            <div
+              className="absolute inset-0 z-0"
+              style={{
+                background: `radial-gradient(circle at 50% 30%, ${theme.secondary} 0%, #111 58%, ${theme.primary} 100%)`,
+              }}
+            />
+            <div
+              className="absolute inset-0 z-0 opacity-45"
+              style={{
+                background: `radial-gradient(circle at 22% 18%, ${theme.accent}, transparent 42%), radial-gradient(circle at 78% 78%, ${theme.primary}, transparent 52%)`,
+              }}
+            />
+          </>
+        )}
         {applyBlackEffect && (
           <div
             className="absolute inset-0 z-0 opacity-65"
@@ -297,8 +317,14 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
         style={{
           background: applyBlackEffect
             ? `linear-gradient(180deg, color-mix(in srgb, #0b0b0d 62%, ${theme.secondary}) 0%, color-mix(in srgb, #131831 55%, ${theme.primary}) 100%)`
-            : `linear-gradient(180deg, color-mix(in srgb, ${theme.secondary} 34%, #141414) 0%, color-mix(in srgb, ${theme.primary} 28%, #121212) 100%)`,
-          borderTopColor: `${theme.accent}66`,
+            : hasDualGameTheme
+              ? `linear-gradient(90deg,
+                  color-mix(in srgb, ${theme.secondary} 34%, #141414) 0%,
+                  color-mix(in srgb, ${theme.primary} 28%, #121212) 50%,
+                  color-mix(in srgb, ${secondaryTheme!.secondary} 34%, #141414) 50%,
+                  color-mix(in srgb, ${secondaryTheme!.primary} 28%, #121212) 100%)`
+              : `linear-gradient(180deg, color-mix(in srgb, ${theme.secondary} 34%, #141414) 0%, color-mix(in srgb, ${theme.primary} 28%, #121212) 100%)`,
+          borderTopColor: hasDualGameTheme ? 'rgba(255,255,255,0.1)' : `${theme.accent}66`,
         }}
       >
         <div className="space-y-2.5">
