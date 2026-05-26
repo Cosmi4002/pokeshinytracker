@@ -82,6 +82,34 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
 
   const displayName = entry.pokemon_name;
   const hasDualGameTheme = Boolean(secondaryTheme);
+  const dualThemeRootBackground = hasDualGameTheme
+    ? `
+      radial-gradient(120% 140% at 14% 18%, color-mix(in srgb, ${theme.accent} 68%, transparent) 0%, transparent 44%),
+      radial-gradient(120% 140% at 86% 22%, color-mix(in srgb, ${secondaryTheme!.accent} 68%, transparent) 0%, transparent 46%),
+      radial-gradient(150% 120% at 18% 78%, color-mix(in srgb, ${theme.primary} 72%, #111) 0%, transparent 52%),
+      radial-gradient(150% 120% at 82% 82%, color-mix(in srgb, ${secondaryTheme!.primary} 72%, #111) 0%, transparent 52%),
+      linear-gradient(135deg, color-mix(in srgb, ${theme.secondary} 72%, #090909) 0%, color-mix(in srgb, #111 52%, ${theme.primary}) 38%, color-mix(in srgb, #111 48%, ${secondaryTheme!.primary}) 62%, color-mix(in srgb, ${secondaryTheme!.secondary} 72%, #090909) 100%)
+    `
+    : null;
+  const dualThemeBorderBackground = hasDualGameTheme
+    ? `linear-gradient(135deg, ${theme.accent} 0%, color-mix(in srgb, ${theme.primary} 58%, ${secondaryTheme!.accent}) 34%, color-mix(in srgb, ${secondaryTheme!.primary} 58%, ${theme.accent}) 66%, ${secondaryTheme!.accent} 100%)`
+    : null;
+  const dualThemeHeroBackground = hasDualGameTheme
+    ? `
+      radial-gradient(95% 90% at 24% 30%, ${theme.secondary} 0%, transparent 60%),
+      radial-gradient(95% 90% at 76% 30%, ${secondaryTheme!.secondary} 0%, transparent 60%),
+      radial-gradient(80% 90% at 20% 82%, color-mix(in srgb, ${theme.primary} 72%, transparent) 0%, transparent 58%),
+      radial-gradient(80% 90% at 80% 82%, color-mix(in srgb, ${secondaryTheme!.primary} 72%, transparent) 0%, transparent 58%),
+      linear-gradient(120deg, rgba(8,8,10,0.96) 0%, rgba(16,16,20,0.78) 28%, rgba(24,24,30,0.52) 50%, rgba(16,16,20,0.78) 72%, rgba(8,8,10,0.96) 100%)
+    `
+    : null;
+  const dualThemeContentBackground = hasDualGameTheme
+    ? `
+      radial-gradient(120% 140% at 12% 0%, color-mix(in srgb, ${theme.primary} 20%, transparent) 0%, transparent 48%),
+      radial-gradient(120% 140% at 88% 6%, color-mix(in srgb, ${secondaryTheme!.primary} 20%, transparent) 0%, transparent 48%),
+      linear-gradient(155deg, rgba(18,18,20,0.9) 0%, rgba(20,20,24,0.84) 48%, rgba(18,18,20,0.92) 100%)
+    `
+    : null;
   const evolvedFromSpriteUrl = useMemo(() => {
     if (!isEvolved || !evolvedFromId) return '';
     const byName = getPokemonSpriteUrl(evolvedFromId, {
@@ -129,7 +157,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                 ? `0 14px 30px ${theme.secondary}44, inset -1px 0 0 ${secondaryTheme!.secondary}44`
                 : `0 14px 30px ${theme.secondary}44`,
         background: hasDualGameTheme
-          ? `linear-gradient(90deg, ${theme.primary} 0%, ${theme.primary} 50%, ${secondaryTheme!.primary} 50%, ${secondaryTheme!.primary} 100%) padding-box, linear-gradient(90deg, ${theme.accent} 0%, ${theme.accent} 50%, ${secondaryTheme!.accent} 50%, ${secondaryTheme!.accent} 100%) border-box`
+          ? `${dualThemeRootBackground} padding-box, ${dualThemeBorderBackground} border-box`
           : `linear-gradient(145deg, ${theme.primary} 0%, ${theme.secondary} 38%, #111 100%)`,
         border: hasDualGameTheme
           ? '2px solid transparent'
@@ -144,37 +172,12 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
       )}
       <div className="relative w-full h-40 sm:h-44 overflow-hidden bg-black/40">
         {hasDualGameTheme ? (
-          <>
-            <div className="absolute inset-y-0 left-0 z-0 w-1/2">
-              <div
-                className="absolute inset-0"
-                style={{
-                  background: `radial-gradient(circle at 50% 30%, ${theme.secondary} 0%, #111 58%, ${theme.primary} 100%)`,
-                }}
-              />
-              <div
-                className="absolute inset-0 opacity-45"
-                style={{
-                  background: `radial-gradient(circle at 35% 18%, ${theme.accent}, transparent 42%), radial-gradient(circle at 65% 78%, ${theme.primary}, transparent 52%)`,
-                }}
-              />
-            </div>
-            <div className="absolute inset-y-0 right-0 z-0 w-1/2">
-              <div
-                className="absolute inset-0"
-                style={{
-                  background: `radial-gradient(circle at 50% 30%, ${secondaryTheme!.secondary} 0%, #111 58%, ${secondaryTheme!.primary} 100%)`,
-                }}
-              />
-              <div
-                className="absolute inset-0 opacity-45"
-                style={{
-                  background: `radial-gradient(circle at 35% 18%, ${secondaryTheme!.accent}, transparent 42%), radial-gradient(circle at 65% 78%, ${secondaryTheme!.primary}, transparent 52%)`,
-                }}
-              />
-            </div>
-            <div className="absolute inset-y-0 left-1/2 z-[1] w-px -translate-x-1/2 bg-white/12" />
-          </>
+          <div
+            className="absolute inset-0 z-0"
+            style={{
+              background: dualThemeHeroBackground!,
+            }}
+          />
         ) : (
           <>
             <div
@@ -204,7 +207,11 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
         <div className="absolute inset-0 flex items-center justify-center z-10 p-2">
           <div
             className="absolute bottom-6 w-24 h-6 blur-xl opacity-60 rounded-[100%]"
-            style={{ background: `radial-gradient(ellipse at center, ${theme.primary}, transparent 70%)` }}
+            style={{
+              background: hasDualGameTheme
+                ? `radial-gradient(ellipse at center, color-mix(in srgb, ${theme.primary} 55%, ${secondaryTheme!.primary}) 0%, transparent 72%)`
+                : `radial-gradient(ellipse at center, ${theme.primary}, transparent 70%)`,
+            }}
           />
           <div className="h-28 w-28 sm:h-32 sm:w-32 flex items-center justify-center">
             <img
@@ -315,13 +322,11 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
           background: applyBlackEffect
             ? `linear-gradient(180deg, color-mix(in srgb, #0b0b0d 62%, ${theme.secondary}) 0%, color-mix(in srgb, #131831 55%, ${theme.primary}) 100%)`
             : hasDualGameTheme
-              ? `linear-gradient(90deg,
-                  color-mix(in srgb, ${theme.secondary} 34%, #141414) 0%,
-                  color-mix(in srgb, ${theme.primary} 28%, #121212) 50%,
-                  color-mix(in srgb, ${secondaryTheme!.secondary} 34%, #141414) 50%,
-                  color-mix(in srgb, ${secondaryTheme!.primary} 28%, #121212) 100%)`
+              ? dualThemeContentBackground!
               : `linear-gradient(180deg, color-mix(in srgb, ${theme.secondary} 34%, #141414) 0%, color-mix(in srgb, ${theme.primary} 28%, #121212) 100%)`,
-          borderTopColor: hasDualGameTheme ? 'rgba(255,255,255,0.1)' : `${theme.accent}66`,
+          borderTopColor: hasDualGameTheme
+            ? `color-mix(in srgb, ${theme.accent} 42%, ${secondaryTheme!.accent})`
+            : `${theme.accent}66`,
         }}
       >
         <div className="space-y-2.5">
@@ -423,8 +428,12 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
               <div
                 className="rounded-lg p-2 border shadow-lg"
                 style={{
-                  background: `linear-gradient(145deg, color-mix(in srgb, ${theme.secondary} 48%, #101010), color-mix(in srgb, ${theme.primary} 42%, #0f0f0f))`,
-                  borderColor: `${theme.accent}66`,
+                  background: hasDualGameTheme
+                    ? `linear-gradient(145deg, color-mix(in srgb, ${theme.secondary} 34%, rgba(16,16,16,0.96)), color-mix(in srgb, ${secondaryTheme!.primary} 26%, rgba(12,12,12,0.94)))`
+                    : `linear-gradient(145deg, color-mix(in srgb, ${theme.secondary} 48%, #101010), color-mix(in srgb, ${theme.primary} 42%, #0f0f0f))`,
+                  borderColor: hasDualGameTheme
+                    ? `color-mix(in srgb, ${theme.accent} 44%, ${secondaryTheme!.accent})`
+                    : `${theme.accent}66`,
                 }}
               >
                 <div className="flex items-center gap-1 mb-1.5">
@@ -451,8 +460,12 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                 <div
                   className="rounded-lg p-2 border shadow-lg flex flex-col"
                   style={{
-                    background: `linear-gradient(145deg, color-mix(in srgb, ${theme.primary} 46%, #101010), color-mix(in srgb, ${theme.secondary} 38%, #0f0f0f))`,
-                    borderColor: `${theme.accent}66`,
+                    background: hasDualGameTheme
+                      ? `linear-gradient(145deg, color-mix(in srgb, ${theme.primary} 30%, rgba(14,14,14,0.96)), color-mix(in srgb, ${secondaryTheme!.secondary} 30%, rgba(10,10,10,0.94)))`
+                      : `linear-gradient(145deg, color-mix(in srgb, ${theme.primary} 46%, #101010), color-mix(in srgb, ${theme.secondary} 38%, #0f0f0f))`,
+                    borderColor: hasDualGameTheme
+                      ? `color-mix(in srgb, ${theme.accent} 44%, ${secondaryTheme!.accent})`
+                      : `${theme.accent}66`,
                   }}
                 >
                   <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em] block mb-1.5">Encounters</span>
@@ -466,9 +479,15 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                       <span
                         className="text-[9px] font-black uppercase tracking-[0.12em] px-1.5 py-0.5 rounded border"
                         style={{
-                          color: theme.accent,
-                          backgroundColor: `color-mix(in srgb, ${theme.accent} 20%, #0d0d0d)`,
-                          borderColor: `${theme.accent}88`,
+                          color: hasDualGameTheme
+                            ? `color-mix(in srgb, ${theme.accent} 55%, ${secondaryTheme!.accent})`
+                            : theme.accent,
+                          backgroundColor: hasDualGameTheme
+                            ? `color-mix(in srgb, ${theme.accent} 14%, color-mix(in srgb, ${secondaryTheme!.accent} 14%, #0d0d0d))`
+                            : `color-mix(in srgb, ${theme.accent} 20%, #0d0d0d)`,
+                          borderColor: hasDualGameTheme
+                            ? `color-mix(in srgb, ${theme.accent} 50%, ${secondaryTheme!.accent})`
+                            : `${theme.accent}88`,
                         }}
                       >
                         PHASE #{entry.phase_number}
