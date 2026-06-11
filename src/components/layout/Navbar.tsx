@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ThemeCustomizer } from '@/components/layout/ThemeCustomizer';
 import { useRandomColor } from '@/lib/random-color-context';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { trainerAvatars } from '@/lib/trainer-avatars';
@@ -29,6 +29,10 @@ export function Navbar() {
   const { toast } = useToast();
   const [profileUsername, setProfileUsername] = useState<string | null>(null);
   const [selectedAvatarId, setSelectedAvatarId] = useState<(typeof trainerAvatars)[number]['id']>('red');
+  const [avatarOrderIds, setAvatarOrderIds] = useState<Array<(typeof trainerAvatars)[number]['id']>>(
+    () => trainerAvatars.map((avatar) => avatar.id)
+  );
+  const [draggedAvatarId, setDraggedAvatarId] = useState<(typeof trainerAvatars)[number]['id'] | null>(null);
 
   const navLinks = [
     { to: '/counter', label: 'Counter', icon: Calculator },
@@ -45,8 +49,38 @@ export function Navbar() {
   }, [user?.user_metadata]);
 
   const displayUsername = profileUsername || metadataUsername;
+  const orderedTrainerAvatars = useMemo(() => {
+    const avatarById = new Map(trainerAvatars.map((avatar) => [avatar.id, avatar]));
+    const ordered = avatarOrderIds
+      .map((id) => avatarById.get(id))
+      .filter((avatar): avatar is (typeof trainerAvatars)[number] => Boolean(avatar));
+    const orderedIds = new Set(ordered.map((avatar) => avatar.id));
+    return [
+      ...ordered,
+      ...trainerAvatars.filter((avatar) => !orderedIds.has(avatar.id)),
+    ];
+  }, [avatarOrderIds]);
   const selectedAvatar =
     trainerAvatars.find((avatar) => avatar.id === selectedAvatarId) ?? trainerAvatars[0];
+
+  const handleAvatarDrop = useCallback((targetAvatarId: (typeof trainerAvatars)[number]['id']) => {
+    if (!draggedAvatarId || draggedAvatarId === targetAvatarId) return;
+
+    setAvatarOrderIds((currentOrder) => {
+      const avatarIds = trainerAvatars.map((avatar) => avatar.id);
+      const currentIds = currentOrder.filter((id) => avatarIds.includes(id));
+      const missingIds = avatarIds.filter((id) => !currentIds.includes(id));
+      const nextOrder = [...currentIds, ...missingIds];
+      const fromIndex = nextOrder.indexOf(draggedAvatarId);
+      const toIndex = nextOrder.indexOf(targetAvatarId);
+
+      if (fromIndex === -1 || toIndex === -1) return currentOrder;
+
+      const [movedAvatarId] = nextOrder.splice(fromIndex, 1);
+      nextOrder.splice(toIndex, 0, movedAvatarId);
+      return nextOrder;
+    });
+  }, [draggedAvatarId]);
 
   const handleSetUsername = async () => {
     if (!user) return;
@@ -102,6 +136,7 @@ export function Navbar() {
   useEffect(() => {
     if (!user) {
       setSelectedAvatarId('red');
+      setAvatarOrderIds(trainerAvatars.map((avatar) => avatar.id));
       return;
     }
 
@@ -109,12 +144,33 @@ export function Navbar() {
     const stored = window.localStorage.getItem(storageKey);
     const exists = trainerAvatars.some((avatar) => avatar.id === stored);
     setSelectedAvatarId(exists ? (stored as (typeof trainerAvatars)[number]['id']) : 'red');
+
+    const orderStorageKey = `trainer-avatar-order-${user.id}`;
+    const storedOrder = window.localStorage.getItem(orderStorageKey);
+    try {
+      const parsedOrder = JSON.parse(storedOrder || '[]');
+      const avatarIds = trainerAvatars.map((avatar) => avatar.id);
+      const safeOrder = Array.isArray(parsedOrder)
+        ? parsedOrder.filter((id): id is (typeof trainerAvatars)[number]['id'] => avatarIds.includes(id))
+        : [];
+      setAvatarOrderIds([
+        ...safeOrder,
+        ...avatarIds.filter((id) => !safeOrder.includes(id)),
+      ]);
+    } catch {
+      setAvatarOrderIds(trainerAvatars.map((avatar) => avatar.id));
+    }
   }, [user?.id]);
 
   useEffect(() => {
     if (!user) return;
     window.localStorage.setItem(`trainer-avatar-${user.id}`, selectedAvatarId);
   }, [selectedAvatarId, user?.id]);
+
+  useEffect(() => {
+    if (!user) return;
+    window.localStorage.setItem(`trainer-avatar-order-${user.id}`, JSON.stringify(avatarOrderIds));
+  }, [avatarOrderIds, user?.id]);
 
   useEffect(() => {
     let active = true;
@@ -230,18 +286,38 @@ export function Navbar() {
                   </DropdownMenuSubTrigger>
                   <DropdownMenuSubContent className="w-[92vw] max-w-sm p-3 max-h-[70vh] overflow-y-auto">
                     <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
-                      {trainerAvatars.map((avatar) => (
-                        <DropdownMenuItem
+                      {orderedTrainerAvatars.map((avatar) => (
+                        <button
+                          type="button"
                           key={avatar.id}
+                          draggable
                           onClick={() => setSelectedAvatarId(avatar.id)}
+                          onDragStart={(event) => {
+                            setDraggedAvatarId(avatar.id);
+                            event.dataTransfer.effectAllowed = 'move';
+                            event.dataTransfer.setData('text/plain', avatar.id);
+                          }}
+                          onDragOver={(event) => {
+                            event.preventDefault();
+                            event.dataTransfer.dropEffect = 'move';
+                          }}
+                          onDrop={(event) => {
+                            event.preventDefault();
+                            handleAvatarDrop(avatar.id);
+                            setDraggedAvatarId(null);
+                          }}
+                          onDragEnd={() => setDraggedAvatarId(null)}
                           className="p-0 focus:bg-transparent"
+                          aria-label={`Seleziona o trascina ${avatar.label}`}
                         >
                           <span
                             className={cn(
-                              'flex h-14 w-14 items-center justify-center overflow-hidden rounded-xl border-2 bg-gradient-to-br from-white/30 to-white/10 shadow-[0_4px_10px_rgba(0,0,0,0.15)] transition-all',
+                              'flex h-14 w-14 cursor-grab items-center justify-center overflow-hidden rounded-xl border-2 bg-gradient-to-br from-white/30 to-white/10 shadow-[0_4px_10px_rgba(0,0,0,0.15)] transition-all active:cursor-grabbing',
                               selectedAvatarId === avatar.id
                                 ? 'border-primary ring-1 ring-primary/60'
-                                : 'border-border hover:border-primary/60'
+                                : draggedAvatarId === avatar.id
+                                  ? 'border-primary/80 opacity-60'
+                                  : 'border-border hover:border-primary/60'
                             )}
                           >
                             <img
@@ -252,7 +328,7 @@ export function Navbar() {
                               onError={(e) => ((e.currentTarget as HTMLImageElement).src = '/placeholder.svg')}
                             />
                           </span>
-                        </DropdownMenuItem>
+                        </button>
                       ))}
                     </div>
                   </DropdownMenuSubContent>
