@@ -476,7 +476,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                   <div className="flex-1 flex items-center justify-center rounded-md bg-black/25 px-1.5 py-2">
                     {isMasuda && (
                       <img
-                        src="/img/items/pokemon-egg.svg"
+                        src="https://archives.bulbagarden.net/media/upload/2/26/Egg.png"
                         alt="Pokemon egg"
                         className="mr-2 h-6 w-6 sm:h-7 sm:w-7 object-contain drop-shadow-[0_2px_6px_rgba(0,0,0,0.55)]"
                         onError={(e) => ((e.currentTarget as HTMLImageElement).src = '/placeholder.svg')}
