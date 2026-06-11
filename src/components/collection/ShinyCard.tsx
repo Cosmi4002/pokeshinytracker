@@ -479,13 +479,13 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                         <img
                           src="https://archives.bulbagarden.net/media/upload/2/26/Egg.png"
                           alt="Pokemon egg"
-                          className="h-12 w-12 sm:h-14 sm:w-14 shrink-0 object-contain drop-shadow-[0_2px_6px_rgba(0,0,0,0.55)]"
+                          className="h-16 w-16 sm:h-18 sm:w-18 shrink-0 object-contain drop-shadow-[0_2px_6px_rgba(0,0,0,0.55)]"
                           onError={(e) => ((e.currentTarget as HTMLImageElement).src = '/placeholder.svg')}
                         />
                       </span>
                     )}
                     <span className={cn(
-                      "font-black tabular-nums tracking-tight text-white leading-none text-[2.15rem] sm:text-[2.35rem]",
+                      "font-black tabular-nums tracking-tight text-white leading-none text-2xl sm:text-[1.75rem]",
                       isMasuda && "mx-auto"
                     )}>
                       {entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-'}
