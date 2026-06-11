@@ -49,4 +49,7 @@ export const trainerAvatars = [
   { id: 'hop', label: 'Hop', src: 'https://play.pokemonshowdown.com/sprites/trainers/hop.png' },
   { id: 'ballguy', label: 'Ball Guy', src: 'https://play.pokemonshowdown.com/sprites/trainers/ballguy.png' },
   { id: 'penny', label: 'Penny', src: 'https://play.pokemonshowdown.com/sprites/trainers/penny.png' },
+  { id: 'marley', label: 'Marley', src: 'https://play.pokemonshowdown.com/sprites/trainers/marley.png' },
+  { id: 'nate', label: 'Nate', src: 'https://play.pokemonshowdown.com/sprites/trainers/nate.png' },
+  { id: 'rosa', label: 'Rosa', src: 'https://play.pokemonshowdown.com/sprites/trainers/rosa.png' },
 ] as const;
