@@ -14,7 +14,7 @@ export const trainerAvatars = [
   { id: 'calem', label: 'Calem', src: 'https://play.pokemonshowdown.com/sprites/trainers/calem.png' },
   { id: 'serena', label: 'Serena', src: 'https://play.pokemonshowdown.com/sprites/trainers/serena.png' },
   { id: 'leaf-gen3', label: 'Leaf', src: 'https://play.pokemonshowdown.com/sprites/trainers/leaf-gen3.png' },
-  { id: 'kris-gen2', label: 'Kris', src: 'https://play.pokemonshowdown.com/sprites/trainers/kris-gen2.png' },
+  { id: 'volkner', label: 'Volkner', src: 'https://play.pokemonshowdown.com/sprites/trainers/volkner.png' },
   { id: 'cynthia', label: 'Cynthia', src: 'https://play.pokemonshowdown.com/sprites/trainers/cynthia.png' },
   { id: 'silver', label: 'Silver', src: 'https://play.pokemonshowdown.com/sprites/trainers/silver.png' },
   { id: 'steven', label: 'Steven', src: 'https://play.pokemonshowdown.com/sprites/trainers/steven.png' },

@@ -475,7 +475,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                   </span>
                   <div className="flex-1 flex items-center justify-center rounded-md bg-black/25 px-1.5 py-2 relative">
                     {isMasuda && (
-                      <span className="absolute left-2 top-1/2 -translate-y-1/2 flex items-center justify-center">
+                      <span className="absolute left-1 top-1/2 -translate-y-1/2 flex items-center justify-center">
                         <img
                           src="https://archives.bulbagarden.net/media/upload/2/26/Egg.png"
                           alt="Pokemon egg"
