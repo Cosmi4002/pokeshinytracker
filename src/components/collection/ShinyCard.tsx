@@ -473,16 +473,21 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                   <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em] block mb-1.5">
                     {isMasuda ? 'Hatched' : 'Encounters'}
                   </span>
-                  <div className="flex-1 flex items-center justify-center rounded-md bg-black/25 px-1.5 py-2 gap-2">
+                  <div className="flex-1 flex items-center justify-center rounded-md bg-black/25 px-1.5 py-2">
                     {isMasuda && (
-                      <img
-                        src="https://archives.bulbagarden.net/media/upload/2/26/Egg.png"
-                        alt="Pokemon egg"
-                        className="h-[1.05em] w-[1.05em] sm:h-[1.15em] sm:w-[1.15em] shrink-0 object-contain drop-shadow-[0_2px_6px_rgba(0,0,0,0.55)]"
-                        onError={(e) => ((e.currentTarget as HTMLImageElement).src = '/placeholder.svg')}
-                      />
+                      <span className="mr-1.5 flex h-full items-center justify-center">
+                        <img
+                          src="https://archives.bulbagarden.net/media/upload/2/26/Egg.png"
+                          alt="Pokemon egg"
+                          className="h-8 w-8 sm:h-9 sm:w-9 shrink-0 object-contain align-middle drop-shadow-[0_2px_6px_rgba(0,0,0,0.55)]"
+                          onError={(e) => ((e.currentTarget as HTMLImageElement).src = '/placeholder.svg')}
+                        />
+                      </span>
                     )}
-                    <span className="text-2xl sm:text-[1.75rem] font-black tabular-nums tracking-tight text-white leading-none">
+                    <span className={cn(
+                      "font-black tabular-nums tracking-tight text-white leading-none text-2xl sm:text-[1.75rem]",
+                      isMasuda && "translate-y-[1px]"
+                    )}>
                       {entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-'}
                     </span>
                   </div>
