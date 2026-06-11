@@ -196,14 +196,17 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
     const formAliases: Record<string, string> = {
       // Gen 9 special forms: older saves / localized labels
       'maushold-famiglia-da-tre': 'maushold-family-of-three',
+      'maushold-famiglia-da-quattro': 'maushold-family-of-four',
       'maushold-family-of-3': 'maushold-family-of-three',
+      'maushold-family-of-4': 'maushold-family-of-four',
       'maushold-family-of-three': 'maushold-family-of-three',
+      'maushold-family-of-four': 'maushold-family-of-four',
       'dudunsparce-trisegmento': 'dudunsparce-three-segment',
       'dudunsparce-three-segment': 'dudunsparce-three-segment',
     };
 
     const preferredBaseForms: Record<number, string> = {
-      925: 'maushold-family-of-three',
+      925: 'maushold-family-of-four',
       982: 'dudunsparce-three-segment',
     };
 

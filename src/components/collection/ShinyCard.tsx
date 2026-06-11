@@ -76,7 +76,12 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   const spriteUrl = useMemo(() => {
     const rawForm = (entry.form || '').toString().trim().toLowerCase();
     const rawName = (entry.pokemon_name || '').toString().trim().toLowerCase();
-    if (rawForm === 'maushold-family-of-four' || rawName === 'maushold-family-of-four') {
+    const rawSpriteName = (spriteName || '').toString().trim().toLowerCase();
+    if (
+      rawForm === 'maushold-family-of-four' ||
+      rawName === 'maushold-family-of-four' ||
+      rawSpriteName === 'maushold-family-of-four'
+    ) {
       return 'https://img.pokemondb.net/sprites/home/shiny/maushold-family4.png';
     }
     const spriteSlug = entry.form || spriteName || entry.pokemon_name;
