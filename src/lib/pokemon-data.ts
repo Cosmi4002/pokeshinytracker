@@ -527,7 +527,7 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
   }
 
   // Gen 9 Form Overrides
-  if (name && name.toLowerCase().includes('maushold-family-of-three')) {
+  if (name && (name.toLowerCase().includes('maushold-family-of-three') || name.toLowerCase().includes('maushold-family-of-four'))) {
     return 'https://www.pokepedia.fr/images/3/3e/Sprite_0925_Trois_chromatique_HOME.png';
   }
   if (name && name.toLowerCase().includes('dudunsparce-three-segment')) {
