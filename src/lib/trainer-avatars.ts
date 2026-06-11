@@ -37,7 +37,7 @@ export const trainerAvatars = [
   { id: 'barry', label: 'Barry', src: 'https://play.pokemonshowdown.com/sprites/trainers/barry.png' },
   { id: 'bianca', label: 'Bianca', src: 'https://play.pokemonshowdown.com/sprites/trainers/bianca.png' },
   { id: 'bede', label: 'Bede', src: 'https://play.pokemonshowdown.com/sprites/trainers/bede.png' },
-  { id: 'ballguy', label: 'Ball Guy', src: 'https://play.pokemonshowdown.com/sprites/trainers/ballguy.png' },
+  { id: 'ghetsis', label: 'Ghetsis', src: 'https://play.pokemonshowdown.com/sprites/trainers/ghetsis.png' },
   { id: 'cheren', label: 'Cheren', src: 'https://play.pokemonshowdown.com/sprites/trainers/cheren.png' },
   { id: 'diantha', label: 'Diantha', src: 'https://play.pokemonshowdown.com/sprites/trainers/diantha.png' },
   { id: 'florian-s', label: 'Florian', src: 'https://play.pokemonshowdown.com/sprites/trainers/florian-s.png' },
@@ -48,5 +48,6 @@ export const trainerAvatars = [
   { id: 'bede', label: 'Bede', src: 'https://play.pokemonshowdown.com/sprites/trainers/bede.png' },
   { id: 'hop', label: 'Hop', src: 'https://play.pokemonshowdown.com/sprites/trainers/hop.png' },
   { id: 'ballguy', label: 'Ball Guy', src: 'https://play.pokemonshowdown.com/sprites/trainers/ballguy.png' },
+  { id: 'ghetsis', label: 'Ghetsis', src: 'https://play.pokemonshowdown.com/sprites/trainers/ghetsis.png' },
   { id: 'penny', label: 'Penny', src: 'https://play.pokemonshowdown.com/sprites/trainers/penny.png' },
 ] as const;
