@@ -74,10 +74,15 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   }, [entry.method, entry.game, entry.form, isEvent, normalizedMethod]);
 
   const spriteUrl = useMemo(() => {
-    const spriteSlug = entry.form || spriteName || entry.pokemon_name;
+    const formSlug = (entry.form || '').toString().trim().toLowerCase();
+    const spriteSlug =
+      formSlug === 'maushold-family-of-four'
+        ? 'maushold-family-of-four'
+        : entry.form || spriteName || entry.pokemon_name;
     return getPokemonSpriteUrl(entry.pokemon_id, {
       shiny: true,
       name: spriteSlug,
+      form: formSlug === 'maushold-family-of-four' ? 'family-of-four' : undefined,
       female: entry.gender === 'female',
     });
   }, [entry.pokemon_id, entry.pokemon_name, entry.form, entry.gender, spriteName]);
