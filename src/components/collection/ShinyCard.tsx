@@ -485,7 +485,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                       </span>
                     )}
                     <span className={cn(
-                      "font-black tabular-nums tracking-tight text-white leading-none text-[1.6rem] sm:text-[1.35rem]",
+                      "font-black tabular-nums tracking-tight text-white leading-none text-[1.7rem] sm:text-[1.45rem]",
                       isMasuda && "mx-auto"
                     )}>
                       {entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-'}
