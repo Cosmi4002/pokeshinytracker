@@ -84,7 +84,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
       name: spriteSlug,
       form: formSlug === 'maushold-family-of-four' ? 'family-of-four' : undefined,
       female: entry.gender === 'female',
-    });
+    }) || (formSlug === 'maushold-family-of-four' ? 'https://img.pokemondb.net/sprites/home/shiny/maushold-family4.png' : '');
   }, [entry.pokemon_id, entry.pokemon_name, entry.form, entry.gender, spriteName]);
 
   const displayName = entry.pokemon_name;
