@@ -475,17 +475,17 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                   </span>
                   <div className="flex-1 flex items-center justify-center rounded-md bg-black/25 px-1.5 py-2 relative">
                     {isMasuda && (
-                      <span className="absolute left-1 top-1/2 -translate-y-1/2 flex items-center justify-center">
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center justify-center">
                         <img
                           src="https://archives.bulbagarden.net/media/upload/2/26/Egg.png"
                           alt="Pokemon egg"
-                          className="h-16 w-16 sm:h-18 sm:w-18 shrink-0 object-contain drop-shadow-[0_2px_6px_rgba(0,0,0,0.55)]"
+                          className="h-16 w-16 sm:h-18 sm:w-18 shrink-0 object-contain drop-shadow-[0_2px_6px_rgba(0,0,0,0.55)] -translate-x-1"
                           onError={(e) => ((e.currentTarget as HTMLImageElement).src = '/placeholder.svg')}
                         />
                       </span>
                     )}
                     <span className={cn(
-                      "font-black tabular-nums tracking-tight text-white leading-none text-[1.85rem] sm:text-[1.55rem]",
+                      "font-black tabular-nums tracking-tight text-white leading-none text-[1.7rem] sm:text-[1.45rem]",
                       isMasuda && "mx-auto"
                     )}>
                       {entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-'}
