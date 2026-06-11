@@ -35,6 +35,8 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   const isEvolved = entry.is_evolved === true;
   const isGigamax = entry.is_gigamax === true && supportsGigamaxMark(entry.game);
   const isEvent = (entry.method || '').toString().trim().toLowerCase() === 'distribution/event';
+  const normalizedMethod = (entry.method || '').toString().trim().toLowerCase();
+  const isMasuda = normalizedMethod.includes('masuda');
   const evolvedFromId = (entry as any).evolved_from_id as number | null | undefined;
   const evolvedFromName = (entry as any).evolved_from_name as string | null | undefined;
 
@@ -47,7 +49,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   const method = useMemo(() => findHuntingMethod(entry.method), [entry.method]);
   const showEncounters = useMemo(() => {
     if (isEvent) return false;
-    const raw = (entry.method || '').toString().trim().toLowerCase();
+    const raw = normalizedMethod;
     const rawGame = (entry.game || '').toString().trim().toLowerCase();
     const formSlug = (entry.form || '').toString().trim().toLowerCase();
 
@@ -69,7 +71,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
       raw !== 'gen9-outbreak-sandwich' &&
       raw !== 'outbreak + sandwich lv3'
     );
-  }, [entry.method, entry.game, entry.form, isEvent]);
+  }, [entry.method, entry.game, entry.form, isEvent, normalizedMethod]);
 
   const spriteUrl = useMemo(() => {
     const spriteSlug = entry.form || spriteName || entry.pokemon_name;
@@ -468,8 +470,18 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                       : `${theme.accent}66`,
                   }}
                 >
-                  <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em] block mb-1.5">Encounters</span>
+                  <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em] block mb-1.5">
+                    {isMasuda ? 'Hatched' : 'Encounters'}
+                  </span>
                   <div className="flex-1 flex items-center justify-center rounded-md bg-black/25 px-1.5 py-2">
+                    {isMasuda && (
+                      <img
+                        src="/img/items/pokemon-egg.svg"
+                        alt="Pokemon egg"
+                        className="mr-2 h-6 w-6 sm:h-7 sm:w-7 object-contain drop-shadow-[0_2px_6px_rgba(0,0,0,0.55)]"
+                        onError={(e) => ((e.currentTarget as HTMLImageElement).src = '/placeholder.svg')}
+                      />
+                    )}
                     <span className="text-2xl sm:text-[1.75rem] font-black tabular-nums tracking-tight text-white leading-none">
                       {entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-'}
                     </span>
