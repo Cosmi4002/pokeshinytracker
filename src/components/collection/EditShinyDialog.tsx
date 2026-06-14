@@ -434,7 +434,14 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
 
           {game === 'pla' && (
             <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
-              <Label>Alpha Pokemon</Label>
+              <div className="flex items-center gap-2">
+                <img
+                  src="https://archives.bulbagarden.net/media/upload/4/4b/Alpha_icon.png"
+                  alt="Alpha Pokemon"
+                  className="h-5 w-5 object-contain"
+                />
+                <Label>Alpha Pokemon</Label>
+              </div>
               <Switch checked={isLegendsArceus} onCheckedChange={setIsLegendsArceus} />
             </div>
           )}
