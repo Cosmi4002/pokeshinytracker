@@ -107,6 +107,7 @@ export type Database = {
           is_evolved: boolean
           is_fail: boolean
           is_gigamax: boolean
+          is_legends_arceus: boolean | null
           is_unobtainable: boolean
           method: string
           notes: string | null
@@ -135,6 +136,7 @@ export type Database = {
           is_evolved?: boolean
           is_fail?: boolean
           is_gigamax?: boolean
+          is_legends_arceus?: boolean | null
           is_unobtainable?: boolean
           method: string
           notes?: string | null
@@ -165,6 +167,7 @@ export type Database = {
           is_evolved?: boolean
           is_fail?: boolean
           is_gigamax?: boolean
+          is_legends_arceus?: boolean | null
           is_unobtainable?: boolean
           method?: string
           notes?: string | null

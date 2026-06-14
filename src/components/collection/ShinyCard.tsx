@@ -34,6 +34,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   const isFail = entry.is_fail === true;
   const isEvolved = entry.is_evolved === true;
   const isGigamax = entry.is_gigamax === true && supportsGigamaxMark(entry.game);
+  const isLegendsArceus = entry.is_legends_arceus === true;
   const isEvent = (entry.method || '').toString().trim().toLowerCase() === 'distribution/event';
   const normalizedMethod = (entry.method || '').toString().trim().toLowerCase();
   const isMasuda = normalizedMethod.includes('masuda');
@@ -584,6 +585,17 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                       decoding="async"
                       className="w-7 h-7 object-contain drop-shadow-[0_0_8px_rgba(244,114,182,0.5)]"
                       alt="Gigamax"
+                    />
+                  </div>
+                )}
+                {isLegendsArceus && (
+                  <div className="flex items-center" title="Leggende Arceus">
+                    <img
+                      src="https://archives.bulbagarden.net/media/upload/4/4b/Alpha_icon.png"
+                      loading="lazy"
+                      decoding="async"
+                      className="w-7 h-7 object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.35)]"
+                      alt="Leggende Arceus"
                     />
                   </div>
                 )}

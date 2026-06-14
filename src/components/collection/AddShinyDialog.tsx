@@ -57,6 +57,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
   const [caughtDate, setCaughtDate] = useState(todayLocalISODate());
   const [isFail, setIsFail] = useState(false);
   const [isGigamax, setIsGigamax] = useState(false);
+  const [isLegendsArceus, setIsLegendsArceus] = useState(false);
   const [isUnobtainable, setIsUnobtainable] = useState(false);
   const [phaseNumber, setPhaseNumber] = useState<number | null>(null);
   const [showTotal, setShowTotal] = useState(false);
@@ -134,6 +135,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
     setCaughtDate(todayLocalISODate());
     setIsFail(false);
     setIsGigamax(false);
+    setIsLegendsArceus(false);
     setIsUnobtainable(false);
     setPhaseNumber(null);
     setPlaylistId('');
@@ -180,6 +182,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
         caught_date: caughtDate,
         is_fail: isFail,
         is_gigamax: isGigamax,
+        is_legends_arceus: isLegendsArceus,
         is_unobtainable: isUnobtainable,
         phase_number: phaseNumber,
         show_total: showTotal,
@@ -364,6 +367,11 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
               <Switch checked={isGigamax} onCheckedChange={setIsGigamax} />
             </div>
           )}
+
+          <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
+            <Label>Leggende Arceus</Label>
+            <Switch checked={isLegendsArceus} onCheckedChange={setIsLegendsArceus} />
+          </div>
 
           {/* 6. Metodo */}
           <div className="space-y-2">

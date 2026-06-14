@@ -61,6 +61,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
   const [caughtDate, setCaughtDate] = useState(todayLocalISODate());
   const [isFail, setIsFail] = useState(false);
   const [isGigamax, setIsGigamax] = useState(false);
+  const [isLegendsArceus, setIsLegendsArceus] = useState(false);
   const [isUnobtainable, setIsUnobtainable] = useState(false);
   const [phaseNumber, setPhaseNumber] = useState<number | null>(null);
   const [showTotal, setShowTotal] = useState(false);
@@ -178,6 +179,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
       setCaughtDate(entry.caught_date ?? todayLocalISODate());
       setIsFail(entry.is_fail ?? false);
       setIsGigamax(entry.is_gigamax ?? false);
+      setIsLegendsArceus((entry as any).is_legends_arceus ?? false);
       setIsUnobtainable(entry.is_unobtainable ?? false);
       setPhaseNumber(entry.phase_number ?? null);
       setShowTotal(entry.show_total ?? false);
@@ -235,6 +237,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
           caught_date: caughtDate,
           is_fail: isFail,
           is_gigamax: isGigamax,
+          is_legends_arceus: isLegendsArceus,
           is_unobtainable: isUnobtainable,
           phase_number: phaseNumber,
           show_total: showTotal,
@@ -422,6 +425,11 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
               <Switch checked={isGigamax} onCheckedChange={setIsGigamax} />
             </div>
           )}
+
+          <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
+            <Label>Leggende Arceus</Label>
+            <Switch checked={isLegendsArceus} onCheckedChange={setIsLegendsArceus} />
+          </div>
 
           {/* 8. Metodo */}
           <div className="space-y-2">
