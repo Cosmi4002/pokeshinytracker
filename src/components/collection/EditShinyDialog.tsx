@@ -195,6 +195,12 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
     }
   }, [canMarkGigamax]);
 
+  useEffect(() => {
+    if (game !== 'pla' && isLegendsArceus) {
+      setIsLegendsArceus(false);
+    }
+  }, [game, isLegendsArceus]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!entry || !user) return;
@@ -426,10 +432,12 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
             </div>
           )}
 
-          <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
-            <Label>Leggende Arceus</Label>
-            <Switch checked={isLegendsArceus} onCheckedChange={setIsLegendsArceus} />
-          </div>
+          {game === 'pla' && (
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
+              <Label>Alpha Pokemon</Label>
+              <Switch checked={isLegendsArceus} onCheckedChange={setIsLegendsArceus} />
+            </div>
+          )}
 
           {/* 8. Metodo */}
           <div className="space-y-2">

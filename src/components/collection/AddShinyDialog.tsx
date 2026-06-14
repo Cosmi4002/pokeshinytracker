@@ -78,6 +78,12 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
     }
   }, [canMarkGigamax]);
 
+  useEffect(() => {
+    if (game !== 'pla' && isLegendsArceus) {
+      setIsLegendsArceus(false);
+    }
+  }, [game, isLegendsArceus]);
+
   // Build form/variant options exactly like counter/pokedex details (forms + varieties).
   const formOptions = useMemo(() => {
     if (!pokemonDetails) return [];
@@ -368,10 +374,12 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
             </div>
           )}
 
-          <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
-            <Label>Leggende Arceus</Label>
-            <Switch checked={isLegendsArceus} onCheckedChange={setIsLegendsArceus} />
-          </div>
+          {game === 'pla' && (
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
+              <Label>Alpha Pokemon</Label>
+              <Switch checked={isLegendsArceus} onCheckedChange={setIsLegendsArceus} />
+            </div>
+          )}
 
           {/* 6. Metodo */}
           <div className="space-y-2">

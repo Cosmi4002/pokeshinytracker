@@ -589,13 +589,13 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                   </div>
                 )}
                 {isLegendsArceus && (
-                  <div className="flex items-center" title="Leggende Arceus">
+                  <div className="flex items-center" title="Alpha Pokemon">
                     <img
                       src="https://archives.bulbagarden.net/media/upload/4/4b/Alpha_icon.png"
                       loading="lazy"
                       decoding="async"
                       className="w-7 h-7 object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.35)]"
-                      alt="Leggende Arceus"
+                      alt="Alpha Pokemon"
                     />
                   </div>
                 )}
