@@ -181,6 +181,11 @@ export const GAME_THEMES: Record<string, GameTheme> = {
     secondary: '#2C7A7B',
     accent: '#81E6D9',
   },
+  za: {
+    primary: '#7A4DFF',
+    secondary: '#2E1A78',
+    accent: '#D8C6FF',
+  },
 
   // Gen 9
   scarlet: {
@@ -244,6 +249,7 @@ export const GAME_ICONS: Record<string, string> = {
   brilliantdiamond: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/brilliant-diamond.png',
   shiningpearl: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/shining-pearl.png',
   pla: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/legends-arceus.png',
+  za: 'https://imguscdn.gamespress.com/cdn/files/PokemonAmerica/2024/02/271239-f7fd5623/Pokemon_Legends_Z-A_Logo_png_jpgcopy.jpg?otf=y&lightbox=y&sky=3f3031c1dc35f727e8e20916afda7e2c526d7843cb609d2fa6bc95d4aaedc636&w=1024&maxheight=4096&mode=pad&format=jpg',
   // Gen 9
   scarlet: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/scarlet.png',
   violet: 'https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/violet.png',
@@ -289,6 +295,7 @@ export const GAME_COVER_ART: Record<string, string> = {
   brilliantdiamond: 'https://img.pokemondb.net/boxes/brilliant-diamond.jpg',
   shiningpearl: 'https://img.pokemondb.net/boxes/shining-pearl.jpg',
   pla: 'https://img.pokemondb.net/boxes/legends-arceus.jpg',
+  za: 'https://imguscdn.gamespress.com/cdn/files/PokemonAmerica/2024/02/271239-f7fd5623/Pokemon_Legends_Z-A_Logo_png_jpgcopy.jpg?otf=y&lightbox=y&sky=3f3031c1dc35f727e8e20916afda7e2c526d7843cb609d2fa6bc95d4aaedc636&w=1024&maxheight=4096&mode=pad&format=jpg',
   // Gen 9
   scarlet: 'https://img.pokemondb.net/boxes/scarlet.jpg',
   violet: 'https://img.pokemondb.net/boxes/violet.jpg',
@@ -335,6 +342,7 @@ export const GAME_LOGOS: Record<string, string> = {
   brilliantdiamond: '/img/game-logos/brilliantdiamond.png',
   shiningpearl: '/img/game-logos/shiningpearl.png',
   pla: '/img/game-logos/pla.png',
+  za: 'https://imguscdn.gamespress.com/cdn/files/PokemonAmerica/2024/02/271239-f7fd5623/Pokemon_Legends_Z-A_Logo_png_jpgcopy.jpg?otf=y&lightbox=y&sky=3f3031c1dc35f727e8e20916afda7e2c526d7843cb609d2fa6bc95d4aaedc636&w=1024&maxheight=4096&mode=pad&format=jpg',
   // Gen 9
   scarlet: '/img/game-logos/scarlet.png',
   violet: '/img/game-logos/violet.png',

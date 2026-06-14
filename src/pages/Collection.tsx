@@ -516,7 +516,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">Tutte</SelectItem>
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((gen) => (
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((gen) => (
                         <SelectItem key={gen} value={gen.toString()}>
                           Gen {gen}
                         </SelectItem>
