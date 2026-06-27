@@ -26,30 +26,6 @@ npm run dev
 npm run build
 ```
 
-## 🎮 Come Usare
-
-### Shiny Counter
-1. Seleziona Pokémon e metodo di caccia
-2. Premi + per ogni incontro
-3. Le statistiche si aggiornano in tempo reale!
-
-### Pokédex
-- Tutti gli sprite shiny da Gen 1 a Gen 9
-- Forme regionali e differenze di genere
-- Filtri per generazione
-
-### Collection
-- Salva i tuoi shiny catturati
-- Dettagli completi (tentativi, metodo, pokéball, etc.)
-- Sistema playlist per organizzare
-- **Dati salvati permanentemente nel browser!**
-
-## 🌐 Deploy
-
-Vedi `COME-METTERE-ONLINE.md` per istruzioni dettagliate.
-
-**Consigliato**: Vercel (gratis, deploy in 2 minuti)
-
 ## 🛠️ Tecnologie
 
 - React + TypeScript
