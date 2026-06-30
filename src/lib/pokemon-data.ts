@@ -337,9 +337,9 @@ export const GAMES = [
   { id: 'brilliantdiamond', name: 'Brilliant Diamond', generation: 8 },
   { id: 'shiningpearl', name: 'Shining Pearl', generation: 8 },
   { id: 'pla', name: 'Legends: Arceus', generation: 8 },
-  { id: 'za', name: 'Pokemon Legends Z-A', generation: 10 },
   { id: 'scarlet', name: 'Scarlet', generation: 9 },
   { id: 'violet', name: 'Violet', generation: 9 },
+  { id: 'za', name: 'Pokemon Legends Z-A', generation: 10 },
 ];
 
 // Calculate shiny probability statistics

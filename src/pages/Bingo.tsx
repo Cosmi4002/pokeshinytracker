@@ -65,10 +65,10 @@ const GAMES: Pick<GameCell, 'id' | 'name' | 'generation' | 'logo'>[] = [
   { id: GAME_ID_BASE + 25, name: 'Shield', generation: 8, logo: '/img/game-logos/shield.png' },
   { id: GAME_ID_BASE + 26, name: 'Brilliant Diamond', generation: 8, logo: '/img/game-logos/brilliantdiamond.png' },
   { id: GAME_ID_BASE + 27, name: 'Shining Pearl', generation: 8, logo: '/img/game-logos/shiningpearl.png' },
-  { id: GAME_ID_BASE + 28, name: 'Legends Arceus', generation: 8, logo: '/img/game-logos/pla.png' },
   // Gen 9
   { id: GAME_ID_BASE + 29, name: 'Scarlet', generation: 9, logo: '/img/game-logos/scarlet.png' },
   { id: GAME_ID_BASE + 30, name: 'Violet', generation: 9, logo: '/img/game-logos/violet.png' },
+  { id: GAME_ID_BASE + 28, name: 'Legends Arceus', generation: 8, logo: '/img/game-logos/pla.png' },
 ];
 
 function shuffleInPlace<T>(arr: T[]) {
