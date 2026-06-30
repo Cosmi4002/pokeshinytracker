@@ -69,6 +69,7 @@ const GAMES: Pick<GameCell, 'id' | 'name' | 'generation' | 'logo'>[] = [
   { id: GAME_ID_BASE + 29, name: 'Scarlet', generation: 9, logo: '/img/game-logos/scarlet.png' },
   { id: GAME_ID_BASE + 30, name: 'Violet', generation: 9, logo: '/img/game-logos/violet.png' },
   { id: GAME_ID_BASE + 28, name: 'Legends Arceus', generation: 8, logo: '/img/game-logos/pla.png' },
+  { id: GAME_ID_BASE + 31, name: 'Pokemon Legends Z-A', generation: 10, logo: 'https://archives.bulbagarden.net/media/upload/thumb/f/f7/Pok%C3%A9mon_Legends_Z-A_logo.png/1280px-Pok%C3%A9mon_Legends_Z-A_logo.png' },
 ];
 
 function shuffleInPlace<T>(arr: T[]) {
@@ -834,3 +835,4 @@ export default function Bingo() {
     </div>
   );
 }
+
