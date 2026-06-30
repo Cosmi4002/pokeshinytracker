@@ -196,7 +196,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
   }, [canMarkGigamax]);
 
   useEffect(() => {
-    if (game !== 'pla' && isLegendsArceus) {
+    if (game !== 'pla' && game !== 'za' && isLegendsArceus) {
       setIsLegendsArceus(false);
     }
   }, [game, isLegendsArceus]);
@@ -432,7 +432,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
             </div>
           )}
 
-          {game === 'pla' && (
+          {(game === 'pla' || game === 'za') && (
             <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
               <div className="flex items-center gap-2">
                 <img
@@ -573,4 +573,5 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
     </Dialog>
   );
 }
+
 
