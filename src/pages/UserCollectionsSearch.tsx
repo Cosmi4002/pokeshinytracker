@@ -52,7 +52,8 @@ export default function UserCollectionsSearch() {
     return raw === 'distribution/event' || raw === 'event';
   };
 
-  const shouldShowEncounters = (method?: string | null, game?: string | null) => {
+  const shouldShowEncounters = (method?: string | null, game?: string | null, attempts?: number | null) => {
+    if (attempts === null) return false;
     if (isDistributionEvent(method)) return false;
     const raw = normalizeMethod(method);
     const rawGame = normalizeMethod(game);
@@ -409,7 +410,7 @@ export default function UserCollectionsSearch() {
                                 <p className="text-xs text-muted-foreground">Inizio: {entry.hunt_start_date ? formatDate(entry.hunt_start_date) : '--'}</p>
                               )}
                               <p className="text-xs text-muted-foreground truncate">Metodo: {formatMethodLabel(entry.method)}</p>
-                              {shouldShowEncounters(entry.method, entry.game) ? (
+                              {shouldShowEncounters(entry.method, entry.game, entry.attempts) ? (
                                 <p className="text-xs text-muted-foreground">Encounters: {entry.attempts ?? '-'}</p>
                               ) : null}
                               <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -467,7 +468,7 @@ export default function UserCollectionsSearch() {
                               <p className="text-xs text-muted-foreground">Inizio: {entry.hunt_start_date ? formatDate(entry.hunt_start_date) : '--'}</p>
                             )}
                             <p className="text-xs text-muted-foreground truncate">Metodo: {formatMethodLabel(entry.method)}</p>
-                            {shouldShowEncounters(entry.method, entry.game) ? (
+                            {shouldShowEncounters(entry.method, entry.game, entry.attempts) ? (
                               <p className="text-xs text-muted-foreground">Encounters: {entry.attempts ?? '-'}</p>
                             ) : null}
                             <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -553,7 +554,7 @@ export default function UserCollectionsSearch() {
                                 <p className="text-xs text-muted-foreground">Inizio: {entry.hunt_start_date ? formatDate(entry.hunt_start_date) : '--'}</p>
                               )}
                               <p className="text-xs text-muted-foreground truncate">Metodo: {formatMethodLabel(entry.method)}</p>
-                              {shouldShowEncounters(entry.method, entry.game) ? (
+                              {shouldShowEncounters(entry.method, entry.game, entry.attempts) ? (
                                 <p className="text-xs text-muted-foreground">Encounters: {entry.attempts ?? '-'}</p>
                               ) : null}
                               <div className="flex items-center gap-1 text-xs text-muted-foreground">

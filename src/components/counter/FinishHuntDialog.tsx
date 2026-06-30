@@ -24,7 +24,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
-import { POKEBALLS, GAMES, GIGAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, findHuntingMethod, getPokemonSpriteUrl, supportsGigamaxMark } from '@/lib/pokemon-data';
+import { POKEBALLS, GAMES, GIGAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, canHideEncountersForMethod, findHuntingMethod, getPokemonSpriteUrl, supportsGigamaxMark } from '@/lib/pokemon-data';
 import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
 import { MethodSelector } from '@/components/counter/MethodSelector';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -74,6 +74,7 @@ export function FinishHuntDialog({
   const [method, setMethod] = useState<HuntingMethod>(initialMethod);
   const [attempts, setAttempts] = useState(counter);
   const [attemptsDirty, setAttemptsDirty] = useState(false);
+  const [hideCounterEncounters, setHideCounterEncounters] = useState(false);
   const prevOpenRef = useRef(false);
   const [huntStartDate, setHuntStartDate] = useState(startDate ? startDate.split('T')[0] : '');
   const [caughtDate, setCaughtDate] = useState(todayLocalISODate());
@@ -88,10 +89,11 @@ export function FinishHuntDialog({
 
   const { pokemon: pokemonDetails } = usePokemonDetails(pokemonId);
   const canMarkGigamax = supportsGigamaxMark(game);
+  const canHideCounterEncounters = canHideEncountersForMethod(method.id);
   const shouldShowAttempts = useMemo(() => {
     const id = method.id;
-    return id !== 'gen9-tera-raid' && id !== 'distribution/event' && id !== 'static overworld game gift';
-  }, [method.id]);
+    return !hideCounterEncounters && id !== 'gen9-tera-raid' && id !== 'distribution/event' && id !== 'static overworld game gift';
+  }, [hideCounterEncounters, method.id]);
 
   useEffect(() => {
     if (!canMarkGigamax) {
@@ -100,12 +102,19 @@ export function FinishHuntDialog({
   }, [canMarkGigamax]);
 
   useEffect(() => {
+    if (!canHideCounterEncounters) {
+      setHideCounterEncounters(false);
+    }
+  }, [canHideCounterEncounters]);
+
+  useEffect(() => {
     const wasOpen = prevOpenRef.current;
     prevOpenRef.current = open;
 
     if (!open || wasOpen) return;
 
     setAttemptsDirty(false);
+    setHideCounterEncounters(false);
     setAttempts(counter);
   }, [open, counter]);
 
@@ -371,6 +380,19 @@ export function FinishHuntDialog({
             <Label>Metodo *</Label>
             <MethodSelector value={method.id} onChange={setMethod} />
           </div>
+
+          {canHideCounterEncounters && (
+            <div className="flex items-center gap-2 px-1">
+              <Checkbox
+                id="finish-hide-counter-encounters"
+                checked={hideCounterEncounters}
+                onCheckedChange={(v) => setHideCounterEncounters(v === true)}
+              />
+              <Label htmlFor="finish-hide-counter-encounters" className="cursor-pointer select-none">
+                Nascondi counter encounters in collezione
+              </Label>
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-4">
             {shouldShowAttempts ? (

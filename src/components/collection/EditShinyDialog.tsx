@@ -23,7 +23,7 @@ import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
 import { PokemonSelector } from '@/components/counter/PokemonSelector';
 import { MethodSelector } from '@/components/counter/MethodSelector';
-import { POKEBALLS, GAMES, GIGAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, findHuntingMethod, supportsGigamaxMark } from '@/lib/pokemon-data';
+import { POKEBALLS, GAMES, GIGAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, canHideEncountersForMethod, findHuntingMethod, supportsGigamaxMark } from '@/lib/pokemon-data';
 import { usePokemonDetails, usePokemonList, formatPokemonName, MANUAL_VARIETIES } from '@/hooks/use-pokemon';
 import { getPokemonSpriteUrl } from '@/lib/pokemon-data';
 import { GenderSelector } from '@/components/ui/GenderSelector';
@@ -57,6 +57,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
   const [secondaryGame, setSecondaryGame] = useState<string>('');
   const [method, setMethod] = useState<HuntingMethod>(HUNTING_METHODS[0]);
   const [attempts, setAttempts] = useState(1);
+  const [hideCounterEncounters, setHideCounterEncounters] = useState(false);
   const [huntStartDate, setHuntStartDate] = useState('');
   const [caughtDate, setCaughtDate] = useState(todayLocalISODate());
   const [isFail, setIsFail] = useState(false);
@@ -72,10 +73,11 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
   const { pokemon: pokemonDetails } = usePokemonDetails(pokemonId);
   const { pokemon: pokemonList } = usePokemonList();
   const canMarkGigamax = supportsGigamaxMark(game);
+  const canHideCounterEncounters = canHideEncountersForMethod(method.id);
   const shouldShowAttempts = useMemo(() => {
     const id = method.id;
-    return id !== 'gen9-tera-raid' && id !== 'distribution/event' && id !== 'static overworld game gift';
-  }, [method.id]);
+    return !hideCounterEncounters && id !== 'gen9-tera-raid' && id !== 'distribution/event' && id !== 'static overworld game gift';
+  }, [hideCounterEncounters, method.id]);
 
   // Build form/variant options exactly like counter/pokedex details (forms + varieties).
   const formOptions = useMemo(() => {
@@ -174,6 +176,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
       setSecondaryGame((entry as any).secondary_game ?? '');
       const m = findHuntingMethod(entry.method) ?? HUNTING_METHODS[0];
       setMethod(m);
+      setHideCounterEncounters(canHideEncountersForMethod(m.id) && entry.attempts === null);
       setAttempts(entry.attempts ?? 1);
       setHuntStartDate(entry.hunt_start_date ?? '');
       setCaughtDate(entry.caught_date ?? todayLocalISODate());
@@ -200,6 +203,12 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
       setIsLegendsArceus(false);
     }
   }, [game, isLegendsArceus]);
+
+  useEffect(() => {
+    if (!canHideCounterEncounters) {
+      setHideCounterEncounters(false);
+    }
+  }, [canHideCounterEncounters]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -451,6 +460,19 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
             <Label>Metodo *</Label>
             <MethodSelector value={method.id} onChange={setMethod} />
           </div>
+
+          {canHideCounterEncounters && (
+            <div className="flex items-center gap-2 px-1">
+              <Checkbox
+                id="edit-hide-counter-encounters"
+                checked={hideCounterEncounters}
+                onCheckedChange={(v) => setHideCounterEncounters(v === true)}
+              />
+              <Label htmlFor="edit-hide-counter-encounters" className="cursor-pointer select-none">
+                Nascondi counter encounters in collezione
+              </Label>
+            </div>
+          )}
 
           {/* 9. Counter and Phase Number - Grid Layout */}
           <div className="grid grid-cols-2 gap-4">

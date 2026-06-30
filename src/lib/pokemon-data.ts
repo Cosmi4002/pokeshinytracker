@@ -261,6 +261,9 @@ export const HUNTING_METHODS: HuntingMethod[] = [
   { id: 'gen9-random', name: 'Random Encounter', baseOdds: 4096, generation: 9, supportsShinyCharm: true },
   { id: 'gen9-sandwich-lv3', name: 'Sandwich (Sparkling Power)', baseOdds: 1024, generation: 9, supportsShinyCharm: true },
   { id: 'gen9-soft-reset', name: 'Soft Reset', baseOdds: 4096, generation: 9, supportsShinyCharm: true },
+  { id: 'gen9-zone-bench-soft-reset', name: 'Zone / Bench / Soft Reset', baseOdds: 4096, generation: 9, supportsShinyCharm: true },
+  { id: 'gen9-fossil-restore', name: 'Fossil Restore', baseOdds: 4096, generation: 9, supportsShinyCharm: true },
+  { id: 'gen9-hyperspace', name: 'Hyperspace', baseOdds: 4096, generation: 9, supportsShinyCharm: true },
   { id: 'gen9-tera-raid', name: 'Tera Raid', baseOdds: 4096, generation: 9, supportsShinyCharm: true },
 
   // --- Distribution / Event & Custom ---
@@ -268,6 +271,9 @@ export const HUNTING_METHODS: HuntingMethod[] = [
   { id: 'static overworld game gift', name: 'Static Overworld / Game Gift', baseOdds: 4096, generation: 0, supportsShinyCharm: false },
   { id: 'custom', name: 'Custom Odds', baseOdds: 4096, generation: 0, supportsShinyCharm: false },
 ];
+
+export const canHideEncountersForMethod = (methodId?: string | null) =>
+  methodId === 'gen9-zone-bench-soft-reset' || methodId === 'gen9-hyperspace';
 
 export const POKEBALLS = [
   { id: 'pokeball', name: 'Poké Ball', sprite: 'https://raw.githubusercontent.com/msikma/pokesprite/master/items/ball/poke.png' },

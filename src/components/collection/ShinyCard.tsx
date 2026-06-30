@@ -49,6 +49,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   const pokeball = useMemo(() => POKEBALLS.find((b) => b.id === entry.pokeball), [entry.pokeball]);
   const method = useMemo(() => findHuntingMethod(entry.method), [entry.method]);
   const showEncounters = useMemo(() => {
+    if (entry.attempts === null) return false;
     if (isEvent) return false;
     const raw = normalizedMethod;
     const rawGame = (entry.game || '').toString().trim().toLowerCase();
@@ -72,7 +73,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
       raw !== 'gen9-outbreak-sandwich' &&
       raw !== 'outbreak + sandwich lv3'
     );
-  }, [entry.method, entry.game, entry.form, isEvent, normalizedMethod]);
+  }, [entry.attempts, entry.method, entry.game, entry.form, isEvent, normalizedMethod]);
 
   const spriteUrl = useMemo(() => {
     const rawForm = (entry.form || '').toString().trim().toLowerCase();
