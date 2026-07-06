@@ -1,4 +1,5 @@
 // Complete Pokemon list with all forms for shiny hunting
+import { LOCAL_SPRITE_URLS } from './local-sprite-map.generated';
 
 export interface Pokemon {
   id: number;
@@ -453,6 +454,12 @@ export function getPokemonSpriteFallbackUrl(): string {
   return '/placeholder.svg';
 }
 
+export function toLocalPokemonSpriteUrl(remoteUrl: string): string {
+  if (!remoteUrl || !remoteUrl.startsWith('http')) return remoteUrl;
+
+  return LOCAL_SPRITE_URLS[remoteUrl] || remoteUrl;
+}
+
 export function handlePokemonSpriteError(img: HTMLImageElement, fallbackUrl = getPokemonSpriteFallbackUrl()) {
   const retryCount = Number(img.dataset.spriteRetryCount || '0');
   const currentSrc = img.currentSrc || img.src;
@@ -472,7 +479,7 @@ export function handlePokemonSpriteError(img: HTMLImageElement, fallbackUrl = ge
   img.src = fallbackUrl;
 }
 
-export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolean, name?: string, female?: boolean, form?: string, animated?: boolean } = {}): string {
+export function _getPokemonSpriteUrlRaw(pokemonId: number, options: { shiny?: boolean, name?: string, female?: boolean, form?: string, animated?: boolean } = {}): string {
   if (!pokemonId) return '';
 
 
@@ -497,7 +504,7 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
   if (female && !hasExplicitGenderForm && !hasBaseGenderDifference) {
     female = false;
   }
-// Combine name and form for overrides check
+  // Combine name and form for overrides check
   if (name && form) {
     const sName = name.toLowerCase();
     const sForm = form.toLowerCase();
@@ -822,6 +829,11 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
   // Assumption: HOME folder has forms indexed by ID.
 
   return `${baseUrl}${shinyPath}${genderPath}/${pokemonId}.png`;
+}
+
+export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolean, name?: string, female?: boolean, form?: string, animated?: boolean } = {}): string {
+  const rawUrl = _getPokemonSpriteUrlRaw(pokemonId, options);
+  return toLocalPokemonSpriteUrl(rawUrl);
 }
 
 // Alias for transition compatibility

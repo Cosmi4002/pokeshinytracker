@@ -1,7 +1,7 @@
 import { Pencil, Trash2, Calendar, ArrowUpCircle, Crosshair, Sparkles, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getGameTheme, GAME_LOGOS, type GameTheme } from '@/lib/game-themes';
-import { GIGAMAX_ICON, POKEBALLS, findHuntingMethod, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, handlePokemonSpriteError, supportsGigamaxMark } from '@/lib/pokemon-data';
+import { GIGAMAX_ICON, POKEBALLS, findHuntingMethod, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, handlePokemonSpriteError, supportsGigamaxMark, toLocalPokemonSpriteUrl } from '@/lib/pokemon-data';
 import type { Tables } from '@/integrations/supabase/types';
 import { useMemo, useCallback } from 'react';
 import { cn } from '@/lib/utils';
@@ -230,7 +230,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
           <div className="h-28 w-28 sm:h-32 sm:w-32 flex items-center justify-center">
             <img
               key={spriteUrl}
-              src={spriteUrl}
+              src={toLocalPokemonSpriteUrl(spriteUrl)}
               loading="lazy"
               decoding="async"
               referrerPolicy="no-referrer"
@@ -317,7 +317,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
               </div>
               {evolvedFromSpriteUrl && (
                 <img
-                  src={evolvedFromSpriteUrl}
+                  src={toLocalPokemonSpriteUrl(evolvedFromSpriteUrl)}
                   alt="Evoluto da"
                   className="h-9 w-9 object-contain drop-shadow block mx-auto"
                   title={`Evoluto da ${evolvedFromName || 'pokemon precedente'}`}

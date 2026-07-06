@@ -15,7 +15,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { usePokemonList, getPokemonSpriteUrl } from '@/hooks/use-pokemon';
-import { handlePokemonSpriteError } from '@/lib/pokemon-data';
+import { handlePokemonSpriteError, toLocalPokemonSpriteUrl } from '@/lib/pokemon-data';
 
 interface PokemonSelectorProps {
   value: number | null;
@@ -103,7 +103,7 @@ export function PokemonSelector({ value, valueName, onChange }: PokemonSelectorP
             <div className="flex items-center gap-2">
               <img
                 key={getPokemonSpriteUrl(selectedPokemon.id, { shiny: true, name: selectedPokemon.name })}
-                src={getPokemonSpriteUrl(selectedPokemon.id, { shiny: true, name: selectedPokemon.name })}
+                src={toLocalPokemonSpriteUrl(getPokemonSpriteUrl(selectedPokemon.id, { shiny: true, name: selectedPokemon.name }))}
                 alt={selectedPokemon.displayName}
                 className="h-8 w-8 pokemon-sprite object-contain"
                 decoding="async"
@@ -166,7 +166,7 @@ export function PokemonSelector({ value, valueName, onChange }: PokemonSelectorP
                   {!isXboxBrowser && (
                     <img
                       key={getPokemonSpriteUrl(p.id, { shiny: true, name: p.name })}
-                      src={getPokemonSpriteUrl(p.id, { shiny: true, name: p.name })}
+                      src={toLocalPokemonSpriteUrl(getPokemonSpriteUrl(p.id, { shiny: true, name: p.name }))}
                       alt={p.displayName}
                       className="h-8 w-8 pokemon-sprite object-contain"
                       loading="lazy"

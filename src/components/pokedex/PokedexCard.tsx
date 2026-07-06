@@ -3,7 +3,7 @@ import { memo } from "react";
 import { useRandomColor } from '@/lib/random-color-context';
 import type { ShinyAvailability } from '@/lib/shiny-availability';
 import { Lock, UserX } from "lucide-react";
-import { handlePokemonSpriteError } from "@/lib/pokemon-data";
+import { handlePokemonSpriteError, toLocalPokemonSpriteUrl } from "@/lib/pokemon-data";
 
 interface PokedexCardProps {
     pokemonId: number;
@@ -140,7 +140,7 @@ export const PokedexCard = memo(function PokedexCard({
                     )}>
                         <img
                             key={spriteUrl}
-                            src={spriteUrl}
+                            src={toLocalPokemonSpriteUrl(spriteUrl)}
                             alt={`${displayName} shiny`}
                             className={cn(
                                 "h-full w-full pokemon-sprite transition-all duration-500 object-contain max-h-48",
@@ -163,7 +163,7 @@ export const PokedexCard = memo(function PokedexCard({
                         <div className="relative w-[48%] flex items-center justify-center transition-all duration-500">
                             <img
                                 key={secondarySprite}
-                                src={secondarySprite}
+                                src={toLocalPokemonSpriteUrl(secondarySprite)}
                                 alt={`${displayName} shiny secondary`}
                                 className={cn(
                                     "h-full w-full pokemon-sprite transition-all duration-500 object-contain max-h-40",
