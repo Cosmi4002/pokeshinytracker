@@ -113,6 +113,11 @@ async function download(url, map) {
       }
 
       if (!response.ok) {
+        if (response.status === 429) {
+          console.log(`Rate limit 429 on ${url}, waiting...`);
+          await new Promise(r => setTimeout(r, 5000 + (attempt * 2000)));
+          continue; // retry even past max retries for 429
+        }
         if (attempt < MAX_RETRIES) {
           await new Promise(r => setTimeout(r, 1000 * attempt));
           continue;
@@ -137,7 +142,8 @@ async function download(url, map) {
 async function runQueue(items, worker) {
   let index = 0;
   const results = [];
-  const workers = Array.from({ length: CONCURRENCY }, async () => {
+  const FIXED_CONCURRENCY = 3;
+  const workers = Array.from({ length: FIXED_CONCURRENCY }, async () => {
     while (index < items.length) {
       const current = items[index++];
       results.push(await worker(current));

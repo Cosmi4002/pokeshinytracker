@@ -457,24 +457,19 @@ export function getPokemonSpriteFallbackUrl(): string {
 export function toLocalPokemonSpriteUrl(remoteUrl: string): string {
   if (!remoteUrl || !remoteUrl.startsWith('http')) return remoteUrl;
 
-  return LOCAL_SPRITE_URLS[remoteUrl] || remoteUrl;
+  const localUrl = LOCAL_SPRITE_URLS[remoteUrl];
+  if (localUrl) return localUrl;
+
+  // Prevent slow network requests to PokeAPI for known missing/dead sprites (e.g. HOME 10000+ IDs)
+  // or sprites that hit rate limits. If we didn't cache it, skip requesting it from them.
+  if (remoteUrl.includes('raw.githubusercontent.com/PokeAPI')) {
+    return getPokemonSpriteFallbackUrl();
+  }
+
+  return remoteUrl;
 }
 
 export function handlePokemonSpriteError(img: HTMLImageElement, fallbackUrl = getPokemonSpriteFallbackUrl()) {
-  const retryCount = Number(img.dataset.spriteRetryCount || '0');
-  const currentSrc = img.currentSrc || img.src;
-
-  if (retryCount < 2 && currentSrc && !currentSrc.endsWith(fallbackUrl)) {
-    img.dataset.spriteRetryCount = String(retryCount + 1);
-    const retryUrl = new URL(currentSrc, window.location.href);
-    retryUrl.searchParams.set('spriteRetry', `${Date.now()}-${retryCount + 1}`);
-
-    window.setTimeout(() => {
-      img.src = retryUrl.toString();
-    }, 300 * (retryCount + 1));
-    return;
-  }
-
   img.onerror = null;
   img.src = fallbackUrl;
 }
