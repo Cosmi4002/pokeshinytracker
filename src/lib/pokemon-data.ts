@@ -449,6 +449,10 @@ const POKEMON_WITH_GENDER_DIFFERENCE_IDS = [
   592, 593, 667, 668, 678, 876, 902, 916
 ];
 
+export function getPokemonSpriteFallbackUrl(): string {
+  return '/placeholder.svg';
+}
+
 export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolean, name?: string, female?: boolean, form?: string, animated?: boolean } = {}): string {
   if (!pokemonId) return '';
 

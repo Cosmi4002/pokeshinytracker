@@ -1,7 +1,7 @@
 import { Pencil, Trash2, Calendar, ArrowUpCircle, Crosshair, Sparkles, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getGameTheme, GAME_LOGOS, type GameTheme } from '@/lib/game-themes';
-import { GIGAMAX_ICON, POKEBALLS, findHuntingMethod, getPokemonSpriteUrl, supportsGigamaxMark } from '@/lib/pokemon-data';
+import { GIGAMAX_ICON, POKEBALLS, findHuntingMethod, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, supportsGigamaxMark } from '@/lib/pokemon-data';
 import type { Tables } from '@/integrations/supabase/types';
 import { useMemo, useCallback } from 'react';
 import { cn } from '@/lib/utils';
@@ -249,7 +249,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                     : undefined,
               }}
               onError={(e) => {
-                e.currentTarget.src = '/fallback-sprite.png';
+                e.currentTarget.src = getPokemonSpriteFallbackUrl();
               }}
             />
           </div>
@@ -321,7 +321,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                   className="h-9 w-9 object-contain drop-shadow block mx-auto"
                   title={`Evoluto da ${evolvedFromName || 'pokemon precedente'}`}
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = getPokemonSpriteUrl(evolvedFromId!, { shiny: true });
+                    (e.target as HTMLImageElement).src = getPokemonSpriteFallbackUrl();
                   }}
                 />
               )}
@@ -492,7 +492,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                           src="https://archives.bulbagarden.net/media/upload/2/26/Egg.png"
                           alt="Pokemon egg"
                           className="h-16 w-16 sm:h-18 sm:w-18 shrink-0 object-contain drop-shadow-[0_2px_6px_rgba(0,0,0,0.55)] -translate-x-1"
-                          onError={(e) => ((e.currentTarget as HTMLImageElement).src = '/placeholder.svg')}
+                          onError={(e) => ((e.currentTarget as HTMLImageElement).src = getPokemonSpriteFallbackUrl())}
                         />
                       </span>
                     )}
