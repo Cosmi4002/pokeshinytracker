@@ -15,6 +15,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { usePokemonList, getPokemonSpriteUrl } from '@/hooks/use-pokemon';
+import { handlePokemonSpriteError } from '@/lib/pokemon-data';
 
 interface PokemonSelectorProps {
   value: number | null;
@@ -105,8 +106,10 @@ export function PokemonSelector({ value, valueName, onChange }: PokemonSelectorP
                 src={getPokemonSpriteUrl(selectedPokemon.id, { shiny: true, name: selectedPokemon.name })}
                 alt={selectedPokemon.displayName}
                 className="h-8 w-8 pokemon-sprite object-contain"
+                decoding="async"
+                referrerPolicy="no-referrer"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/placeholder.svg';
+                  handlePokemonSpriteError(e.currentTarget);
                 }}
               />
               <span>#{selectedPokemon.baseId.toString().padStart(4, '0')} {selectedPokemon.displayName}</span>
@@ -168,8 +171,9 @@ export function PokemonSelector({ value, valueName, onChange }: PokemonSelectorP
                       className="h-8 w-8 pokemon-sprite object-contain"
                       loading="lazy"
                       decoding="async"
+                      referrerPolicy="no-referrer"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/placeholder.svg';
+                        handlePokemonSpriteError(e.currentTarget);
                       }}
                     />
                   )}

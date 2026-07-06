@@ -3,6 +3,7 @@ import { memo } from "react";
 import { useRandomColor } from '@/lib/random-color-context';
 import type { ShinyAvailability } from '@/lib/shiny-availability';
 import { Lock, UserX } from "lucide-react";
+import { handlePokemonSpriteError } from "@/lib/pokemon-data";
 
 interface PokedexCardProps {
     pokemonId: number;
@@ -149,8 +150,10 @@ export const PokedexCard = memo(function PokedexCard({
                             )}
                             style={{ imageRendering: 'auto' }}
                             loading="lazy"
+                            decoding="async"
+                            referrerPolicy="no-referrer"
                             onError={(e) => {
-                                (e.target as HTMLImageElement).src = '/placeholder.svg';
+                                handlePokemonSpriteError(e.currentTarget);
                             }}
                         />
                     </div>
@@ -170,8 +173,10 @@ export const PokedexCard = memo(function PokedexCard({
                                 )}
                                 style={{ imageRendering: 'auto' }}
                                 loading="lazy"
+                                decoding="async"
+                                referrerPolicy="no-referrer"
                                 onError={(e) => {
-                                    (e.target as HTMLImageElement).src = '/placeholder.svg';
+                                    handlePokemonSpriteError(e.currentTarget);
                                 }}
                             />
                         </div>

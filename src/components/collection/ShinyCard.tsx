@@ -1,7 +1,7 @@
 import { Pencil, Trash2, Calendar, ArrowUpCircle, Crosshair, Sparkles, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getGameTheme, GAME_LOGOS, type GameTheme } from '@/lib/game-themes';
-import { GIGAMAX_ICON, POKEBALLS, findHuntingMethod, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, supportsGigamaxMark } from '@/lib/pokemon-data';
+import { GIGAMAX_ICON, POKEBALLS, findHuntingMethod, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, handlePokemonSpriteError, supportsGigamaxMark } from '@/lib/pokemon-data';
 import type { Tables } from '@/integrations/supabase/types';
 import { useMemo, useCallback } from 'react';
 import { cn } from '@/lib/utils';
@@ -233,6 +233,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
               src={spriteUrl}
               loading="lazy"
               decoding="async"
+              referrerPolicy="no-referrer"
               alt={entry.pokemon_name}
               className={cn(
                 "h-full w-full object-contain pokemon-sprite transition-all duration-300 group-hover:scale-105 relative z-10",
@@ -249,7 +250,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                     : undefined,
               }}
               onError={(e) => {
-                e.currentTarget.src = getPokemonSpriteFallbackUrl();
+                handlePokemonSpriteError(e.currentTarget);
               }}
             />
           </div>
@@ -320,8 +321,9 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                   alt="Evoluto da"
                   className="h-9 w-9 object-contain drop-shadow block mx-auto"
                   title={`Evoluto da ${evolvedFromName || 'pokemon precedente'}`}
+                  referrerPolicy="no-referrer"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = getPokemonSpriteFallbackUrl();
+                    handlePokemonSpriteError(e.currentTarget);
                   }}
                 />
               )}

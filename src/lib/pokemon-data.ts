@@ -453,6 +453,25 @@ export function getPokemonSpriteFallbackUrl(): string {
   return '/placeholder.svg';
 }
 
+export function handlePokemonSpriteError(img: HTMLImageElement, fallbackUrl = getPokemonSpriteFallbackUrl()) {
+  const retryCount = Number(img.dataset.spriteRetryCount || '0');
+  const currentSrc = img.currentSrc || img.src;
+
+  if (retryCount < 2 && currentSrc && !currentSrc.endsWith(fallbackUrl)) {
+    img.dataset.spriteRetryCount = String(retryCount + 1);
+    const retryUrl = new URL(currentSrc, window.location.href);
+    retryUrl.searchParams.set('spriteRetry', `${Date.now()}-${retryCount + 1}`);
+
+    window.setTimeout(() => {
+      img.src = retryUrl.toString();
+    }, 300 * (retryCount + 1));
+    return;
+  }
+
+  img.onerror = null;
+  img.src = fallbackUrl;
+}
+
 export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolean, name?: string, female?: boolean, form?: string, animated?: boolean } = {}): string {
   if (!pokemonId) return '';
 
