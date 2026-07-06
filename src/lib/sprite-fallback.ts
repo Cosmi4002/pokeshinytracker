@@ -1,10 +1,10 @@
 /**
  * Sprite Fallback Service
  * Tries multiple sources to load Pokemon sprites with graceful degradation
- * Priority: Local mapping → PokeAPI HOME → PokemonDB → Placeholder
+ * Priority: PokemonDB → PokeAPI HOME → Showdown → Official Artwork → Placeholder
  */
 
-// Map of Pokemon IDs to verified working sprite URLs (for common forms)
+// Map of Pokemon IDs to verified working sprite URLs (for forms with known issues)
 const SPRITE_OVERRIDES: Record<string, string> = {
   // Gen 7 Shiny sprite overrides (sourced from pokemondb when PokeAPI fails)
   '745-midday': 'https://img.pokemondb.net/sprites/home/shiny/lycanroc-midday.png',
@@ -33,55 +33,78 @@ export function getSpriteFallbackChain(
   const { shiny = false, female = false, name = '', form = '' } = options;
 
   // 1. Check for exact override first
-  const overrideKey = form ? `${pokemonId}-${form}` : name ? `${pokemonId}-${name.split('-').slice(1).join('-')}` : pokemonId.toString();
+  const formKey = form || (name ? name.split('-').slice(1).join('-') : '');
+  const overrideKey = formKey ? `${pokemonId}-${formKey}` : pokemonId.toString();
   if (SPRITE_OVERRIDES[overrideKey]) {
     urls.push(SPRITE_OVERRIDES[overrideKey]);
   }
 
-  // 2. Primary: PokeAPI HOME sprite (most complete)
+  // 2. Primary: PokemonDB (often more complete for forms)
+  if (name) {
+    const slug = normalizePokemonSlug(name);
+    const subPath = shiny ? 'shiny' : 'normal';
+    urls.push(`https://img.pokemondb.net/sprites/home/${subPath}/${slug}.png`);
+  }
+
+  // 3. Fallback: PokeAPI HOME sprite (official)
   const baseUrl = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home';
   const shinyPath = shiny ? '/shiny' : '';
   const genderPath = female ? '/female' : '';
   urls.push(`${baseUrl}${shinyPath}${genderPath}/${pokemonId}.png`);
 
-  // 3. Fallback: PokemonDB
-  // Build pokemondb slug from name
-  if (name) {
-    const slug = name.toLowerCase()
-      .replace(/[''%: .]/g, '')
-      .replace(/♀/g, 'f')
-      .replace(/♂/g, 'm')
-      .replace(/é/g, 'e')
-      .replace('nidoran-f', 'nidoranf')
-      .replace('nidoran-m', 'nidoranm')
-      .replace('mr-mime', 'mrmime')
-      .replace('type-null', 'typenull');
-
-    const subPath = shiny ? 'shiny' : 'normal';
-    urls.push(`https://img.pokemondb.net/sprites/home/${subPath}/${slug}.png`);
-  }
-
   // 4. Fallback: Showdown sprite (usually has most forms)
   if (name) {
-    const showdownSlug = name.toLowerCase()
-      .replace(/[''%: .]/g, '')
-      .replace(/♀/g, 'f')
-      .replace(/♂/g, 'm')
-      .replace('nidoran-f', 'nidoranf')
-      .replace('nidoran-m', 'nidoranm')
-      .replace('mr-mime', 'mrmime');
-
+    const showdownSlug = normalizeShowdownSlug(name);
     urls.push(`https://play.pokemonshowdown.com/sprites/pokemon${shiny ? '-shiny' : ''}/${showdownSlug}.png`);
   }
 
-  // 5. Last resort: Official Artwork from PokeAPI
-  urls.push(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/shiny/${pokemonId}.png`);
+  // 5. Fallback: PokePedia (French source, good for special forms)
+  if (name) {
+    const slug = normalizePokemonSlug(name);
+    urls.push(`https://www.pokepedia.fr/images/a/a0/${slug.replace(/-/g, '_')}.png`);
+  }
 
-  // 6. Absolute fallback
+  // 6. Last resort: Official Artwork from PokeAPI
+  urls.push(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork${shiny ? '/shiny' : ''}/${pokemonId}.png`);
+
+  // 7. Absolute fallback
   urls.push('/placeholder.svg');
 
   // Remove duplicates while preserving order
   return Array.from(new Set(urls));
+}
+
+/**
+ * Normalize Pokemon name to pokemondb slug format
+ */
+function normalizePokemonSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/['%: .]/g, '')
+    .replace(/♀/g, 'f')
+    .replace(/♂/g, 'm')
+    .replace(/é/g, 'e')
+    .replace('nidoran-f', 'nidoranf')
+    .replace('nidoran-m', 'nidoranm')
+    .replace('mr-mime', 'mrmime')
+    .replace('mime-jr', 'mimejr')
+    .replace('mr-rime', 'mrrime')
+    .replace('type-null', 'typenull');
+}
+
+/**
+ * Normalize Pokemon name to Showdown slug format
+ */
+function normalizeShowdownSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/['%: .]/g, '')
+    .replace(/♀/g, 'f')
+    .replace(/♂/g, 'm')
+    .replace('nidoran-f', 'nidoranf')
+    .replace('nidoran-m', 'nidoranm')
+    .replace('mr-mime', 'mrmime')
+    .replace('type-null', 'typenull');
 }
 
 /**
