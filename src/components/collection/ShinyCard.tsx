@@ -142,7 +142,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   return (
     <div
       className={cn(
-        'group relative h-full flex flex-col overflow-hidden rounded-xl border bg-transparent shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1',
+        'group relative h-full w-full min-w-0 flex flex-col overflow-hidden rounded-xl border bg-transparent shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1',
         isFail
           ? 'border-red-500/80 shadow-[0_0_20px_rgba(239,68,68,0.25)] ring-1 ring-red-500/50'
           : entry.is_unobtainable
@@ -331,7 +331,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
       </div>
 
       <div
-        className="flex-1 p-3 bg-[#222] relative z-10 border-t border-white/10"
+        className="flex-1 w-full min-w-0 p-3 bg-[#222] relative z-10 border-t border-white/10"
         style={{
           background: applyBlackEffect
             ? `linear-gradient(180deg, color-mix(in srgb, #0b0b0d 62%, ${theme.secondary}) 0%, color-mix(in srgb, #131831 55%, ${theme.primary}) 100%)`
@@ -345,9 +345,9 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
       >
         <div className="space-y-2.5">
           <div className="space-y-1.5">
-            <div className="w-full flex justify-center">
-              <div className="inline-flex items-center justify-center gap-1.5 max-w-full px-1">
-                <h3 className="text-base sm:text-lg font-black text-white tracking-tight capitalize leading-tight text-center break-words whitespace-normal max-w-full">
+            <div className="w-full flex justify-center px-1">
+              <div className="inline-flex flex-wrap items-center justify-center gap-1.5 max-w-full px-1">
+                <h3 className="text-base sm:text-lg font-black text-white tracking-tight capitalize leading-tight text-center break-words whitespace-normal max-w-full min-w-0">
                   {displayName}
                 </h3>
                 {entry.gender && (entry.gender === 'male' || entry.gender === 'female') && (
@@ -392,7 +392,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
 
             <div className="flex items-center justify-center">
               {GAME_LOGOS[entry.game] && (
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center justify-center gap-2 max-w-full">
                   <img
                     src={GAME_LOGOS[entry.game]}
                     loading="lazy"
@@ -418,9 +418,9 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
           </div>
 
           {method && (
-            <div className="flex justify-center">
+            <div className="flex justify-center px-1">
               <div
-                className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.12em] border shadow-sm"
+                className="inline-flex max-w-full items-center justify-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.12em] border shadow-sm text-center"
                 style={{
                   backgroundColor: isEvent
                     ? 'rgba(217, 70, 239, 0.12)'
