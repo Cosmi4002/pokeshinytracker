@@ -228,7 +228,7 @@ export const HUNTING_METHODS: HuntingMethod[] = [
   { id: 'gen6-random', name: 'Random Encounter', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
   { id: 'gen6-runaway', name: 'Runaway', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
   { id: 'gen6-soft-reset', name: 'Soft Reset', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
-
+  { id: 'gen6-pokeradar', name: 'Poke Radar', baseOdds: 4096, generation: 6, supportsShinyCharm: true, description: 'Increases with Chain' },
   // --- Gen 7 ---
   { id: 'gen7-fossil-restore', name: 'Fossil Restore', baseOdds: 4096, generation: 7, supportsShinyCharm: true },
   { id: 'gen7-gift', name: 'Gift Pokémon', baseOdds: 4096, generation: 7, supportsShinyCharm: true },
