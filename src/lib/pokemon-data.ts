@@ -90,6 +90,18 @@ export const getDynamicOdds = (methodId: string, encounters: number, hasShinyCha
     const totalRolls = 5 + (hasShinyCharm ? 2 : 0);
     return Math.round(4096 / totalRolls);
   }
+  if (methodId === 'gen6-pokeradar') {
+    // Gen 6 Poke Radar (XY/ORAS): odds increase with chain length, caps at chain 40.
+    // Shiny Charm is supported in Gen 6 and roughly doubles the shiny chance.
+    const chain = Math.min(encounters, 40);
+    if (chain >= 40) return hasShinyCharm ? 100 : 200;
+    if (chain >= 30) {
+      // Linear interpolation: chain 30 → ~1/1300, chain 40 → 1/200
+      const baseOdds = 200 + (40 - chain) * 110;
+      return hasShinyCharm ? Math.round(baseOdds / 2) : baseOdds;
+    }
+    return hasShinyCharm ? 1365 : 4096;
+  }
 
   // --- Gen 7 ---
   if (methodId === 'gen7-masuda') return hasShinyCharm ? 512 : 683;
@@ -225,10 +237,10 @@ export const HUNTING_METHODS: HuntingMethod[] = [
   { id: 'gen6-gift', name: 'Gift Pokémon', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
   { id: 'gen6-horde', name: 'Horde Encounter', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
   { id: 'gen6-masuda', name: 'Masuda Method', baseOdds: 683, generation: 6, supportsShinyCharm: true },
+  { id: 'gen6-pokeradar', name: 'Poke Radar', baseOdds: 4096, generation: 6, supportsShinyCharm: true, description: 'Increases with Chain' },
   { id: 'gen6-random', name: 'Random Encounter', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
   { id: 'gen6-runaway', name: 'Runaway', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
   { id: 'gen6-soft-reset', name: 'Soft Reset', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
-  { id: 'gen6-pokeradar', name: 'Poke Radar', baseOdds: 4096, generation: 6, supportsShinyCharm: true, description: 'Increases with Chain' },
   // --- Gen 7 ---
   { id: 'gen7-fossil-restore', name: 'Fossil Restore', baseOdds: 4096, generation: 7, supportsShinyCharm: true },
   { id: 'gen7-gift', name: 'Gift Pokémon', baseOdds: 4096, generation: 7, supportsShinyCharm: true },
