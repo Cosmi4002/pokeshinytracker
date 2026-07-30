@@ -477,7 +477,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                 </div>
               </div>
 
-              {showEncounters && (
+                            {showEncounters ? (
                 <div
                   className="rounded-lg p-2 border shadow-lg flex flex-col"
                   style={{
@@ -545,8 +545,45 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                       </span>
                     </div>
                   )}
+                  {(entry as any).show_seen && (
+                    <div className="mt-1.5 pt-1.5 border-t border-white/15 flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1">
+                        <Crosshair className="w-3 h-3 text-white/70" />
+                        <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em]">
+                          Seen
+                        </span>
+                      </div>
+                      <span className="text-[10px] sm:text-[11px] font-black tabular-nums text-white/95">
+                        {(entry as any).seen_count ?? 0}
+                      </span>
+                    </div>
+                  )}
                 </div>
-              )}
+              ) : (entry as any).show_seen ? (
+                <div
+                  className="rounded-lg p-2 border shadow-lg flex flex-col"
+                  style={{
+                    background: hasDualGameTheme
+                      ? `linear-gradient(145deg, color-mix(in srgb, ${theme.primary} 30%, rgba(14,14,14,0.96)), color-mix(in srgb, ${secondaryTheme!.secondary} 30%, rgba(10,10,10,0.94)))`
+                      : `linear-gradient(145deg, color-mix(in srgb, ${theme.primary} 46%, #101010), color-mix(in srgb, ${theme.secondary} 38%, #0f0f0f))`,
+                    borderColor: hasDualGameTheme
+                      ? `color-mix(in srgb, ${theme.accent} 44%, ${secondaryTheme!.accent})`
+                      : `${theme.accent}66`,
+                  }}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1">
+                      <Crosshair className="w-3 h-3 text-white/70" />
+                      <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em]">
+                        Seen
+                      </span>
+                    </div>
+                    <span className="text-[10px] sm:text-[11px] font-black tabular-nums text-white/95">
+                      {(entry as any).seen_count ?? 0}
+                    </span>
+                  </div>
+                </div>
+              ) : null}
             </div>
           )}
 

@@ -66,8 +66,10 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
   const [isLegendsArceus, setIsLegendsArceus] = useState(false);
   const [isUnobtainable, setIsUnobtainable] = useState(false);
   const [phaseNumber, setPhaseNumber] = useState<number | null>(null);
-  const [showTotal, setShowTotal] = useState(false);
+    const [showTotal, setShowTotal] = useState(false);
   const [totalValue, setTotalValue] = useState<number | null>(null);
+  const [showSeen, setShowSeen] = useState(false);
+  const [seenCount, setSeenCount] = useState<number | null>(null);
   const [playlistId, setPlaylistId] = useState<string>('');
   const [notes, setNotes] = useState('');
 
@@ -187,9 +189,11 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
       setIsGigamax(entry.is_gigamax ?? false);
       setIsLegendsArceus((entry as any).is_legends_arceus ?? false);
       setIsUnobtainable(entry.is_unobtainable ?? false);
-      setPhaseNumber(entry.phase_number ?? null);
+            setPhaseNumber(entry.phase_number ?? null);
       setShowTotal(entry.show_total ?? false);
       setTotalValue(entry.total_value ?? null);
+      setShowSeen((entry as any).show_seen ?? false);
+      setSeenCount((entry as any).seen_count ?? null);
       setPlaylistId(entry.playlist_id ?? '');
       setNotes(entry.notes ?? '');
     }
@@ -258,9 +262,11 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
           is_gigamax: isGigamax,
           is_legends_arceus: isLegendsArceus,
           is_unobtainable: isUnobtainable,
-          phase_number: phaseNumber,
+                    phase_number: phaseNumber,
           show_total: showTotal,
           total_value: showTotal ? (totalValue ?? attempts) : null,
+          show_seen: showSeen,
+          seen_count: showSeen ? seenCount : null,
           playlist_id: playlistId || null,
           notes: notes || null,
         })
@@ -539,7 +545,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
                 Mostra “Total” in collezione
               </Label>
             </div>
-            <div className="space-y-2">
+                        <div className="space-y-2">
               <Label>Total</Label>
               <Input
                 type="number"
@@ -548,6 +554,39 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
                 value={showTotal ? (totalValue ?? attempts) : ''}
                 placeholder="Es: 1234"
                 onChange={(e) => setTotalValue(e.target.value ? Math.max(1, parseInt(e.target.value) || 1) : null)}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 items-end">
+            <div className="flex items-center gap-2 px-1">
+              <Checkbox
+                id="show-seen"
+                checked={showSeen}
+                onCheckedChange={(v) => {
+                  const enabled = v === true;
+                  setShowSeen(enabled);
+                  if (enabled && seenCount === null) {
+                    setSeenCount(0);
+                  }
+                  if (!enabled) {
+                    setSeenCount(null);
+                  }
+                }}
+              />
+              <Label htmlFor="show-seen" className="cursor-pointer select-none">
+                Mostra “Seen” in collezione
+              </Label>
+            </div>
+            <div className="space-y-2">
+              <Label>Seen Count</Label>
+              <Input
+                type="number"
+                min={0}
+                disabled={!showSeen}
+                value={showSeen ? (seenCount ?? '') : ''}
+                placeholder="Es: 123"
+                onChange={(e) => setSeenCount(e.target.value ? Math.max(0, parseInt(e.target.value) || 0) : null)}
               />
             </div>
           </div>
