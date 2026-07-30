@@ -472,12 +472,6 @@ export function toLocalPokemonSpriteUrl(remoteUrl: string): string {
   const localUrl = LOCAL_SPRITE_URLS[remoteUrl];
   if (localUrl) return localUrl;
 
-  // Prevent slow network requests to PokeAPI for known missing/dead sprites (e.g. HOME 10000+ IDs)
-  // or sprites that hit rate limits. If we didn't cache it, skip requesting it from them.
-  if (remoteUrl.includes('raw.githubusercontent.com/PokeAPI')) {
-    return getPokemonSpriteFallbackUrl();
-  }
-
   return remoteUrl;
 }
 
