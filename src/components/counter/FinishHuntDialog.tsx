@@ -28,6 +28,7 @@ import { POKEBALLS, GAMES, GIGAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_C
 import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
 import { MethodSelector } from '@/components/counter/MethodSelector';
 import { Checkbox } from '@/components/ui/checkbox';
+import { getPokemonSpriteFallbackUrl } from '@/lib/pokemon-data';
 import { todayLocalISODate } from '@/lib/date';
 
 interface FinishHuntDialogProps {
@@ -279,7 +280,7 @@ export function FinishHuntDialog({
               alt={pokemonName}
               className="w-20 h-20 pokemon-sprite object-contain"
               onError={(e) => {
-                (e.target as HTMLImageElement).src = '/placeholder.svg';
+                (e.target as HTMLImageElement).src = getPokemonSpriteFallbackUrl();
               }}
             />
             <div>
