@@ -58,6 +58,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
   const [method, setMethod] = useState<HuntingMethod>(HUNTING_METHODS[0]);
   const [attempts, setAttempts] = useState(1);
   const [hideCounterEncounters, setHideCounterEncounters] = useState(false);
+  const [showEncounters, setShowEncounters] = useState(true);
   const [huntStartDate, setHuntStartDate] = useState('');
   const [caughtDate, setCaughtDate] = useState(todayLocalISODate());
   const [isFail, setIsFail] = useState(false);
@@ -78,6 +79,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
     const id = method.id;
     return !hideCounterEncounters && id !== 'gen9-tera-raid' && id !== 'distribution/event' && id !== 'static overworld game gift';
   }, [hideCounterEncounters, method.id]);
+  const shouldShowEncountersBox = useMemo(() => showEncounters && shouldShowAttempts, [showEncounters, shouldShowAttempts]);
 
   // Build form/variant options exactly like counter/pokedex details (forms + varieties).
   const formOptions = useMemo(() => {
@@ -177,6 +179,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
       const m = findHuntingMethod(entry.method) ?? HUNTING_METHODS[0];
       setMethod(m);
       setHideCounterEncounters(canHideEncountersForMethod(m.id) && entry.attempts === null);
+      setShowEncounters((entry as any).show_encounters ?? true);
       setAttempts(entry.attempts ?? 1);
       setHuntStartDate(entry.hunt_start_date ?? '');
       setCaughtDate(entry.caught_date ?? todayLocalISODate());
@@ -248,6 +251,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
           secondary_game: secondaryGame || null,
           method: method.id,
           attempts: shouldShowAttempts ? attempts : null,
+          show_encounters: shouldShowEncountersBox,
           hunt_start_date: huntStartDate || null,
           caught_date: caughtDate,
           is_fail: isFail,
@@ -474,6 +478,17 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
             </div>
           )}
 
+          <div className="flex items-center gap-2 px-1">
+            <Checkbox
+              id="edit-show-encounters"
+              checked={showEncounters}
+              onCheckedChange={(v) => setShowEncounters(v === true)}
+            />
+            <Label htmlFor="edit-show-encounters" className="cursor-pointer select-none">
+              Mostra encounters in collezione
+            </Label>
+          </div>
+
           {/* 9. Counter and Phase Number - Grid Layout */}
           <div className="grid grid-cols-2 gap-4">
             {shouldShowAttempts ? (
@@ -595,5 +610,4 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
     </Dialog>
   );
 }
-
 

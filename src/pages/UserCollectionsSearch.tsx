@@ -13,7 +13,7 @@ import { toLocalISODate } from '@/lib/date';
 type ProfileRow = Pick<Tables<'profiles'>, 'user_id' | 'username'>;
 type PublicCaughtRow = Pick<
   Tables<'caught_shinies'>,
-  'id' | 'pokemon_id' | 'pokemon_name' | 'form' | 'gender' | 'caught_date' | 'created_at' | 'sprite_url' | 'game' | 'is_fail' | 'is_unobtainable' | 'hunt_start_date' | 'method' | 'attempts' | 'has_shiny_charm' | 'is_evolved'
+  'id' | 'pokemon_id' | 'pokemon_name' | 'form' | 'gender' | 'caught_date' | 'created_at' | 'sprite_url' | 'game' | 'is_fail' | 'is_unobtainable' | 'hunt_start_date' | 'method' | 'attempts' | 'has_shiny_charm' | 'is_evolved' | 'show_encounters'
 >;
 type PublicRecentRow = PublicCaughtRow & { user_id: string; username: string | null };
 
@@ -52,8 +52,9 @@ export default function UserCollectionsSearch() {
     return raw === 'distribution/event' || raw === 'event';
   };
 
-  const shouldShowEncounters = (method?: string | null, game?: string | null, attempts?: number | null) => {
+  const shouldShowEncounters = (method?: string | null, game?: string | null, attempts?: number | null, showEncounters = true) => {
     if (attempts === null) return false;
+    if (!showEncounters) return false;
     if (isDistributionEvent(method)) return false;
     const raw = normalizeMethod(method);
     const rawGame = normalizeMethod(game);
@@ -127,7 +128,7 @@ export default function UserCollectionsSearch() {
     try {
       const { data, error } = await supabase
         .from('caught_shinies')
-        .select('id, pokemon_id, pokemon_name, form, gender, caught_date, created_at, sprite_url, game, is_fail, is_unobtainable, hunt_start_date, method, attempts, has_shiny_charm, is_evolved')
+        .select('id, pokemon_id, pokemon_name, form, gender, caught_date, created_at, sprite_url, game, is_fail, is_unobtainable, hunt_start_date, method, attempts, has_shiny_charm, is_evolved, show_encounters')
         .eq('user_id', profile.user_id)
         .order('caught_date', { ascending: false })
         .order('created_at', { ascending: false })
@@ -154,7 +155,7 @@ export default function UserCollectionsSearch() {
       const cutoff = getFourDaysAgoDate();
       const { data, error } = await supabase
         .from('caught_shinies')
-        .select('id, user_id, pokemon_id, pokemon_name, form, gender, caught_date, created_at, sprite_url, game, is_fail, is_unobtainable, hunt_start_date, method, attempts, has_shiny_charm, is_evolved')
+        .select('id, user_id, pokemon_id, pokemon_name, form, gender, caught_date, created_at, sprite_url, game, is_fail, is_unobtainable, hunt_start_date, method, attempts, has_shiny_charm, is_evolved, show_encounters')
         .gte('caught_date', cutoff)
         .order('caught_date', { ascending: false })
         .order('created_at', { ascending: false })
@@ -410,7 +411,7 @@ export default function UserCollectionsSearch() {
                                 <p className="text-xs text-muted-foreground">Inizio: {entry.hunt_start_date ? formatDate(entry.hunt_start_date) : '--'}</p>
                               )}
                               <p className="text-xs text-muted-foreground truncate">Metodo: {formatMethodLabel(entry.method)}</p>
-                              {shouldShowEncounters(entry.method, entry.game, entry.attempts) ? (
+                              {shouldShowEncounters(entry.method, entry.game, entry.attempts, entry.show_encounters ?? true) ? (
                                 <p className="text-xs text-muted-foreground">Encounters: {entry.attempts ?? '-'}</p>
                               ) : null}
                               <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -468,7 +469,7 @@ export default function UserCollectionsSearch() {
                               <p className="text-xs text-muted-foreground">Inizio: {entry.hunt_start_date ? formatDate(entry.hunt_start_date) : '--'}</p>
                             )}
                             <p className="text-xs text-muted-foreground truncate">Metodo: {formatMethodLabel(entry.method)}</p>
-                            {shouldShowEncounters(entry.method, entry.game, entry.attempts) ? (
+                            {shouldShowEncounters(entry.method, entry.game, entry.attempts, entry.show_encounters ?? true) ? (
                               <p className="text-xs text-muted-foreground">Encounters: {entry.attempts ?? '-'}</p>
                             ) : null}
                             <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -554,7 +555,7 @@ export default function UserCollectionsSearch() {
                                 <p className="text-xs text-muted-foreground">Inizio: {entry.hunt_start_date ? formatDate(entry.hunt_start_date) : '--'}</p>
                               )}
                               <p className="text-xs text-muted-foreground truncate">Metodo: {formatMethodLabel(entry.method)}</p>
-                              {shouldShowEncounters(entry.method, entry.game, entry.attempts) ? (
+                              {shouldShowEncounters(entry.method, entry.game, entry.attempts, entry.show_encounters ?? true) ? (
                                 <p className="text-xs text-muted-foreground">Encounters: {entry.attempts ?? '-'}</p>
                               ) : null}
                               <div className="flex items-center gap-1 text-xs text-muted-foreground">

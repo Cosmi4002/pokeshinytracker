@@ -38,6 +38,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   const isEvent = (entry.method || '').toString().trim().toLowerCase() === 'distribution/event';
   const normalizedMethod = (entry.method || '').toString().trim().toLowerCase();
   const isMasuda = normalizedMethod.includes('masuda');
+  const showEncountersPreference = (entry as any).show_encounters !== false;
   const evolvedFromId = (entry as any).evolved_from_id as number | null | undefined;
   const evolvedFromName = (entry as any).evolved_from_name as string | null | undefined;
 
@@ -50,6 +51,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   const method = useMemo(() => findHuntingMethod(entry.method), [entry.method]);
   const showEncounters = useMemo(() => {
     if (entry.attempts === null) return false;
+    if (!showEncountersPreference) return false;
     if (isEvent) return false;
     const raw = normalizedMethod;
     const rawGame = (entry.game || '').toString().trim().toLowerCase();
@@ -73,7 +75,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
       raw !== 'gen9-outbreak-sandwich' &&
       raw !== 'outbreak + sandwich lv3'
     );
-  }, [entry.attempts, entry.method, entry.game, entry.form, isEvent, normalizedMethod]);
+  }, [entry.attempts, entry.method, entry.game, entry.form, isEvent, normalizedMethod, showEncountersPreference]);
 
   const spriteUrl = useMemo(() => {
     const rawForm = (entry.form || '').toString().trim().toLowerCase();

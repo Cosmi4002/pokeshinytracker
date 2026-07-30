@@ -54,6 +54,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
   const [method, setMethod] = useState<HuntingMethod>(HUNTING_METHODS[0]);
   const [attempts, setAttempts] = useState(1);
   const [hideCounterEncounters, setHideCounterEncounters] = useState(false);
+  const [showEncounters, setShowEncounters] = useState(true);
   const [huntStartDate, setHuntStartDate] = useState('');
   const [caughtDate, setCaughtDate] = useState(todayLocalISODate());
   const [isFail, setIsFail] = useState(false);
@@ -73,6 +74,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
     const id = method.id;
     return !hideCounterEncounters && id !== 'gen9-tera-raid' && id !== 'distribution/event' && id !== 'static overworld game gift';
   }, [hideCounterEncounters, method.id]);
+  const shouldShowEncountersBox = useMemo(() => showEncounters && shouldShowAttempts, [showEncounters, shouldShowAttempts]);
 
   useEffect(() => {
     if (!canMarkGigamax) {
@@ -146,6 +148,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
     setMethod(HUNTING_METHODS[0]);
     setAttempts(1);
     setHideCounterEncounters(false);
+    setShowEncounters(true);
     setHuntStartDate('');
     setCaughtDate(todayLocalISODate());
     setIsFail(false);
@@ -193,6 +196,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
         secondary_game: secondaryGame || null,
         method: method.id,
         attempts: shouldShowAttempts ? attempts : null,
+        show_encounters: shouldShowEncountersBox,
         hunt_start_date: huntStartDate || null,
         caught_date: caughtDate,
         is_fail: isFail,
@@ -416,6 +420,17 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
             </div>
           )}
 
+          <div className="flex items-center gap-2 px-1">
+            <Checkbox
+              id="show-encounters"
+              checked={showEncounters}
+              onCheckedChange={(v) => setShowEncounters(v === true)}
+            />
+            <Label htmlFor="show-encounters" className="cursor-pointer select-none">
+              Mostra encounters in collezione
+            </Label>
+          </div>
+
           {/* 7. Counter and Phase Number - Grid Layout */}
           <div className="grid grid-cols-2 gap-4">
             {shouldShowAttempts ? (
@@ -545,5 +560,4 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
     </Dialog >
   );
 }
-
 

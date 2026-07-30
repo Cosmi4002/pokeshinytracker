@@ -75,6 +75,7 @@ export function FinishHuntDialog({
   const [attempts, setAttempts] = useState(counter);
   const [attemptsDirty, setAttemptsDirty] = useState(false);
   const [hideCounterEncounters, setHideCounterEncounters] = useState(false);
+  const [showEncounters, setShowEncounters] = useState(true);
   const prevOpenRef = useRef(false);
   const [huntStartDate, setHuntStartDate] = useState(startDate ? startDate.split('T')[0] : '');
   const [caughtDate, setCaughtDate] = useState(todayLocalISODate());
@@ -94,6 +95,7 @@ export function FinishHuntDialog({
     const id = method.id;
     return !hideCounterEncounters && id !== 'gen9-tera-raid' && id !== 'distribution/event' && id !== 'static overworld game gift';
   }, [hideCounterEncounters, method.id]);
+  const shouldShowEncountersBox = useMemo(() => showEncounters && shouldShowAttempts, [showEncounters, shouldShowAttempts]);
 
   useEffect(() => {
     if (!canMarkGigamax) {
@@ -115,6 +117,7 @@ export function FinishHuntDialog({
 
     setAttemptsDirty(false);
     setHideCounterEncounters(false);
+    setShowEncounters(true);
     setAttempts(counter);
   }, [open, counter]);
 
@@ -217,6 +220,7 @@ export function FinishHuntDialog({
         game,
         method: method.id,
         attempts: shouldShowAttempts ? attempts : null,
+        show_encounters: shouldShowEncountersBox,
         hunt_start_date: huntStartDate || null,
         caught_date: caughtDate,
         is_fail: isFail,
@@ -394,6 +398,17 @@ export function FinishHuntDialog({
             </div>
           )}
 
+          <div className="flex items-center gap-2 px-1">
+            <Checkbox
+              id="finish-show-encounters"
+              checked={showEncounters}
+              onCheckedChange={(v) => setShowEncounters(v === true)}
+            />
+            <Label htmlFor="finish-show-encounters" className="cursor-pointer select-none">
+              Mostra encounters in collezione
+            </Label>
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             {shouldShowAttempts ? (
               <div className="space-y-2">
@@ -528,4 +543,3 @@ export function FinishHuntDialog({
     </Dialog>
   );
 }
-
