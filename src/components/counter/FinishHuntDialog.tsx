@@ -83,9 +83,11 @@ export function FinishHuntDialog({
   const [isFail, setIsFail] = useState(false);
   const [isGigamax, setIsGigamax] = useState(false);
   const [isUnobtainable, setIsUnobtainable] = useState(false);
-  const [phaseNumber, setPhaseNumber] = useState<number | null>(null);
+    const [phaseNumber, setPhaseNumber] = useState<number | null>(null);
   const [showTotal, setShowTotal] = useState(false);
   const [totalValue, setTotalValue] = useState<number | null>(null);
+  const [showSeen, setShowSeen] = useState(false);
+  const [seenCount, setSeenCount] = useState<number | null>(null);
   const [playlistId, setPlaylistId] = useState<string>('');
   const [notes, setNotes] = useState('');
 
@@ -228,8 +230,10 @@ export function FinishHuntDialog({
         is_gigamax: isGigamax,
         is_unobtainable: isUnobtainable,
         phase_number: phaseNumber,
-        show_total: showTotal,
+                show_total: showTotal,
         total_value: showTotal ? (totalValue ?? attempts) : null,
+        show_seen: showSeen,
+        seen_count: showSeen ? seenCount : null,
         playlist_id: playlistId || null,
         notes: notes || null,
       });
@@ -442,7 +446,7 @@ export function FinishHuntDialog({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 items-end">
+                    <div className="grid grid-cols-2 gap-4 items-end">
             <div className="flex items-center gap-2 px-1">
               <Checkbox
                 id="show-total"
@@ -471,6 +475,39 @@ export function FinishHuntDialog({
                 value={showTotal ? (totalValue ?? attempts) : ''}
                 placeholder="Es: 1234"
                 onChange={(e) => setTotalValue(e.target.value ? Math.max(1, parseInt(e.target.value) || 1) : null)}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 items-end">
+            <div className="flex items-center gap-2 px-1">
+              <Checkbox
+                id="show-seen"
+                checked={showSeen}
+                onCheckedChange={(v) => {
+                  const enabled = v === true;
+                  setShowSeen(enabled);
+                  if (enabled && seenCount === null) {
+                    setSeenCount(0);
+                  }
+                  if (!enabled) {
+                    setSeenCount(null);
+                  }
+                }}
+              />
+              <Label htmlFor="show-seen" className="cursor-pointer select-none">
+                Mostra “Seen” in collezione
+              </Label>
+            </div>
+            <div className="space-y-2">
+              <Label>Seen Count</Label>
+              <Input
+                type="number"
+                min={0}
+                disabled={!showSeen}
+                value={showSeen ? (seenCount ?? '') : ''}
+                placeholder="Es: 123"
+                onChange={(e) => setSeenCount(e.target.value ? Math.max(0, parseInt(e.target.value) || 0) : null)}
               />
             </div>
           </div>
