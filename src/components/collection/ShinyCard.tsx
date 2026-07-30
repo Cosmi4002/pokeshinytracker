@@ -444,7 +444,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
           {isEvent ? null : (
             <div className={cn('grid gap-2 mt-2', showEncounters ? 'grid-cols-2' : 'grid-cols-1')}>
               <div
-                className="rounded-lg p-2 border shadow-lg min-h-[108px] flex flex-col"
+                className="rounded-lg p-2 border shadow-lg"
                 style={{
                   background: hasDualGameTheme
                     ? `linear-gradient(145deg, color-mix(in srgb, ${theme.secondary} 34%, rgba(16,16,16,0.96)), color-mix(in srgb, ${secondaryTheme!.primary} 26%, rgba(12,12,12,0.94)))`
@@ -458,7 +458,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                   <Calendar className="w-3 h-3 text-white/70" />
                   <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em]">Hunt Dates</span>
                 </div>
-                <div className="space-y-1 flex-1">
+                <div className="space-y-1">
                   <div className="flex items-center justify-between gap-1 rounded-md bg-black/25 px-1.5 py-1">
                     <span className="text-[8px] sm:text-[9px] text-white/55 font-bold uppercase tracking-wider">Start</span>
                     <span className="text-[9px] sm:text-[10px] font-semibold text-white/95 tabular-nums text-right">
@@ -476,7 +476,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
 
               {showEncounters && (
                 <div
-                  className="rounded-lg p-2 border shadow-lg flex flex-col min-h-[108px]"
+                  className="rounded-lg p-2 border shadow-lg flex flex-col"
                   style={{
                     background: hasDualGameTheme
                       ? `linear-gradient(145deg, color-mix(in srgb, ${theme.primary} 30%, rgba(14,14,14,0.96)), color-mix(in srgb, ${secondaryTheme!.secondary} 30%, rgba(10,10,10,0.94)))`
@@ -489,7 +489,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                   <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em] block mb-1.5">
                     {isMasuda ? 'Hatched' : 'Encounters'}
                   </span>
-                  <div className="flex-1 min-h-[52px] flex items-center justify-center rounded-md bg-black/25 px-1.5 py-2 relative">
+                  <div className="flex-1 flex items-center justify-center rounded-md bg-black/25 px-1.5 py-2 relative">
                     {isMasuda && (
                       <span className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center justify-center">
                         <img
@@ -507,8 +507,8 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                       {entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-'}
                     </span>
                   </div>
-                  <div className="mt-1.5 pt-1.5 border-t border-white/15 min-h-[28px] flex items-center">
-                    {entry.phase_number ? (
+                  {entry.phase_number && (
+                    <div className="mt-1.5 pt-1.5 border-t border-white/15">
                       <span
                         className="text-[9px] font-black uppercase tracking-[0.12em] px-1.5 py-0.5 rounded border"
                         style={{
@@ -525,39 +525,31 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                       >
                         PHASE #{entry.phase_number}
                       </span>
-                    ) : (
-                      <span className="text-[9px] font-black uppercase tracking-[0.12em] px-1.5 py-0.5 rounded border border-transparent text-transparent select-none">
-                        PHASE
-                      </span>
-                    )}
-                  </div>
-                  <div className="mt-1.5 pt-1.5 border-t border-white/15 min-h-[30px] flex items-center justify-between gap-2">
-                    {entry.show_total ? (
-                      <>
-                        <div className="flex items-center gap-1">
-                          <Crosshair className="w-3 h-3 text-white/70" />
-                          <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em]">
-                            Total
-                          </span>
-                        </div>
-                        <span className="text-[10px] sm:text-[11px] font-black tabular-nums text-white/95">
-                          {entry.total_value && entry.total_value > 0
-                            ? entry.total_value.toLocaleString()
-                            : (entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-')}
+                    </div>
+                  )}
+                  {entry.show_total && (
+                    <div className="mt-1.5 pt-1.5 border-t border-white/15 flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1">
+                        <Crosshair className="w-3 h-3 text-white/70" />
+                        <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em]">
+                          Total
                         </span>
-                      </>
-                    ) : (
-                      <span className="text-[8px] sm:text-[9px] font-bold text-transparent select-none">Total</span>
-                    )}
-                  </div>
+                      </div>
+                      <span className="text-[10px] sm:text-[11px] font-black tabular-nums text-white/95">
+                        {entry.total_value && entry.total_value > 0
+                          ? entry.total_value.toLocaleString()
+                          : (entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-')}
+                      </span>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
           )}
 
           {(pokeball || entry.has_shiny_charm || isGigamax || entry.is_fail || entry.is_unobtainable) && (
-            <div className="mt-2 pt-2 border-t flex items-center justify-between gap-2 min-h-[34px]" style={{ borderTopColor: `${theme.primary}20` }}>
-              <div className="flex items-center gap-2 min-w-0">
+            <div className="mt-2 pt-2 border-t flex items-center justify-between" style={{ borderTopColor: `${theme.primary}20` }}>
+              <div className="flex items-center gap-2">
                 {(entry.is_fail || entry.is_unobtainable) ? (
                   <div className="flex items-center gap-1.5">
                     {entry.is_fail && (
@@ -589,7 +581,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                 )}
               </div>
 
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex items-center gap-2">
                 {isGigamax && (
                   <div className="flex items-center" title="Gigamax">
                     <img
