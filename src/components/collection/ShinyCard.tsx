@@ -51,6 +51,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   const method = useMemo(() => findHuntingMethod(entry.method), [entry.method]);
   const hasBottomMeta = entry.has_shiny_charm || isGigamax || entry.is_fail || entry.is_unobtainable;
   const hasOnlyShinyCharm = entry.has_shiny_charm && !isGigamax && !entry.is_fail && !entry.is_unobtainable;
+  const encountersLabel = normalizedMethod.includes('game corner') ? 'Seen' : (isMasuda ? 'Hatched' : 'Encounters');
   const showEncounters = useMemo(() => {
     if (entry.attempts === null) return false;
     if (!showEncountersPreference) return false;
@@ -489,7 +490,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                   }}
                 >
                   <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em] block mb-1.5">
-                    {isMasuda ? 'Hatched' : 'Encounters'}
+                    {encountersLabel}
                   </span>
                   <div className="flex-1 flex items-center justify-center rounded-md bg-black/25 px-1.5 py-2 relative">
                     {isMasuda && (
