@@ -49,6 +49,8 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   }, [(entry as any).secondary_game, secondaryThemeOverride]);
   const pokeball = useMemo(() => POKEBALLS.find((b) => b.id === entry.pokeball), [entry.pokeball]);
   const method = useMemo(() => findHuntingMethod(entry.method), [entry.method]);
+  const hasBottomMeta = entry.has_shiny_charm || isGigamax || entry.is_fail || entry.is_unobtainable;
+  const hasOnlyShinyCharm = entry.has_shiny_charm && !isGigamax && !entry.is_fail && !entry.is_unobtainable;
   const showEncounters = useMemo(() => {
     if (entry.attempts === null) return false;
     if (!showEncountersPreference) return false;
@@ -547,8 +549,14 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
             </div>
           )}
 
-          {(pokeball || entry.has_shiny_charm || isGigamax || entry.is_fail || entry.is_unobtainable) && (
-            <div className="mt-2 pt-2 border-t flex items-center justify-between" style={{ borderTopColor: `${theme.primary}20` }}>
+          {(pokeball || hasBottomMeta) && (
+            <div
+              className={cn(
+                'flex items-center justify-between',
+                hasBottomMeta ? (hasOnlyShinyCharm ? 'mt-1 pt-1' : 'mt-2 pt-2 border-t') : 'mt-2'
+              )}
+              style={{ borderTopColor: `${theme.primary}20` }}
+            >
               <div className="flex items-center gap-2">
                 {(entry.is_fail || entry.is_unobtainable) ? (
                   <div className="flex items-center gap-1.5">

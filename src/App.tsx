@@ -15,7 +15,6 @@ import Collection from "./pages/Collection";
 import CollectionEvents from "./pages/CollectionEvents";
 import CollectionSpecial from "./pages/CollectionSpecial";
 import CollectionFailUncatchable from "./pages/CollectionFailUncatchable";
-import Memo from "./pages/Memo";
 import UserCollectionsSearch from "./pages/UserCollectionsSearch";
 import Bingo from "./pages/Bingo";
 import { ScrollRestoration } from "@/components/layout/ScrollRestoration";
@@ -50,7 +49,6 @@ function AppContent() {
           <Route path="/collection/special" element={<CollectionSpecial />} />
           <Route path="/collection/events" element={<CollectionEvents />} />
           <Route path="/collection/fail-uncatchable" element={<CollectionFailUncatchable />} />
-          <Route path="/memo" element={<Memo />} />
           <Route path="/users" element={<UserCollectionsSearch />} />
           <Route path="/bingo" element={<Bingo />} />
           <Route path="/debug" element={<Debug />} />

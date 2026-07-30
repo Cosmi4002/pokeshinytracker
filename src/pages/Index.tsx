@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Sparkles, Calculator, Search, Grid3X3, ArrowRight, FileText } from 'lucide-react';
+import { Sparkles, Calculator, Search, Grid3X3, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useAuth } from '@/lib/auth-context';
@@ -35,12 +35,6 @@ export default function Index() {
       title: 'Collection',
       description: 'Your caught shinies.',
       link: '/collection',
-    },
-    {
-      icon: FileText,
-      title: 'Memo',
-      description: 'Write quick notes.',
-      link: '/memo',
     },
   ];
 
