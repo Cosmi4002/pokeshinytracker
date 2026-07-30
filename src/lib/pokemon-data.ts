@@ -60,9 +60,12 @@ export const getDynamicOdds = (methodId: string, encounters: number, hasShinyCha
 
   // --- Gen 2 ---
   if (methodId === 'gen2-breeding-shiny') return 64;
+  if (methodId === 'gen2-egg-hatching') return 64;
   if (methodId === 'gen2-odd-egg') return 128;
 
   // --- Gen 4 ---
+  if (methodId === 'gen3-egg-hatching') return 1639;
+  if (methodId === 'gen4-egg-hatching') return 1639;
   if (methodId === 'gen4-masuda') return 1639;
   if (methodId === 'gen4-pokeradar') {
     const chain = Math.min(encounters, 40);
@@ -72,9 +75,11 @@ export const getDynamicOdds = (methodId: string, encounters: number, hasShinyCha
   }
 
   // --- Gen 5 ---
+  if (methodId === 'gen5-egg-hatching') return hasShinyCharm ? 1024 : 1366;
   if (methodId === 'gen5-masuda') return hasShinyCharm ? 1024 : 1366;
 
   // --- Gen 6 ---
+  if (methodId === 'gen6-egg-hatching') return hasShinyCharm ? 512 : 683;
   if (methodId === 'gen6-masuda') return hasShinyCharm ? 512 : 683;
   if (methodId === 'gen6-chain-fishing') {
     const chain = Math.min(encounters, 20);
@@ -104,6 +109,7 @@ export const getDynamicOdds = (methodId: string, encounters: number, hasShinyCha
   }
 
   // --- Gen 7 ---
+  if (methodId === 'gen7-egg-hatching') return hasShinyCharm ? 512 : 683;
   if (methodId === 'gen7-masuda') return hasShinyCharm ? 512 : 683;
   if (methodId === 'gen7-sos') {
     const chain = encounters % 256;
@@ -125,6 +131,7 @@ export const getDynamicOdds = (methodId: string, encounters: number, hasShinyCha
   if (methodId === 'gen7-wormhole') return hasShinyCharm ? 100 : 300;
 
   // --- Gen 8 ---
+  if (methodId === 'gen8-egg-hatching') return hasShinyCharm ? 512 : 683;
   if (methodId === 'gen8-masuda' || methodId === 'gen8-bdsp-masuda') return hasShinyCharm ? 512 : 683;
   if (methodId === 'gen8-murder') return hasShinyCharm ? 512 : 683;
   if (methodId === 'gen8-dynamax') return hasShinyCharm ? 100 : 300;
@@ -139,6 +146,7 @@ export const getDynamicOdds = (methodId: string, encounters: number, hasShinyCha
   }
 
   // --- Gen 9 ---
+  if (methodId === 'gen9-egg-hatching') return hasShinyCharm ? 512 : 683;
   if (methodId === 'gen9-masuda') return hasShinyCharm ? 512 : 683;
   if (methodId === 'gen9-outbreak') {
     let outbreakRolls = 0;
@@ -180,6 +188,7 @@ export const getDynamicOdds = (methodId: string, encounters: number, hasShinyCha
 export const HUNTING_METHODS: HuntingMethod[] = [
   // --- Gen 2 ---
   { id: 'gen2-breeding-shiny', name: 'Breeding (Shiny Parent)', baseOdds: 64, generation: 2, supportsShinyCharm: false },
+  { id: 'gen2-egg-hatching', name: 'Egg Hatching', baseOdds: 64, generation: 2, supportsShinyCharm: false },
   { id: 'gen2-game-corner', name: 'Game Corner', baseOdds: 8192, generation: 2, supportsShinyCharm: false },
   { id: 'gen2-gift', name: 'Gift Pokémon', baseOdds: 8192, generation: 2, supportsShinyCharm: false },
   { id: 'gen2-headbutt', name: 'Headbutt', baseOdds: 8192, generation: 2, supportsShinyCharm: false },
@@ -191,6 +200,7 @@ export const HUNTING_METHODS: HuntingMethod[] = [
 
   // --- Gen 3 ---
   { id: 'gen3-fishing', name: 'Fishing', baseOdds: 8192, generation: 3, supportsShinyCharm: false },
+  { id: 'gen3-egg-hatching', name: 'Egg Hatching', baseOdds: 1639, generation: 3, supportsShinyCharm: false },
   { id: 'gen3-fossil-restore', name: 'Fossil Restore', baseOdds: 8192, generation: 3, supportsShinyCharm: false },
   { id: 'gen3-game-corner', name: 'Game Corner', baseOdds: 8192, generation: 3, supportsShinyCharm: false },
   { id: 'gen3-gift', name: 'Gift Pokémon', baseOdds: 8192, generation: 3, supportsShinyCharm: false },
@@ -203,6 +213,7 @@ export const HUNTING_METHODS: HuntingMethod[] = [
   // --- Gen 4 ---
   { id: 'gen4-double-encounter', name: 'Double Encounter', baseOdds: 4096, generation: 4, supportsShinyCharm: false },
   { id: 'gen4-fishing', name: 'Fishing', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
+  { id: 'gen4-egg-hatching', name: 'Egg Hatching', baseOdds: 1639, generation: 4, supportsShinyCharm: false },
   { id: 'gen4-fossil-restore', name: 'Fossil Restore', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
   { id: 'gen4-game-corner', name: 'Game Corner', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
   { id: 'gen4-gift', name: 'Gift Pokémon', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
@@ -221,6 +232,7 @@ export const HUNTING_METHODS: HuntingMethod[] = [
   { id: 'gen5-double-rustling-grass', name: 'Double Rustling Grass', baseOdds: 4096, generation: 5, supportsShinyCharm: true },
   { id: 'gen5-double-dust-clouds', name: 'Double Dust Clouds', baseOdds: 4096, generation: 5, supportsShinyCharm: true },
   { id: 'gen5-dust-clouds', name: 'Dust Clouds', baseOdds: 8192, generation: 5, supportsShinyCharm: true },
+  { id: 'gen5-egg-hatching', name: 'Egg Hatching', baseOdds: 1366, generation: 5, supportsShinyCharm: true },
   { id: 'gen5-fossil-restore', name: 'Fossil Restore', baseOdds: 8192, generation: 5, supportsShinyCharm: true },
   { id: 'gen5-gift', name: 'Gift Pokémon', baseOdds: 8192, generation: 5, supportsShinyCharm: true },
   { id: 'gen5-masuda', name: 'Masuda Method', baseOdds: 1366, generation: 5, supportsShinyCharm: true },
@@ -232,6 +244,7 @@ export const HUNTING_METHODS: HuntingMethod[] = [
   // --- Gen 6 ---
   { id: 'gen6-chain-fishing', name: 'Chain Fishing', baseOdds: 4096, generation: 6, supportsShinyCharm: true, description: 'Increases with consecutive hooks' },
   { id: 'gen6-dexnav', name: 'DexNav', baseOdds: 4096, generation: 6, supportsShinyCharm: true, description: 'Increases with Search Level' },
+  { id: 'gen6-egg-hatching', name: 'Egg Hatching', baseOdds: 683, generation: 6, supportsShinyCharm: true },
   { id: 'gen6-fossil-restore', name: 'Fossil Restore', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
   { id: 'gen6-friend-safari', name: 'Friend Safari', baseOdds: 512, generation: 6, supportsShinyCharm: true },
   { id: 'gen6-gift', name: 'Gift Pokémon', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
@@ -278,6 +291,9 @@ export const HUNTING_METHODS: HuntingMethod[] = [
   { id: 'gen9-fossil-restore', name: 'Fossil Restore', baseOdds: 4096, generation: 9, supportsShinyCharm: true },
   { id: 'gen9-hyperspace', name: 'Hyperspace', baseOdds: 4096, generation: 9, supportsShinyCharm: true },
   { id: 'gen9-tera-raid', name: 'Tera Raid', baseOdds: 4096, generation: 9, supportsShinyCharm: true },
+  { id: 'gen7-egg-hatching', name: 'Egg Hatching', baseOdds: 683, generation: 7, supportsShinyCharm: true },
+  { id: 'gen8-egg-hatching', name: 'Egg Hatching', baseOdds: 683, generation: 8, supportsShinyCharm: true },
+  { id: 'gen9-egg-hatching', name: 'Egg Hatching', baseOdds: 683, generation: 9, supportsShinyCharm: true },
 
   // --- Distribution / Event & Custom ---
   { id: 'distribution/event', name: 'Distribution / Event', baseOdds: 4096, generation: 0, supportsShinyCharm: false },
