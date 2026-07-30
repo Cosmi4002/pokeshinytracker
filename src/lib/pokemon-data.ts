@@ -463,7 +463,7 @@ const POKEMON_WITH_GENDER_DIFFERENCE_IDS = [
 ];
 
 export function getPokemonSpriteFallbackUrl(): string {
-  return '/img/items/pokemon-egg.svg';
+  return '/placeholder.svg';
 }
 
 export function toLocalPokemonSpriteUrl(remoteUrl: string): string {
@@ -482,13 +482,6 @@ export function toLocalPokemonSpriteUrl(remoteUrl: string): string {
 }
 
 export function handlePokemonSpriteError(img: HTMLImageElement, fallbackUrl = getPokemonSpriteFallbackUrl()) {
-  const currentSrc = img.currentSrc || img.src;
-  if (currentSrc && !currentSrc.includes('/placeholder.svg') && fallbackUrl !== '/placeholder.svg') {
-    img.onerror = null;
-    img.src = fallbackUrl;
-    return;
-  }
-
   img.onerror = null;
   img.src = fallbackUrl;
 }
@@ -850,10 +843,6 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
   const localUrl = toLocalPokemonSpriteUrl(rawUrl);
 
   if (localUrl !== rawUrl) return localUrl;
-
-  if (rawUrl.includes('raw.githubusercontent.com/PokeAPI')) {
-    return getPokemonSpriteFallbackUrl();
-  }
 
   return rawUrl;
 }

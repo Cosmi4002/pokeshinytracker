@@ -3,7 +3,7 @@ import { getPokemonSpriteFallbackUrl, getPokemonSpriteUrl } from './pokemon-data
 
 describe('pokemon sprite helpers', () => {
   it('returns a stable fallback asset for missing sprite images', () => {
-    expect(getPokemonSpriteFallbackUrl()).toBe('/img/items/pokemon-egg.svg');
+    expect(getPokemonSpriteFallbackUrl()).toBe('/placeholder.svg');
   });
 
   it('builds the expected HOME sprite URL for a base shiny Pokémon', () => {
