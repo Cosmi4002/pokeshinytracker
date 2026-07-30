@@ -52,6 +52,13 @@ export default function UserCollectionsSearch() {
     return raw === 'distribution/event' || raw === 'event';
   };
 
+  const getEncounterLabel = (method?: string | null) => {
+    const raw = normalizeMethod(method);
+    if (raw.includes('game corner')) return 'Seen';
+    if (raw.includes('masuda')) return 'Hatched';
+    return 'Encounters';
+  };
+
   const shouldShowEncounters = (method?: string | null, game?: string | null, attempts?: number | null, showEncounters = true) => {
     if (attempts === null) return false;
     if (!showEncounters) return false;
@@ -412,7 +419,7 @@ export default function UserCollectionsSearch() {
                               )}
                               <p className="text-xs text-muted-foreground truncate">Metodo: {formatMethodLabel(entry.method)}</p>
                               {shouldShowEncounters(entry.method, entry.game, entry.attempts, entry.show_encounters ?? true) ? (
-                                <p className="text-xs text-muted-foreground">Encounters: {entry.attempts ?? '-'}</p>
+                                <p className="text-xs text-muted-foreground">{getEncounterLabel(entry.method)}: {entry.attempts ?? '-'}</p>
                               ) : null}
                               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                                 <img src={SHINY_CHARM_ICON} alt="Cromamuleto" className="h-3 w-3 object-contain" />
@@ -470,7 +477,7 @@ export default function UserCollectionsSearch() {
                             )}
                             <p className="text-xs text-muted-foreground truncate">Metodo: {formatMethodLabel(entry.method)}</p>
                             {shouldShowEncounters(entry.method, entry.game, entry.attempts, entry.show_encounters ?? true) ? (
-                              <p className="text-xs text-muted-foreground">Encounters: {entry.attempts ?? '-'}</p>
+                              <p className="text-xs text-muted-foreground">{getEncounterLabel(entry.method)}: {entry.attempts ?? '-'}</p>
                             ) : null}
                             <div className="flex items-center gap-1 text-xs text-muted-foreground">
                               <img src={SHINY_CHARM_ICON} alt="Cromamuleto" className="h-3 w-3 object-contain" />
@@ -556,7 +563,7 @@ export default function UserCollectionsSearch() {
                               )}
                               <p className="text-xs text-muted-foreground truncate">Metodo: {formatMethodLabel(entry.method)}</p>
                               {shouldShowEncounters(entry.method, entry.game, entry.attempts, entry.show_encounters ?? true) ? (
-                                <p className="text-xs text-muted-foreground">Encounters: {entry.attempts ?? '-'}</p>
+                                <p className="text-xs text-muted-foreground">{getEncounterLabel(entry.method)}: {entry.attempts ?? '-'}</p>
                               ) : null}
                               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                                 <img src={SHINY_CHARM_ICON} alt="Cromamuleto" className="h-3 w-3 object-contain" />
