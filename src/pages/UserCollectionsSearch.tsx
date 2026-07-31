@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Search, Radio, UserRound, Users, ArrowUpCircle } from 'lucide-react';
+import { Calendar, Radio, Search, Sparkles, UserRound, Users, ArrowUpCircle } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,7 +8,9 @@ import { supabase } from '@/integrations/supabase/client';
 import type { Tables } from '@/integrations/supabase/types';
 import { getPokemonSpriteUrl } from '@/hooks/use-pokemon';
 import { SHINY_CHARM_ICON } from '@/lib/pokemon-data';
+import { GAME_LOGOS } from '@/lib/game-themes';
 import { toLocalISODate } from '@/lib/date';
+import { cn } from '@/lib/utils';
 
 type ProfileRow = Pick<Tables<'profiles'>, 'user_id' | 'username'>;
 type PublicCaughtRow = Pick<
@@ -276,32 +278,6 @@ export default function UserCollectionsSearch() {
     return Array.from(map.values()).sort((a, b) => b.count - a.count);
   }, [entries]);
 
-  const recentEntries = useMemo(() => {
-    const now = Date.now();
-    const fourDaysMs = 4 * 24 * 60 * 60 * 1000;
-
-    const toDayValue = (value?: string | null) => {
-      if (!value) return Number.NaN;
-      const day = value.slice(0, 10);
-      return new Date(`${day}T00:00:00Z`).getTime();
-    };
-
-    return entries
-      .filter((entry) => {
-        const capturedAt = Number.isFinite(toDayValue(entry.caught_date))
-          ? toDayValue(entry.caught_date)
-          : toDayValue(entry.created_at);
-        return Number.isFinite(capturedAt) && now - capturedAt <= fourDaysMs;
-      })
-      .sort((a, b) => {
-        const aDay = Number.isFinite(toDayValue(a.caught_date)) ? toDayValue(a.caught_date) : toDayValue(a.created_at);
-        const bDay = Number.isFinite(toDayValue(b.caught_date)) ? toDayValue(b.caught_date) : toDayValue(b.created_at);
-        const byCaughtDate = bDay - aDay;
-        if (byCaughtDate !== 0) return byCaughtDate;
-        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-      });
-  }, [entries]);
-
   const renderGenderIcon = (gender: string | null) => {
     if (gender === 'male') return <span className="text-blue-500">{'\u2642'}</span>;
     if (gender === 'female') return <span className="text-pink-500">{'\u2640'}</span>;
@@ -332,6 +308,145 @@ export default function UserCollectionsSearch() {
       } as const;
     }
     return undefined;
+  };
+
+  const renderPublicShinyCard = (
+    entry: PublicCaughtRow | PublicRecentRow,
+    keyPrefix: string,
+    options: { showUsername?: boolean; large?: boolean } = {}
+  ) => {
+    const sprite = entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, { shiny: true, name: entry.form || entry.pokemon_name });
+    const isEvent = isDistributionEvent(entry.method);
+    const showEntryEncounters = shouldShowEncounters(entry.method, entry.game, entry.attempts, entry.show_encounters ?? true);
+    const username = 'username' in entry ? entry.username : null;
+    const gameLogo = entry.game ? GAME_LOGOS[entry.game] : null;
+
+    return (
+      <div
+        key={`${keyPrefix}-${entry.id}`}
+        className="group relative overflow-hidden rounded-[1.4rem] border border-border bg-card text-card-foreground shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+      >
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.12),transparent_42%)] opacity-70" />
+        {renderEvolutionBadge(entry.is_evolved)}
+
+        <div className="relative p-3">
+          <div className="relative flex min-h-[118px] items-center justify-center overflow-hidden rounded-[1.05rem] border border-border bg-muted/55">
+            <div className="absolute inset-x-6 bottom-4 h-6 rounded-full bg-black/20 blur-xl" />
+            <img
+              src={sprite}
+              alt={entry.pokemon_name}
+              className={cn(
+                'relative z-10 object-contain transition-transform duration-300 group-hover:scale-105',
+                options.large ? 'h-28 w-28' : 'h-24 w-24',
+                entry.is_fail && 'drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]'
+              )}
+              style={getSpriteStyle(entry.is_fail, entry.is_unobtainable)}
+              loading="lazy"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/placeholder.svg';
+              }}
+            />
+          </div>
+
+          <div className="mt-3 space-y-2">
+            <div className="min-w-0 text-center">
+              <div className="flex min-w-0 items-center justify-center gap-1.5">
+                <h4 className="min-w-0 truncate text-base font-black leading-tight sm:text-lg">
+                  {entry.pokemon_name}
+                </h4>
+                {renderGenderIcon(entry.gender)}
+              </div>
+              <div className="mt-1 flex flex-wrap items-center justify-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
+                {entry.form && (
+                  <span className="max-w-full truncate rounded-full bg-muted px-2 py-0.5">
+                    {entry.form}
+                  </span>
+                )}
+                {options.showUsername && (
+                  <span className="max-w-full truncate rounded-full bg-muted px-2 py-0.5 normal-case tracking-normal">
+                    @{username || 'utente'}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="flex min-h-[42px] items-center justify-center">
+              {gameLogo ? (
+                <img
+                  src={gameLogo}
+                  alt={entry.game || 'Gioco'}
+                  className="h-9 w-auto max-w-[96px] object-contain brightness-110 drop-shadow"
+                  loading="lazy"
+                />
+              ) : (
+                <span className="rounded-full border border-border bg-muted px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-muted-foreground">
+                  {entry.game || 'Gioco non indicato'}
+                </span>
+              )}
+            </div>
+
+            <div className="flex justify-center">
+              <span className="inline-flex max-w-full items-center gap-1.5 truncate rounded-full border border-border bg-muted px-3 py-1 text-center text-[10px] font-black uppercase tracking-[0.12em] text-muted-foreground">
+                {isEvent && <Sparkles className="h-3 w-3 flex-shrink-0 text-fuchsia-400" />}
+                <span className="truncate">{formatMethodLabel(entry.method)}</span>
+              </span>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-center gap-1.5">
+              {entry.is_fail && (
+                <span className="rounded-full border border-red-500/40 bg-red-500/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.12em] text-red-500">
+                  Fail
+                </span>
+              )}
+              {entry.is_unobtainable && (
+                <span className="rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.12em] text-amber-500">
+                  Uncatchable
+                </span>
+              )}
+              {entry.has_shiny_charm && (
+                <span className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
+                  <img src={SHINY_CHARM_ICON} alt="Cromamuleto" className="h-4 w-4 object-contain" />
+                  Charm
+                </span>
+              )}
+            </div>
+
+            {!isEvent && (
+              <div className="grid grid-cols-2 gap-2 rounded-xl bg-muted/60 p-2">
+                <div className="min-w-0 text-center">
+                  <div className="flex items-center justify-center gap-1 text-[9px] font-black uppercase tracking-[0.12em] text-muted-foreground">
+                    <Calendar className="h-3 w-3" />
+                    Start
+                  </div>
+                  <div className="mt-0.5 truncate text-xs font-black tabular-nums">
+                    {entry.hunt_start_date ? formatDate(entry.hunt_start_date) : '--'}
+                  </div>
+                </div>
+                <div className="min-w-0 border-l border-border text-center">
+                  <div className="text-[9px] font-black uppercase tracking-[0.12em] text-muted-foreground">
+                    Caught
+                  </div>
+                  <div className="mt-0.5 truncate text-xs font-black tabular-nums">
+                    {formatDate(entry.caught_date)}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {showEntryEncounters && (
+              <div className="flex items-center justify-between rounded-xl bg-muted/60 px-3 py-2">
+                <span className="text-[10px] font-black uppercase tracking-[0.12em] text-muted-foreground">
+                  {getEncounterLabel(entry.method)}
+                </span>
+                <span className="text-lg font-black tabular-nums">
+                  {entry.attempts ? entry.attempts.toLocaleString() : '-'}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -376,65 +491,7 @@ export default function UserCollectionsSearch() {
               </div>
             )}
 
-            {selectedProfile && (
-              <div className="space-y-2 pt-2 border-t">
-                <h3 className="font-semibold">
-                  Anteprima ultime catture (4 giorni) di @{selectedProfile.username}
-                </h3>
-                {entriesLoading && <p className="text-sm text-muted-foreground">Caricamento anteprima...</p>}
-                {!entriesLoading && recentEntries.length === 0 && (
-                  <p className="text-sm text-muted-foreground">Nessuna cattura negli ultimi 4 giorni.</p>
-                )}
-                {!entriesLoading && recentEntries.length > 0 && (
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                    {recentEntries.map((entry) => {
-                      const sprite = entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, { shiny: true, name: entry.form || entry.pokemon_name });
-                      const isEvent = isDistributionEvent(entry.method);
-                      return (
-                        <div key={`preview-${entry.id}`} className="relative rounded-lg border p-3 bg-card">
-                          {renderEvolutionBadge(entry.is_evolved)}
-                          <div className="flex items-center gap-3">
-                            <img
-                              src={sprite}
-                              alt={entry.pokemon_name}
-                              className={entry.is_fail ? 'h-14 w-14 object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.25)]' : 'h-14 w-14 object-contain'}
-                              style={getSpriteStyle(entry.is_fail, entry.is_unobtainable)}
-                              loading="lazy"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).src = '/placeholder.svg';
-                              }}
-                            />
-                            <div className="min-w-0">
-                              <p className="font-medium truncate flex items-center gap-1">
-                                <span className="truncate">{entry.pokemon_name}</span>
-                                {renderGenderIcon(entry.gender)}
-                              </p>
-                              <p className="text-xs text-muted-foreground truncate">{entry.form || 'Forma base'}</p>
-                              {entry.is_fail && <p className="text-xs font-bold text-red-500">FAIL</p>}
-                              {entry.is_unobtainable && <p className="text-xs font-bold text-amber-500">UNCATCHABLE</p>}
-                              {!isEvent && <p className="text-xs text-muted-foreground">{formatDate(entry.caught_date)}</p>}
-                              <p className="text-xs text-muted-foreground truncate">Gioco: {entry.game || '-'}</p>
-                              {!isEvent && (
-                                <p className="text-xs text-muted-foreground">Inizio: {entry.hunt_start_date ? formatDate(entry.hunt_start_date) : '--'}</p>
-                              )}
-                              <p className="text-xs text-muted-foreground truncate">Metodo: {formatMethodLabel(entry.method)}</p>
-                              {shouldShowEncounters(entry.method, entry.game, entry.attempts, entry.show_encounters ?? true) ? (
-                                <p className="text-xs text-muted-foreground">{getEncounterLabel(entry.method)}: {entry.attempts ?? '-'}</p>
-                              ) : null}
-                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                <img src={SHINY_CHARM_ICON} alt="Cromamuleto" className="h-3 w-3 object-contain" />
-                                <span>Cromamuleto: {entry.has_shiny_charm ? 'Si' : 'No'}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
-
+            {!selectedProfile && (
             <div className="space-y-2 pt-2 border-t">
               <h3 className="font-semibold">Anteprima tutti gli utenti (ultimi 4 giorni)</h3>
               {globalRecentLoading && <p className="text-sm text-muted-foreground">Caricamento anteprima globale...</p>}
@@ -443,54 +500,12 @@ export default function UserCollectionsSearch() {
                 <p className="text-sm text-muted-foreground">Nessuna cattura pubblica negli ultimi 4 giorni.</p>
               )}
               {!globalRecentLoading && globalRecentEntries.length > 0 && (
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                  {globalRecentEntries.map((entry) => {
-                    const sprite = entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, { shiny: true, name: entry.form || entry.pokemon_name });
-                    const isEvent = isDistributionEvent(entry.method);
-                    return (
-                      <div key={`global-${entry.id}`} className="relative rounded-lg border p-3 bg-card">
-                        {renderEvolutionBadge(entry.is_evolved)}
-                        <div className="flex items-center gap-3">
-                          <img
-                            src={sprite}
-                            alt={entry.pokemon_name}
-                            className={entry.is_fail ? 'h-14 w-14 object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.25)]' : 'h-14 w-14 object-contain'}
-                            style={getSpriteStyle(entry.is_fail, entry.is_unobtainable)}
-                            loading="lazy"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = '/placeholder.svg';
-                            }}
-                          />
-                          <div className="min-w-0">
-                            <p className="font-medium truncate flex items-center gap-1">
-                              <span className="truncate">{entry.pokemon_name}</span>
-                              {renderGenderIcon(entry.gender)}
-                            </p>
-                            <p className="text-xs text-muted-foreground truncate">{entry.form || 'Forma base'}</p>
-                            <p className="text-xs text-muted-foreground truncate">@{entry.username || 'utente'}</p>
-                            {entry.is_fail && <p className="text-xs font-bold text-red-500">FAIL</p>}
-                            {entry.is_unobtainable && <p className="text-xs font-bold text-amber-500">UNCATCHABLE</p>}
-                            {!isEvent && <p className="text-xs text-muted-foreground">{formatDate(entry.caught_date)}</p>}
-                            <p className="text-xs text-muted-foreground truncate">Gioco: {entry.game || '-'}</p>
-                            {!isEvent && (
-                              <p className="text-xs text-muted-foreground">Inizio: {entry.hunt_start_date ? formatDate(entry.hunt_start_date) : '--'}</p>
-                            )}
-                            <p className="text-xs text-muted-foreground truncate">Metodo: {formatMethodLabel(entry.method)}</p>
-                            {shouldShowEncounters(entry.method, entry.game, entry.attempts, entry.show_encounters ?? true) ? (
-                              <p className="text-xs text-muted-foreground">{getEncounterLabel(entry.method)}: {entry.attempts ?? '-'}</p>
-                            ) : null}
-                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                              <img src={SHINY_CHARM_ICON} alt="Cromamuleto" className="h-3 w-3 object-contain" />
-                              <span>Cromamuleto: {entry.has_shiny_charm ? 'Si' : 'No'}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {globalRecentEntries.map((entry) => renderPublicShinyCard(entry, 'global', { showUsername: true }))}
                 </div>
               )}
             </div>
+            )}
           </CardContent>
         </Card>
 
@@ -515,12 +530,25 @@ export default function UserCollectionsSearch() {
               )}
 
               {!entriesLoading && groupedByPokemon.length > 0 && (
-                <div className="space-y-2">
-                  <h3 className="font-semibold">Riepilogo collezione</h3>
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <h3 className="font-semibold">Riepilogo collezione</h3>
+                    <span className="rounded-full border border-border bg-muted px-3 py-1 text-xs font-black text-muted-foreground">
+                      Top {Math.min(groupedByPokemon.length, 24)}
+                    </span>
+                  </div>
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
                     {groupedByPokemon.slice(0, 24).map((item, index) => (
-                      <div key={`${item.pokemonId}-${item.form}-${index}`} className="rounded-md border p-2 text-sm">
-                        {item.name} {item.form ? `(${item.form})` : ''} x{item.count}
+                      <div
+                        key={`${item.pokemonId}-${item.form}-${index}`}
+                        className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card px-3 py-2 text-sm shadow-sm"
+                      >
+                        <span className="min-w-0 truncate font-bold">
+                          {item.name} {item.form ? `(${item.form})` : ''}
+                        </span>
+                        <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-black tabular-nums text-muted-foreground">
+                          x{item.count}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -530,50 +558,8 @@ export default function UserCollectionsSearch() {
               {!entriesLoading && entries.length > 0 && (
                 <div className="space-y-2">
                   <h3 className="font-semibold">Ultime catture</h3>
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                    {entries.map((entry) => {
-                      const sprite = entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, { shiny: true, name: entry.form || entry.pokemon_name });
-                      const isEvent = isDistributionEvent(entry.method);
-                      return (
-                        <div key={entry.id} className="relative rounded-lg border p-3 bg-card">
-                          {renderEvolutionBadge(entry.is_evolved)}
-                          <div className="flex items-center gap-3">
-                            <img
-                              src={sprite}
-                              alt={entry.pokemon_name}
-                              className={entry.is_fail ? 'h-16 w-16 object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.25)]' : 'h-16 w-16 object-contain'}
-                              style={getSpriteStyle(entry.is_fail, entry.is_unobtainable)}
-                              loading="lazy"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).src = '/placeholder.svg';
-                              }}
-                            />
-                            <div className="min-w-0">
-                              <p className="font-medium truncate flex items-center gap-1">
-                                <span className="truncate">{entry.pokemon_name}</span>
-                                {renderGenderIcon(entry.gender)}
-                              </p>
-                              <p className="text-xs text-muted-foreground truncate">{entry.form || 'Forma base'}</p>
-                              {entry.is_fail && <p className="text-xs font-bold text-red-500">FAIL</p>}
-                              {entry.is_unobtainable && <p className="text-xs font-bold text-amber-500">UNCATCHABLE</p>}
-                              {!isEvent && <p className="text-xs text-muted-foreground">{formatDate(entry.caught_date)}</p>}
-                              <p className="text-xs text-muted-foreground truncate">Gioco: {entry.game || '-'}</p>
-                              {!isEvent && (
-                                <p className="text-xs text-muted-foreground">Inizio: {entry.hunt_start_date ? formatDate(entry.hunt_start_date) : '--'}</p>
-                              )}
-                              <p className="text-xs text-muted-foreground truncate">Metodo: {formatMethodLabel(entry.method)}</p>
-                              {shouldShowEncounters(entry.method, entry.game, entry.attempts, entry.show_encounters ?? true) ? (
-                                <p className="text-xs text-muted-foreground">{getEncounterLabel(entry.method)}: {entry.attempts ?? '-'}</p>
-                              ) : null}
-                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                <img src={SHINY_CHARM_ICON} alt="Cromamuleto" className="h-3 w-3 object-contain" />
-                                <span>Cromamuleto: {entry.has_shiny_charm ? 'Si' : 'No'}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {entries.map((entry) => renderPublicShinyCard(entry, 'collection', { large: true }))}
                   </div>
                 </div>
               )}

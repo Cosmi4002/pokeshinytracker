@@ -283,8 +283,13 @@ export function Navbar() {
                     />
                     Avatar
                   </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent className="w-[92vw] max-w-sm p-3 max-h-[70vh] overflow-y-auto">
-                    <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
+                  <DropdownMenuSubContent
+                    side="bottom"
+                    alignOffset={-8}
+                    collisionPadding={8}
+                    className="w-[calc(100vw-1rem)] max-w-sm max-h-[68vh] overflow-y-auto overflow-x-hidden p-3"
+                  >
+                    <div className="grid grid-cols-4 justify-items-center gap-2 sm:grid-cols-5">
                       {orderedTrainerAvatars.map((avatar) => (
                         <button
                           type="button"
