@@ -666,6 +666,7 @@ export function ShinyCounter({
               <MethodSelector
                 value={safeSelectedMethod.id}
                 onChange={setSelectedMethod}
+                currentOdds={stats.currentOdds}
               />
             </div>
 

@@ -56,7 +56,7 @@ export default function UserCollectionsSearch() {
 
   const getEncounterLabel = (method?: string | null) => {
     const raw = normalizeMethod(method);
-    if (raw.includes('game corner')) return 'Seen';
+    if (raw.includes('game corner') || raw.includes('game-corner')) return 'Seen';
     if (raw.includes('masuda')) return 'Hatched';
     return 'Encounters';
   };

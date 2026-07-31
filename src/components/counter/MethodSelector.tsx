@@ -20,9 +20,10 @@ import { findHuntingMethod, HUNTING_METHODS, HuntingMethod } from '@/lib/pokemon
 interface MethodSelectorProps {
   value: string;
   onChange: (method: HuntingMethod) => void;
+  currentOdds?: number;
 }
 
-export function MethodSelector({ value, onChange }: MethodSelectorProps) {
+export function MethodSelector({ value, onChange, currentOdds }: MethodSelectorProps) {
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -70,7 +71,7 @@ export function MethodSelector({ value, onChange }: MethodSelectorProps) {
             <span className="flex items-center justify-between w-full gap-2 pr-2">
               <span>{selectedMethod.name}</span>
               <span className="text-xs text-muted-foreground">
-                1/{selectedMethod.baseOdds.toLocaleString()}
+                1/{(currentOdds ?? selectedMethod.baseOdds).toLocaleString()}
               </span>
             </span>
           ) : (

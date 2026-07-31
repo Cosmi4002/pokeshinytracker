@@ -96,13 +96,24 @@ export const getDynamicOdds = (methodId: string, encounters: number, hasShinyCha
     return Math.round(4096 / totalRolls);
   }
   if (methodId === 'gen6-pokeradar') {
+    // App-facing Gen 6 Radar odds: standard Gen 6 base rate, then chain boosts up to 40.
+    const chain = Math.min(Math.max(encounters, 0), 40);
+    const totalRolls = 1 + chain + charmRolls;
+    return Math.max(100, Math.round(4096 / totalRolls));
+  }
+  if (methodId === 'gen6-pokeradar') {
+    // Gen 6 Poke Radar (XY): rapidly-shaking shiny patches use
+    // 1 / (8100 - chain * 200), capped at 1/100 from chain 40.
+    const chain = Math.min(Math.max(encounters, 0), 40);
+    return Math.max(100, 8100 - chain * 200);
+
     // Gen 6 Poke Radar (XY/ORAS): odds increase with chain length, caps at chain 40.
     // Shiny Charm is supported in Gen 6 and roughly doubles the shiny chance.
-    const chain = Math.min(encounters, 40);
-    if (chain >= 40) return hasShinyCharm ? 100 : 200;
+    const oldChain = Math.min(encounters, 40);
+    if (oldChain >= 40) return hasShinyCharm ? 100 : 200;
     if (chain >= 30) {
       // Linear interpolation: chain 30 → ~1/1300, chain 40 → 1/200
-      const baseOdds = 200 + (40 - chain) * 110;
+      const baseOdds = 200 + (40 - oldChain) * 110;
       return hasShinyCharm ? Math.round(baseOdds / 2) : baseOdds;
     }
     return hasShinyCharm ? 1365 : 4096;
@@ -250,8 +261,9 @@ export const HUNTING_METHODS: HuntingMethod[] = [
   { id: 'gen6-gift', name: 'Gift Pokémon', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
   { id: 'gen6-horde', name: 'Horde Encounter', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
   { id: 'gen6-masuda', name: 'Masuda Method', baseOdds: 683, generation: 6, supportsShinyCharm: true },
-  { id: 'gen6-pokeradar', name: 'Poke Radar', baseOdds: 4096, generation: 6, supportsShinyCharm: true, description: 'Increases with Chain' },
+  { id: 'gen6-pokeradar', name: 'Poke Radar', baseOdds: 4096, generation: 6, supportsShinyCharm: true, description: 'Base 1/4096, chain boosts up to 40' },
   { id: 'gen6-random', name: 'Random Encounter', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
+  { id: 'gen6-rock-smash', name: 'Rock Smash', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
   { id: 'gen6-runaway', name: 'Runaway', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
   { id: 'gen6-soft-reset', name: 'Soft Reset', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
   // --- Gen 7 ---
