@@ -492,7 +492,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                   <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em] block mb-1.5">
                     {encountersLabel}
                   </span>
-                                    <div className="flex-1 flex items-center justify-center rounded-md bg-black/25 px-1.5 py-2 relative">
+                  <div className="flex-1 flex items-center justify-center rounded-md bg-black/25 px-1.5 py-2 relative">
                     {isMasuda && (
                       <span className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center justify-center">
                         <img
@@ -503,7 +503,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                         />
                       </span>
                     )}
-                    <div className="flex flex-col items-center justify-center w-full relative">
+                    <div className="flex flex-col items-center justify-center w-full gap-1.5 relative">
                       <span className={cn(
                         "font-black tabular-nums tracking-tight text-white leading-none text-[1.7rem] sm:text-[1.45rem]",
                         isMasuda && "mx-auto"
@@ -511,8 +511,8 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                         {entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-'}
                       </span>
                       {(entry as any).show_seen && (
-                        <span className="absolute right-0 bottom-0 text-[10px] sm:text-[11px] font-bold text-white/50 tracking-wide tabular-nums leading-none">
-                          ({(entry as any).seen_count ?? 0} seen)
+                        <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[9px] sm:text-[10px] font-bold text-white/55 tracking-wide tabular-nums">
+                          {(entry as any).seen_count ?? 0} seen
                         </span>
                       )}
                     </div>
@@ -545,17 +545,24 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                           Total
                         </span>
                       </div>
-                      <span className="text-[10px] sm:text-[11px] font-black tabular-nums text-white/95">
-                        {entry.total_value && entry.total_value > 0
-                          ? entry.total_value.toLocaleString()
-                          : (entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-')}
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] sm:text-[11px] font-black tabular-nums text-white/95">
+                          {entry.total_value && entry.total_value > 0
+                            ? entry.total_value.toLocaleString()
+                            : (entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-')}
+                        </span>
+                        {(entry as any).show_seen && (
+                          <span className="text-[9px] sm:text-[10px] font-bold text-white/50 tracking-wide tabular-nums">
+                            ({(entry as any).seen_count ?? 0} seen)
+                          </span>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
               ) : (entry as any).show_seen ? (
                 <div
-                  className="rounded-lg p-2 border shadow-lg flex flex-col"
+                  className="rounded-lg p-2 border shadow-lg flex flex-col min-h-[72px]"
                   style={{
                     background: hasDualGameTheme
                       ? `linear-gradient(145deg, color-mix(in srgb, ${theme.primary} 30%, rgba(14,14,14,0.96)), color-mix(in srgb, ${secondaryTheme!.secondary} 30%, rgba(10,10,10,0.94)))`
@@ -565,15 +572,18 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                       : `${theme.accent}66`,
                   }}
                 >
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-1">
-                      <Crosshair className="w-3 h-3 text-white/70" />
-                      <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em]">
-                        Seen
-                      </span>
-                    </div>
-                    <span className="text-[10px] sm:text-[11px] font-black tabular-nums text-white/95">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <Crosshair className="w-3 h-3 text-white/70" />
+                    <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em]">
+                      Seen
+                    </span>
+                  </div>
+                  <div className="flex flex-1 items-end justify-between gap-2">
+                    <span className="text-lg sm:text-xl font-black tabular-nums text-white/95 leading-none tracking-tight">
                       {(entry as any).seen_count ?? 0}
+                    </span>
+                    <span className="inline-flex items-center rounded-full border border-white/10 bg-black/25 px-2 py-0.5 text-[9px] sm:text-[10px] font-bold text-white/55 tracking-wide">
+                      tracked
                     </span>
                   </div>
                 </div>
