@@ -68,6 +68,8 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
   const [phaseNumber, setPhaseNumber] = useState<number | null>(null);
     const [showTotal, setShowTotal] = useState(false);
   const [totalValue, setTotalValue] = useState<number | null>(null);
+  const [showTotalSeen, setShowTotalSeen] = useState(false);
+  const [totalSeenCount, setTotalSeenCount] = useState<number | null>(null);
   const [showSeen, setShowSeen] = useState(false);
   const [seenCount, setSeenCount] = useState<number | null>(null);
   const [playlistId, setPlaylistId] = useState<string>('');
@@ -192,6 +194,8 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
             setPhaseNumber(entry.phase_number ?? null);
       setShowTotal(entry.show_total ?? false);
       setTotalValue(entry.total_value ?? null);
+      setShowTotalSeen(entry.show_total_seen ?? false);
+      setTotalSeenCount(entry.total_seen_count ?? null);
       setShowSeen((entry as any).show_seen ?? false);
       setSeenCount((entry as any).seen_count ?? null);
       setPlaylistId(entry.playlist_id ?? '');
@@ -262,9 +266,11 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
           is_gigamax: isGigamax,
           is_legends_arceus: isLegendsArceus,
           is_unobtainable: isUnobtainable,
-                    phase_number: phaseNumber,
+          phase_number: phaseNumber,
           show_total: showTotal,
           total_value: showTotal ? (totalValue ?? attempts) : null,
+          show_total_seen: showTotalSeen,
+          total_seen_count: showTotalSeen ? totalSeenCount : null,
           show_seen: showSeen,
           seen_count: showSeen ? seenCount : null,
           playlist_id: playlistId || null,
@@ -304,7 +310,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* 1. Sprite & Quick Selectors */}
           {pokemonId && (
-            <div className="flex flex-col items-center gap-4 p-4 bg-muted rounded-lg">
+              <div className="flex flex-col items-center gap-4 p-4 bg-muted rounded-lg border border-border shadow-inner">
               <img
                 key={spriteUrl}
                 src={spriteUrl}
@@ -318,7 +324,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
               <div className="flex items-center gap-2 w-full justify-center">
                 {/* Form Selector (Compact) */}
                 <Select value={form || 'default'} onValueChange={(v) => setForm(v === 'default' ? '' : v)}>
-                  <SelectTrigger className="h-8 w-[200px] rounded-full bg-background/50 backdrop-blur-sm border-primary/20 hover:border-primary/50 transition-colors text-xs">
+                    <SelectTrigger className="h-8 w-[200px] rounded-full bg-background border-border hover:border-foreground/30 transition-colors text-xs">
                     <Sparkles className="mr-2 h-4 w-4 text-amber-400 fill-amber-400/20" />
                     <SelectValue placeholder="Forma base" />
                   </SelectTrigger>
@@ -587,6 +593,45 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
                 value={showSeen ? (seenCount ?? '') : ''}
                 placeholder="Es: 123"
                 onChange={(e) => setSeenCount(e.target.value ? Math.max(0, parseInt(e.target.value) || 0) : null)}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 items-end">
+            <div className="flex items-center gap-2 px-1">
+              <Checkbox
+                id="edit-show-total-seen"
+                checked={showTotalSeen}
+                onCheckedChange={(v) => {
+                  const enabled = v === true;
+                  setShowTotalSeen(enabled);
+                  if (enabled) {
+                    setShowTotal(true);
+                    if (totalValue === null) {
+                      setTotalValue(attempts);
+                    }
+                    if (totalSeenCount === null) {
+                      setTotalSeenCount(0);
+                    }
+                  }
+                  if (!enabled) {
+                    setTotalSeenCount(null);
+                  }
+                }}
+              />
+              <Label htmlFor="edit-show-total-seen" className="cursor-pointer select-none">
+                Mostra "Total Seen"
+              </Label>
+            </div>
+            <div className="space-y-2">
+              <Label>Total Seen</Label>
+              <Input
+                type="number"
+                min={0}
+                disabled={!showTotalSeen}
+                value={showTotalSeen ? (totalSeenCount ?? '') : ''}
+                placeholder="Es: 123"
+                onChange={(e) => setTotalSeenCount(e.target.value ? Math.max(0, parseInt(e.target.value) || 0) : null)}
               />
             </div>
           </div>

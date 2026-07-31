@@ -86,6 +86,8 @@ export function FinishHuntDialog({
     const [phaseNumber, setPhaseNumber] = useState<number | null>(null);
   const [showTotal, setShowTotal] = useState(false);
   const [totalValue, setTotalValue] = useState<number | null>(null);
+  const [showTotalSeen, setShowTotalSeen] = useState(false);
+  const [totalSeenCount, setTotalSeenCount] = useState<number | null>(null);
   const [showSeen, setShowSeen] = useState(false);
   const [seenCount, setSeenCount] = useState<number | null>(null);
   const [playlistId, setPlaylistId] = useState<string>('');
@@ -232,6 +234,8 @@ export function FinishHuntDialog({
         phase_number: phaseNumber,
                 show_total: showTotal,
         total_value: showTotal ? (totalValue ?? attempts) : null,
+        show_total_seen: showTotalSeen,
+        total_seen_count: showTotalSeen ? totalSeenCount : null,
         show_seen: showSeen,
         seen_count: showSeen ? seenCount : null,
         playlist_id: playlistId || null,
@@ -277,7 +281,7 @@ export function FinishHuntDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="flex items-center gap-4 p-4 bg-muted rounded-lg">
+              <div className="flex items-center gap-4 p-4 bg-muted rounded-lg border border-border shadow-inner">
             <img
               key={spriteUrl}
               src={spriteUrl}
@@ -346,7 +350,7 @@ export function FinishHuntDialog({
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="max-h-72 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-muted/20 [&::-webkit-scrollbar-thumb]:bg-primary/40 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-primary/60">
+              <SelectContent className="max-h-72 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-muted [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-muted-foreground">
                 {POKEBALLS.map((ball) => (
                   <SelectItem key={ball.id} value={ball.id}>
                     <div className="flex items-center gap-2">
@@ -365,7 +369,7 @@ export function FinishHuntDialog({
               <SelectTrigger>
                 <SelectValue placeholder="Seleziona il gioco" />
               </SelectTrigger>
-              <SelectContent className="max-h-72 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-muted/20 [&::-webkit-scrollbar-thumb]:bg-primary/40 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-primary/60">
+                <SelectContent className="max-h-72 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-muted [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-muted-foreground">
                 {GAMES.map((g) => (
                   <SelectItem key={g.id} value={g.id}>
                     {g.name}
@@ -508,6 +512,45 @@ export function FinishHuntDialog({
                 value={showSeen ? (seenCount ?? '') : ''}
                 placeholder="Es: 123"
                 onChange={(e) => setSeenCount(e.target.value ? Math.max(0, parseInt(e.target.value) || 0) : null)}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 items-end">
+            <div className="flex items-center gap-2 px-1">
+              <Checkbox
+                id="finish-show-total-seen"
+                checked={showTotalSeen}
+                onCheckedChange={(v) => {
+                  const enabled = v === true;
+                  setShowTotalSeen(enabled);
+                  if (enabled) {
+                    setShowTotal(true);
+                    if (totalValue === null) {
+                      setTotalValue(attempts);
+                    }
+                    if (totalSeenCount === null) {
+                      setTotalSeenCount(0);
+                    }
+                  }
+                  if (!enabled) {
+                    setTotalSeenCount(null);
+                  }
+                }}
+              />
+              <Label htmlFor="finish-show-total-seen" className="cursor-pointer select-none">
+                Mostra "Total Seen"
+              </Label>
+            </div>
+            <div className="space-y-2">
+              <Label>Total Seen</Label>
+              <Input
+                type="number"
+                min={0}
+                disabled={!showTotalSeen}
+                value={showTotalSeen ? (totalSeenCount ?? '') : ''}
+                placeholder="Es: 123"
+                onChange={(e) => setTotalSeenCount(e.target.value ? Math.max(0, parseInt(e.target.value) || 0) : null)}
               />
             </div>
           </div>

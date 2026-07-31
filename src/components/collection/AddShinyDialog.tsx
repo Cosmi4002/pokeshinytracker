@@ -64,6 +64,8 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
   const [phaseNumber, setPhaseNumber] = useState<number | null>(null);
     const [showTotal, setShowTotal] = useState(false);
   const [totalValue, setTotalValue] = useState<number | null>(null);
+  const [showTotalSeen, setShowTotalSeen] = useState(false);
+  const [totalSeenCount, setTotalSeenCount] = useState<number | null>(null);
   const [showSeen, setShowSeen] = useState(false);
   const [seenCount, setSeenCount] = useState<number | null>(null);
   const [playlistId, setPlaylistId] = useState<string>('');
@@ -160,6 +162,8 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
     setPhaseNumber(null);
     setShowTotal(false);
     setTotalValue(null);
+    setShowTotalSeen(false);
+    setTotalSeenCount(null);
     setShowSeen(false);
     setSeenCount(null);
     setPlaylistId('');
@@ -212,6 +216,8 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
         phase_number: phaseNumber,
         show_total: showTotal,
         total_value: showTotal ? (totalValue ?? attempts) : null,
+        show_total_seen: showTotalSeen,
+        total_seen_count: showTotalSeen ? totalSeenCount : null,
         show_seen: showSeen,
         seen_count: showSeen ? seenCount : null,
         playlist_id: playlistId || null,
@@ -240,7 +246,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Aggiungi Shiny alla collezione</DialogTitle>
         </DialogHeader>
@@ -248,7 +254,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* 1. Sprite & Quick Selectors */}
           {pokemonId && (
-            <div className="flex flex-col items-center gap-4 p-4 bg-muted rounded-lg border border-primary/10 shadow-inner">
+              <div className="flex flex-col items-center gap-4 p-4 bg-muted rounded-lg border border-border shadow-inner">
               <img
                 key={spriteUrl}
                 src={spriteUrl}
@@ -262,7 +268,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
               <div className="flex items-center gap-2 w-full justify-center">
                 {/* Form Selector (Compact) */}
                 <Select value={form || 'default'} onValueChange={(v) => setForm(v === 'default' ? '' : v)}>
-                  <SelectTrigger className="h-8 w-[200px] rounded-full bg-background/50 backdrop-blur-sm border-primary/20 hover:border-primary/50 transition-colors text-xs">
+                    <SelectTrigger className="h-8 w-[200px] rounded-full bg-background border-border hover:border-foreground/30 transition-colors text-xs">
                     <Sparkles className="mr-2 h-4 w-4 text-amber-400 fill-amber-400/20" />
                     <SelectValue placeholder="Forma base" />
                   </SelectTrigger>
@@ -337,7 +343,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="max-h-72 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-muted/20 [&::-webkit-scrollbar-thumb]:bg-primary/40 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-primary/60">
+                  <SelectContent className="max-h-72 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-muted [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-muted-foreground">
                 {POKEBALLS.map((ball) => (
                   <SelectItem key={ball.id} value={ball.id}>
                     <div className="flex items-center gap-2">
@@ -357,7 +363,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="max-h-72 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-muted/20 [&::-webkit-scrollbar-thumb]:bg-primary/40 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-primary/60">
+                  <SelectContent className="max-h-72 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-muted [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-muted-foreground">
                 {GAMES.map((g) => (
                   <SelectItem key={g.id} value={g.id}>
                     {g.name}
@@ -374,7 +380,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="max-h-72 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-muted/20 [&::-webkit-scrollbar-thumb]:bg-primary/40 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-primary/60">
+                <SelectContent className="max-h-72 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-muted [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-muted-foreground">
                 <SelectItem value="none">Nessuno</SelectItem>
                 {GAMES.filter((g) => g.id !== game).map((g) => (
                   <SelectItem key={g.id} value={g.id}>
@@ -531,6 +537,45 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
                 value={showSeen ? (seenCount ?? '') : ''}
                 placeholder="Es: 123"
                 onChange={(e) => setSeenCount(e.target.value ? Math.max(0, parseInt(e.target.value) || 0) : null)}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 items-end">
+            <div className="flex items-center gap-2 px-1">
+              <Checkbox
+                id="show-total-seen"
+                checked={showTotalSeen}
+                onCheckedChange={(v) => {
+                  const enabled = v === true;
+                  setShowTotalSeen(enabled);
+                  if (enabled) {
+                    setShowTotal(true);
+                    if (totalValue === null) {
+                      setTotalValue(attempts);
+                    }
+                    if (totalSeenCount === null) {
+                      setTotalSeenCount(0);
+                    }
+                  }
+                  if (!enabled) {
+                    setTotalSeenCount(null);
+                  }
+                }}
+              />
+              <Label htmlFor="show-total-seen" className="cursor-pointer select-none">
+                Mostra "Total Seen"
+              </Label>
+            </div>
+            <div className="space-y-2">
+              <Label>Total Seen</Label>
+              <Input
+                type="number"
+                min={0}
+                disabled={!showTotalSeen}
+                value={showTotalSeen ? (totalSeenCount ?? '') : ''}
+                placeholder="Es: 123"
+                onChange={(e) => setTotalSeenCount(e.target.value ? Math.max(0, parseInt(e.target.value) || 0) : null)}
               />
             </div>
           </div>

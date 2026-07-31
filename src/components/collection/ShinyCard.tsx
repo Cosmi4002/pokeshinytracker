@@ -49,8 +49,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   }, [(entry as any).secondary_game, secondaryThemeOverride]);
   const pokeball = useMemo(() => POKEBALLS.find((b) => b.id === entry.pokeball), [entry.pokeball]);
   const method = useMemo(() => findHuntingMethod(entry.method), [entry.method]);
-  const hasBottomMeta = entry.has_shiny_charm || isGigamax || entry.is_fail || entry.is_unobtainable;
-  const hasOnlyShinyCharm = entry.has_shiny_charm && !isGigamax && !entry.is_fail && !entry.is_unobtainable;
+  const hasBottomMeta = isGigamax || isLegendsArceus || entry.is_fail || entry.is_unobtainable;
   const encountersLabel = normalizedMethod.includes('game corner') ? 'Seen' : (isMasuda ? 'Hatched' : 'Encounters');
   const showEncounters = useMemo(() => {
     if (entry.attempts === null) return false;
@@ -189,156 +188,8 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
           <div className="absolute left-0 right-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-fuchsia-300/70 to-transparent" />
         </div>
       )}
-      <div className="relative w-full h-40 sm:h-44 overflow-hidden bg-black/40">
-        {hasDualGameTheme ? (
-          <div
-            className="absolute inset-0 z-0"
-            style={{
-              background: dualThemeHeroBackground!,
-            }}
-          />
-        ) : (
-          <>
-            <div
-              className="absolute inset-0 z-0"
-              style={{
-                background: `radial-gradient(circle at 50% 30%, ${theme.secondary} 0%, #111 58%, ${theme.primary} 100%)`,
-              }}
-            />
-            <div
-              className="absolute inset-0 z-0 opacity-45"
-              style={{
-                background: `radial-gradient(circle at 22% 18%, ${theme.accent}, transparent 42%), radial-gradient(circle at 78% 78%, ${theme.primary}, transparent 52%)`,
-              }}
-            />
-          </>
-        )}
-        {applyBlackEffect && (
-          <div
-            className="absolute inset-0 z-0 opacity-65"
-            style={{
-              background:
-                'radial-gradient(circle at 50% 25%, rgba(11,11,13,0.78) 0%, rgba(25,31,63,0.48) 45%, rgba(8,10,20,0.86) 100%)',
-            }}
-          />
-        )}
-
-        <div className="absolute inset-0 flex items-center justify-center z-10 p-2">
-          <div
-            className="absolute bottom-6 w-24 h-6 blur-xl opacity-60 rounded-[100%]"
-            style={{
-              background: hasDualGameTheme
-                ? `radial-gradient(ellipse at center, color-mix(in srgb, ${theme.primary} 55%, ${secondaryTheme!.primary}) 0%, transparent 72%)`
-                : `radial-gradient(ellipse at center, ${theme.primary}, transparent 70%)`,
-            }}
-          />
-          <div className="h-28 w-28 sm:h-32 sm:w-32 flex items-center justify-center">
-            <img
-              key={spriteUrl}
-              src={toLocalPokemonSpriteUrl(spriteUrl)}
-              loading="lazy"
-              decoding="async"
-              referrerPolicy="no-referrer"
-              alt={entry.pokemon_name}
-              className={cn(
-                "h-full w-full object-contain pokemon-sprite transition-all duration-300 group-hover:scale-105 relative z-10",
-                isFail
-                  ? "drop-shadow-[0_0_12px_rgba(255,255,255,0.25)]"
-                  : "drop-shadow-[0_8px_16px_rgba(0,0,0,0.75)]"
-              )}
-              style={{
-                imageRendering: 'auto',
-                filter: isFail
-                  ? 'brightness(0) contrast(1.3)'
-                  : entry.is_unobtainable
-                    ? 'grayscale(1) brightness(1.05) contrast(0.95)'
-                    : undefined,
-              }}
-              onError={(e) => {
-                handlePokemonSpriteError(e.currentTarget);
-              }}
-            />
-          </div>
-        </div>
-
-        <div className="absolute top-2 left-2 right-2 flex justify-between items-start z-20">
-          <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-300 -translate-x-2 group-hover:translate-x-0">
-            <Button
-              variant="secondary"
-              size="icon"
-              onClick={onEdit}
-              className="h-7 w-7 rounded-full bg-black/55 hover:bg-white text-white hover:text-black border border-white/10 backdrop-blur-md shadow-lg"
-            >
-              <Pencil className="h-3.5 w-3.5" />
-            </Button>
-            <Button
-              variant="secondary"
-              size="icon"
-              onClick={onToggleEvolved}
-              className={cn(
-                "h-7 w-7 rounded-full text-white border border-white/10 backdrop-blur-md shadow-lg",
-                isEvolved ? "bg-emerald-600 hover:bg-emerald-700" : "bg-black/55 hover:bg-emerald-500"
-              )}
-              title={isEvolved ? 'Segna come non evoluto' : 'Segna come evoluto'}
-            >
-              <ArrowUpCircle className="h-3.5 w-3.5" />
-            </Button>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  className="h-7 w-7 rounded-full bg-black/55 hover:bg-destructive text-white border border-white/10 backdrop-blur-md shadow-lg"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent className="bg-[#1a1a1a] border-white/10 text-white">
-                <AlertDialogHeader>
-                  <AlertDialogTitle className="text-xl font-bold">Delete {displayName}?</AlertDialogTitle>
-                  <AlertDialogDescription className="text-white/60">
-                    Sei sicuro di voler eliminare questo Pokemon dalla tua collezione? Questa azione non puo essere annullata.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel className="bg-white/5 hover:bg-white/10 border-white/10 text-white">
-                    Annulla
-                  </AlertDialogCancel>
-                  <AlertDialogAction onClick={onDelete} className="bg-destructive hover:bg-destructive/90 text-white">
-                    Elimina
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
-
-          {isEvolved && (
-            <div className="flex flex-col items-center gap-1 w-9">
-              <div
-                className="h-7 w-7 rounded-full bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 flex items-center justify-center backdrop-blur-md"
-                title="Pokemon evoluto"
-              >
-                <ArrowUpCircle className="h-3.5 w-3.5" />
-              </div>
-              {evolvedFromSpriteUrl && (
-                <img
-                  src={toLocalPokemonSpriteUrl(evolvedFromSpriteUrl)}
-                  alt="Evoluto da"
-                  className="h-9 w-9 object-contain drop-shadow block mx-auto"
-                  title={`Evoluto da ${evolvedFromName || 'pokemon precedente'}`}
-                  referrerPolicy="no-referrer"
-                  onError={(e) => {
-                    handlePokemonSpriteError(e.currentTarget);
-                  }}
-                />
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-
       <div
-        className="flex-1 w-full min-w-0 p-3 bg-[#222] relative z-10 border-t border-white/10"
+        className="flex-1 w-full min-w-0 p-3.5 bg-[#222] relative z-10 border-t border-white/10 flex flex-col"
         style={{
           background: applyBlackEffect
             ? `linear-gradient(180deg, color-mix(in srgb, #0b0b0d 62%, ${theme.secondary}) 0%, color-mix(in srgb, #131831 55%, ${theme.primary}) 100%)`
@@ -350,322 +201,454 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
             : `${theme.accent}66`,
         }}
       >
-        <div className="space-y-2.5">
-          <div className="space-y-1.5">
-            <div className="w-full flex justify-center px-1">
-              <div className="inline-flex flex-wrap items-center justify-center gap-1.5 max-w-full px-1">
-                <h3 className="text-base sm:text-lg font-black text-white tracking-tight capitalize leading-tight text-center break-words whitespace-normal max-w-full min-w-0">
-                  {displayName}
-                </h3>
-                {entry.gender && (entry.gender === 'male' || entry.gender === 'female') && (
-                  entry.gender === 'male' ? (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="h-4 w-4 text-blue-400 flex-shrink-0"
-                    >
-                      <path d="M16 3h5v5" />
-                      <path d="m21 3-6.75 6.75" />
-                      <circle cx="10" cy="14" r="6" />
-                    </svg>
-                  ) : (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="h-4 w-4 text-pink-400 flex-shrink-0"
-                    >
-                      <path d="M12 15v7" />
-                      <path d="M9 19h6" />
-                      <circle cx="12" cy="9" r="6" />
-                    </svg>
-                  )
+        <div className="space-y-3 flex flex-1 flex-col">
+          <div
+            className="relative min-h-[162px] sm:min-h-[178px] rounded-[1.5rem] border border-white/10 bg-black/40 p-3 shadow-inner overflow-hidden"
+            style={{
+              background: hasDualGameTheme
+                ? `linear-gradient(135deg, ${theme.secondary} 0%, color-mix(in srgb, ${theme.secondary} 50%, ${secondaryTheme!.secondary}) 50%, ${secondaryTheme!.secondary} 100%)`
+                : `linear-gradient(135deg, ${theme.secondary} 0%, color-mix(in srgb, ${theme.secondary} 55%, ${theme.primary}) 52%, ${theme.primary} 100%)`,
+            }}
+          >
+            <div className="absolute left-2 top-2 z-30 flex gap-1.5">
+              <Button
+                variant="secondary"
+                size="icon"
+                onClick={onEdit}
+                className="h-7 w-7 rounded-full border border-white/10 bg-black/55 text-white shadow-lg backdrop-blur-md hover:bg-white hover:text-black"
+                title="Modifica"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </Button>
+              <Button
+                variant="secondary"
+                size="icon"
+                onClick={onToggleEvolved}
+                className={cn(
+                  "h-7 w-7 rounded-full border border-white/10 text-white shadow-lg backdrop-blur-md",
+                  isEvolved ? "bg-emerald-600 hover:bg-emerald-700" : "bg-black/55 hover:bg-emerald-500"
+                )}
+                title={isEvolved ? 'Segna come non evoluto' : 'Segna come evoluto'}
+              >
+                <ArrowUpCircle className="h-3.5 w-3.5" />
+              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="h-7 w-7 rounded-full border border-white/10 bg-black/55 text-white shadow-lg backdrop-blur-md hover:bg-destructive"
+                    title="Elimina"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent className="bg-[#1a1a1a] border-white/10 text-white">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="text-xl font-bold">Delete {displayName}?</AlertDialogTitle>
+                    <AlertDialogDescription className="text-white/60">
+                      Sei sicuro di voler eliminare questo Pokemon dalla tua collezione? Questa azione non puo essere annullata.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel className="bg-white/5 hover:bg-white/10 border-white/10 text-white">
+                      Annulla
+                    </AlertDialogCancel>
+                    <AlertDialogAction onClick={onDelete} className="bg-destructive hover:bg-destructive/90 text-white">
+                      Elimina
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+            {isEvolved && (
+              <div className="absolute right-2 top-2 z-30 flex w-9 flex-col items-center gap-1">
+                <div
+                  className="flex h-7 w-7 items-center justify-center rounded-full border border-emerald-400/50 bg-emerald-500/20 text-emerald-300 shadow-lg backdrop-blur-md"
+                  title="Pokemon evoluto"
+                >
+                  <ArrowUpCircle className="h-3.5 w-3.5" />
+                </div>
+                {evolvedFromSpriteUrl && (
+                  <img
+                    src={toLocalPokemonSpriteUrl(evolvedFromSpriteUrl)}
+                    alt="Evoluto da"
+                    className="h-[2.58rem] w-[2.58rem] object-contain drop-shadow-[0_4px_10px_rgba(0,0,0,0.65)]"
+                    title={`Evoluto da ${evolvedFromName || 'pokemon precedente'}`}
+                    referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      handlePokemonSpriteError(e.currentTarget);
+                    }}
+                  />
                 )}
               </div>
+            )}
+            <div className="absolute inset-0 bg-[linear-gradient(135deg,transparent_0%,rgba(255,255,255,0.04)_45%,transparent_70%)]" />
+            <div className="relative flex items-center justify-center">
+              <div className="relative h-[7.3rem] w-[7.3rem] sm:h-[8.4rem] sm:w-[8.4rem]">
+                <img
+                  key={spriteUrl}
+                  src={toLocalPokemonSpriteUrl(spriteUrl)}
+                  loading="lazy"
+                  decoding="async"
+                  referrerPolicy="no-referrer"
+                  alt={entry.pokemon_name}
+                  className={cn(
+                    "relative z-10 h-full w-full object-contain pokemon-sprite transition-all duration-300",
+                    isFail
+                      ? "drop-shadow-[0_0_12px_rgba(255,255,255,0.25)]"
+                      : "drop-shadow-[0_8px_16px_rgba(0,0,0,0.75)]",
+                    entry.is_unobtainable ? "grayscale brightness-105" : ""
+                  )}
+                  style={{ imageRendering: 'auto' }}
+                  onError={(e) => {
+                    handlePokemonSpriteError(e.currentTarget);
+                  }}
+                />
+              </div>
             </div>
+          </div>
+        </div>
 
-            <div className="flex items-center justify-center">
-              {GAME_LOGOS[entry.game] && (
-                <div className="flex flex-wrap items-center justify-center gap-2 max-w-full">
-                  <img
-                    src={GAME_LOGOS[entry.game]}
-                    loading="lazy"
-                    decoding="async"
-                    alt={entry.game}
-                    className="h-10 sm:h-12 w-auto max-w-[92px] object-contain brightness-110 drop-shadow-lg"
-                  />
-                  {(entry as any).secondary_game && GAME_LOGOS[(entry as any).secondary_game] && (
+        <div className="flex flex-1 flex-col gap-3">
+          <div className="space-y-2">
+            <div className="mt-1.5 flex min-w-0 flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0 flex-1">
+                <div className="flex min-w-0 max-w-full items-center gap-2">
+                  {pokeball && (
+                    <img
+                      src={pokeball.sprite}
+                      loading="lazy"
+                      decoding="async"
+                      className="h-[1.6rem] w-[1.6rem] flex-shrink-0 object-contain drop-shadow"
+                      alt={pokeball.name}
+                      title={pokeball.name}
+                    />
+                  )}
+                  <h3 className="min-w-0 truncate pb-0.5 text-[1.18rem] font-black leading-tight text-white sm:text-[1.26rem]">
+                    {displayName}
+                  </h3>
+                  {entry.gender && (entry.gender === 'male' || entry.gender === 'female') && (
+                    entry.gender === 'male' ? (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="h-[1.1rem] w-[1.1rem] flex-shrink-0 text-blue-400"
+                      >
+                        <path d="M16 3h5v5" />
+                        <path d="m21 3-6.75 6.75" />
+                        <circle cx="10" cy="14" r="6" />
+                      </svg>
+                    ) : (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="h-[1.1rem] w-[1.1rem] flex-shrink-0 text-pink-400"
+                      >
+                        <path d="M12 15v7" />
+                        <path d="M9 19h6" />
+                        <circle cx="12" cy="9" r="6" />
+                      </svg>
+                    )
+                  )}
+                </div>
+              </div>
+
+              {(GAME_LOGOS[entry.game] || entry.has_shiny_charm) && (
+                <div className="flex w-full shrink-0 items-center justify-center gap-2 sm:w-auto sm:max-w-[220px] sm:justify-end">
+                  {GAME_LOGOS[entry.game] && (
                     <>
-                      <ArrowRight className="h-4 w-4 text-white/70" />
                       <img
-                        src={GAME_LOGOS[(entry as any).secondary_game]}
+                        src={GAME_LOGOS[entry.game]}
                         loading="lazy"
                         decoding="async"
-                        alt={(entry as any).secondary_game}
-                        className="h-10 sm:h-12 w-auto max-w-[92px] object-contain brightness-110 drop-shadow-lg"
+                        alt={entry.game}
+                        className="h-10 w-auto max-w-[82px] object-contain brightness-110 drop-shadow-lg sm:h-11 sm:max-w-[92px]"
                       />
+                      {(entry as any).secondary_game && GAME_LOGOS[(entry as any).secondary_game] && (
+                        <>
+                          <ArrowRight className="h-4 w-4 flex-shrink-0 text-white/60" />
+                          <img
+                            src={GAME_LOGOS[(entry as any).secondary_game]}
+                            loading="lazy"
+                            decoding="async"
+                            alt={(entry as any).secondary_game}
+                            className="h-10 w-auto max-w-[82px] object-contain brightness-110 drop-shadow-lg sm:h-11 sm:max-w-[92px]"
+                          />
+                        </>
+                      )}
                     </>
+                  )}
+                  {entry.has_shiny_charm && (
+                    <img
+                      src="/img/items/shiny-charm.png"
+                      loading="lazy"
+                      decoding="async"
+                      className="h-8 w-8 flex-shrink-0 object-contain animate-pulse drop-shadow-[0_0_10px_rgba(234,179,8,0.72)]"
+                      alt="Shiny Charm"
+                      title="Shiny Charm Active"
+                    />
                   )}
                 </div>
               )}
             </div>
+
+            {method && (
+              <div className="flex justify-center px-2">
+                <div
+                  className="inline-flex max-w-full items-center justify-center gap-1.5 truncate rounded-full border px-3.5 py-1.5 text-center text-[10px] font-black uppercase tracking-[0.12em] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+                  style={{
+                    color: isEvent ? 'rgb(232, 121, 249)' : theme.accent,
+                    borderColor: isEvent ? 'rgba(232, 121, 249, 0.45)' : `${theme.accent}66`,
+                    background: isEvent ? 'rgba(232, 121, 249, 0.1)' : `${theme.accent}14`,
+                  }}
+                >
+                  {isEvent && <Sparkles className="h-3 w-3 flex-shrink-0" />}
+                  <span className="truncate">
+                    {isEvent ? 'Distribution / Event' : method.name === 'Random Encounter' && (entry.method || '').toString().trim().toLowerCase().includes('safari')
+                      ? 'Random Encounter (Safari Zone)'
+                      : method.name}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            <div
+              className="h-px w-full"
+              style={{
+                background: hasDualGameTheme
+                  ? `linear-gradient(90deg, transparent, color-mix(in srgb, ${theme.accent} 48%, ${secondaryTheme!.accent}), transparent)`
+                  : `linear-gradient(90deg, transparent, ${theme.accent}80, transparent)`,
+              }}
+            />
           </div>
 
-          {method && (
-            <div className="flex justify-center px-1">
-              <div
-                className="inline-flex max-w-full items-center justify-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.12em] border shadow-sm text-center"
-                style={{
-                  backgroundColor: isEvent
-                    ? 'rgba(217, 70, 239, 0.12)'
-                    : `color-mix(in srgb, ${theme.accent} 20%, #0d0d0d)`,
-                  borderColor: isEvent ? 'rgba(217, 70, 239, 0.65)' : `${theme.accent}88`,
-                  color: isEvent ? 'rgb(232, 121, 249)' : theme.accent,
-                }}
-              >
-                {isEvent && <Sparkles className="w-3 h-3 mr-1.5" />}
-                {isEvent ? 'Distribution / Event' : method.name === 'Random Encounter' && (entry.method || '').toString().trim().toLowerCase().includes('safari')
-                  ? 'Random Encounter (Safari Zone)'
-                  : method.name}
-              </div>
-            </div>
-          )}
-
           {isEvent ? null : (
-            <div className={cn('grid gap-2 mt-2', showEncounters ? 'grid-cols-2' : 'grid-cols-1')}>
+            <div className="grid gap-2.5">
+              {showEncounters ? (
+                <div
+                  className="rounded-2xl px-2.5 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+                  style={{
+                    background: hasDualGameTheme
+                      ? `linear-gradient(145deg, color-mix(in srgb, ${theme.primary} 30%, rgba(14,14,14,0.96)), color-mix(in srgb, ${secondaryTheme!.secondary} 30%, rgba(10,10,10,0.94)))`
+                      : `linear-gradient(145deg, color-mix(in srgb, ${theme.primary} 46%, #101010), color-mix(in srgb, ${theme.secondary} 38%, #0f0f0f))`,
+                  }}
+                >
+                  <div className="flex items-center gap-1.5 px-1">
+                    <Crosshair className="h-3 w-3 text-white/70" />
+                    <span className="truncate text-[8px] font-black uppercase tracking-[0.14em] text-white/[0.65] sm:text-[9px]">
+                      {encountersLabel}
+                    </span>
+                  </div>
+                  <div className={cn(
+                    "mt-2 grid items-stretch gap-2.5",
+                    (entry as any).show_seen ? "grid-cols-[minmax(0,1fr)_72px]" : "grid-cols-1"
+                  )}>
+                    <div className="relative flex min-h-[72px] min-w-0 items-center justify-center overflow-hidden rounded-xl bg-black/30 px-3.5 py-2.5">
+                      {isMasuda && (
+                        <img
+                          src="https://archives.bulbagarden.net/media/upload/2/26/Egg.png"
+                          alt="Pokemon egg"
+                          className="pointer-events-none absolute left-1.5 top-1/2 h-[4.25rem] w-[4.25rem] -translate-y-1/2 object-contain opacity-95 drop-shadow-[0_2px_6px_rgba(0,0,0,0.55)]"
+                          onError={(e) => ((e.currentTarget as HTMLImageElement).src = '/placeholder.svg')}
+                        />
+                      )}
+                      <span
+                        className="relative z-10 w-full max-w-full truncate text-center text-[2rem] font-black leading-none text-white tabular-nums sm:text-[1.86rem]"
+                        style={{
+                          textShadow: '1px 0 0 #050505, -1px 0 0 #050505, 0 1px 0 #050505, 0 -1px 0 #050505, 0 2px 5px rgba(0,0,0,0.9)',
+                        }}
+                      >
+                        {entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-'}
+                      </span>
+                    </div>
+                    {(entry as any).show_seen && (
+                      <div className="flex min-h-[72px] flex-col items-center justify-center rounded-xl bg-black/25 px-2 py-2 text-center">
+                        <span className="text-[8px] font-black uppercase tracking-[0.12em] text-white/45">
+                          Seen
+                        </span>
+                        <span
+                          className="mt-1 max-w-full truncate text-[1rem] font-black leading-none text-white tabular-nums"
+                          style={{
+                            textShadow: '1px 0 0 #050505, -1px 0 0 #050505, 0 1px 0 #050505, 0 -1px 0 #050505, 0 2px 4px rgba(0,0,0,0.85)',
+                          }}
+                        >
+                          {(entry as any).seen_count ?? 0}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="mt-2 grid min-h-[64px] grid-rows-2 overflow-hidden px-1">
+                    <div className="grid min-w-0 grid-cols-[64px_minmax(0,1fr)] items-center gap-2">
+                      {entry.phase_number ? (
+                        <>
+                          <span className="text-[10px] font-black uppercase tracking-[0.1em] text-white/55 sm:text-[11px]">Phase</span>
+                          <span
+                            className="min-w-0 truncate whitespace-nowrap text-[12px] font-black uppercase tracking-[0.08em] sm:text-[13px]"
+                            style={{
+                              color: hasDualGameTheme ? `color-mix(in srgb, ${theme.accent} 55%, ${secondaryTheme!.accent})` : theme.accent,
+                            }}
+                          >
+                            #{entry.phase_number}
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="invisible text-[10px] font-black uppercase tracking-[0.1em] sm:text-[11px]">Phase</span>
+                          <span className="invisible text-[12px] font-bold sm:text-[13px]">#</span>
+                        </>
+                      )}
+                    </div>
+                    <div className="grid min-w-0 grid-cols-[64px_minmax(0,1fr)_auto] items-center gap-2 border-t border-white/10 pt-1.5">
+                      {entry.show_total ? (
+                        <>
+                          <span className="text-[10px] font-black uppercase tracking-[0.1em] text-white/55 sm:text-[11px]">Total</span>
+                          <span className="min-w-0 truncate text-[12px] font-black tabular-nums text-white/95 sm:text-[13px]">
+                            {entry.total_value && entry.total_value > 0
+                              ? entry.total_value.toLocaleString()
+                              : (entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-')}
+                          </span>
+                          {entry.show_total_seen ? (
+                            <span className="inline-flex min-w-[88px] flex-col items-center justify-center rounded-md bg-white/[0.08] px-2.5 py-1.5 text-center ring-1 ring-white/10">
+                              <span className="text-[8px] font-black uppercase leading-none tracking-[0.1em] text-white/50 sm:text-[9px]">Total Seen</span>
+                              <span className="mt-1 text-[12px] font-black leading-none tabular-nums text-white/95 sm:text-[13px]">
+                                {(entry.total_seen_count ?? 0).toLocaleString()}
+                              </span>
+                            </span>
+                          ) : (
+                            <span className="invisible inline-flex min-w-[88px] flex-col items-center justify-center rounded-md px-2.5 py-1.5 text-[9px] font-black">
+                              Total Seen
+                            </span>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          <span className="invisible text-[10px] font-black uppercase tracking-[0.1em] sm:text-[11px]">Total</span>
+                          <span className="invisible text-[12px] font-bold sm:text-[13px]">-</span>
+                          <span className="invisible inline-flex min-w-[88px] flex-col items-center justify-center rounded-md px-2.5 py-1.5 text-[9px] font-black">
+                            Total Seen
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ) : (entry as any).show_seen ? (
+                <div
+                  className="relative overflow-hidden rounded-xl px-3 py-2.5"
+                  style={{
+                    background: hasDualGameTheme
+                      ? `linear-gradient(145deg, color-mix(in srgb, ${theme.primary} 30%, rgba(14,14,14,0.96)), color-mix(in srgb, ${secondaryTheme!.secondary} 30%, rgba(10,10,10,0.94)))`
+                      : `linear-gradient(145deg, color-mix(in srgb, ${theme.primary} 46%, #101010), color-mix(in srgb, ${theme.secondary} 38%, #0f0f0f))`,
+                  }}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-1.5">
+                      <Crosshair className="h-3.5 w-3.5 text-white/[0.65]" />
+                      <span className="text-[8px] font-black uppercase tracking-[0.16em] text-white/[0.55] sm:text-[9px]">
+                        Seen
+                      </span>
+                    </div>
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="text-[1.6rem] font-black leading-none text-white tabular-nums">
+                        {(entry as any).seen_count ?? 0}
+                      </span>
+                      <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-white/[0.45]">seen</span>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+
               <div
-                className="rounded-lg p-2 border shadow-lg"
+                className="rounded-2xl px-3 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
                 style={{
                   background: hasDualGameTheme
                     ? `linear-gradient(145deg, color-mix(in srgb, ${theme.secondary} 34%, rgba(16,16,16,0.96)), color-mix(in srgb, ${secondaryTheme!.primary} 26%, rgba(12,12,12,0.94)))`
                     : `linear-gradient(145deg, color-mix(in srgb, ${theme.secondary} 48%, #101010), color-mix(in srgb, ${theme.primary} 42%, #0f0f0f))`,
-                  borderColor: hasDualGameTheme
-                    ? `color-mix(in srgb, ${theme.accent} 44%, ${secondaryTheme!.accent})`
-                    : `${theme.accent}66`,
                 }}
               >
-                <div className="flex items-center gap-1 mb-1.5">
-                  <Calendar className="w-3 h-3 text-white/70" />
-                  <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em]">Hunt Dates</span>
+                <div className="mb-2 flex items-center gap-1.5">
+                  <Calendar className="h-3 w-3 text-white/70" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.12em] text-white/80">Hunt Dates</span>
                 </div>
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between gap-1 rounded-md bg-black/25 px-1.5 py-1">
-                    <span className="text-[8px] sm:text-[9px] text-white/55 font-bold uppercase tracking-wider">Start</span>
-                    <span className="text-[9px] sm:text-[10px] font-semibold text-white/95 tabular-nums text-right">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="min-w-0 text-center">
+                    <span className="block text-[9px] font-black uppercase tracking-wider text-white/75">Start</span>
+                    <span className="block truncate text-center text-[11px] font-black tabular-nums text-white sm:text-xs">
                       {entry.hunt_start_date ? formatDate(entry.hunt_start_date) : '--'}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between gap-1 rounded-md bg-black/25 px-1.5 py-1">
-                    <span className="text-[8px] sm:text-[9px] text-white/55 font-bold uppercase tracking-wider">Caught</span>
-                    <span className="text-[9px] sm:text-[10px] font-semibold text-white/95 tabular-nums text-right">
+                  <div className="min-w-0 border-l border-white/10 pl-3 text-center">
+                    <span className="block text-[9px] font-black uppercase tracking-wider text-white/75">Caught</span>
+                    <span className="block truncate text-center text-[11px] font-black tabular-nums text-white sm:text-xs">
                       {formatDate(entry.caught_date)}
                     </span>
                   </div>
                 </div>
               </div>
-
-                            {showEncounters ? (
-                <div
-                  className="rounded-lg p-2 border shadow-lg flex flex-col"
-                  style={{
-                    background: hasDualGameTheme
-                      ? `linear-gradient(145deg, color-mix(in srgb, ${theme.primary} 30%, rgba(14,14,14,0.96)), color-mix(in srgb, ${secondaryTheme!.secondary} 30%, rgba(10,10,10,0.94)))`
-                      : `linear-gradient(145deg, color-mix(in srgb, ${theme.primary} 46%, #101010), color-mix(in srgb, ${theme.secondary} 38%, #0f0f0f))`,
-                    borderColor: hasDualGameTheme
-                      ? `color-mix(in srgb, ${theme.accent} 44%, ${secondaryTheme!.accent})`
-                      : `${theme.accent}66`,
-                  }}
-                >
-                  <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em] block mb-1.5">
-                    {encountersLabel}
-                  </span>
-                  <div className="flex-1 flex items-center justify-center rounded-md bg-black/25 px-1.5 py-2 relative">
-                    {isMasuda && (
-                      <span className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center justify-center">
-                        <img
-                          src="https://archives.bulbagarden.net/media/upload/2/26/Egg.png"
-                          alt="Pokemon egg"
-                          className="h-16 w-16 sm:h-18 sm:w-18 shrink-0 object-contain drop-shadow-[0_2px_6px_rgba(0,0,0,0.55)] -translate-x-1"
-                          onError={(e) => ((e.currentTarget as HTMLImageElement).src = '/placeholder.svg')}
-                        />
-                      </span>
-                    )}
-                    <div className="flex flex-col items-center justify-center w-full gap-1.5 relative">
-                      <span className={cn(
-                        "font-black tabular-nums tracking-tight text-white leading-none text-[1.7rem] sm:text-[1.45rem]",
-                        isMasuda && "mx-auto"
-                      )}>
-                        {entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-'}
-                      </span>
-                      {(entry as any).show_seen && (
-                        <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[9px] sm:text-[10px] font-bold text-white/55 tracking-wide tabular-nums">
-                          {(entry as any).seen_count ?? 0} seen
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  {entry.phase_number && (
-                    <div className="mt-1.5 pt-1.5 border-t border-white/15">
-                      <span
-                        className="text-[9px] font-black uppercase tracking-[0.12em] px-1.5 py-0.5 rounded border"
-                        style={{
-                          color: hasDualGameTheme
-                            ? `color-mix(in srgb, ${theme.accent} 55%, ${secondaryTheme!.accent})`
-                            : theme.accent,
-                          backgroundColor: hasDualGameTheme
-                            ? `color-mix(in srgb, ${theme.accent} 14%, color-mix(in srgb, ${secondaryTheme!.accent} 14%, #0d0d0d))`
-                            : `color-mix(in srgb, ${theme.accent} 20%, #0d0d0d)`,
-                          borderColor: hasDualGameTheme
-                            ? `color-mix(in srgb, ${theme.accent} 50%, ${secondaryTheme!.accent})`
-                            : `${theme.accent}88`,
-                        }}
-                      >
-                        PHASE #{entry.phase_number}
-                      </span>
-                    </div>
-                  )}
-                  {entry.show_total && (
-                    <div className="mt-1.5 pt-1.5 border-t border-white/15 flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-1">
-                        <Crosshair className="w-3 h-3 text-white/70" />
-                        <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em]">
-                          Total
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[10px] sm:text-[11px] font-black tabular-nums text-white/95">
-                          {entry.total_value && entry.total_value > 0
-                            ? entry.total_value.toLocaleString()
-                            : (entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-')}
-                        </span>
-                        {(entry as any).show_seen && (
-                          <span className="text-[9px] sm:text-[10px] font-bold text-white/50 tracking-wide tabular-nums">
-                            ({(entry as any).seen_count ?? 0} seen)
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ) : (entry as any).show_seen ? (
-                <div
-                  className="rounded-lg p-2 border shadow-lg flex flex-col min-h-[72px]"
-                  style={{
-                    background: hasDualGameTheme
-                      ? `linear-gradient(145deg, color-mix(in srgb, ${theme.primary} 30%, rgba(14,14,14,0.96)), color-mix(in srgb, ${secondaryTheme!.secondary} 30%, rgba(10,10,10,0.94)))`
-                      : `linear-gradient(145deg, color-mix(in srgb, ${theme.primary} 46%, #101010), color-mix(in srgb, ${theme.secondary} 38%, #0f0f0f))`,
-                    borderColor: hasDualGameTheme
-                      ? `color-mix(in srgb, ${theme.accent} 44%, ${secondaryTheme!.accent})`
-                      : `${theme.accent}66`,
-                  }}
-                >
-                  <div className="flex items-center gap-1.5 mb-2">
-                    <Crosshair className="w-3 h-3 text-white/70" />
-                    <span className="text-[8px] sm:text-[9px] font-bold text-white/60 uppercase tracking-[0.14em]">
-                      Seen
-                    </span>
-                  </div>
-                  <div className="flex flex-1 items-end justify-between gap-2">
-                    <span className="text-lg sm:text-xl font-black tabular-nums text-white/95 leading-none tracking-tight">
-                      {(entry as any).seen_count ?? 0}
-                    </span>
-                    <span className="inline-flex items-center rounded-full border border-white/10 bg-black/25 px-2 py-0.5 text-[9px] sm:text-[10px] font-bold text-white/55 tracking-wide">
-                      tracked
-                    </span>
-                  </div>
-                </div>
-              ) : null}
             </div>
           )}
 
-          {(pokeball || hasBottomMeta) && (
-            <div
-              className={cn(
-                'flex items-center justify-between',
-                hasBottomMeta ? (hasOnlyShinyCharm ? 'mt-1 pt-1' : 'mt-2 pt-2 border-t') : 'mt-2'
+          {hasBottomMeta && (
+            <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-1">
+              {(entry.is_fail || entry.is_unobtainable) && (
+                <>
+                  {entry.is_fail && (
+                    <div className="relative overflow-hidden rounded-full border border-red-500/70 bg-red-900/55 px-2.5 py-1 shadow-[0_0_14px_rgba(239,68,68,0.28)] inset-shadow-sm">
+                      <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_45%,rgba(239,68,68,0.2)_50%,transparent_55%)] bg-[length:200%_200%] animate-[shimmer_3s_infinite]" />
+                      <div className="flex items-center gap-1.5">
+                        <div className="h-2 w-2 rounded-full bg-red-500 shadow-[0_0_5px_rgba(239,68,68,0.8)]" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.15em] text-red-400 drop-shadow-sm">FAIL</span>
+                      </div>
+                    </div>
+                  )}
+                  {entry.is_unobtainable && (
+                    <div className="relative overflow-hidden rounded-full border border-amber-500/70 bg-amber-900/55 px-2.5 py-1 shadow-[0_0_14px_rgba(245,158,11,0.28)] inset-shadow-sm">
+                      <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_45%,rgba(245,158,11,0.2)_50%,transparent_55%)] bg-[length:200%_200%] animate-[shimmer_3s_infinite]" />
+                      <div className="flex items-center gap-1.5">
+                        <div className="h-2 w-2 rounded-full bg-amber-500 shadow-[0_0_5px_rgba(245,158,11,0.8)]" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.15em] text-amber-300 drop-shadow-sm">UNCATCHABLE</span>
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
-              style={{ borderTopColor: `${theme.primary}20` }}
-            >
-              <div className="flex items-center gap-2">
-                {(entry.is_fail || entry.is_unobtainable) ? (
-                  <div className="flex items-center gap-1.5">
-                    {entry.is_fail && (
-                      <div className="relative overflow-hidden rounded border border-red-500/50 bg-red-950/40 pl-2 pr-3 py-1 shadow-[0_0_10px_rgba(239,68,68,0.2)] inset-shadow-sm">
-                        <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_45%,rgba(239,68,68,0.2)_50%,transparent_55%)] bg-[length:200%_200%] animate-[shimmer_3s_infinite]" />
-                        <div className="flex items-center gap-1.5">
-                          <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_5px_rgba(239,68,68,0.8)]" />
-                          <span className="text-red-400 font-black text-[11px] tracking-[0.15em] uppercase drop-shadow-sm">FAIL</span>
-                        </div>
-                      </div>
-                    )}
-                    {entry.is_unobtainable && (
-                      <div className="relative overflow-hidden rounded border border-amber-500/50 bg-amber-950/40 pl-2 pr-3 py-1 shadow-[0_0_10px_rgba(245,158,11,0.2)] inset-shadow-sm">
-                        <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_45%,rgba(245,158,11,0.2)_50%,transparent_55%)] bg-[length:200%_200%] animate-[shimmer_3s_infinite]" />
-                        <div className="flex items-center gap-1.5">
-                          <div className="h-2 w-2 rounded-full bg-amber-500 animate-pulse shadow-[0_0_5px_rgba(245,158,11,0.8)]" />
-                          <span className="text-amber-300 font-black text-[11px] tracking-[0.15em] uppercase drop-shadow-sm">UNCATCHABLE</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ) : pokeball ? (
-                  <>
-                    <img src={pokeball.sprite} loading="lazy" decoding="async" className="w-5 h-5 object-contain" alt="pokeball" />
-                    <span className="text-[9px] text-white/50 font-semibold uppercase tracking-wide">{pokeball.name}</span>
-                  </>
-                ) : (
-                  <span className="text-[9px] text-white/40 font-semibold uppercase tracking-wide">No Pokeball</span>
-                )}
-              </div>
-
-              <div className="flex items-center gap-2">
-                {isGigamax && (
-                  <div className="flex items-center" title="Gigamax">
-                    <img
-                      src={GIGAMAX_ICON}
-                      loading="lazy"
-                      decoding="async"
-                      className="w-7 h-7 object-contain drop-shadow-[0_0_8px_rgba(244,114,182,0.5)]"
-                      alt="Gigamax"
-                    />
-                  </div>
-                )}
-                {isLegendsArceus && (
-                  <div className="flex items-center" title="Alpha Pokemon">
-                    <img
-                      src="https://archives.bulbagarden.net/media/upload/4/4b/Alpha_icon.png"
-                      loading="lazy"
-                      decoding="async"
-                      className="w-7 h-7 object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.35)]"
-                      alt="Alpha Pokemon"
-                    />
-                  </div>
-                )}
-                {entry.has_shiny_charm && (
-                  <div className="flex items-center" title="Shiny Charm Active">
-                    <img
-                      src="/img/items/shiny-charm.png"
-                      loading="lazy"
-                      decoding="async"
-                      className="w-8 h-8 object-contain animate-pulse drop-shadow-[0_0_8px_rgba(234,179,8,0.6)]"
-                      alt="Shiny Charm"
-                    />
-                  </div>
-                )}
-              </div>
+              {isGigamax && (
+                <div className="inline-flex items-center rounded-full bg-black/20 px-1.5 py-1" title="Gigamax">
+                  <img
+                    src={GIGAMAX_ICON}
+                    loading="lazy"
+                    decoding="async"
+                    className="h-7 w-7 object-contain drop-shadow-[0_0_8px_rgba(244,114,182,0.5)]"
+                    alt="Gigamax"
+                  />
+                </div>
+              )}
+              {isLegendsArceus && (
+                <div className="inline-flex items-center rounded-full bg-black/20 px-1.5 py-1" title="Alpha Pokemon">
+                  <img
+                    src="https://archives.bulbagarden.net/media/upload/4/4b/Alpha_icon.png"
+                    loading="lazy"
+                    decoding="async"
+                    className="h-7 w-7 object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.35)]"
+                    alt="Alpha Pokemon"
+                  />
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -76,9 +76,9 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
       return 'flex flex-col gap-4';
     }
     if (collectionLayoutStyle === 'compact') {
-      return 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3';
+      return 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3';
     }
-    return 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4';
+    return 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 xl:gap-5';
   }, [collectionLayoutStyle]);
 
   const isAbortLikeError = (err: unknown) => {
@@ -362,26 +362,31 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
 
   return (
     <div
-      className="min-h-screen bg-background transition-colors duration-1000"
+      className="min-h-screen bg-background transition-colors duration-1000 relative overflow-hidden"
       style={{
         backgroundImage: `radial-gradient(circle at 50% 0%, ${accentColor}15 0%, transparent 70%)`
       }}
     >
+      <div
+        className="pointer-events-none absolute inset-0 opacity-70"
+        style={{
+          background: `
+            radial-gradient(circle at 20% 0%, ${accentColor}18 0%, transparent 30%),
+            radial-gradient(circle at 80% 10%, rgba(255,255,255,0.08) 0%, transparent 24%),
+            radial-gradient(circle at 50% 100%, rgba(0,0,0,0.35) 0%, transparent 36%)
+          `,
+        }}
+      />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:56px_56px] [mask-image:radial-gradient(circle_at_center,black,transparent_82%)]" />
       <Navbar />
-      <main className="container mx-auto py-8 px-4">
+      <main className="relative z-10 container mx-auto py-8 px-4">
         <div className="space-y-6">
           {/* Login banner */}
           {!user && (
-            <Card
-              className="border-primary/50 bg-primary/5 transition-all duration-500"
-              style={{
-                borderColor: accentColor,
-                boxShadow: `0 0 20px ${accentColor}20`
-              }}
-            >
+            <Card className="border-border bg-card text-card-foreground shadow-xl transition-all duration-500">
               <CardContent className="py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <LogIn className="h-10 w-10 text-primary" />
+                  <LogIn className="h-10 w-10 text-muted-foreground" />
                   <div>
                     <h3 className="font-semibold">Accedi per salvare la tua collezione</h3>
                     <p className="text-sm text-muted-foreground">
@@ -390,13 +395,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
                   </div>
                 </div>
                 <Link to="/auth">
-                  <Button
-                    className="shadow-lg hover:shadow-xl transition-all duration-300"
-                    style={{
-                      backgroundColor: accentColor,
-                      boxShadow: `0 0 15px ${accentColor}60`
-                    }}
-                  >
+                  <Button className="shadow-lg hover:shadow-xl transition-all duration-300">
                     Accedi / Registrati
                   </Button>
                 </Link>
@@ -405,27 +404,23 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
           )}
 
           {/* Header */}
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
+          <div className="relative overflow-hidden rounded-[2rem] border border-border bg-card p-6 text-card-foreground shadow-2xl flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,hsl(var(--muted)/0.45),transparent_34%),radial-gradient(circle_at_bottom_right,hsl(var(--muted)/0.28),transparent_30%)] pointer-events-none" />
             <div>
-              <h1
-                className="text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r"
-                style={{
-                  backgroundImage: `linear-gradient(to right, ${accentColor}, color-mix(in srgb, ${accentColor}, white 30%))`
-                }}
-              >
+              <h1 className="text-3xl sm:text-4xl font-bold text-foreground">
                 La mia collezione Shiny
               </h1>
               <div className="mt-3 flex flex-wrap justify-center md:justify-start gap-2">
-                <Button variant={mode === 'obtained' ? 'default' : 'outline'} size="sm" asChild>
+                <Button variant="outline" size="sm" className={cn(mode === 'obtained' && 'bg-muted text-foreground')} asChild>
                   <Link to="/collection">Ottenuti</Link>
                 </Button>
-                <Button variant={mode === 'special' ? 'default' : 'outline'} size="sm" asChild>
+                <Button variant="outline" size="sm" className={cn(mode === 'special' && 'bg-muted text-foreground')} asChild>
                   <Link to="/collection/special">Static Overworld / Game Gift</Link>
                 </Button>
-                <Button variant={mode === 'distribution_event' ? 'default' : 'outline'} size="sm" asChild>
+                <Button variant="outline" size="sm" className={cn(mode === 'distribution_event' && 'bg-muted text-foreground')} asChild>
                   <Link to="/collection/events">Distribution / Event</Link>
                 </Button>
-                <Button variant={mode === 'fail_uncatchable' ? 'default' : 'outline'} size="sm" asChild>
+                <Button variant="outline" size="sm" className={cn(mode === 'fail_uncatchable' && 'bg-muted text-foreground')} asChild>
                   <Link to="/collection/fail-uncatchable">Uncatchable / Fail</Link>
                 </Button>
               </div>
@@ -491,7 +486,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
           </div>
 
           {/* Filters */}
-          <Card>
+          <Card className="border-border bg-card text-card-foreground shadow-2xl">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Filter className="h-5 w-5" />
@@ -530,7 +525,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="max-h-72 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-muted/20 [&::-webkit-scrollbar-thumb]:bg-primary/40 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-primary/60">
+                      <SelectContent className="max-h-72 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-muted [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-muted-foreground">
                       <SelectItem value="all">Tutti</SelectItem>
                       {GAMES.map((game) => (
                         <SelectItem key={game.id} value={game.id}>
@@ -601,28 +596,28 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
               </CardContent>
             </Card>
           ) : (
-            <div className={cn(collectionLayoutClassName)}>
+            <div className={cn(collectionLayoutClassName, 'items-stretch')}>
               {filteredEntries.map((entry) => {
                 const resolved = resolveEntryPokemon(entry);
                 return (
-                <ShinyCard
-                  key={entry.id}
-                  entry={entry}
-                  themeOverride={mergedThemes[entry.game]}
-                  secondaryThemeOverride={
-                    (entry as any).secondary_game
-                      ? mergedThemes[(entry as any).secondary_game]
-                      : undefined
-                  }
-                  applyBlackEffect={effects.blackEffectEnabled}
-                  spriteName={resolved?.name}
-                  onEdit={() => {
-                    setEditEntry(entry);
-                    setIsEditDialogOpen(true);
-                  }}
-                  onDelete={() => handleDelete(entry.id)}
-                  onToggleEvolved={() => handleOpenEvolveDialog(entry)}
-                />
+                  <ShinyCard
+                    key={entry.id}
+                    entry={entry}
+                    themeOverride={mergedThemes[entry.game]}
+                    secondaryThemeOverride={
+                      (entry as any).secondary_game
+                        ? mergedThemes[(entry as any).secondary_game]
+                        : undefined
+                    }
+                    applyBlackEffect={effects.blackEffectEnabled}
+                    spriteName={resolved?.name}
+                    onEdit={() => {
+                      setEditEntry(entry);
+                      setIsEditDialogOpen(true);
+                    }}
+                    onDelete={() => handleDelete(entry.id)}
+                    onToggleEvolved={() => handleOpenEvolveDialog(entry)}
+                  />
                 );
               })}
             </div>

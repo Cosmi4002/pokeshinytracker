@@ -218,6 +218,8 @@ export default function PokemonDetails() {
                         method: 'unknown',
                         game: 'unknown',
                         pokeball: 'pokeball',
+                        show_total_seen: false,
+                        total_seen_count: null,
                         caught_date: todayLocalISODate()
                     });
                 if (error) throw error;
