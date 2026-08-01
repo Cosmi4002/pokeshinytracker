@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Pencil, RefreshCcw, Sparkles } from 'lucide-react';
+import { CheckCircle2, Gamepad2, Grid3X3, Pencil, RefreshCcw, Shuffle, Sparkles } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
 import { PokemonSelector } from '@/components/counter/PokemonSelector';
 import { usePokemonList, getPokemonSpriteUrl, PokemonBasic } from '@/hooks/use-pokemon';
 import { useRandomColor } from '@/lib/random-color-context';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth-context';
+import { cn } from '@/lib/utils';
 import {
   Dialog,
   DialogContent,
@@ -69,7 +72,7 @@ const GAMES: Pick<GameCell, 'id' | 'name' | 'generation' | 'logo'>[] = [
   { id: GAME_ID_BASE + 29, name: 'Scarlet', generation: 9, logo: '/img/game-logos/scarlet.png' },
   { id: GAME_ID_BASE + 30, name: 'Violet', generation: 9, logo: '/img/game-logos/violet.png' },
   { id: GAME_ID_BASE + 28, name: 'Legends Arceus', generation: 8, logo: '/img/game-logos/pla.png' },
-  { id: GAME_ID_BASE + 31, name: 'Pokemon Legends Z-A', generation: 10, logo: 'https://archives.bulbagarden.net/media/upload/thumb/f/f7/Pok%C3%A9mon_Legends_Z-A_logo.png/1280px-Pok%C3%A9mon_Legends_Z-A_logo.png' },
+  { id: GAME_ID_BASE + 31, name: 'Pokemon Legends Z-A', generation: 10, logo: '/img/game-logos/za.png' },
 ];
 
 function shuffleInPlace<T>(arr: T[]) {
@@ -450,265 +453,271 @@ export default function Bingo() {
     };
   }, [loading, gridSize, gridIds, marked, includedGenerations, includeGames, gameRatio, persist, selectedGameIds]);
 
+  const totalCells = grid.length || gridSize * gridSize;
+  const markedCount = marked.size;
+  const progress = totalCells > 0 ? Math.round((markedCount / totalCells) * 100) : 0;
+
   return (
     <div
       className="min-h-screen bg-background transition-colors duration-1000"
       style={{ backgroundImage: `radial-gradient(circle at 50% 0%, ${accentColor}18 0%, transparent 70%)` }}
     >
       <Navbar />
-      <main className="container mx-auto py-8 px-4 space-y-6">
-        <div className="rounded-2xl border border-white/10 bg-card/60 p-4 sm:p-5">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="text-center sm:text-left">
-              <h1 className="text-2xl font-bold flex items-center gap-2 justify-center sm:justify-start">
-                <Sparkles className="h-5 w-5" />
-                Bingo Shiny
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                Genera una griglia casuale di Pokemon shiny da trovare. Clicca una casella per segnare.
-              </p>
+      <main className="mx-auto flex w-full max-w-7xl flex-col gap-5 px-3 py-5 sm:px-4 lg:px-6">
+        <header className="rounded-lg border border-border bg-card p-4 shadow-sm">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background">
+                  <Sparkles className="h-5 w-5" style={{ color: accentColor }} />
+                </span>
+                <div>
+                  <h1 className="text-2xl font-bold leading-tight">Bingo Shiny</h1>
+                  <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                    <span className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-2 py-1">
+                      <Grid3X3 className="h-3.5 w-3.5" />
+                      {pendingGridSize}x{pendingGridSize}
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-2 py-1">
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      {markedCount}/{totalCells}
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-2 py-1">
+                      <Gamepad2 className="h-3.5 w-3.5" />
+                      {selectedGameIds.size} loghi
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 justify-center sm:justify-end">
-              <div className="flex items-center gap-2 rounded-lg border border-border/60 bg-card/60 p-1">
-                {SIZE_OPTIONS.map((size) => (
-                  <Button
-                    key={size}
-                    variant={pendingGridSize === size ? 'default' : 'ghost'}
-                    size="sm"
-                    onClick={() => setPendingGridSize(size)}
-                    className="h-8 px-3"
-                  >
-                    {size}x{size}
-                  </Button>
-                ))}
-              </div>
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-end">
               <Button
                 variant={replaceMode ? 'default' : 'outline'}
                 onClick={() => setReplaceMode((prev) => !prev)}
-                className="h-8 px-3"
-                title="Attiva per cambiare una casella alla volta"
+                className="h-10 justify-center gap-2"
+                title="Cambia una casella alla volta"
               >
-                {replaceMode ? 'Cambia: ON' : 'Cambia: OFF'}
+                <Shuffle className="h-4 w-4" />
+                {replaceMode ? 'Cambio ON' : 'Cambio OFF'}
               </Button>
-              <Button variant="outline" onClick={generateGrid} className="h-8 px-3">
-                <RefreshCcw className="mr-2 h-4 w-4" />
+              <Button onClick={generateGrid} className="h-10 justify-center gap-2">
+                <RefreshCcw className="h-4 w-4" />
                 Rigenera
               </Button>
             </div>
           </div>
+        </header>
 
-          <div className="mt-4 flex flex-wrap items-center gap-2 justify-center">
-            <div className="text-sm text-muted-foreground">Generazioni:</div>
-            <div className="flex flex-wrap items-center gap-1.5 justify-center">
-              {availableGenerations.map((gen) => {
-                const isActive = pendingGenerations.has(gen);
-                return (
-                  <Button
-                    key={gen}
-                    variant={isActive ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => toggleGeneration(gen)}
-                    className="h-7 px-2.5"
+        <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
+          <div className="order-2 lg:order-1">
+            {loading ? (
+              <div className="rounded-lg border border-border bg-card p-8 text-center text-muted-foreground">
+                Caricamento Pokemon...
+              </div>
+            ) : pendingGenerations.size === 0 ? (
+              <div className="rounded-lg border border-border bg-card p-8 text-center text-muted-foreground">
+                Seleziona almeno una generazione.
+              </div>
+            ) : grid.length === 0 ? (
+              <div className="rounded-lg border border-border bg-card p-8 text-center text-muted-foreground">
+                Premi Rigenera.
+              </div>
+            ) : (
+              <div className="mx-auto w-full max-w-[680px]">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <div className="text-sm font-medium text-muted-foreground">{progress}% completato</div>
+                  <div className="h-2 w-36 overflow-hidden rounded-full bg-muted">
+                    <div
+                      className="h-full rounded-full transition-all"
+                      style={{ width: `${progress}%`, backgroundColor: MARK_COLOR }}
+                    />
+                  </div>
+                </div>
+
+                <div className="rounded-lg border border-border bg-card p-2 shadow-sm sm:p-3">
+                  <div
+                    className="grid gap-1.5 sm:gap-2"
+                    style={{ gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))` }}
                   >
-                    Gen {gen}
-                  </Button>
-                );
-              })}
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" onClick={selectAllGenerations} className="h-7 px-2.5">
-                Tutte
-              </Button>
-              <Button variant="ghost" size="sm" onClick={clearGenerations} className="h-7 px-2.5">
-                Nessuna
-              </Button>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <label className="text-sm text-muted-foreground whitespace-nowrap">Includi Giochi:</label>
-              <input
-                type="checkbox"
-                checked={includeGames}
-                onChange={(e) => setIncludeGames(e.target.checked)}
-                className="w-4 h-4 rounded border-gray-400"
-              />
-              <span className="text-xs">({Math.round(gameRatio * 100)}% caselle)</span>
-              {includeGames && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 px-2.5"
-                  onClick={() => setGamePickerOpen(true)}
-                  title="Scegli quali loghi possono uscire"
-                >
-                  Seleziona loghi
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {loading ? (
-          <div className="rounded-xl border p-8 text-center text-muted-foreground max-w-2xl mx-auto">
-            Caricamento Pokemon...
-          </div>
-        ) : pendingGenerations.size === 0 ? (
-          <div className="rounded-xl border p-8 text-center text-muted-foreground max-w-2xl mx-auto">
-            Seleziona almeno una generazione per generare il bingo.
-          </div>
-        ) : grid.length === 0 ? (
-          <div className="rounded-xl border p-8 text-center text-muted-foreground max-w-2xl mx-auto">
-            Nessuna griglia generata. Premi "Rigenera".
-          </div>
-        ) : (
-          <div className="flex justify-center">
-            <div className="w-full max-w-[600px] rounded-2xl border border-white/20 bg-card/70 shadow-lg">
-              <table className="w-full table-fixed border-collapse">
-                <tbody>
-                  {Array.from({ length: gridSize }).map((_, row) => (
-                    <tr key={`row-${row}`}>
-                      {Array.from({ length: gridSize }).map((__, col) => {
-                        const index = row * gridSize + col;
-                        const cell = grid[index];
-                        if (!cell) {
-                          return (
-                            <td key={`cell-${row}-${col}`} className="border border-white/10 bg-black/20 aspect-square" />
-                          );
-                        }
-
-                        const isMarked = marked.has(index);
-                        const isAlt = (row + col) % 2 === 1;
-                        const isGame = (cell as any).type === 'game';
-
+                    {Array.from({ length: gridSize * gridSize }).map((_, index) => {
+                      const cell = grid[index];
+                      if (!cell) {
                         return (
-                          <td
-                            key={`cell-${row}-${col}`}
-                            className={`border-2 border-white/20 ${isAlt ? 'bg-black/25' : 'bg-black/15'} align-middle`}
-                          >
-                            <div
-                              onClick={() => {
-                                if (replaceMode) replaceCell(index);
-                                else toggleMark(index);
-                              }}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter' || e.key === ' ') {
-                                  e.preventDefault();
-                                  if (replaceMode) replaceCell(index);
-                                  else toggleMark(index);
-                                }
-                              }}
-                              role="button"
-                              tabIndex={0}
-                              className="group relative aspect-square w-full focus:outline-none focus:ring-2 focus:ring-offset-2"
-                              style={{ outlineColor: MARK_COLOR }}
-                            >
-                              <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 p-0.5">
-                                {isGame ? (
-                                  <>
-                                    <img
-                                      src={(cell as GameCell).logo}
-                                      alt={(cell as GameCell).name}
-                                      className="h-10 w-10 sm:h-14 sm:w-14 object-contain drop-shadow-[0_6px_10px_rgba(0,0,0,0.45)]"
-                                      loading="lazy"
-                                      decoding="async"
-                                      onError={(e) => {
-                                        (e.currentTarget as HTMLImageElement).src = '/placeholder.svg';
-                                      }}
-                                      style={{
-                                        filter: isMarked
-                                          ? 'grayscale(0) brightness(1.05) saturate(1.05)'
-                                          : 'grayscale(0.3) brightness(1.1)',
-                                      }}
-                                    />
-                                    <div className="text-[9px] sm:text-[10px] font-semibold text-center leading-tight text-gray-200">
-                                      {(cell as GameCell).name}
-                                    </div>
-                                  </>
-                                ) : (
-                                  <>
-                                    <img
-                                      src={getPokemonSpriteUrl((cell as PokemonBasic).id, { shiny: true, name: (cell as PokemonBasic).name })}
-                                      alt={(cell as PokemonBasic).displayName || (cell as PokemonBasic).name}
-                                      className="h-10 w-10 sm:h-14 sm:w-14 object-contain drop-shadow-[0_6px_10px_rgba(0,0,0,0.45)]"
-                                      loading="lazy"
-                                      decoding="async"
-                                      onError={(e) => {
-                                        (e.currentTarget as HTMLImageElement).src = '/placeholder.svg';
-                                      }}
-                                      style={{
-                                        filter: isMarked
-                                          ? 'grayscale(0) brightness(1.05) saturate(1.05)'
-                                          : 'grayscale(0.2) brightness(0.95)',
-                                      }}
-                                    />
-                                    <div className="text-[9px] sm:text-[10px] font-semibold text-center leading-tight">
-                                      {(cell as PokemonBasic).displayName || (cell as PokemonBasic).name}
-                                    </div>
-                                  </>
-                                )}
-                              </div>
-
-                              {isMarked && (
-                                <>
-                                  <div
-                                    className="absolute inset-0 pointer-events-none"
-                                    style={{
-                                      boxShadow: `inset 0 0 0 3px ${MARK_COLOR}`,
-                                      backgroundColor: `${MARK_COLOR}22`,
-                                    }}
-                                  />
-                                  <div
-                                    className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[8px] px-1.5 py-0.5 rounded-full font-bold uppercase tracking-[0.12em] border"
-                                    style={{
-                                      color: MARK_COLOR,
-                                      borderColor: `${MARK_COLOR}99`,
-                                      backgroundColor: 'rgba(0,0,0,0.45)',
-                                    }}
-                                  >
-                                    Trovato
-                                  </div>
-                                </>
-                              )}
-
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  openPickerForCell(index);
-                                }}
-                                className="absolute top-1.5 right-1.5 h-6 w-6 rounded-full border border-white/20 bg-black/50 text-white/80 backdrop-blur hover:text-white hover:bg-black/70 transition-opacity opacity-0 group-hover:opacity-100"
-                                title="Scegli Pokemon"
-                              >
-                                <Pencil className="h-3.5 w-3.5 mx-auto" />
-                              </button>
-                            </div>
-                          </td>
+                          <div
+                            key={`cell-empty-${index}`}
+                            className="aspect-square rounded-md border border-border bg-muted/30"
+                          />
                         );
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                      }
+
+                      const isMarked = marked.has(index);
+                      const isAlt = index % 2 === 1;
+                      const isGame = (cell as any).type === 'game';
+                      const label = isGame
+                        ? (cell as GameCell).name
+                        : (cell as PokemonBasic).displayName || (cell as PokemonBasic).name;
+
+                      return (
+                        <div
+                          key={`cell-${index}`}
+                          onClick={() => {
+                            if (replaceMode) replaceCell(index);
+                            else toggleMark(index);
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              if (replaceMode) replaceCell(index);
+                              else toggleMark(index);
+                            }
+                          }}
+                          role="button"
+                          tabIndex={0}
+                          className={cn(
+                            'group relative aspect-square overflow-hidden rounded-md border text-card-foreground transition-all focus:outline-none focus:ring-2 focus:ring-offset-2',
+                            isMarked
+                              ? 'border-green-500/80 bg-green-500/10 shadow-[0_0_0_1px_rgba(34,197,94,0.25)]'
+                              : isAlt
+                                ? 'border-border bg-background/85 hover:border-primary/50'
+                                : 'border-border bg-muted/40 hover:border-primary/50'
+                          )}
+                          style={{ outlineColor: MARK_COLOR }}
+                        >
+                          <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 p-1">
+                            <img
+                              src={
+                                isGame
+                                  ? (cell as GameCell).logo
+                                  : getPokemonSpriteUrl((cell as PokemonBasic).id, {
+                                      shiny: true,
+                                      name: (cell as PokemonBasic).name,
+                                    })
+                              }
+                              alt={label}
+                              className={cn(
+                                'h-[44%] max-h-16 min-h-8 w-[60%] object-contain drop-shadow-sm transition-transform group-hover:scale-105',
+                                isMarked ? 'saturate-125' : 'saturate-95'
+                              )}
+                              loading="lazy"
+                              decoding="async"
+                              onError={(e) => {
+                                (e.currentTarget as HTMLImageElement).src = '/placeholder.svg';
+                              }}
+                            />
+                            <div className="max-h-8 w-full overflow-hidden px-1 text-center text-[9px] font-semibold leading-tight sm:text-[10px] [overflow-wrap:anywhere]">
+                              {label}
+                            </div>
+                          </div>
+
+                          {isMarked && (
+                            <span className="absolute left-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-green-500 text-white shadow-sm">
+                              <CheckCircle2 className="h-3.5 w-3.5" />
+                            </span>
+                          )}
+
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openPickerForCell(index);
+                            }}
+                            className="absolute right-1 top-1 flex h-7 w-7 items-center justify-center rounded-full border border-border bg-card/95 text-card-foreground shadow-sm opacity-100 transition hover:bg-accent sm:opacity-0 sm:group-hover:opacity-100"
+                            title="Scegli contenuto"
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-        )}
+
+          <aside className="order-1 space-y-4 lg:order-2">
+            <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
+              <div className="mb-3 flex items-center justify-between">
+                <div className="text-sm font-semibold">Generazioni</div>
+                <div className="text-xs text-muted-foreground">{pendingGenerations.size}/{availableGenerations.length}</div>
+              </div>
+              <div className="grid grid-cols-4 gap-2">
+                {availableGenerations.map((gen) => {
+                  const isActive = pendingGenerations.has(gen);
+                  return (
+                    <Button
+                      key={gen}
+                      variant={isActive ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => toggleGeneration(gen)}
+                      className="h-9 px-2"
+                    >
+                      {gen}
+                    </Button>
+                  );
+                })}
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <Button variant="outline" size="sm" onClick={selectAllGenerations} className="h-9">
+                  Tutte
+                </Button>
+                <Button variant="outline" size="sm" onClick={clearGenerations} className="h-9">
+                  Nessuna
+                </Button>
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2 text-sm font-semibold">
+                  <Gamepad2 className="h-4 w-4" />
+                  Loghi gioco
+                </div>
+                <Switch checked={includeGames} onCheckedChange={setIncludeGames} />
+              </div>
+              <div className={cn('mt-4 space-y-3', !includeGames && 'opacity-50')}>
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>Quota caselle</span>
+                  <span>{Math.round(gameRatio * 100)}%</span>
+                </div>
+                <Slider
+                  value={[Math.round(gameRatio * 100)]}
+                  min={0}
+                  max={60}
+                  step={5}
+                  disabled={!includeGames}
+                  onValueChange={([value]) => setGameRatio(value / 100)}
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-9 w-full justify-center gap-2"
+                  onClick={() => setGamePickerOpen(true)}
+                  disabled={!includeGames}
+                >
+                  <Gamepad2 className="h-4 w-4" />
+                  {selectedGameIds.size} selezionati
+                </Button>
+              </div>
+            </div>
+          </aside>
+        </section>
       </main>
 
       <Dialog open={pickerOpen} onOpenChange={setPickerOpen}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
+        <DialogContent className="w-[calc(100vw-1rem)] max-w-xl max-h-[85dvh] overflow-hidden p-0">
+          <DialogHeader className="border-b border-border p-4 pr-10 text-left">
             <DialogTitle>Scegli contenuto</DialogTitle>
             <DialogDescription>Puoi inserire un Pokémon o un logo gioco nella casella.</DialogDescription>
           </DialogHeader>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 px-4 pt-4">
             <Button
               type="button"
               variant={pickerMode === 'pokemon' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setPickerMode('pokemon')}
-              className="h-8"
+              className="h-9 flex-1"
             >
               Pokémon
             </Button>
@@ -717,14 +726,14 @@ export default function Bingo() {
               variant={pickerMode === 'logo' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setPickerMode('logo')}
-              className="h-8"
+              className="h-9 flex-1"
             >
               Logo
             </Button>
           </div>
 
           {pickerMode === 'pokemon' ? (
-            <div className="space-y-3">
+            <div className="max-h-[60dvh] space-y-3 overflow-y-auto p-4">
               <PokemonSelector
                 value={pickerValue}
                 valueName={pickerValueName}
@@ -739,13 +748,13 @@ export default function Bingo() {
               </p>
             </div>
           ) : (
-            <div className="mt-1 max-h-[55vh] overflow-y-auto rounded-lg border border-white/10 p-3 space-y-2">
+            <div className="grid max-h-[60dvh] grid-cols-1 gap-2 overflow-y-auto p-4 sm:grid-cols-2">
               {GAMES.map((g) => (
                 <button
                   key={g.id}
                   type="button"
                   onClick={() => applySelectedGameLogo(g.id)}
-                  className="w-full flex items-center justify-between gap-3 rounded-lg border border-transparent hover:border-white/15 hover:bg-white/5 px-2 py-1.5 text-left transition-colors"
+                  className="flex w-full items-center justify-between gap-3 rounded-lg border border-border bg-background px-3 py-2 text-left transition-colors hover:bg-accent"
                 >
                   <span className="flex items-center gap-3">
                     <img
@@ -767,18 +776,18 @@ export default function Bingo() {
       </Dialog>
 
       <Dialog open={gamePickerOpen} onOpenChange={setGamePickerOpen}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
+        <DialogContent className="w-[calc(100vw-1rem)] max-w-xl max-h-[85dvh] overflow-hidden p-0">
+          <DialogHeader className="border-b border-border p-4 pr-10 text-left">
             <DialogTitle>Seleziona Loghi</DialogTitle>
             <DialogDescription>Scegli quali giochi possono comparire nel bingo.</DialogDescription>
           </DialogHeader>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 px-4 pt-4">
             <Button
               variant="outline"
               size="sm"
               onClick={() => setSelectedGameIds(new Set(GAMES.map((g) => g.id)))}
-              className="h-8"
+              className="h-9 flex-1"
             >
               Tutti
             </Button>
@@ -786,7 +795,7 @@ export default function Bingo() {
               variant="outline"
               size="sm"
               onClick={() => setSelectedGameIds(new Set())}
-              className="h-8"
+              className="h-9 flex-1"
             >
               Nessuno
             </Button>
@@ -795,11 +804,17 @@ export default function Bingo() {
             </div>
           </div>
 
-          <div className="mt-3 max-h-[55vh] overflow-y-auto rounded-lg border border-white/10 p-3 space-y-2">
+          <div className="grid max-h-[58dvh] grid-cols-1 gap-2 overflow-y-auto p-4 sm:grid-cols-2">
             {GAMES.map((g) => {
               const checked = selectedGameIds.has(g.id);
               return (
-                <label key={g.id} className="flex items-center justify-between gap-3">
+                <label
+                  key={g.id}
+                  className={cn(
+                    'flex items-center justify-between gap-3 rounded-lg border bg-background px-3 py-2 transition-colors',
+                    checked ? 'border-primary/60 ring-1 ring-primary/20' : 'border-border'
+                  )}
+                >
                   <span className="flex items-center gap-3">
                     <img
                       src={g.logo}
@@ -827,7 +842,7 @@ export default function Bingo() {
             })}
           </div>
 
-          <div className="mt-3 flex justify-end">
+          <div className="border-t border-border p-4 flex justify-end">
             <Button onClick={() => setGamePickerOpen(false)}>Chiudi</Button>
           </div>
         </DialogContent>

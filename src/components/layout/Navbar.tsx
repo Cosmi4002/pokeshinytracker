@@ -10,10 +10,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { ThemeCustomizer } from '@/components/layout/ThemeCustomizer';
 import { useRandomColor } from '@/lib/random-color-context';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -33,6 +37,7 @@ export function Navbar() {
     () => trainerAvatars.map((avatar) => avatar.id)
   );
   const [draggedAvatarId, setDraggedAvatarId] = useState<(typeof trainerAvatars)[number]['id'] | null>(null);
+  const [avatarPickerOpen, setAvatarPickerOpen] = useState(false);
 
   const navLinks = [
     { to: '/counter', label: 'Counter', icon: Calculator },
@@ -244,6 +249,7 @@ export function Navbar() {
         <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           <ThemeCustomizer />
           {user ? (
+            <>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-12 w-12">
@@ -273,70 +279,20 @@ export function Navbar() {
                   <Pencil className="mr-2 h-4 w-4" />
                   Imposta username
                 </DropdownMenuItem>
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>
-                    <img
-                      src={selectedAvatar.src}
-                      alt={selectedAvatar.label}
-                      className="mr-2 h-4 w-4 rounded-md border border-primary/70 bg-gradient-to-br from-white/30 to-white/10 p-0.5 object-contain"
-                      onError={(e) => ((e.currentTarget as HTMLImageElement).src = '/placeholder.svg')}
-                    />
-                    Avatar
-                  </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent
-                    side="bottom"
-                    alignOffset={-8}
-                    collisionPadding={8}
-                    className="w-[calc(100vw-1rem)] max-w-sm max-h-[68vh] overflow-y-auto overflow-x-hidden p-3"
-                  >
-                    <div className="grid grid-cols-4 justify-items-center gap-2 sm:grid-cols-5">
-                      {orderedTrainerAvatars.map((avatar) => (
-                        <button
-                          type="button"
-                          key={avatar.id}
-                          draggable
-                          onClick={() => setSelectedAvatarId(avatar.id)}
-                          onDragStart={(event) => {
-                            setDraggedAvatarId(avatar.id);
-                            event.dataTransfer.effectAllowed = 'move';
-                            event.dataTransfer.setData('text/plain', avatar.id);
-                          }}
-                          onDragOver={(event) => {
-                            event.preventDefault();
-                            event.dataTransfer.dropEffect = 'move';
-                          }}
-                          onDrop={(event) => {
-                            event.preventDefault();
-                            handleAvatarDrop(avatar.id);
-                            setDraggedAvatarId(null);
-                          }}
-                          onDragEnd={() => setDraggedAvatarId(null)}
-                          className="p-0 focus:bg-transparent"
-                          aria-label={`Seleziona o trascina ${avatar.label}`}
-                        >
-                          <span
-                            className={cn(
-                              'flex h-14 w-14 cursor-grab items-center justify-center overflow-hidden rounded-xl border-2 bg-gradient-to-br from-white/30 to-white/10 shadow-[0_4px_10px_rgba(0,0,0,0.15)] transition-all active:cursor-grabbing',
-                              selectedAvatarId === avatar.id
-                                ? 'border-primary ring-1 ring-primary/60'
-                                : draggedAvatarId === avatar.id
-                                  ? 'border-primary/80 opacity-60'
-                                  : 'border-border hover:border-primary/60'
-                            )}
-                          >
-                            <img
-                              src={avatar.src}
-                              alt={avatar.label}
-                              title={avatar.label}
-                              className="h-full w-full origin-top scale-[1.58] object-cover object-[50%_10%] [image-rendering:pixelated]"
-                              onError={(e) => ((e.currentTarget as HTMLImageElement).src = '/placeholder.svg')}
-                            />
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  </DropdownMenuSubContent>
-                </DropdownMenuSub>
+                <DropdownMenuItem
+                  onSelect={(event) => {
+                    event.preventDefault();
+                    setAvatarPickerOpen(true);
+                  }}
+                >
+                  <img
+                    src={selectedAvatar.src}
+                    alt={selectedAvatar.label}
+                    className="mr-2 h-4 w-4 rounded-md border border-primary/70 bg-gradient-to-br from-white/30 to-white/10 p-0.5 object-contain"
+                    onError={(e) => ((e.currentTarget as HTMLImageElement).src = '/placeholder.svg')}
+                  />
+                  Avatar
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="text-muted-foreground text-xs flex flex-col items-start gap-1">
                   <span className="font-semibold text-foreground">
@@ -352,6 +308,69 @@ export function Navbar() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            <Dialog open={avatarPickerOpen} onOpenChange={setAvatarPickerOpen}>
+              <DialogContent className="w-[calc(100vw-1rem)] max-w-2xl max-h-[85dvh] overflow-hidden p-0">
+                <DialogHeader className="border-b border-border p-4 pr-10 text-left">
+                  <DialogTitle>Avatar</DialogTitle>
+                  <DialogDescription>Scegli il trainer.</DialogDescription>
+                </DialogHeader>
+                <div className="max-h-[66dvh] overflow-y-auto p-4">
+                  <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 md:grid-cols-8">
+                    {orderedTrainerAvatars.map((avatar, index) => (
+                      <button
+                        type="button"
+                        key={`${avatar.id}-${index}`}
+                        draggable
+                        onClick={() => {
+                          setSelectedAvatarId(avatar.id);
+                          if (window.innerWidth < 640) setAvatarPickerOpen(false);
+                        }}
+                        onDragStart={(event) => {
+                          setDraggedAvatarId(avatar.id);
+                          event.dataTransfer.effectAllowed = 'move';
+                          event.dataTransfer.setData('text/plain', avatar.id);
+                        }}
+                        onDragOver={(event) => {
+                          event.preventDefault();
+                          event.dataTransfer.dropEffect = 'move';
+                        }}
+                        onDrop={(event) => {
+                          event.preventDefault();
+                          handleAvatarDrop(avatar.id);
+                          setDraggedAvatarId(null);
+                        }}
+                        onDragEnd={() => setDraggedAvatarId(null)}
+                        className="flex min-w-0 flex-col items-center gap-1 rounded-lg border border-transparent p-1.5 text-center transition hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
+                        aria-label={`Seleziona o trascina ${avatar.label}`}
+                      >
+                        <span
+                          className={cn(
+                            'flex h-14 w-14 cursor-grab items-center justify-center overflow-hidden rounded-lg border-2 bg-gradient-to-br from-white/30 to-white/10 shadow-sm transition-all active:cursor-grabbing',
+                            selectedAvatarId === avatar.id
+                              ? 'border-primary ring-1 ring-primary/60'
+                              : draggedAvatarId === avatar.id
+                                ? 'border-primary/80 opacity-60'
+                                : 'border-border hover:border-primary/60'
+                          )}
+                        >
+                          <img
+                            src={avatar.src}
+                            alt={avatar.label}
+                            title={avatar.label}
+                            className="h-full w-full origin-top scale-[1.58] object-cover object-[50%_10%] [image-rendering:pixelated]"
+                            onError={(e) => ((e.currentTarget as HTMLImageElement).src = '/placeholder.svg')}
+                          />
+                        </span>
+                        <span className="max-w-full truncate text-[10px] font-medium text-muted-foreground">
+                          {avatar.label}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+            </>
           ) : (
             <Link to="/auth">
               <Button
