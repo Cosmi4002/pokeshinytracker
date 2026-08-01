@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Check, Image, Moon, Palette, Paintbrush, Save, SlidersHorizontal, Sparkles, Sun } from 'lucide-react';
+import { Check, Image, Moon, Palette, Paintbrush, Save, Sparkles, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -120,19 +120,6 @@ function getBackgroundPreview(style: BackgroundStyle, themeColor: string, color2
   return `radial-gradient(circle at 20% 18%, rgba(255,255,255,0.14), transparent 52%), radial-gradient(circle at 84% 24%, ${color3}24, transparent 54%), repeating-linear-gradient(0deg, rgba(255,255,255,0.08) 0 1px, transparent 1px 5px)`;
 }
 
-function getSurfacePreview(style: UiStyle, themeColor: string) {
-  if (style === 'card') {
-    return `radial-gradient(circle at 50% 0%, rgba(255,255,255,0.22), transparent 55%), linear-gradient(180deg, ${themeColor}18, transparent)`;
-  }
-  if (style === 'holo') {
-    return `linear-gradient(115deg, transparent, ${themeColor}32, rgba(255,255,255,0.28), #38bdf82c, transparent)`;
-  }
-  if (style === 'arena') {
-    return `radial-gradient(circle at 50% -10%, ${themeColor}40, transparent 62%), linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,0.18))`;
-  }
-  return `linear-gradient(90deg, rgba(255,255,255,0.14) 1px, transparent 1px), linear-gradient(0deg, rgba(255,255,255,0.10) 1px, transparent 1px)`;
-}
-
 export function ThemeCustomizer() {
   const { setColorScheme, colorScheme } = useTheme();
   const { accentColor, setManualColor, resetToRandom, isRandom } = useRandomColor();
@@ -164,22 +151,15 @@ export function ThemeCustomizer() {
   const animationFrameRef = useRef<number | null>(null);
 
   const themePresets = useMemo<ThemeCombo[]>(() => ([
-    { themeColor: '#a855f7', backgroundColor: '#0b1020', uiStyle: 'holo', backgroundStyle: 'prism', backgroundColor2: '#7dd3fc', backgroundColor3: '#f0abfc' },
-    { themeColor: '#10b981', backgroundColor: '#071a12', uiStyle: 'card', backgroundStyle: 'safari', backgroundColor2: '#34d399', backgroundColor3: '#a3e635' },
-    { themeColor: '#fb7185', backgroundColor: '#1b0b10', uiStyle: 'card', backgroundStyle: 'route', backgroundColor2: '#fbbf24', backgroundColor3: '#fb7185' },
-    { themeColor: '#38bdf8', backgroundColor: '#07111a', uiStyle: 'holo', backgroundStyle: 'prism', backgroundColor2: '#99f6e4', backgroundColor3: '#bfdbfe' },
-    { themeColor: '#fbbf24', backgroundColor: '#000000', uiStyle: 'arena', backgroundStyle: 'night', backgroundColor2: '#f59e0b', backgroundColor3: '#e879f9' },
+    { themeColor: '#a855f7', backgroundColor: '#0b1020', uiStyle: 'dex', backgroundStyle: 'prism', backgroundColor2: '#7dd3fc', backgroundColor3: '#f0abfc' },
+    { themeColor: '#10b981', backgroundColor: '#071a12', uiStyle: 'dex', backgroundStyle: 'safari', backgroundColor2: '#34d399', backgroundColor3: '#a3e635' },
+    { themeColor: '#fb7185', backgroundColor: '#1b0b10', uiStyle: 'dex', backgroundStyle: 'route', backgroundColor2: '#fbbf24', backgroundColor3: '#fb7185' },
+    { themeColor: '#38bdf8', backgroundColor: '#07111a', uiStyle: 'dex', backgroundStyle: 'prism', backgroundColor2: '#99f6e4', backgroundColor3: '#bfdbfe' },
+    { themeColor: '#fbbf24', backgroundColor: '#000000', uiStyle: 'dex', backgroundStyle: 'night', backgroundColor2: '#f59e0b', backgroundColor3: '#e879f9' },
     { themeColor: '#8b5cf6', backgroundColor: '#0f172a', uiStyle: 'dex', backgroundStyle: 'calm', backgroundColor2: '#8b5cf6', backgroundColor3: DEFAULT_BG_ACCENT_3 },
   ]), []);
 
   const themePresetLabels = ['Violet Holo', 'Safari Green', 'Sunset Route', 'Ice Prism', 'AMOLED Arena', 'Classic Dex'];
-
-  const uiStyleOptions = useMemo<Array<{ id: UiStyle; label: string; detail: string }>>(() => ([
-    { id: 'dex', label: 'Dex', detail: 'Pulita' },
-    { id: 'card', label: 'Card', detail: 'Collezione' },
-    { id: 'holo', label: 'Holo', detail: 'Riflessi' },
-    { id: 'arena', label: 'Arena', detail: 'Contrasto' },
-  ]), []);
 
   const backgroundStyleOptions = useMemo<Array<{ id: BackgroundStyle; label: string; detail: string }>>(() => ([
     { id: 'calm', label: 'Calmo', detail: 'Solido' },
@@ -204,7 +184,7 @@ export function ThemeCustomizer() {
   const currentCombo = (): ThemeCombo => ({
     themeColor,
     backgroundColor,
-    uiStyle,
+    uiStyle: 'dex',
     backgroundStyle,
     backgroundColor2: backgroundColor2 || themeColor,
     backgroundColor3: backgroundColor3 || DEFAULT_BG_ACCENT_3,
@@ -214,7 +194,7 @@ export function ThemeCustomizer() {
     setPresetId(id);
     setThemeColor(combo.themeColor);
     setBackgroundColor(combo.backgroundColor);
-    setUiStyle(combo.uiStyle);
+    setUiStyle('dex');
     setBackgroundStyle(combo.backgroundStyle);
     setBackgroundColor2(combo.backgroundColor2 || combo.themeColor);
     setBackgroundColor3(combo.backgroundColor3 || DEFAULT_BG_ACCENT_3);
@@ -234,11 +214,6 @@ export function ThemeCustomizer() {
   const updateBackgroundColor = (color: string) => {
     setBackgroundColor(color);
     rememberCustomPatch({ backgroundColor: color });
-  };
-
-  const updateUiStyle = (style: UiStyle) => {
-    setUiStyle(style);
-    rememberCustomPatch({ uiStyle: style });
   };
 
   const updateBackgroundStyle = (style: BackgroundStyle) => {
@@ -266,7 +241,7 @@ export function ThemeCustomizer() {
 
   useEffect(() => {
     applyAppearanceToRoot({
-      uiStyle: getStoredUiStyle(),
+      uiStyle: 'dex',
       backgroundStyle: getStoredBackgroundStyle(),
       backgroundColor2: getStoredBackgroundAccent2(),
       backgroundColor3: getStoredBackgroundAccent3(),
@@ -279,7 +254,7 @@ export function ThemeCustomizer() {
     const currentThemeColor = isRandom ? accentColor : preferences?.theme_color || DEFAULT_THEME_COLOR;
     const currentBackgroundColor = preferences?.background_color || DEFAULT_BACKGROUND_COLOR;
     const currentAppearance = {
-      uiStyle: getStoredUiStyle(),
+      uiStyle: 'dex',
       backgroundStyle: getStoredBackgroundStyle(),
       backgroundColor2: getStoredBackgroundAccent2() || currentThemeColor,
       backgroundColor3: getStoredBackgroundAccent3() || DEFAULT_BG_ACCENT_3,
@@ -298,7 +273,7 @@ export function ThemeCustomizer() {
     setThemeColor(combo.themeColor);
     setBackgroundColor(combo.backgroundColor);
     setLayoutStyle(preferences?.layout_style || 'grid');
-    setUiStyle(combo.uiStyle);
+    setUiStyle('dex');
     setBackgroundStyle(combo.backgroundStyle);
     setBackgroundColor2(combo.backgroundColor2);
     setBackgroundColor3(combo.backgroundColor3);
@@ -313,7 +288,7 @@ export function ThemeCustomizer() {
 
     animationFrameRef.current = window.requestAnimationFrame(() => {
       applyAppearanceToRoot({
-        uiStyle,
+        uiStyle: 'dex',
         backgroundStyle,
         backgroundColor2,
         backgroundColor3,
@@ -327,7 +302,7 @@ export function ThemeCustomizer() {
         animationFrameRef.current = null;
       }
     };
-  }, [uiStyle, backgroundStyle, backgroundColor2, backgroundColor3, open]);
+  }, [backgroundStyle, backgroundColor2, backgroundColor3, open]);
 
   const handleCloseWithoutSave = () => {
     const original = initialAppearanceRef.current;
@@ -355,7 +330,7 @@ export function ThemeCustomizer() {
       if (presetId === 'custom') {
         setStoredCustomCombo(currentCombo());
       }
-      setStoredUiStyle(uiStyle);
+      setStoredUiStyle('dex');
       setStoredBackgroundStyle(backgroundStyle);
       setStoredBackgroundAccent2(backgroundColor2);
       setStoredBackgroundAccent3(backgroundColor3);
@@ -462,9 +437,7 @@ export function ThemeCustomizer() {
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-medium">{themePresetLabels[index]}</span>
-                    <span className="block truncate text-xs capitalize text-muted-foreground">
-                      {preset.uiStyle} / {preset.backgroundStyle}
-                    </span>
+                    <span className="block truncate text-xs capitalize text-muted-foreground">{preset.backgroundStyle}</span>
                   </span>
                   {presetId === `preset-${index}` && <Check className="h-4 w-4 text-primary" />}
                 </button>
@@ -535,40 +508,8 @@ export function ThemeCustomizer() {
           </section>
 
           <section className="space-y-4 rounded-xl border border-border/70 bg-card/70 p-4 shadow-sm">
-            <Label className="flex items-center gap-2 text-sm font-semibold">
-              <SlidersHorizontal className="h-4 w-4" />
-              Superfici e sfondo
-            </Label>
-
             <div className="space-y-2">
-              <Label className="text-xs uppercase tracking-wide text-muted-foreground">Superficie</Label>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                {uiStyleOptions.map((option) => (
-                  <button
-                    key={option.id}
-                    type="button"
-                    onClick={() => updateUiStyle(option.id)}
-                    className={`min-h-20 rounded-xl border p-3 text-left transition-all hover:border-primary/60 hover:bg-muted/40 ${
-                      uiStyle === option.id ? 'border-primary bg-primary/10 shadow-sm' : 'border-border/80 bg-background/70'
-                    }`}
-                  >
-                    <span
-                      className="mb-3 block h-5 rounded-lg border border-border/70"
-                      style={{
-                        backgroundColor,
-                        backgroundImage: getSurfacePreview(option.id, themeColor),
-                        backgroundSize: option.id === 'dex' ? '12px 12px' : 'cover',
-                      }}
-                    />
-                    <span className="block text-sm font-medium">{option.label}</span>
-                    <span className="block text-xs text-muted-foreground">{option.detail}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
+              <Label className="flex items-center gap-2 text-sm font-semibold">
                 <Image className="h-3.5 w-3.5" />
                 Sfondo
               </Label>

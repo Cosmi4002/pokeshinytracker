@@ -164,40 +164,6 @@
 }
 
 @layer base {
-    /* Surface presets */
-    .ui-dex {
-        --ui-overlay-image:
-            linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 38%),
-            linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px),
-            linear-gradient(0deg, rgba(255, 255, 255, 0.014) 1px, transparent 1px);
-        --ui-body-bg-size: auto, 40px 40px, 40px 40px;
-    }
-
-    .ui-card {
-        --ui-overlay-image:
-            radial-gradient(900px circle at 50% 0%, rgba(255, 255, 255, 0.045), transparent 58%),
-            linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 34%);
-        --ui-body-bg-size: auto;
-    }
-
-    .ui-holo {
-        --ui-overlay-image:
-            linear-gradient(115deg,
-                transparent 0%,
-                color-mix(in srgb, var(--primary), transparent 96%) 24%,
-                rgba(255, 255, 255, 0.045) 48%,
-                color-mix(in srgb, var(--shiny-glow), transparent 96%) 72%,
-                transparent 100%);
-        --ui-body-bg-size: 220% 220%;
-    }
-
-    .ui-arena {
-        --ui-overlay-image:
-            radial-gradient(800px circle at 50% -10%, color-mix(in srgb, var(--primary), transparent 94%), transparent 60%),
-            linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.08) 100%);
-        --ui-body-bg-size: auto;
-    }
-
     /* Background presets */
     .bg-calm {
         --bg-preset-image: none;

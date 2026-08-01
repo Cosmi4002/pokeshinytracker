@@ -59,10 +59,8 @@ export function setStoredBackgroundAccent3(color: string) {
 
 export function applyUiStyleToRoot(style: UiStyle) {
   const root = document.documentElement;
-  const className = `ui-${style}`;
-  if (root.classList.contains(className)) return;
   root.classList.remove('ui-flat', 'ui-soft', 'ui-glass', 'ui-neon', 'ui-dex', 'ui-card', 'ui-holo', 'ui-arena');
-  root.classList.add(`ui-${style}`);
+  root.style.removeProperty('--ui-overlay-image');
 }
 
 export function applyBackgroundStyleToRoot(style: BackgroundStyle) {
