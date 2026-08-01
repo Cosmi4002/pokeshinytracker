@@ -26,6 +26,13 @@ import { isFormEliminated, POKEMON_DATA_OVERRIDES } from "@/lib/form-filters";
 import { usePokedexOverrides } from "@/hooks/use-pokedex-overrides";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { todayLocalISODate } from "@/lib/date";
+import { getGameTheme, GAME_LOGOS } from "@/lib/game-themes";
+import { GAMES } from "@/lib/pokemon-data";
+import {
+    AVAILABILITY_RULE_LABEL,
+    getAvailabilitySourceLinks,
+    getCuratedShinyOriginGameIds
+} from "@/lib/pokemon-game-availability";
 
 interface FormVariant {
     id: number;
@@ -34,6 +41,14 @@ interface FormVariant {
     category: 'base' | 'regional' | 'seasonal' | 'form' | 'gender';
     gender: 'male' | 'female' | 'genderless';
     spriteUrl: string;
+}
+
+interface CaughtGameRow {
+    pokemon_id: number;
+    gender: string | null;
+    form: string | null;
+    game: string | null;
+    secondary_game: string | null;
 }
 
 export default function PokemonDetails() {
@@ -60,12 +75,16 @@ export default function PokemonDetails() {
 
 
     const [caughtForms, setCaughtForms] = useState<Set<string>>(new Set());
+    const [caughtGames, setCaughtGames] = useState<Set<string>>(new Set());
     const [actionLoading, setActionLoading] = useState<string | null>(null);
 
     // Fetch caught status
     useEffect(() => {
         if (user && pokemonId) {
             fetchCaughtStatus();
+        } else {
+            setCaughtForms(new Set());
+            setCaughtGames(new Set());
         }
     }, [user, pokemonId, details]);
 
@@ -77,7 +96,7 @@ export default function PokemonDetails() {
 
             const { data, error } = await supabase
                 .from('caught_shinies')
-                .select('pokemon_id, gender, form')
+                .select('pokemon_id, gender, form, game, secondary_game')
                 .eq('user_id', user.id)
                 .or('is_fail.is.false,is_fail.is.null')
                 .or('is_unobtainable.is.false,is_unobtainable.is.null')
@@ -86,10 +105,16 @@ export default function PokemonDetails() {
             if (error) throw error;
 
             const caughtSet = new Set<string>();
-            data?.forEach(row => {
+            const gameSet = new Set<string>();
+            const rows = (data || []) as CaughtGameRow[];
+
+            rows.forEach(row => {
+                let matchedThisPokemon = false;
+
                 // Priority 1: Exact form name match (new standard)
                 if (row.form) {
                     caughtSet.add(row.form);
+                    matchedThisPokemon = true;
                 } else {
                     // Priority 2: Legacy fallback using ID and gender
                     const g = row.gender || 'genderless';
@@ -110,10 +135,20 @@ export default function PokemonDetails() {
 
                     if (matchedVariant) {
                         caughtSet.add(matchedVariant.name);
+                        matchedThisPokemon = true;
                     }
+                }
+
+                if (matchedThisPokemon) {
+                    [row.game, row.secondary_game].forEach(gameId => {
+                        if (gameId && gameId !== 'unknown' && GAME_LOGOS[gameId]) {
+                            gameSet.add(gameId);
+                        }
+                    });
                 }
             });
             setCaughtForms(caughtSet);
+            setCaughtGames(gameSet);
         } catch (err) {
             console.error("Error fetching caught status:", err);
         }
@@ -177,6 +212,53 @@ export default function PokemonDetails() {
         return items;
     }, [details, overrides]);
 
+    const curatedGameIds = useMemo(() => {
+        if (!details) return null;
+        return getCuratedShinyOriginGameIds(details.baseId || details.id, details.name);
+    }, [details]);
+
+    const availabilitySourceLinks = useMemo(() => {
+        if (!details || !curatedGameIds) return [];
+        return getAvailabilitySourceLinks(details.displayName, details.name);
+    }, [curatedGameIds, details]);
+
+    const availableGames = useMemo(() => {
+        if (!details) return [];
+
+        const firstPlayableGeneration = Math.max(details.generation || 1, 2);
+        const curatedGameIdSet = curatedGameIds ? new Set<string>(curatedGameIds) : null;
+
+        return GAMES
+            .filter(game => (
+                GAME_LOGOS[game.id]
+                && (curatedGameIdSet ? curatedGameIdSet.has(game.id) : game.generation >= firstPlayableGeneration)
+            ))
+            .map(game => ({
+                ...game,
+                logo: GAME_LOGOS[game.id],
+                theme: getGameTheme(game.id),
+                isCaught: caughtGames.has(game.id)
+            }));
+    }, [caughtGames, curatedGameIds, details]);
+
+    const gamesByGeneration = useMemo(() => {
+        const groups = new Map<number, typeof availableGames>();
+
+        availableGames.forEach(game => {
+            const games = groups.get(game.generation);
+
+            if (games) {
+                games.push(game);
+            } else {
+                groups.set(game.generation, [game]);
+            }
+        });
+
+        return Array.from(groups.entries()).map(([generation, games]) => ({ generation, games }));
+    }, [availableGames]);
+
+    const caughtGameCount = availableGames.filter(game => game.isCaught).length;
+
     const toggleCaught = async (variant: FormVariant) => {
         if (!user) {
             toast({
@@ -204,6 +286,7 @@ export default function PokemonDetails() {
                 const next = new Set(caughtForms);
                 next.delete(key);
                 setCaughtForms(next);
+                await fetchCaughtStatus();
             } else {
                 const { error } = await supabase
                     .from('caught_shinies')
@@ -227,6 +310,7 @@ export default function PokemonDetails() {
                 const next = new Set(caughtForms);
                 next.add(key);
                 setCaughtForms(next);
+                await fetchCaughtStatus();
             }
         } catch (err: any) {
             toast({ title: "Errore", description: err.message, variant: "destructive" });
@@ -237,7 +321,7 @@ export default function PokemonDetails() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-background">
+            <div className="min-h-screen bg-card text-card-foreground">
                 <Navbar />
                 <div className="container mx-auto py-12 px-4 space-y-8 animate-pulse">
                     <div className="h-64 rounded-3xl bg-muted" />
@@ -266,15 +350,7 @@ export default function PokemonDetails() {
     const nextId = currentId < 1025 ? currentId + 1 : null;
 
     return (
-        <div className="min-h-screen bg-background selection:bg-primary/20">
-            {/* Ambient Background */}
-            <div
-                className="fixed inset-0 pointer-events-none opacity-[0.05] transition-colors duration-1000"
-                style={{
-                    background: `radial-gradient(circle at 50% 20%, ${accentColor} 0%, transparent 60%)`
-                }}
-            />
-
+        <div className="min-h-screen bg-card text-card-foreground selection:bg-primary/20">
             <Navbar />
 
             <main className="container mx-auto py-8 px-4 relative z-10 max-w-5xl">
@@ -284,7 +360,7 @@ export default function PokemonDetails() {
                         variant="ghost"
                         size="sm"
                         onClick={() => navigate('/pokedex')}
-                        className="group text-muted-foreground hover:text-foreground font-medium bg-white/5 hover:bg-white/10 rounded-xl px-4"
+                        className="group rounded-lg border border-border bg-card px-4 font-medium text-muted-foreground shadow-sm hover:bg-muted hover:text-foreground"
                     >
                         <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
                         Pokedex
@@ -298,17 +374,17 @@ export default function PokemonDetails() {
                     {/* Centered Header */}
                     <div className="space-y-6 w-full max-w-3xl">
                         <div className="flex flex-col items-center gap-4">
-                            <h1 className="text-7xl md:text-8xl font-black tracking-tighter capitalize bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/30 drop-shadow-2xl py-2">
+                            <h1 className="text-7xl md:text-8xl font-black tracking-tighter capitalize text-foreground drop-shadow-sm py-2">
                                 {(overrides[`${details.id}-${details.name}`] as any)?.custom_display_name || details.displayName}
                             </h1>
 
                             {details.shinyAvailability && details.shinyAvailability !== 'ok' && (
                                 <div
                                     className={cn(
-                                        "inline-flex items-center gap-2 rounded-2xl border px-4 py-2 text-sm font-extrabold shadow-sm backdrop-blur",
+                                        "inline-flex items-center gap-2 rounded-lg border bg-card px-4 py-2 text-sm font-extrabold shadow-sm",
                                         details.shinyAvailability === 'unobtainable'
-                                            ? "border-fuchsia-200/70 bg-gradient-to-r from-fuchsia-500/20 to-purple-500/10 text-fuchsia-50 ring-1 ring-fuchsia-300/30"
-                                            : "border-amber-200/70 bg-gradient-to-r from-amber-500/20 to-orange-500/10 text-amber-50 ring-1 ring-amber-300/30"
+                                            ? "border-fuchsia-500/40 bg-fuchsia-500/10 text-fuchsia-700 dark:text-fuchsia-200"
+                                            : "border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-200"
                                     )}
                                     title={details.shinyAvailability === 'unobtainable'
                                         ? 'Shiny Locked'
@@ -337,7 +413,7 @@ export default function PokemonDetails() {
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className="h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-white/5"
+                                                    className="h-10 w-10 rounded-lg border border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
                                                     onClick={() => {
                                                         const currentName = (overrides[`${details.id}-${details.name}`] as any)?.custom_display_name || details.displayName;
                                                         const newName = prompt("Personalizza nome display:", currentName);
@@ -381,16 +457,131 @@ export default function PokemonDetails() {
 
                         {/* Generation Badge */}
                         <div className="flex justify-center flex-wrap gap-4">
-                            <div className="px-6 py-2 rounded-lg bg-white/5 border border-white/10 text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center">
+                            <div className="flex items-center rounded-lg border border-border bg-card px-6 py-2 text-xs font-bold uppercase tracking-widest text-muted-foreground shadow-sm">
                                 Gen {details.generation}
                             </div>
                         </div>
 
                     </div>
 
+                    {(availableGames.length > 0 || curatedGameIds) && (
+                        <section className="w-full space-y-5 rounded-lg border border-border bg-card p-6 text-card-foreground shadow-2xl">
+                            <div className="flex flex-col gap-3 border-b border-border pb-5 text-left sm:flex-row sm:items-end sm:justify-between">
+                                <div>
+                                    <h2 className="flex items-center gap-3 text-2xl font-black tracking-tight">
+                                        <span className="h-7 w-2 rounded-full bg-primary shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
+                                        Giochi salvati
+                                    </h2>
+                                    <p className="mt-1 text-sm font-medium text-muted-foreground">
+                                        {curatedGameIds ? AVAILABILITY_RULE_LABEL : `Da Gen ${Math.max(details.generation || 1, 2)} in poi`}
+                                    </p>
+                                    {availabilitySourceLinks.length > 0 && (
+                                        <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                                            <span>Fonti</span>
+                                            {availabilitySourceLinks.map(source => (
+                                                <a
+                                                    key={source.url}
+                                                    href={source.url}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="rounded-full border border-border bg-muted px-2 py-1 text-card-foreground transition-colors hover:bg-background hover:text-primary"
+                                                    onClick={(event) => event.stopPropagation()}
+                                                >
+                                                    {source.label}
+                                                </a>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="flex w-fit items-center gap-2 rounded-lg border border-border bg-muted px-4 py-2 text-sm font-bold text-card-foreground shadow-sm">
+                                    <Sparkles className="h-4 w-4 text-primary" />
+                                    <span className="text-foreground">{caughtGameCount}</span>
+                                    <span className="text-muted-foreground">/</span>
+                                    <span className="text-muted-foreground">{availableGames.length}</span>
+                                </div>
+                            </div>
+
+                            <div className="space-y-5">
+                                {availableGames.length === 0 && curatedGameIds && (
+                                    <div className="rounded-lg border border-border bg-muted p-4 text-sm font-bold text-muted-foreground">
+                                        Nessun gioco console valido per shiny origin.
+                                    </div>
+                                )}
+
+                                {gamesByGeneration.map(({ generation, games }) => (
+                                    <div key={generation} className="space-y-3">
+                                        <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.24em] text-muted-foreground/70">
+                                            <span className="h-px flex-1 bg-border" />
+                                            Gen {generation}
+                                            <span className="h-px flex-1 bg-border" />
+                                        </div>
+
+                                        <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">
+                                            {games.map(game => (
+                                                <div
+                                                    key={game.id}
+                                                    title={game.name}
+                                                    className={cn(
+                                                        "relative flex min-h-[88px] flex-col items-center justify-center gap-2 overflow-hidden rounded-lg border border-border p-2.5 text-card-foreground shadow-sm transition-all duration-300",
+                                                        game.isCaught
+                                                            ? "scale-[1.01] bg-background shadow-lg"
+                                                            : "bg-muted/50 opacity-80"
+                                                    )}
+                                                    style={{
+                                                        borderColor: game.isCaught ? `color-mix(in srgb, ${game.theme.accent} 70%, var(--border))` : undefined,
+                                                        background: game.isCaught
+                                                            ? `linear-gradient(135deg, color-mix(in srgb, ${game.theme.primary} 18%, var(--card)), color-mix(in srgb, ${game.theme.secondary} 12%, var(--card)))`
+                                                            : undefined,
+                                                        boxShadow: game.isCaught ? `0 12px 28px ${game.theme.primary}2e` : undefined
+                                                    }}
+                                                >
+                                                    {game.isCaught && (
+                                                        <div
+                                                            className="absolute inset-x-4 top-1 h-px rounded-full opacity-80"
+                                                            style={{ backgroundColor: game.theme.accent }}
+                                                        />
+                                                    )}
+
+                                                    <img
+                                                        src={game.logo}
+                                                        alt={game.name}
+                                                        loading="lazy"
+                                                        className={cn(
+                                                            "h-7 w-full object-contain transition-all duration-300 sm:h-8",
+                                                            game.isCaught
+                                                                ? "opacity-100 saturate-125 drop-shadow-[0_0_10px_rgba(255,255,255,0.45)]"
+                                                                : "opacity-35 grayscale saturate-0"
+                                                        )}
+                                                    />
+
+                                                    <span
+                                                        className={cn(
+                                                            "max-w-full truncate text-[10px] font-black uppercase leading-none",
+                                                            game.isCaught ? "text-foreground" : "text-muted-foreground/55"
+                                                        )}
+                                                    >
+                                                        {game.name}
+                                                    </span>
+
+                                                    {game.isCaught && (
+                                                        <CheckCircle2
+                                                            className="absolute right-2 top-2 h-3.5 w-3.5"
+                                                            style={{ color: game.theme.accent }}
+                                                        />
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    )}
+
                     {/* Form Collection Section - Main Focus */}
-                    <div className="w-full space-y-8 pt-6">
-                        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-white/10">
+                    <div className="w-full space-y-8 rounded-lg border border-border bg-card p-6 text-card-foreground shadow-2xl">
+                        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-border">
                             <div className="text-left">
                                 <h2 className="text-3xl font-black tracking-tight flex items-center gap-3">
                                     <span className="w-2 h-8 bg-primary rounded-full shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
@@ -398,7 +589,7 @@ export default function PokemonDetails() {
                                 </h2>
                                 <p className="text-muted-foreground mt-1 font-medium">Visualizza e segna le varianti cromatiche catturate.</p>
                             </div>
-                            <div className="flex items-center gap-3 bg-white/5 px-5 py-2.5 rounded-2xl border border-white/10 backdrop-blur-md">
+                            <div className="flex items-center gap-3 rounded-lg border border-border bg-muted px-5 py-2.5 text-card-foreground shadow-sm">
                                 <Sparkles className="h-4 w-4 text-primary" />
                                 <span className="text-sm font-bold text-foreground">
                                     {caughtForms.size} <span className="text-muted-foreground mx-1">/</span> {variants.length}
@@ -417,14 +608,14 @@ export default function PokemonDetails() {
                                         key={variant.name}
                                         onClick={() => toggleCaught(variant)}
                                         className={cn(
-                                            "group relative flex flex-col items-center justify-center p-4 rounded-[1.5rem] transition-all duration-500 transform active:scale-95",
+                                            "group relative flex flex-col items-center justify-center rounded-lg border border-border p-4 text-card-foreground shadow-sm transition-all duration-500 transform active:scale-95",
                                             isCaught
-                                                ? "bg-white/5 border-2 shadow-lg"
-                                                : "bg-white/[0.02] border border-white/10 hover:border-white/20 hover:bg-white/[0.04]"
+                                                ? "bg-background border-2 shadow-lg"
+                                                : "bg-muted/50 hover:bg-muted"
                                         )}
                                         style={{
                                             borderColor: isCaught ? accentColor : undefined,
-                                            boxShadow: isCaught ? `0 0 20px ${accentColor}40` : undefined
+                                            boxShadow: isCaught ? `0 12px 28px ${accentColor}30` : undefined
                                         }}
                                     >
                                         <div className="relative w-full aspect-square mb-3 flex items-center justify-center">
@@ -433,7 +624,7 @@ export default function PokemonDetails() {
                                                 alt={variant.displayName}
                                                 className={cn(
                                                     "w-full h-full object-contain pokemon-sprite transition-all duration-500",
-                                                    isCaught ? "scale-110 drop-shadow-lg" : "brightness-[0.3] grayscale group-hover:brightness-100 group-hover:grayscale-0"
+                                                    isCaught ? "scale-110 drop-shadow-lg" : "opacity-45 grayscale saturate-0 group-hover:opacity-100 group-hover:grayscale-0 group-hover:saturate-100"
                                                 )}
                                             />
 
@@ -442,11 +633,11 @@ export default function PokemonDetails() {
                                                     className="absolute -top-2 -right-2 p-1.5 rounded-full shadow-lg z-30 animate-in zoom-in-50 duration-300"
                                                     style={{ backgroundColor: accentColor }}
                                                 >
-                                                    <CheckCircle2 className="w-4 h-4 text-white font-bold" />
+                                                    <CheckCircle2 className="w-4 h-4 text-primary-foreground font-bold" />
                                                 </div>
                                             )}
                                             {isLoading && (
-                                                <div className="absolute inset-0 flex items-center justify-center bg-background/60 backdrop-blur-sm rounded-full z-30">
+                                                <div className="absolute inset-0 flex items-center justify-center bg-card/70 backdrop-blur-sm rounded-lg z-30">
                                                     <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
                                                 </div>
                                             )}
@@ -470,7 +661,7 @@ export default function PokemonDetails() {
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className="h-8 w-8 rounded-lg bg-black/20 hover:bg-primary/20 text-white/50 hover:text-primary backdrop-blur-sm"
+                                                    className="h-8 w-8 rounded-lg border border-border bg-card/90 text-muted-foreground shadow-sm hover:bg-muted hover:text-primary"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         const currentName = (overrides[`${variant.id}-${variant.name}`] as any)?.custom_display_name || variant.displayName;
@@ -486,7 +677,7 @@ export default function PokemonDetails() {
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className="h-8 w-8 rounded-lg bg-black/20 hover:bg-destructive/20 text-white/50 hover:text-destructive backdrop-blur-sm"
+                                                    className="h-8 w-8 rounded-lg border border-border bg-card/90 text-muted-foreground shadow-sm hover:bg-muted hover:text-destructive"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         if (confirm(`Eliminare la forma ${variant.displayName}?`)) {
@@ -501,7 +692,7 @@ export default function PokemonDetails() {
                                         )}
 
                                         {!user && (
-                                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-background/40 backdrop-blur-sm rounded-[2rem] z-20">
+                                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-card/70 backdrop-blur-sm rounded-lg z-20">
                                                 <Lock className="w-8 h-8 text-muted-foreground" />
                                             </div>
                                         )}
