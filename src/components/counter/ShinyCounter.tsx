@@ -90,6 +90,37 @@ export function ShinyCounter({
     selectedPokemon3Name,
   ]);
 
+  const getExtraPokemonStorageKey = useCallback((id: string) => `shiny-counter-extra-pokemon:${user?.id || 'guest'}:${id}`, [user?.id]);
+
+  const loadStoredExtraPokemon = useCallback((id: string) => {
+    try {
+      const raw = window.localStorage.getItem(getExtraPokemonStorageKey(id));
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as {
+        pokemon_2_id?: number | null;
+        pokemon_2_name?: string | null;
+        pokemon_3_id?: number | null;
+        pokemon_3_name?: string | null;
+      };
+      return parsed;
+    } catch {
+      return null;
+    }
+  }, [getExtraPokemonStorageKey]);
+
+  const saveStoredExtraPokemon = useCallback((id: string, slots: {
+    pokemon_2_id: number | null;
+    pokemon_2_name: string | null;
+    pokemon_3_id: number | null;
+    pokemon_3_name: string | null;
+  }) => {
+    try {
+      window.localStorage.setItem(getExtraPokemonStorageKey(id), JSON.stringify(slots));
+    } catch {
+      // local persistence is best-effort
+    }
+  }, [getExtraPokemonStorageKey]);
+
   // Build all forms/varieties from pokemon details without exclusion filters.
   const formOptions = useMemo(() => {
     if (!pokemonDetails) return [];
@@ -160,10 +191,11 @@ export function ShinyCounter({
           setIncrementHotkey(data.increment_hotkey ?? '');
           setSelectedPokemonId(data.pokemon_id ?? null);
           setSelectedPokemonName(data.pokemon_name ?? '');
-          setSelectedPokemon2Id((data as any).pokemon_2_id ?? null);
-          setSelectedPokemon2Name((data as any).pokemon_2_name ?? '');
-          setSelectedPokemon3Id((data as any).pokemon_3_id ?? null);
-          setSelectedPokemon3Name((data as any).pokemon_3_name ?? '');
+          const storedExtra = loadStoredExtraPokemon(data.id);
+          setSelectedPokemon2Id((data as any).pokemon_2_id ?? storedExtra?.pokemon_2_id ?? null);
+          setSelectedPokemon2Name((data as any).pokemon_2_name ?? storedExtra?.pokemon_2_name ?? '');
+          setSelectedPokemon3Id((data as any).pokemon_3_id ?? storedExtra?.pokemon_3_id ?? null);
+          setSelectedPokemon3Name((data as any).pokemon_3_name ?? storedExtra?.pokemon_3_name ?? '');
           setSelectedMethod(findHuntingMethod(data.method) ?? HUNTING_METHODS[0]);
           setHasShinyCharm(data.has_shiny_charm ?? false);
           setSelectedForm(data.form ?? '');
@@ -199,7 +231,7 @@ export function ShinyCounter({
     };
 
     loadData();
-  }, [user?.id, huntId]);
+  }, [user?.id, huntId, loadStoredExtraPokemon]);
 
   // Sync state and clear variants when Pokémon changes
   useEffect(() => {
@@ -253,10 +285,6 @@ export function ShinyCounter({
           user_id: user.id,
           pokemon_id: selectedPokemonId,
           pokemon_name: selectedPokemonName ?? '',
-          pokemon_2_id: selectedPokemon2Id,
-          pokemon_2_name: selectedPokemon2Name || null,
-          pokemon_3_id: selectedPokemon3Id,
-          pokemon_3_name: selectedPokemon3Name || null,
           method: selectedMethod.id,
           counter,
           has_shiny_charm: hasShinyCharm,
@@ -266,19 +294,44 @@ export function ShinyCounter({
           gender: selectedGender || null,
           updated_at: new Date().toISOString(),
         };
+        const extraPokemonPayload = {
+          pokemon_2_id: selectedPokemon2Id,
+          pokemon_2_name: selectedPokemon2Name || null,
+          pokemon_3_id: selectedPokemon3Id,
+          pokemon_3_name: selectedPokemon3Name || null,
+        };
+        const fullPayload = { ...payload, ...extraPokemonPayload };
 
         if (activeHuntIdRef.current) {
+          saveStoredExtraPokemon(activeHuntIdRef.current, extraPokemonPayload);
           // Update existing hunt
-          await supabase
+          const { error } = await supabase
             .from('active_hunts')
-            .update(payload)
+            .update(fullPayload)
             .eq('id', activeHuntIdRef.current);
+          if (error) {
+            const { error: retryError } = await supabase
+              .from('active_hunts')
+              .update(payload)
+              .eq('id', activeHuntIdRef.current);
+            if (retryError) throw retryError;
+          }
         } else {
           // Create new hunt only if we have user data
-          const insertPayload = { ...payload, created_at: new Date().toISOString() };
+          const insertPayload = { ...fullPayload, created_at: new Date().toISOString() };
           const { data, error } = await supabase.from('active_hunts').insert(insertPayload).select('id').single();
-          if (!error && data) {
+          if (error) {
+            const fallbackInsertPayload = { ...payload, created_at: insertPayload.created_at };
+            const { data: fallbackData, error: fallbackError } = await supabase.from('active_hunts').insert(fallbackInsertPayload).select('id').single();
+            if (fallbackError) throw fallbackError;
+            if (fallbackData) {
+              activeHuntIdRef.current = fallbackData.id;
+              saveStoredExtraPokemon(fallbackData.id, extraPokemonPayload);
+              setHuntCreatedAt(fallbackInsertPayload.created_at);
+            }
+          } else if (data) {
             activeHuntIdRef.current = data.id;
+            saveStoredExtraPokemon(data.id, extraPokemonPayload);
             setHuntCreatedAt(insertPayload.created_at);
           }
         }
@@ -289,38 +342,53 @@ export function ShinyCounter({
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [user?.id, loading, counter, incrementAmount, incrementHotkey, selectedPokemonId, selectedPokemonName, selectedPokemon2Id, selectedPokemon2Name, selectedPokemon3Id, selectedPokemon3Name, selectedMethod, hasShinyCharm, selectedForm, selectedGender]);
+  }, [user?.id, loading, counter, incrementAmount, incrementHotkey, selectedPokemonId, selectedPokemonName, selectedPokemon2Id, selectedPokemon2Name, selectedPokemon3Id, selectedPokemon3Name, selectedMethod, hasShinyCharm, selectedForm, selectedGender, saveStoredExtraPokemon]);
 
   // Fast-sync variant/name changes so Hunts page reflects them immediately after navigation.
   useEffect(() => {
     if (!user || isInitialLoadRef.current) return;
     if (!activeHuntIdRef.current) return;
+    const currentHuntId = activeHuntIdRef.current;
 
     const syncVariantNow = async () => {
       try {
-        await supabase
+        const extraPokemonPayload = {
+          pokemon_2_id: selectedPokemon2Id,
+          pokemon_2_name: selectedPokemon2Name || null,
+          pokemon_3_id: selectedPokemon3Id,
+          pokemon_3_name: selectedPokemon3Name || null,
+        };
+        const payload = {
+          pokemon_id: selectedPokemonId,
+          pokemon_name: selectedPokemonName ?? '',
+          form: selectedForm || null,
+          gender: selectedGender || null,
+          method: selectedMethod.id,
+          updated_at: new Date().toISOString(),
+        };
+
+        saveStoredExtraPokemon(currentHuntId, extraPokemonPayload);
+
+        const { error } = await supabase
           .from('active_hunts')
-          .update({
-            pokemon_id: selectedPokemonId,
-            pokemon_name: selectedPokemonName ?? '',
-            pokemon_2_id: selectedPokemon2Id,
-            pokemon_2_name: selectedPokemon2Name || null,
-            pokemon_3_id: selectedPokemon3Id,
-            pokemon_3_name: selectedPokemon3Name || null,
-            form: selectedForm || null,
-            gender: selectedGender || null,
-            method: selectedMethod.id,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', activeHuntIdRef.current)
+          .update({ ...payload, ...extraPokemonPayload })
+          .eq('id', currentHuntId)
           .eq('user_id', user.id);
+
+        if (error) {
+          await supabase
+            .from('active_hunts')
+            .update(payload)
+            .eq('id', currentHuntId)
+            .eq('user_id', user.id);
+        }
       } catch {
         // non-blocking best-effort sync
       }
     };
 
     void syncVariantNow();
-  }, [user?.id, selectedPokemonId, selectedPokemonName, selectedPokemon2Id, selectedPokemon2Name, selectedPokemon3Id, selectedPokemon3Name, selectedForm, selectedGender, selectedMethod.id]);
+  }, [user?.id, selectedPokemonId, selectedPokemonName, selectedPokemon2Id, selectedPokemon2Name, selectedPokemon3Id, selectedPokemon3Name, selectedForm, selectedGender, selectedMethod.id, saveStoredExtraPokemon]);
 
   // Calculate stats based on current counter and method
   const stats = useMemo(() => {
