@@ -45,6 +45,14 @@ type PokemonSlot = {
 };
 
 type PokemonDetails = ReturnType<typeof usePokemonDetails>['pokemon'];
+type PersistedPokemonSlot = {
+  id: number | null;
+  name: string;
+  form: string;
+  gender: string;
+};
+
+const COUNTER_SLOTS_PREFIX = '__counter_slots_v1__:';
 
 const getFormOptions = (pokemonDetails: PokemonDetails) => {
   if (!pokemonDetails) return [];
@@ -72,6 +80,43 @@ const getFormOptions = (pokemonDetails: PokemonDetails) => {
   });
 
   return items.sort((a, b) => a.displayName.localeCompare(b.displayName));
+};
+
+const normalizePersistedSlot = (slot?: Partial<PersistedPokemonSlot> | null): PersistedPokemonSlot => ({
+  id: typeof slot?.id === 'number' ? slot.id : null,
+  name: typeof slot?.name === 'string' ? slot.name : '',
+  form: typeof slot?.form === 'string' ? slot.form : '',
+  gender: typeof slot?.gender === 'string' ? slot.gender : '',
+});
+
+const encodePokemonSlots = (slots: PersistedPokemonSlot[]) => {
+  const normalized = slots.map(normalizePersistedSlot).filter((slot) => slot.id);
+  if (normalized.length <= 1) return normalized[0]?.name || '';
+  return `${COUNTER_SLOTS_PREFIX}${JSON.stringify(normalized)}`;
+};
+
+const decodePokemonSlots = (
+  savedName: string | null | undefined,
+  pokemonId: number | null | undefined,
+  form: string | null | undefined,
+  gender: string | null | undefined
+): PersistedPokemonSlot[] => {
+  if (savedName?.startsWith(COUNTER_SLOTS_PREFIX)) {
+    try {
+      const parsed = JSON.parse(savedName.slice(COUNTER_SLOTS_PREFIX.length));
+      if (Array.isArray(parsed)) {
+        return [0, 1, 2].map((index) => normalizePersistedSlot(parsed[index]));
+      }
+    } catch {
+      // Fall through to legacy single-Pokemon shape.
+    }
+  }
+
+  return [
+    normalizePersistedSlot({ id: pokemonId ?? null, name: savedName || '', form: form || '', gender: gender || '' }),
+    normalizePersistedSlot(),
+    normalizePersistedSlot(),
+  ];
 };
 
 export function ShinyCounter({
@@ -137,45 +182,6 @@ export function ShinyCounter({
     pokemon3Details,
   ]);
 
-  const getExtraPokemonStorageKey = useCallback((id: string) => `shiny-counter-extra-pokemon:${user?.id || 'guest'}:${id}`, [user?.id]);
-
-  const loadStoredExtraPokemon = useCallback((id: string) => {
-    try {
-      const raw = window.localStorage.getItem(getExtraPokemonStorageKey(id));
-      if (!raw) return null;
-      const parsed = JSON.parse(raw) as {
-        pokemon_2_id?: number | null;
-        pokemon_2_name?: string | null;
-        pokemon_2_form?: string | null;
-        pokemon_2_gender?: string | null;
-        pokemon_3_id?: number | null;
-        pokemon_3_name?: string | null;
-        pokemon_3_form?: string | null;
-        pokemon_3_gender?: string | null;
-      };
-      return parsed;
-    } catch {
-      return null;
-    }
-  }, [getExtraPokemonStorageKey]);
-
-  const saveStoredExtraPokemon = useCallback((id: string, slots: {
-    pokemon_2_id: number | null;
-    pokemon_2_name: string | null;
-    pokemon_2_form: string | null;
-    pokemon_2_gender: string | null;
-    pokemon_3_id: number | null;
-    pokemon_3_name: string | null;
-    pokemon_3_form: string | null;
-    pokemon_3_gender: string | null;
-  }) => {
-    try {
-      window.localStorage.setItem(getExtraPokemonStorageKey(id), JSON.stringify(slots));
-    } catch {
-      // local persistence is best-effort
-    }
-  }, [getExtraPokemonStorageKey]);
-
   // Load active hunt and playlists from Supabase when user is logged in
   useEffect(() => {
     if (!user) {
@@ -215,21 +221,21 @@ export function ShinyCounter({
           setCounter(data.counter ?? 0);
           setIncrementAmount(data.increment_amount ?? 1);
           setIncrementHotkey(data.increment_hotkey ?? '');
-          setSelectedPokemonId(data.pokemon_id ?? null);
-          setSelectedPokemonName(data.pokemon_name ?? '');
-          const storedExtra = loadStoredExtraPokemon(data.id);
-          setSelectedPokemon2Id((data as any).pokemon_2_id ?? storedExtra?.pokemon_2_id ?? null);
-          setSelectedPokemon2Name((data as any).pokemon_2_name ?? storedExtra?.pokemon_2_name ?? '');
-          setSelectedPokemon2Form((data as any).pokemon_2_form ?? storedExtra?.pokemon_2_form ?? '');
-          setSelectedPokemon2Gender((data as any).pokemon_2_gender ?? storedExtra?.pokemon_2_gender ?? '');
-          setSelectedPokemon3Id((data as any).pokemon_3_id ?? storedExtra?.pokemon_3_id ?? null);
-          setSelectedPokemon3Name((data as any).pokemon_3_name ?? storedExtra?.pokemon_3_name ?? '');
-          setSelectedPokemon3Form((data as any).pokemon_3_form ?? storedExtra?.pokemon_3_form ?? '');
-          setSelectedPokemon3Gender((data as any).pokemon_3_gender ?? storedExtra?.pokemon_3_gender ?? '');
+          const savedSlots = decodePokemonSlots(data.pokemon_name, data.pokemon_id, (data as any).form, (data as any).gender);
+          setSelectedPokemonId(savedSlots[0].id);
+          setSelectedPokemonName(savedSlots[0].name);
+          setSelectedForm(savedSlots[0].form);
+          setSelectedGender(savedSlots[0].gender);
+          setSelectedPokemon2Id(savedSlots[1].id);
+          setSelectedPokemon2Name(savedSlots[1].name);
+          setSelectedPokemon2Form(savedSlots[1].form);
+          setSelectedPokemon2Gender(savedSlots[1].gender);
+          setSelectedPokemon3Id(savedSlots[2].id);
+          setSelectedPokemon3Name(savedSlots[2].name);
+          setSelectedPokemon3Form(savedSlots[2].form);
+          setSelectedPokemon3Gender(savedSlots[2].gender);
           setSelectedMethod(findHuntingMethod(data.method) ?? HUNTING_METHODS[0]);
           setHasShinyCharm(data.has_shiny_charm ?? false);
-          setSelectedForm(data.form ?? '');
-          setSelectedGender(data.gender ?? '');
           setHuntCreatedAt(data.created_at);
         } else {
           // No hunt found for ID or no recent hunt. Reset to default new hunt state.
@@ -265,7 +271,7 @@ export function ShinyCounter({
     };
 
     loadData();
-  }, [user?.id, huntId, loadStoredExtraPokemon]);
+  }, [user?.id, huntId]);
 
   // Sync state and clear variants when Pokémon changes
   useEffect(() => {
@@ -315,10 +321,15 @@ export function ShinyCounter({
 
       setSaveStatus('saving');
       try {
+        const pokemonSlotsPayload = [
+          { id: selectedPokemonId, name: selectedPokemonName, form: selectedForm, gender: selectedGender },
+          { id: selectedPokemon2Id, name: selectedPokemon2Name, form: selectedPokemon2Form, gender: selectedPokemon2Gender },
+          { id: selectedPokemon3Id, name: selectedPokemon3Name, form: selectedPokemon3Form, gender: selectedPokemon3Gender },
+        ];
         const payload = {
           user_id: user.id,
           pokemon_id: selectedPokemonId,
-          pokemon_name: selectedPokemonName ?? '',
+          pokemon_name: encodePokemonSlots(pokemonSlotsPayload),
           method: selectedMethod.id,
           counter,
           has_shiny_charm: hasShinyCharm,
@@ -328,48 +339,21 @@ export function ShinyCounter({
           gender: selectedGender || null,
           updated_at: new Date().toISOString(),
         };
-        const extraPokemonPayload = {
-          pokemon_2_id: selectedPokemon2Id,
-          pokemon_2_name: selectedPokemon2Name || null,
-          pokemon_2_form: selectedPokemon2Form || null,
-          pokemon_2_gender: selectedPokemon2Gender || null,
-          pokemon_3_id: selectedPokemon3Id,
-          pokemon_3_name: selectedPokemon3Name || null,
-          pokemon_3_form: selectedPokemon3Form || null,
-          pokemon_3_gender: selectedPokemon3Gender || null,
-        };
-        const fullPayload = { ...payload, ...extraPokemonPayload };
 
         if (activeHuntIdRef.current) {
-          saveStoredExtraPokemon(activeHuntIdRef.current, extraPokemonPayload);
           // Update existing hunt
           const { error } = await supabase
             .from('active_hunts')
-            .update(fullPayload)
+            .update(payload)
             .eq('id', activeHuntIdRef.current);
-          if (error) {
-            const { error: retryError } = await supabase
-              .from('active_hunts')
-              .update(payload)
-              .eq('id', activeHuntIdRef.current);
-            if (retryError) throw retryError;
-          }
+          if (error) throw error;
         } else {
           // Create new hunt only if we have user data
-          const insertPayload = { ...fullPayload, created_at: new Date().toISOString() };
+          const insertPayload = { ...payload, created_at: new Date().toISOString() };
           const { data, error } = await supabase.from('active_hunts').insert(insertPayload).select('id').single();
-          if (error) {
-            const fallbackInsertPayload = { ...payload, created_at: insertPayload.created_at };
-            const { data: fallbackData, error: fallbackError } = await supabase.from('active_hunts').insert(fallbackInsertPayload).select('id').single();
-            if (fallbackError) throw fallbackError;
-            if (fallbackData) {
-              activeHuntIdRef.current = fallbackData.id;
-              saveStoredExtraPokemon(fallbackData.id, extraPokemonPayload);
-              setHuntCreatedAt(fallbackInsertPayload.created_at);
-            }
-          } else if (data) {
+          if (error) throw error;
+          if (data) {
             activeHuntIdRef.current = data.id;
-            saveStoredExtraPokemon(data.id, extraPokemonPayload);
             setHuntCreatedAt(insertPayload.created_at);
           }
         }
@@ -380,7 +364,7 @@ export function ShinyCounter({
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [user?.id, loading, counter, incrementAmount, incrementHotkey, selectedPokemonId, selectedPokemonName, selectedPokemon2Id, selectedPokemon2Name, selectedPokemon2Form, selectedPokemon2Gender, selectedPokemon3Id, selectedPokemon3Name, selectedPokemon3Form, selectedPokemon3Gender, selectedMethod, hasShinyCharm, selectedForm, selectedGender, saveStoredExtraPokemon]);
+  }, [user?.id, loading, counter, incrementAmount, incrementHotkey, selectedPokemonId, selectedPokemonName, selectedPokemon2Id, selectedPokemon2Name, selectedPokemon2Form, selectedPokemon2Gender, selectedPokemon3Id, selectedPokemon3Name, selectedPokemon3Form, selectedPokemon3Gender, selectedMethod, hasShinyCharm, selectedForm, selectedGender]);
 
   // Fast-sync variant/name changes so Hunts page reflects them immediately after navigation.
   useEffect(() => {
@@ -390,47 +374,34 @@ export function ShinyCounter({
 
     const syncVariantNow = async () => {
       try {
-        const extraPokemonPayload = {
-          pokemon_2_id: selectedPokemon2Id,
-          pokemon_2_name: selectedPokemon2Name || null,
-          pokemon_2_form: selectedPokemon2Form || null,
-          pokemon_2_gender: selectedPokemon2Gender || null,
-          pokemon_3_id: selectedPokemon3Id,
-          pokemon_3_name: selectedPokemon3Name || null,
-          pokemon_3_form: selectedPokemon3Form || null,
-          pokemon_3_gender: selectedPokemon3Gender || null,
-        };
+        const pokemonSlotsPayload = [
+          { id: selectedPokemonId, name: selectedPokemonName, form: selectedForm, gender: selectedGender },
+          { id: selectedPokemon2Id, name: selectedPokemon2Name, form: selectedPokemon2Form, gender: selectedPokemon2Gender },
+          { id: selectedPokemon3Id, name: selectedPokemon3Name, form: selectedPokemon3Form, gender: selectedPokemon3Gender },
+        ];
         const payload = {
           pokemon_id: selectedPokemonId,
-          pokemon_name: selectedPokemonName ?? '',
+          pokemon_name: encodePokemonSlots(pokemonSlotsPayload),
           form: selectedForm || null,
           gender: selectedGender || null,
           method: selectedMethod.id,
           updated_at: new Date().toISOString(),
         };
 
-        saveStoredExtraPokemon(currentHuntId, extraPokemonPayload);
-
         const { error } = await supabase
           .from('active_hunts')
-          .update({ ...payload, ...extraPokemonPayload })
+          .update(payload)
           .eq('id', currentHuntId)
           .eq('user_id', user.id);
 
-        if (error) {
-          await supabase
-            .from('active_hunts')
-            .update(payload)
-            .eq('id', currentHuntId)
-            .eq('user_id', user.id);
-        }
+        if (error) throw error;
       } catch {
         // non-blocking best-effort sync
       }
     };
 
     void syncVariantNow();
-  }, [user?.id, selectedPokemonId, selectedPokemonName, selectedPokemon2Id, selectedPokemon2Name, selectedPokemon2Form, selectedPokemon2Gender, selectedPokemon3Id, selectedPokemon3Name, selectedPokemon3Form, selectedPokemon3Gender, selectedForm, selectedGender, selectedMethod.id, saveStoredExtraPokemon]);
+  }, [user?.id, selectedPokemonId, selectedPokemonName, selectedPokemon2Id, selectedPokemon2Name, selectedPokemon2Form, selectedPokemon2Gender, selectedPokemon3Id, selectedPokemon3Name, selectedPokemon3Form, selectedPokemon3Gender, selectedForm, selectedGender, selectedMethod.id]);
 
   // Calculate stats based on current counter and method
   const stats = useMemo(() => {
@@ -639,7 +610,7 @@ export function ShinyCounter({
                             : setSelectedPokemon3Gender;
 
                         return (
-                          <div key={`${slot.id}-${slot.name}-${spriteUrl}`} className="flex w-32 flex-col items-center gap-1.5 sm:w-40">
+                          <div key={`${slot.slot}-${slot.id}-${slot.name}`} className="flex w-32 flex-col items-center gap-1.5 sm:w-40">
                             <img
                               src={spriteUrl}
                               alt={slot.name}
