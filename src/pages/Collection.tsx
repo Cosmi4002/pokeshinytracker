@@ -21,7 +21,6 @@ import { SetEvolutionDialog } from '@/components/collection/SetEvolutionDialog';
 import { ShinyCard } from '@/components/collection/ShinyCard';
 import { useGlobalCollectionThemes } from '@/hooks/use-global-collection-themes';
 import { isFormEliminated } from '@/lib/form-filters';
-import { useUserPreferences } from '@/hooks/use-user-preferences';
 import { cn } from '@/lib/utils';
 import type { Tables } from '@/integrations/supabase/types';
 
@@ -40,7 +39,6 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
   const { accentColor } = useRandomColor();
   const { pokemon } = usePokemonList();
   const { mergedThemes, effects } = useGlobalCollectionThemes();
-  const { preferences } = useUserPreferences();
   const { toast } = useToast();
 
   const [entries, setEntries] = useState<CaughtShinyRow[]>([]);
@@ -70,16 +68,9 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
       .replace(/\s+/g, '-')
       .replace(/_+/g, '-');
 
-  const collectionLayoutStyle = preferences?.layout_style || 'grid';
   const collectionLayoutClassName = useMemo(() => {
-    if (collectionLayoutStyle === 'list') {
-      return 'flex flex-col gap-4';
-    }
-    if (collectionLayoutStyle === 'compact') {
-      return 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3';
-    }
     return 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 xl:gap-5';
-  }, [collectionLayoutStyle]);
+  }, []);
 
   const isAbortLikeError = (err: unknown) => {
     if (!err || typeof err !== 'object') return false;
