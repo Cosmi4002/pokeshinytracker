@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { Minus, Plus, RotateCcw, Cloud, CloudOff, Loader2, Check, Sparkles } from 'lucide-react';
+import { Minus, Plus, RotateCcw, Cloud, CloudOff, Loader2, Check, Sparkles, X, ArrowUp, ArrowDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -37,6 +37,11 @@ interface ShinyCounterProps {
   allowGlobalPlusMinusHotkeys?: boolean;
 }
 
+type PokemonSlot = {
+  id: number | null;
+  name: string;
+};
+
 export function ShinyCounter({
   huntId,
   enableKeyboardShortcuts = true,
@@ -49,6 +54,10 @@ export function ShinyCounter({
   const [incrementHotkey, setIncrementHotkey] = useState('');
   const [selectedPokemonId, setSelectedPokemonId] = useState<number | null>(null);
   const [selectedPokemonName, setSelectedPokemonName] = useState<string>('');
+  const [selectedPokemon2Id, setSelectedPokemon2Id] = useState<number | null>(null);
+  const [selectedPokemon2Name, setSelectedPokemon2Name] = useState<string>('');
+  const [selectedPokemon3Id, setSelectedPokemon3Id] = useState<number | null>(null);
+  const [selectedPokemon3Name, setSelectedPokemon3Name] = useState<string>('');
   const [selectedMethod, setSelectedMethod] = useState<HuntingMethod>(HUNTING_METHODS[0]);
   const [hasShinyCharm, setHasShinyCharm] = useState(false);
   const [selectedForm, setSelectedForm] = useState<string>('');
@@ -68,6 +77,18 @@ export function ShinyCounter({
   const skipNextVariantResetRef = useRef(false);
 
   const { pokemon: pokemonDetails } = usePokemonDetails(selectedPokemonId || 0);
+  const selectedPokemonSlots = useMemo(() => [
+    { slot: 1, id: selectedPokemonId, name: selectedPokemonName },
+    { slot: 2, id: selectedPokemon2Id, name: selectedPokemon2Name },
+    { slot: 3, id: selectedPokemon3Id, name: selectedPokemon3Name },
+  ].filter((slot): slot is { slot: number; id: number; name: string } => !!slot.id), [
+    selectedPokemonId,
+    selectedPokemonName,
+    selectedPokemon2Id,
+    selectedPokemon2Name,
+    selectedPokemon3Id,
+    selectedPokemon3Name,
+  ]);
 
   // Build all forms/varieties from pokemon details without exclusion filters.
   const formOptions = useMemo(() => {
@@ -139,6 +160,10 @@ export function ShinyCounter({
           setIncrementHotkey(data.increment_hotkey ?? '');
           setSelectedPokemonId(data.pokemon_id ?? null);
           setSelectedPokemonName(data.pokemon_name ?? '');
+          setSelectedPokemon2Id((data as any).pokemon_2_id ?? null);
+          setSelectedPokemon2Name((data as any).pokemon_2_name ?? '');
+          setSelectedPokemon3Id((data as any).pokemon_3_id ?? null);
+          setSelectedPokemon3Name((data as any).pokemon_3_name ?? '');
           setSelectedMethod(findHuntingMethod(data.method) ?? HUNTING_METHODS[0]);
           setHasShinyCharm(data.has_shiny_charm ?? false);
           setSelectedForm(data.form ?? '');
@@ -152,6 +177,10 @@ export function ShinyCounter({
           setIncrementHotkey('');
           setSelectedPokemonId(null);
           setSelectedPokemonName('');
+          setSelectedPokemon2Id(null);
+          setSelectedPokemon2Name('');
+          setSelectedPokemon3Id(null);
+          setSelectedPokemon3Name('');
           setSelectedMethod(HUNTING_METHODS[0]);
           setHasShinyCharm(false);
           setSelectedForm('');
@@ -224,6 +253,10 @@ export function ShinyCounter({
           user_id: user.id,
           pokemon_id: selectedPokemonId,
           pokemon_name: selectedPokemonName ?? '',
+          pokemon_2_id: selectedPokemon2Id,
+          pokemon_2_name: selectedPokemon2Name || null,
+          pokemon_3_id: selectedPokemon3Id,
+          pokemon_3_name: selectedPokemon3Name || null,
           method: selectedMethod.id,
           counter,
           has_shiny_charm: hasShinyCharm,
@@ -256,7 +289,7 @@ export function ShinyCounter({
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [user?.id, loading, counter, incrementAmount, incrementHotkey, selectedPokemonId, selectedPokemonName, selectedMethod, hasShinyCharm, selectedForm, selectedGender]);
+  }, [user?.id, loading, counter, incrementAmount, incrementHotkey, selectedPokemonId, selectedPokemonName, selectedPokemon2Id, selectedPokemon2Name, selectedPokemon3Id, selectedPokemon3Name, selectedMethod, hasShinyCharm, selectedForm, selectedGender]);
 
   // Fast-sync variant/name changes so Hunts page reflects them immediately after navigation.
   useEffect(() => {
@@ -270,6 +303,10 @@ export function ShinyCounter({
           .update({
             pokemon_id: selectedPokemonId,
             pokemon_name: selectedPokemonName ?? '',
+            pokemon_2_id: selectedPokemon2Id,
+            pokemon_2_name: selectedPokemon2Name || null,
+            pokemon_3_id: selectedPokemon3Id,
+            pokemon_3_name: selectedPokemon3Name || null,
             form: selectedForm || null,
             gender: selectedGender || null,
             method: selectedMethod.id,
@@ -283,7 +320,7 @@ export function ShinyCounter({
     };
 
     void syncVariantNow();
-  }, [user?.id, selectedPokemonId, selectedPokemonName, selectedForm, selectedGender, selectedMethod.id]);
+  }, [user?.id, selectedPokemonId, selectedPokemonName, selectedPokemon2Id, selectedPokemon2Name, selectedPokemon3Id, selectedPokemon3Name, selectedForm, selectedGender, selectedMethod.id]);
 
   // Calculate stats based on current counter and method
   const stats = useMemo(() => {
@@ -305,6 +342,53 @@ export function ShinyCounter({
     if (hotkey.length === 1) return hotkey.toUpperCase();
     return hotkey.charAt(0).toUpperCase() + hotkey.slice(1);
   }, []);
+
+  const getPokemonSlot = useCallback((index: number): PokemonSlot => {
+    if (index === 0) return { id: selectedPokemonId, name: selectedPokemonName };
+    if (index === 1) return { id: selectedPokemon2Id, name: selectedPokemon2Name };
+    return { id: selectedPokemon3Id, name: selectedPokemon3Name };
+  }, [
+    selectedPokemonId,
+    selectedPokemonName,
+    selectedPokemon2Id,
+    selectedPokemon2Name,
+    selectedPokemon3Id,
+    selectedPokemon3Name,
+  ]);
+
+  const setPokemonSlot = useCallback((index: number, slot: PokemonSlot) => {
+    if (index === 0) {
+      setSelectedPokemonId(slot.id);
+      setSelectedPokemonName(slot.name);
+      return;
+    }
+
+    if (index === 1) {
+      setSelectedPokemon2Id(slot.id);
+      setSelectedPokemon2Name(slot.name);
+      return;
+    }
+
+    setSelectedPokemon3Id(slot.id);
+    setSelectedPokemon3Name(slot.name);
+  }, []);
+
+  const movePokemonSlot = useCallback((fromIndex: number, toIndex: number) => {
+    if (toIndex < 0 || toIndex > 2) return;
+
+    const fromSlot = getPokemonSlot(fromIndex);
+    if (!fromSlot.id) return;
+
+    const toSlot = getPokemonSlot(toIndex);
+    setPokemonSlot(fromIndex, toSlot);
+    setPokemonSlot(toIndex, fromSlot);
+
+    if (fromIndex === 0 || toIndex === 0) {
+      setSelectedForm('');
+      setSelectedGender('');
+      skipNextVariantResetRef.current = false;
+    }
+  }, [getPokemonSlot, setPokemonSlot]);
 
   const handleHotkeyAssignment = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Tab') {
@@ -406,28 +490,42 @@ export function ShinyCounter({
         {/* Counter Display */}
         <div className="text-center space-y-4">
           {/* Pokemon Sprite */}
-          {selectedPokemonId && (
-            <div key={`sprite-container-${selectedPokemonId}`} className="relative group/sprite flex justify-center mb-4">
+          {selectedPokemonSlots.length > 0 && (
+            <div key={`sprite-container-${selectedPokemonSlots.map((slot) => slot.id).join('-')}`} className="relative group/sprite flex justify-center mb-4">
               {(() => {
                 const currentVariant = formOptions.find(f => f.name === selectedForm);
                 const displayId = currentVariant ? currentVariant.id : selectedPokemonId;
 
-                const spriteUrl = getGameSpecificSpriteUrl(displayId, safeSelectedMethod.id, selectedPokemonName, selectedForm, selectedGender);
-
                 return (
                   <div className="flex flex-col items-center gap-2">
-                    <img
-                      key={spriteUrl}
-                      src={spriteUrl}
-                      alt={selectedPokemonName}
-                      className="w-40 h-40 object-contain pokemon-sprite animate-in fade-in zoom-in duration-500"
-                      style={{ imageRendering: 'auto' }}
-                      loading="eager"
-                      decoding="async"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/placeholder.svg';
-                      }}
-                    />
+                    <div className="flex flex-wrap justify-center gap-2">
+                      {selectedPokemonSlots.map((slot) => {
+                        const isPrimarySlot = slot.slot === 1;
+                        const spriteId = isPrimarySlot ? displayId : slot.id;
+                        const spriteUrl = getGameSpecificSpriteUrl(
+                          spriteId || slot.id,
+                          safeSelectedMethod.id,
+                          slot.name,
+                          isPrimarySlot ? selectedForm : '',
+                          isPrimarySlot ? selectedGender : ''
+                        );
+
+                        return (
+                          <img
+                            key={`${slot.id}-${slot.name}-${spriteUrl}`}
+                            src={spriteUrl}
+                            alt={slot.name}
+                            className="h-32 w-32 sm:h-40 sm:w-40 object-contain pokemon-sprite animate-in fade-in zoom-in duration-500"
+                            style={{ imageRendering: 'auto' }}
+                            loading="eager"
+                            decoding="async"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = '/placeholder.svg';
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
 
                     {/* Variant/Gender Controls */}
                     <div className="flex flex-col items-center gap-1.5 mt-2 w-full">
@@ -658,6 +756,96 @@ export function ShinyCounter({
                   }
                 }}
               />
+
+              <div className="flex justify-end gap-1">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className="h-9 w-9"
+                  onClick={() => movePokemonSlot(0, 1)}
+                  disabled={!selectedPokemonId}
+                  title="Sposta giu Pokemon 1"
+                >
+                  <ArrowDown className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <div className="grid gap-3 pt-1">
+                {[
+                  {
+                    label: 'Pokemon 2',
+                    value: selectedPokemon2Id,
+                    valueName: selectedPokemon2Name,
+                    setId: setSelectedPokemon2Id,
+                    setName: setSelectedPokemon2Name,
+                  },
+                  {
+                    label: 'Pokemon 3',
+                    value: selectedPokemon3Id,
+                    valueName: selectedPokemon3Name,
+                    setId: setSelectedPokemon3Id,
+                    setName: setSelectedPokemon3Name,
+                  },
+                ].map((slot, index) => (
+                  <div key={slot.label} className="flex items-end gap-2">
+                    <div className="flex-1 min-w-0 space-y-1">
+                      <Label className="text-xs text-muted-foreground">{slot.label}</Label>
+                      <PokemonSelector
+                        value={slot.value}
+                        valueName={slot.valueName}
+                        onChange={(id, name, baseId) => {
+                          if (id === null) {
+                            slot.setId(null);
+                            slot.setName('');
+                            return;
+                          }
+
+                          slot.setId(baseId ?? id);
+                          slot.setName(name);
+                        }}
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      className="h-9 w-9"
+                      onClick={() => movePokemonSlot(index + 1, index)}
+                      disabled={!slot.value}
+                      title={`Sposta su ${slot.label}`}
+                    >
+                      <ArrowUp className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      className="h-9 w-9"
+                      onClick={() => movePokemonSlot(index + 1, index + 2)}
+                      disabled={!slot.value || index === 1}
+                      title={`Sposta giu ${slot.label}`}
+                    >
+                      <ArrowDown className="h-4 w-4" />
+                    </Button>
+                    {slot.value && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-9 w-9"
+                        onClick={() => {
+                          slot.setId(null);
+                          slot.setName('');
+                        }}
+                        title={`Rimuovi ${slot.label}`}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Method Selector */}

@@ -55,6 +55,10 @@ export type Database = {
           increment_hotkey: string | null
           is_visible_on_counter: boolean | null
           method: string
+          pokemon_2_id: number | null
+          pokemon_2_name: string | null
+          pokemon_3_id: number | null
+          pokemon_3_name: string | null
           pokemon_id: number | null
           pokemon_name: string | null
           updated_at: string
@@ -69,6 +73,10 @@ export type Database = {
           increment_hotkey?: string | null
           is_visible_on_counter?: boolean | null
           method: string
+          pokemon_2_id?: number | null
+          pokemon_2_name?: string | null
+          pokemon_3_id?: number | null
+          pokemon_3_name?: string | null
           pokemon_id?: number | null
           pokemon_name?: string | null
           updated_at?: string
@@ -83,6 +91,10 @@ export type Database = {
           increment_hotkey?: string | null
           is_visible_on_counter?: boolean | null
           method?: string
+          pokemon_2_id?: number | null
+          pokemon_2_name?: string | null
+          pokemon_3_id?: number | null
+          pokemon_3_name?: string | null
           pokemon_id?: number | null
           pokemon_name?: string | null
           updated_at?: string
