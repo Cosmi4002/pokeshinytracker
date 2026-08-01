@@ -40,6 +40,7 @@ interface ShinyCounterProps {
 type PokemonSlot = {
   id: number | null;
   name: string;
+  gender: string;
 };
 
 export function ShinyCounter({
@@ -62,6 +63,8 @@ export function ShinyCounter({
   const [hasShinyCharm, setHasShinyCharm] = useState(false);
   const [selectedForm, setSelectedForm] = useState<string>('');
   const [selectedGender, setSelectedGender] = useState<string>('');
+  const [selectedPokemon2Gender, setSelectedPokemon2Gender] = useState<string>('');
+  const [selectedPokemon3Gender, setSelectedPokemon3Gender] = useState<string>('');
   const [customOdds, setCustomOdds] = useState(4096);
   const [loading, setLoading] = useState(!!user);
   const activeHuntIdRef = useRef<string | null>(null);
@@ -77,17 +80,25 @@ export function ShinyCounter({
   const skipNextVariantResetRef = useRef(false);
 
   const { pokemon: pokemonDetails } = usePokemonDetails(selectedPokemonId || 0);
+  const { pokemon: pokemon2Details } = usePokemonDetails(selectedPokemon2Id || 0);
+  const { pokemon: pokemon3Details } = usePokemonDetails(selectedPokemon3Id || 0);
   const selectedPokemonSlots = useMemo(() => [
-    { slot: 1, id: selectedPokemonId, name: selectedPokemonName },
-    { slot: 2, id: selectedPokemon2Id, name: selectedPokemon2Name },
-    { slot: 3, id: selectedPokemon3Id, name: selectedPokemon3Name },
-  ].filter((slot): slot is { slot: number; id: number; name: string } => !!slot.id), [
+    { slot: 1, id: selectedPokemonId, name: selectedPokemonName, gender: selectedGender, details: pokemonDetails },
+    { slot: 2, id: selectedPokemon2Id, name: selectedPokemon2Name, gender: selectedPokemon2Gender, details: pokemon2Details },
+    { slot: 3, id: selectedPokemon3Id, name: selectedPokemon3Name, gender: selectedPokemon3Gender, details: pokemon3Details },
+  ].filter((slot): slot is { slot: number; id: number; name: string; gender: string; details: typeof pokemonDetails } => !!slot.id), [
     selectedPokemonId,
     selectedPokemonName,
+    selectedGender,
+    pokemonDetails,
     selectedPokemon2Id,
     selectedPokemon2Name,
+    selectedPokemon2Gender,
+    pokemon2Details,
     selectedPokemon3Id,
     selectedPokemon3Name,
+    selectedPokemon3Gender,
+    pokemon3Details,
   ]);
 
   const getExtraPokemonStorageKey = useCallback((id: string) => `shiny-counter-extra-pokemon:${user?.id || 'guest'}:${id}`, [user?.id]);
@@ -99,8 +110,10 @@ export function ShinyCounter({
       const parsed = JSON.parse(raw) as {
         pokemon_2_id?: number | null;
         pokemon_2_name?: string | null;
+        pokemon_2_gender?: string | null;
         pokemon_3_id?: number | null;
         pokemon_3_name?: string | null;
+        pokemon_3_gender?: string | null;
       };
       return parsed;
     } catch {
@@ -111,8 +124,10 @@ export function ShinyCounter({
   const saveStoredExtraPokemon = useCallback((id: string, slots: {
     pokemon_2_id: number | null;
     pokemon_2_name: string | null;
+    pokemon_2_gender: string | null;
     pokemon_3_id: number | null;
     pokemon_3_name: string | null;
+    pokemon_3_gender: string | null;
   }) => {
     try {
       window.localStorage.setItem(getExtraPokemonStorageKey(id), JSON.stringify(slots));
@@ -159,7 +174,7 @@ export function ShinyCounter({
 
     const loadData = async () => {
       try {
-        const promises: Promise<any>[] = [
+        const promises: any[] = [
           supabase.from('shiny_playlists').select('id, name').eq('user_id', user.id)
         ];
 
@@ -194,8 +209,10 @@ export function ShinyCounter({
           const storedExtra = loadStoredExtraPokemon(data.id);
           setSelectedPokemon2Id((data as any).pokemon_2_id ?? storedExtra?.pokemon_2_id ?? null);
           setSelectedPokemon2Name((data as any).pokemon_2_name ?? storedExtra?.pokemon_2_name ?? '');
+          setSelectedPokemon2Gender((data as any).pokemon_2_gender ?? storedExtra?.pokemon_2_gender ?? '');
           setSelectedPokemon3Id((data as any).pokemon_3_id ?? storedExtra?.pokemon_3_id ?? null);
           setSelectedPokemon3Name((data as any).pokemon_3_name ?? storedExtra?.pokemon_3_name ?? '');
+          setSelectedPokemon3Gender((data as any).pokemon_3_gender ?? storedExtra?.pokemon_3_gender ?? '');
           setSelectedMethod(findHuntingMethod(data.method) ?? HUNTING_METHODS[0]);
           setHasShinyCharm(data.has_shiny_charm ?? false);
           setSelectedForm(data.form ?? '');
@@ -211,8 +228,10 @@ export function ShinyCounter({
           setSelectedPokemonName('');
           setSelectedPokemon2Id(null);
           setSelectedPokemon2Name('');
+          setSelectedPokemon2Gender('');
           setSelectedPokemon3Id(null);
           setSelectedPokemon3Name('');
+          setSelectedPokemon3Gender('');
           setSelectedMethod(HUNTING_METHODS[0]);
           setHasShinyCharm(false);
           setSelectedForm('');
@@ -297,8 +316,10 @@ export function ShinyCounter({
         const extraPokemonPayload = {
           pokemon_2_id: selectedPokemon2Id,
           pokemon_2_name: selectedPokemon2Name || null,
+          pokemon_2_gender: selectedPokemon2Gender || null,
           pokemon_3_id: selectedPokemon3Id,
           pokemon_3_name: selectedPokemon3Name || null,
+          pokemon_3_gender: selectedPokemon3Gender || null,
         };
         const fullPayload = { ...payload, ...extraPokemonPayload };
 
@@ -342,7 +363,7 @@ export function ShinyCounter({
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [user?.id, loading, counter, incrementAmount, incrementHotkey, selectedPokemonId, selectedPokemonName, selectedPokemon2Id, selectedPokemon2Name, selectedPokemon3Id, selectedPokemon3Name, selectedMethod, hasShinyCharm, selectedForm, selectedGender, saveStoredExtraPokemon]);
+  }, [user?.id, loading, counter, incrementAmount, incrementHotkey, selectedPokemonId, selectedPokemonName, selectedPokemon2Id, selectedPokemon2Name, selectedPokemon2Gender, selectedPokemon3Id, selectedPokemon3Name, selectedPokemon3Gender, selectedMethod, hasShinyCharm, selectedForm, selectedGender, saveStoredExtraPokemon]);
 
   // Fast-sync variant/name changes so Hunts page reflects them immediately after navigation.
   useEffect(() => {
@@ -355,8 +376,10 @@ export function ShinyCounter({
         const extraPokemonPayload = {
           pokemon_2_id: selectedPokemon2Id,
           pokemon_2_name: selectedPokemon2Name || null,
+          pokemon_2_gender: selectedPokemon2Gender || null,
           pokemon_3_id: selectedPokemon3Id,
           pokemon_3_name: selectedPokemon3Name || null,
+          pokemon_3_gender: selectedPokemon3Gender || null,
         };
         const payload = {
           pokemon_id: selectedPokemonId,
@@ -388,7 +411,7 @@ export function ShinyCounter({
     };
 
     void syncVariantNow();
-  }, [user?.id, selectedPokemonId, selectedPokemonName, selectedPokemon2Id, selectedPokemon2Name, selectedPokemon3Id, selectedPokemon3Name, selectedForm, selectedGender, selectedMethod.id, saveStoredExtraPokemon]);
+  }, [user?.id, selectedPokemonId, selectedPokemonName, selectedPokemon2Id, selectedPokemon2Name, selectedPokemon2Gender, selectedPokemon3Id, selectedPokemon3Name, selectedPokemon3Gender, selectedForm, selectedGender, selectedMethod.id, saveStoredExtraPokemon]);
 
   // Calculate stats based on current counter and method
   const stats = useMemo(() => {
@@ -412,33 +435,39 @@ export function ShinyCounter({
   }, []);
 
   const getPokemonSlot = useCallback((index: number): PokemonSlot => {
-    if (index === 0) return { id: selectedPokemonId, name: selectedPokemonName };
-    if (index === 1) return { id: selectedPokemon2Id, name: selectedPokemon2Name };
-    return { id: selectedPokemon3Id, name: selectedPokemon3Name };
+    if (index === 0) return { id: selectedPokemonId, name: selectedPokemonName, gender: selectedGender };
+    if (index === 1) return { id: selectedPokemon2Id, name: selectedPokemon2Name, gender: selectedPokemon2Gender };
+    return { id: selectedPokemon3Id, name: selectedPokemon3Name, gender: selectedPokemon3Gender };
   }, [
     selectedPokemonId,
     selectedPokemonName,
+    selectedGender,
     selectedPokemon2Id,
     selectedPokemon2Name,
+    selectedPokemon2Gender,
     selectedPokemon3Id,
     selectedPokemon3Name,
+    selectedPokemon3Gender,
   ]);
 
   const setPokemonSlot = useCallback((index: number, slot: PokemonSlot) => {
     if (index === 0) {
       setSelectedPokemonId(slot.id);
       setSelectedPokemonName(slot.name);
+      setSelectedGender(slot.gender);
       return;
     }
 
     if (index === 1) {
       setSelectedPokemon2Id(slot.id);
       setSelectedPokemon2Name(slot.name);
+      setSelectedPokemon2Gender(slot.gender);
       return;
     }
 
     setSelectedPokemon3Id(slot.id);
     setSelectedPokemon3Name(slot.name);
+    setSelectedPokemon3Gender(slot.gender);
   }, []);
 
   const movePokemonSlot = useCallback((fromIndex: number, toIndex: number) => {
@@ -575,22 +604,42 @@ export function ShinyCounter({
                           safeSelectedMethod.id,
                           slot.name,
                           isPrimarySlot ? selectedForm : '',
-                          isPrimarySlot ? selectedGender : ''
+                          slot.gender
                         );
+                        const setSlotGender = slot.slot === 1
+                          ? setSelectedGender
+                          : slot.slot === 2
+                            ? setSelectedPokemon2Gender
+                            : setSelectedPokemon3Gender;
 
                         return (
-                          <img
-                            key={`${slot.id}-${slot.name}-${spriteUrl}`}
-                            src={spriteUrl}
-                            alt={slot.name}
-                            className="h-32 w-32 sm:h-40 sm:w-40 object-contain pokemon-sprite animate-in fade-in zoom-in duration-500"
-                            style={{ imageRendering: 'auto' }}
-                            loading="eager"
-                            decoding="async"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = '/placeholder.svg';
-                            }}
-                          />
+                          <div key={`${slot.id}-${slot.name}-${spriteUrl}`} className="flex w-32 flex-col items-center gap-1.5 sm:w-40">
+                            <img
+                              src={spriteUrl}
+                              alt={slot.name}
+                              className="h-32 w-32 sm:h-40 sm:w-40 object-contain pokemon-sprite animate-in fade-in zoom-in duration-500"
+                              style={{ imageRendering: 'auto' }}
+                              loading="eager"
+                              decoding="async"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = '/placeholder.svg';
+                              }}
+                            />
+                            {slot.details?.hasGenderDifference && (
+                              <Select value={slot.gender || 'male'} onValueChange={(v) => setSlotGender(v === 'female' ? 'female' : '')}>
+                                <SelectTrigger
+                                  className="h-8 w-full px-2 rounded-full text-xs"
+                                  style={{ borderColor: accentColor }}
+                                >
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="male">Maschio</SelectItem>
+                                  <SelectItem value="female">Femmina</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            )}
+                          </div>
                         );
                       })}
                     </div>
@@ -619,20 +668,6 @@ export function ShinyCounter({
                         </Select>
                       )}
 
-                      {pokemonDetails?.hasGenderDifference && (
-                        <Select value={selectedGender || 'male'} onValueChange={(v) => setSelectedGender(v === 'female' ? 'female' : '')}>
-                          <SelectTrigger
-                            className="h-8 min-w-[140px] px-3 rounded-full text-xs"
-                            style={{ borderColor: accentColor }}
-                          >
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="male">Maschio</SelectItem>
-                            <SelectItem value="female">Femmina</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      )}
                     </div>
                   </div>
                 );
@@ -847,6 +882,7 @@ export function ShinyCounter({
                     valueName: selectedPokemon2Name,
                     setId: setSelectedPokemon2Id,
                     setName: setSelectedPokemon2Name,
+                    setGender: setSelectedPokemon2Gender,
                   },
                   {
                     label: 'Pokemon 3',
@@ -854,6 +890,7 @@ export function ShinyCounter({
                     valueName: selectedPokemon3Name,
                     setId: setSelectedPokemon3Id,
                     setName: setSelectedPokemon3Name,
+                    setGender: setSelectedPokemon3Gender,
                   },
                 ].map((slot, index) => (
                   <div key={slot.label} className="flex items-end gap-2">
@@ -866,11 +903,13 @@ export function ShinyCounter({
                           if (id === null) {
                             slot.setId(null);
                             slot.setName('');
+                            slot.setGender('');
                             return;
                           }
 
                           slot.setId(baseId ?? id);
                           slot.setName(name);
+                          slot.setGender('');
                         }}
                       />
                     </div>
@@ -905,6 +944,7 @@ export function ShinyCounter({
                         onClick={() => {
                           slot.setId(null);
                           slot.setName('');
+                          slot.setGender('');
                         }}
                         title={`Rimuovi ${slot.label}`}
                       >
