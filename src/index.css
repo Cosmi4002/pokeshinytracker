@@ -140,11 +140,11 @@
     }
 
     /* Let the animated background show through the main page wrapper only. */
-    .bg-route .min-h-screen.bg-background,
-    .bg-prism .min-h-screen.bg-background,
-    .bg-safari .min-h-screen.bg-background,
-    .bg-pokeball .min-h-screen.bg-background,
-    .bg-night .min-h-screen.bg-background {
+    .bg-mesh .min-h-screen.bg-background,
+    .bg-aurora .min-h-screen.bg-background,
+    .bg-diagonal .min-h-screen.bg-background,
+    .bg-noise .min-h-screen.bg-background,
+    .bg-pokemon .min-h-screen.bg-background {
         background-color: transparent !important;
     }
 }
@@ -164,73 +164,79 @@
 }
 
 @layer base {
+    /* UI style presets (global, lightweight) */
+    .ui-flat { --ui-overlay-image: none; }
+
+    .ui-soft {
+        --ui-overlay-image: radial-gradient(900px circle at 10% 10%, rgba(255, 255, 255, 0.06), transparent 55%),
+            radial-gradient(900px circle at 90% 20%, rgba(255, 255, 255, 0.04), transparent 60%);
+    }
+
+    .ui-glass {
+        --ui-overlay-image: radial-gradient(1200px circle at 15% 10%, rgba(255, 255, 255, 0.08), transparent 50%),
+            radial-gradient(900px circle at 85% 25%, rgba(255, 255, 255, 0.05), transparent 60%),
+            radial-gradient(900px circle at 50% 90%, rgba(255, 255, 255, 0.03), transparent 60%);
+    }
+
+    .ui-neon {
+        --ui-overlay-image: radial-gradient(1000px circle at 15% 10%, color-mix(in srgb, var(--primary), transparent 86%), transparent 55%),
+            radial-gradient(900px circle at 85% 30%, color-mix(in srgb, var(--shiny-glow), transparent 88%), transparent 60%);
+    }
+
     /* Background presets */
-    .bg-calm {
-        --bg-preset-image: none;
-        --ui-body-bg-anim: none;
-        --ui-body-bg-opacity: 1;
-    }
+    .bg-plain { --bg-preset-image: none; --ui-body-bg-anim: none; }
 
-    .bg-route {
-        --bg-preset-image:
-            linear-gradient(135deg,
-                color-mix(in srgb, var(--primary), transparent 95%) 0%,
-                transparent 36%),
-            radial-gradient(900px circle at 82% 18%,
-                color-mix(in srgb, var(--bg-accent-2), transparent 94%),
-                transparent 58%),
-            radial-gradient(900px circle at 20% 88%,
-                color-mix(in srgb, var(--bg-accent-3), transparent 95%),
-                transparent 62%);
-        --ui-body-bg-size: 170% 170%;
-        --ui-body-bg-anim: bg-pan 34s ease-in-out infinite;
-        --ui-body-bg-opacity: 0.88;
-    }
-
-    .bg-prism {
-        --bg-preset-image:
-            conic-gradient(from 210deg at 50% 45%,
-                color-mix(in srgb, var(--primary), transparent 96%),
-                color-mix(in srgb, var(--bg-accent-2), transparent 95%),
-                color-mix(in srgb, var(--bg-accent-3), transparent 96%),
-                color-mix(in srgb, var(--primary), transparent 96%)),
-            radial-gradient(1000px circle at 50% 30%, rgba(255, 255, 255, 0.035), transparent 56%);
+    .bg-diagonal {
+        --bg-preset-image: linear-gradient(135deg,
+                color-mix(in srgb, var(--primary), transparent 90%) 0%,
+                transparent 35%),
+            radial-gradient(900px circle at 80% 20%,
+                color-mix(in srgb, var(--bg-accent-2), transparent 88%),
+                transparent 60%),
+            radial-gradient(900px circle at 20% 90%,
+                color-mix(in srgb, var(--bg-accent-3), transparent 90%),
+                transparent 60%);
         --ui-body-bg-size: 180% 180%;
-        --ui-body-bg-anim: bg-pan 42s ease-in-out infinite;
-        --ui-body-bg-opacity: 0.74;
+        --ui-body-bg-anim: bg-pan 18s ease-in-out infinite;
     }
 
-    .bg-safari {
-        --bg-preset-image:
-            radial-gradient(900px circle at 12% 25%, color-mix(in srgb, var(--bg-accent-2), transparent 95%), transparent 58%),
-            radial-gradient(760px circle at 88% 18%, color-mix(in srgb, var(--primary), transparent 96%), transparent 56%),
-            linear-gradient(120deg, rgba(255, 255, 255, 0.025), transparent 42%),
-            linear-gradient(45deg, transparent 0 47%, rgba(255,255,255,0.018) 47% 53%, transparent 53% 100%);
-        --ui-body-bg-size: 170% 170%, 170% 170%, auto, 72px 72px;
-        --ui-body-bg-anim: bg-pan 38s ease-in-out infinite;
-        --ui-body-bg-opacity: 0.82;
+    .bg-aurora {
+        --bg-preset-image: radial-gradient(1200px circle at 10% 20%, color-mix(in srgb, var(--bg-accent-2), transparent 88%), transparent 55%),
+            radial-gradient(900px circle at 90% 25%, color-mix(in srgb, var(--bg-accent-3), transparent 90%), transparent 55%),
+            radial-gradient(900px circle at 35% 90%, color-mix(in srgb, var(--primary), transparent 90%), transparent 60%),
+            linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 35%);
+        --ui-body-bg-size: 160% 160%;
+        --ui-body-bg-anim: bg-pan 22s ease-in-out infinite;
     }
 
-    .bg-pokeball {
-        --bg-preset-image:
-            radial-gradient(circle at 28px 28px, rgba(255,255,255,0.12) 0 3px, transparent 3.5px),
-            radial-gradient(circle at 28px 28px, transparent 0 13px, rgba(255,255,255,0.045) 13.5px 15px, transparent 15.5px),
-            linear-gradient(90deg, transparent 0 26px, rgba(255,255,255,0.035) 26px 30px, transparent 30px 56px),
-            radial-gradient(900px circle at 18% 20%, color-mix(in srgb, var(--primary), transparent 95%), transparent 58%),
-            radial-gradient(900px circle at 86% 72%, color-mix(in srgb, var(--bg-accent-2), transparent 96%), transparent 62%);
-        --ui-body-bg-size: 56px 56px, 56px 56px, 56px 56px, 180% 180%, 180% 180%;
-        --ui-body-bg-anim: bg-float 12s ease-in-out infinite;
-        --ui-body-bg-opacity: 0.7;
+    .bg-mesh {
+        --bg-preset-image: radial-gradient(600px circle at 20% 30%, color-mix(in srgb, var(--primary), transparent 82%), transparent 60%),
+            radial-gradient(700px circle at 80% 25%, color-mix(in srgb, var(--bg-accent-2), transparent 88%), transparent 60%),
+            radial-gradient(700px circle at 60% 85%, color-mix(in srgb, var(--bg-accent-3), transparent 88%), transparent 60%),
+            radial-gradient(900px circle at 10% 90%, color-mix(in srgb, var(--bg-accent-2), transparent 92%), transparent 60%);
+        --ui-body-bg-size: 200% 200%;
+        --ui-body-bg-anim: bg-pan 26s ease-in-out infinite;
     }
 
-    .bg-night {
-        --bg-preset-image:
-            radial-gradient(900px circle at 20% 18%, rgba(255,255,255,0.04), transparent 56%),
-            radial-gradient(780px circle at 84% 24%, color-mix(in srgb, var(--bg-accent-3), transparent 96%), transparent 60%),
-            repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.018) 0px, rgba(255, 255, 255, 0.018) 1px, transparent 1px, transparent 5px);
+    .bg-noise {
+        --bg-preset-image: radial-gradient(900px circle at 20% 25%, rgba(255, 255, 255, 0.05), transparent 60%),
+            radial-gradient(900px circle at 80% 35%, rgba(255, 255, 255, 0.03), transparent 60%),
+            repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.02) 0px, rgba(255, 255, 255, 0.02) 1px, transparent 1px, transparent 3px);
         --ui-body-bg-size: 140% 140%;
-        --ui-body-bg-anim: none;
-        --ui-body-bg-opacity: 0.64;
+        --ui-body-bg-anim: bg-pan 30s linear infinite;
+    }
+
+    .bg-pokemon {
+        --bg-preset-image:
+            radial-gradient(900px circle at 20% 25%, color-mix(in srgb, var(--primary), transparent 88%), transparent 60%),
+            radial-gradient(900px circle at 85% 35%, color-mix(in srgb, var(--bg-accent-2), transparent 90%), transparent 60%),
+            radial-gradient(900px circle at 50% 85%, color-mix(in srgb, var(--bg-accent-3), transparent 90%), transparent 60%),
+            radial-gradient(circle at 16px 16px, rgba(255,255,255,0.10) 2px, transparent 2.5px),
+            radial-gradient(circle at 48px 44px, rgba(255,255,255,0.06) 1.5px, transparent 2px),
+            radial-gradient(circle at 72px 18px, rgba(255,255,255,0.07) 1.5px, transparent 2px),
+            radial-gradient(circle at 28px 72px, rgba(255,255,255,0.05) 1.5px, transparent 2px);
+        --ui-body-bg-size: 180% 180%, 180% 180%, 180% 180%, 96px 96px, 96px 96px, 96px 96px, 96px 96px;
+        --ui-body-bg-anim: bg-pan 20s ease-in-out infinite, bg-float 8s ease-in-out infinite;
     }
 }
 

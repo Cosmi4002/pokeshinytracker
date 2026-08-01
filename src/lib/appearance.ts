@@ -1,11 +1,5 @@
-export type UiStyle = 'dex' | 'card' | 'holo' | 'arena';
-export type BackgroundStyle = 'calm' | 'route' | 'prism' | 'safari' | 'pokeball' | 'night';
-export type AppearanceSettings = {
-  uiStyle: UiStyle;
-  backgroundStyle: BackgroundStyle;
-  backgroundColor2: string;
-  backgroundColor3: string;
-};
+export type UiStyle = 'flat' | 'soft' | 'glass' | 'neon';
+export type BackgroundStyle = 'plain' | 'mesh' | 'aurora' | 'diagonal' | 'noise' | 'pokemon';
 
 const UI_STYLE_KEY = 'ui_style';
 const BG_STYLE_KEY = 'background_style';
@@ -14,11 +8,8 @@ const BG3_KEY = 'background_color3';
 
 export function getStoredUiStyle(): UiStyle {
   const v = localStorage.getItem(UI_STYLE_KEY);
-  if (v === 'dex' || v === 'card' || v === 'holo' || v === 'arena') return v;
-  if (v === 'flat' || v === 'soft') return 'dex';
-  if (v === 'glass') return 'holo';
-  if (v === 'neon') return 'arena';
-  return 'dex';
+  if (v === 'soft' || v === 'glass' || v === 'neon' || v === 'flat') return v;
+  return 'flat';
 }
 
 export function setStoredUiStyle(style: UiStyle) {
@@ -27,14 +18,8 @@ export function setStoredUiStyle(style: UiStyle) {
 
 export function getStoredBackgroundStyle(): BackgroundStyle {
   const v = localStorage.getItem(BG_STYLE_KEY);
-  if (v === 'calm' || v === 'route' || v === 'prism' || v === 'safari' || v === 'pokeball' || v === 'night') return v;
-  if (v === 'plain') return 'calm';
-  if (v === 'diagonal') return 'route';
-  if (v === 'mesh') return 'prism';
-  if (v === 'aurora') return 'safari';
-  if (v === 'noise') return 'night';
-  if (v === 'pokemon') return 'pokeball';
-  return 'calm';
+  if (v === 'mesh' || v === 'aurora' || v === 'diagonal' || v === 'noise' || v === 'pokemon' || v === 'plain') return v;
+  return 'plain';
 }
 
 export function setStoredBackgroundStyle(style: BackgroundStyle) {
@@ -59,28 +44,13 @@ export function setStoredBackgroundAccent3(color: string) {
 
 export function applyUiStyleToRoot(style: UiStyle) {
   const root = document.documentElement;
-  root.classList.remove('ui-flat', 'ui-soft', 'ui-glass', 'ui-neon', 'ui-dex', 'ui-card', 'ui-holo', 'ui-arena');
-  root.style.removeProperty('--ui-overlay-image');
+  root.classList.remove('ui-flat', 'ui-soft', 'ui-glass', 'ui-neon');
+  root.classList.add(`ui-${style}`);
 }
 
 export function applyBackgroundStyleToRoot(style: BackgroundStyle) {
   const root = document.documentElement;
-  const className = `bg-${style}`;
-  if (root.classList.contains(className)) return;
-  root.classList.remove(
-    'bg-plain',
-    'bg-mesh',
-    'bg-aurora',
-    'bg-diagonal',
-    'bg-noise',
-    'bg-pokemon',
-    'bg-calm',
-    'bg-route',
-    'bg-prism',
-    'bg-safari',
-    'bg-pokeball',
-    'bg-night',
-  );
+  root.classList.remove('bg-plain', 'bg-mesh', 'bg-aurora', 'bg-diagonal', 'bg-noise', 'bg-pokemon');
   root.classList.add(`bg-${style}`);
 }
 
@@ -92,8 +62,3 @@ export function applyBackgroundAccentsToRoot(color2: string, color3: string) {
   else root.style.removeProperty('--bg-accent-3');
 }
 
-export function applyAppearanceToRoot(settings: AppearanceSettings) {
-  applyUiStyleToRoot(settings.uiStyle);
-  applyBackgroundStyleToRoot(settings.backgroundStyle);
-  applyBackgroundAccentsToRoot(settings.backgroundColor2, settings.backgroundColor3);
-}
