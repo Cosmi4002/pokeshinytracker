@@ -644,18 +644,32 @@ export function ShinyCounter({
                               </Select>
                             )}
                             {slot.details?.hasGenderDifference && (
-                              <Select value={slot.gender || 'male'} onValueChange={(v) => setSlotGender(v === 'female' ? 'female' : '')}>
-                                <SelectTrigger
-                                  className="h-8 w-full px-2 rounded-full text-xs"
-                                  style={{ borderColor: accentColor }}
+                              <div className="grid w-full grid-cols-2 gap-1">
+                                <Button
+                                  type="button"
+                                  variant={slot.gender === 'female' ? 'outline' : 'default'}
+                                  size="icon"
+                                  className="h-8 w-full rounded-full"
+                                  style={slot.gender === 'female' ? { borderColor: accentColor, color: accentColor } : { backgroundColor: accentColor }}
+                                  onClick={() => setSlotGender('')}
+                                  aria-pressed={slot.gender !== 'female'}
+                                  title="Maschio"
                                 >
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="male">Maschio</SelectItem>
-                                  <SelectItem value="female">Femmina</SelectItem>
-                                </SelectContent>
-                              </Select>
+                                  <span className="text-base leading-none" aria-hidden="true">♂</span>
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant={slot.gender === 'female' ? 'default' : 'outline'}
+                                  size="icon"
+                                  className="h-8 w-full rounded-full"
+                                  style={slot.gender === 'female' ? { backgroundColor: accentColor } : { borderColor: accentColor, color: accentColor }}
+                                  onClick={() => setSlotGender('female')}
+                                  aria-pressed={slot.gender === 'female'}
+                                  title="Femmina"
+                                >
+                                  <span className="text-base leading-none" aria-hidden="true">♀</span>
+                                </Button>
+                              </div>
                             )}
                           </div>
                         );
