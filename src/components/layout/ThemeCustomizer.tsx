@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Check, Image, Moon, Palette, Paintbrush, Save, Sparkles, Sun } from 'lucide-react';
+import { flushSync } from 'react-dom';
+import { Check, Image, Moon, Palette, Paintbrush, Pipette, Save, Sparkles, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -42,6 +43,18 @@ type ThemePreset = {
   backgroundColor3: string;
 };
 
+type EyeDropperResult = {
+  sRGBHex: string;
+};
+
+declare global {
+  interface Window {
+    EyeDropper?: new () => {
+      open: () => Promise<EyeDropperResult>;
+    };
+  }
+}
+
 const DEFAULT_THEME_COLOR = '#8b5cf6';
 const DEFAULT_BACKGROUND_COLOR = '#0f172a';
 const DEFAULT_BG_ACCENT_3 = '#38bdf8';
@@ -79,6 +92,7 @@ export function ThemeCustomizer() {
   const [backgroundColor3, setBackgroundColor3] = useState(getStoredBackgroundAccent3());
   const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState(false);
+  const skipNextOpenSyncRef = useRef(false);
 
   const initialAppearanceRef = useRef<{
     uiStyle: UiStyle;
@@ -130,6 +144,10 @@ export function ThemeCustomizer() {
 
   useEffect(() => {
     if (!open) return;
+    if (skipNextOpenSyncRef.current) {
+      skipNextOpenSyncRef.current = false;
+      return;
+    }
 
     if (preferences) {
       setPresetId('custom');
@@ -243,6 +261,52 @@ export function ThemeCustomizer() {
     setOpen(false);
   };
 
+  const handlePickColor = async (target: 'button' | 'background') => {
+    if (!window.EyeDropper) {
+      toast({
+        variant: 'destructive',
+        title: 'Pipetta non disponibile',
+        description: 'Il browser non supporta la selezione colore dallo schermo.',
+      });
+      return;
+    }
+
+    try {
+      flushSync(() => setOpen(false));
+      const result = await new window.EyeDropper().open();
+      setPresetId('custom');
+
+      if (target === 'button') {
+        setThemeColor(result.sRGBHex);
+        setManualColor(result.sRGBHex);
+        skipNextOpenSyncRef.current = true;
+        setOpen(true);
+        toast({
+          title: 'Colore pulsante applicato',
+          description: result.sRGBHex,
+        });
+        return;
+      }
+
+      setBackgroundColor(result.sRGBHex);
+      skipNextOpenSyncRef.current = true;
+      setOpen(true);
+      toast({
+        title: 'Colore sfondo applicato',
+        description: result.sRGBHex,
+      });
+    } catch (err: any) {
+      skipNextOpenSyncRef.current = true;
+      setOpen(true);
+      if (err?.name === 'AbortError') return;
+      toast({
+        variant: 'destructive',
+        title: 'Errore pipetta',
+        description: 'Non sono riuscito a leggere il colore selezionato.',
+      });
+    }
+  };
+
   const previewAccent2 = backgroundColor2 || themeColor;
   const previewAccent3 = backgroundColor3 || DEFAULT_BG_ACCENT_3;
 
@@ -255,21 +319,23 @@ export function ThemeCustomizer() {
         <Button
           variant="outline"
           size="icon"
-          className="h-12 w-12 rounded-xl border-2 transition-all duration-300 dark:bg-gray-800 dark:text-gray-100"
+          className="h-[3.25rem] w-[3.25rem] rounded-xl border-2 bg-gradient-to-b from-muted to-background text-card-foreground outline outline-1 outline-black/10 transition-all duration-300 hover:brightness-105 dark:from-muted/80 dark:to-background dark:outline-white/15"
           style={{
             borderColor: accentColor,
-            boxShadow: `0 0 12px ${accentColor}40`,
+            boxShadow: `inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -10px 20px rgba(0,0,0,0.10), 0 0 16px ${accentColor}45`,
           }}
         >
-          {colorScheme === 'dark' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+          {colorScheme === 'dark'
+            ? <Moon className="h-6 w-6 text-white drop-shadow-[0_0_6px_rgba(255,255,255,0.85)]" />
+            : <Sun className="h-6 w-6 text-amber-600 drop-shadow-[0_0_6px_rgba(251,191,36,0.75)]" />}
           <span className="sr-only">Impostazioni colori</span>
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto p-0">
-        <DialogHeader className="border-b border-border/70 bg-muted/30 px-5 pb-4 pt-5">
+      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto border-border bg-card p-0 text-card-foreground shadow-2xl">
+        <DialogHeader className="border-b border-border bg-card px-5 pb-4 pt-5">
           <DialogTitle className="flex items-center gap-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card">
               <Paintbrush className="h-4 w-4" />
             </span>
             Colori
@@ -277,8 +343,8 @@ export function ThemeCustomizer() {
           <DialogDescription>Personalizza tema, sfondo e modalita dell'app.</DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 p-5">
-          <section className="space-y-3 rounded-xl border border-border/70 bg-card/70 p-4 shadow-sm">
+        <div className="space-y-4 bg-card p-5">
+          <section className="space-y-3 rounded-xl border border-border bg-card p-4 shadow-sm">
             <Label className="flex items-center gap-2 text-sm font-semibold">
               <Sparkles className="h-4 w-4" />
               Temi rapidi
@@ -288,7 +354,7 @@ export function ThemeCustomizer() {
                 type="button"
                 onClick={() => setPresetId('custom')}
                 className={`flex min-h-16 items-center gap-3 rounded-xl border p-3 text-left transition-all hover:border-primary/60 hover:bg-muted/40 ${
-                  presetId === 'custom' ? 'border-primary bg-primary/10 shadow-sm' : 'border-border/80 bg-background/70'
+                  presetId === 'custom' ? 'border-primary bg-primary/10 shadow-sm' : 'border-border bg-card'
                 }`}
               >
                 <span className="flex h-10 w-10 shrink-0 rounded-full border border-border p-1">
@@ -308,7 +374,7 @@ export function ThemeCustomizer() {
                   type="button"
                   onClick={() => applyPreset(preset.id)}
                   className={`flex min-h-16 items-center gap-3 rounded-xl border p-3 text-left transition-all hover:border-primary/60 hover:bg-muted/40 ${
-                    presetId === preset.id ? 'border-primary bg-primary/10 shadow-sm' : 'border-border/80 bg-background/70'
+                    presetId === preset.id ? 'border-primary bg-primary/10 shadow-sm' : 'border-border bg-card'
                   }`}
                 >
                   <span className="flex h-10 w-10 shrink-0 rounded-full border border-border p-1">
@@ -325,18 +391,18 @@ export function ThemeCustomizer() {
             </div>
           </section>
 
-          <section className="space-y-3 rounded-xl border border-border/70 bg-card/70 p-4 shadow-sm">
+          <section className="space-y-3 rounded-xl border border-border bg-card p-4 shadow-sm">
             <Label className="flex items-center gap-2 text-sm font-semibold">
               <Sun className="h-4 w-4" />
               Modalita
             </Label>
-            <div className="grid grid-cols-2 gap-1 rounded-xl bg-muted p-1">
+            <div className="grid grid-cols-2 gap-1 rounded-xl border border-border bg-card p-1">
               <Button
                 type="button"
                 variant="ghost"
                 onClick={() => setColorScheme('light')}
                 className={`h-11 rounded-lg ${
-                  colorScheme === 'light' ? 'bg-background text-foreground shadow-sm hover:bg-background' : 'text-muted-foreground'
+                  colorScheme === 'light' ? 'bg-card text-card-foreground shadow-sm hover:bg-card' : 'text-muted-foreground'
                 }`}
               >
                 <Sun className="mr-2 h-4 w-4" />
@@ -347,7 +413,7 @@ export function ThemeCustomizer() {
                 variant="ghost"
                 onClick={() => setColorScheme('dark')}
                 className={`h-11 rounded-lg ${
-                  colorScheme === 'dark' ? 'bg-background text-foreground shadow-sm hover:bg-background' : 'text-muted-foreground'
+                  colorScheme === 'dark' ? 'bg-card text-card-foreground shadow-sm hover:bg-card' : 'text-muted-foreground'
                 }`}
               >
                 <Moon className="mr-2 h-4 w-4" />
@@ -356,11 +422,32 @@ export function ThemeCustomizer() {
             </div>
           </section>
 
-          <section className="space-y-3 rounded-xl border border-border/70 bg-card/70 p-4 shadow-sm">
+          <section className="space-y-3 rounded-xl border border-border bg-card p-4 shadow-sm">
             <Label className="flex items-center gap-2 text-sm font-semibold">
               <Palette className="h-4 w-4" />
               Palette
             </Label>
+            <div className="grid gap-2 rounded-xl border border-border bg-card p-2 sm:grid-cols-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => handlePickColor('button')}
+                className="h-10 justify-center gap-2"
+                style={{ borderColor: `${accentColor}80`, color: accentColor }}
+              >
+                <Pipette className="h-4 w-4" />
+                Pipetta pulsante
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => handlePickColor('background')}
+                className="h-10 justify-center gap-2"
+              >
+                <Pipette className="h-4 w-4" />
+                Pipetta sfondo
+              </Button>
+            </div>
             <div className="grid gap-3 md:grid-cols-2">
               <div className="space-y-3">
                 <Button
@@ -396,7 +483,7 @@ export function ThemeCustomizer() {
             </div>
           </section>
 
-          <section className="space-y-3 rounded-xl border border-border/70 bg-card/70 p-4 shadow-sm">
+          <section className="space-y-3 rounded-xl border border-border bg-card p-4 shadow-sm">
             <Label className="flex items-center gap-2 text-sm font-semibold">
               <Image className="h-4 w-4" />
               Sfondo
@@ -411,7 +498,7 @@ export function ThemeCustomizer() {
                     setBackgroundStyle(option.id);
                   }}
                   className={`overflow-hidden rounded-xl border text-left transition-all hover:border-primary/60 hover:bg-muted/40 ${
-                    backgroundStyle === option.id ? 'border-primary bg-primary/10 shadow-sm' : 'border-border/80 bg-background/70'
+                    backgroundStyle === option.id ? 'border-primary bg-primary/10 shadow-sm' : 'border-border bg-card'
                   }`}
                 >
                   <span

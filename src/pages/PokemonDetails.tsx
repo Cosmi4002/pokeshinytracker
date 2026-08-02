@@ -523,23 +523,28 @@ export default function PokemonDetails() {
                                                     key={game.id}
                                                     title={game.name}
                                                     className={cn(
-                                                        "relative flex min-h-[88px] flex-col items-center justify-center gap-2 overflow-hidden rounded-lg border border-border p-2.5 text-card-foreground shadow-sm transition-all duration-300",
+                                                        "relative flex min-h-[88px] flex-col items-center justify-center gap-2 overflow-hidden rounded-xl border p-2.5 shadow-md transition-all duration-300",
                                                         game.isCaught
-                                                            ? "scale-[1.01] bg-background shadow-lg"
-                                                            : "bg-muted/50 opacity-80"
+                                                            ? "scale-[1.01] border-2 text-white shadow-xl"
+                                                            : "border-border/80 bg-gradient-to-b from-muted/85 to-card/95 text-foreground opacity-95 hover:from-muted hover:to-background dark:from-muted/45 dark:to-card/95"
                                                     )}
                                                     style={{
-                                                        borderColor: game.isCaught ? `color-mix(in srgb, ${game.theme.accent} 70%, var(--border))` : undefined,
+                                                        borderColor: game.isCaught ? `color-mix(in srgb, ${game.theme.accent} 82%, white 18%)` : undefined,
                                                         background: game.isCaught
-                                                            ? `linear-gradient(135deg, color-mix(in srgb, ${game.theme.primary} 18%, var(--card)), color-mix(in srgb, ${game.theme.secondary} 12%, var(--card)))`
+                                                            ? `linear-gradient(160deg, color-mix(in srgb, ${game.theme.primary} 72%, black 28%) 0%, color-mix(in srgb, ${game.theme.secondary} 58%, black 42%) 62%, color-mix(in srgb, ${game.theme.accent} 42%, black 58%) 100%)`
                                                             : undefined,
-                                                        boxShadow: game.isCaught ? `0 12px 28px ${game.theme.primary}2e` : undefined
+                                                        boxShadow: game.isCaught
+                                                            ? `inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -18px 30px rgba(0,0,0,0.22), 0 14px 32px ${game.theme.primary}45`
+                                                            : undefined
                                                     }}
                                                 >
                                                     {game.isCaught && (
                                                         <div
-                                                            className="absolute inset-x-4 top-1 h-px rounded-full opacity-80"
-                                                            style={{ backgroundColor: game.theme.accent }}
+                                                            className="absolute inset-x-4 top-1 h-1 rounded-full opacity-95"
+                                                            style={{
+                                                                backgroundImage: `linear-gradient(90deg, transparent, ${game.theme.accent}, transparent)`,
+                                                                boxShadow: `0 0 12px ${game.theme.accent}`
+                                                            }}
                                                         />
                                                     )}
 
@@ -550,25 +555,32 @@ export default function PokemonDetails() {
                                                         className={cn(
                                                             "h-7 w-full object-contain transition-all duration-300 sm:h-8",
                                                             game.isCaught
-                                                                ? "opacity-100 saturate-125 drop-shadow-[0_0_10px_rgba(255,255,255,0.45)]"
-                                                                : "opacity-35 grayscale saturate-0"
+                                                                ? "opacity-100 saturate-150 brightness-110 drop-shadow-[0_2px_8px_rgba(0,0,0,0.75)]"
+                                                                : "opacity-55 grayscale saturate-0"
                                                         )}
                                                     />
 
                                                     <span
                                                         className={cn(
-                                                            "max-w-full truncate text-[10px] font-black uppercase leading-none",
-                                                            game.isCaught ? "text-foreground" : "text-muted-foreground/55"
+                                                            "max-w-full truncate text-[10px] font-black uppercase leading-none tracking-wide",
+                                                            game.isCaught
+                                                                ? "text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
+                                                                : "text-foreground/80"
                                                         )}
                                                     >
                                                         {game.name}
                                                     </span>
 
                                                     {game.isCaught && (
-                                                        <CheckCircle2
-                                                            className="absolute right-2 top-2 h-3.5 w-3.5"
-                                                            style={{ color: game.theme.accent }}
-                                                        />
+                                                        <span
+                                                            className="absolute right-2 top-2 rounded-full p-0.5"
+                                                            style={{
+                                                                backgroundColor: 'rgba(0,0,0,0.35)',
+                                                                boxShadow: `0 0 10px ${game.theme.accent}`
+                                                            }}
+                                                        >
+                                                            <CheckCircle2 className="h-3.5 w-3.5 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]" />
+                                                        </span>
                                                     )}
                                                 </div>
                                             ))}
@@ -580,8 +592,8 @@ export default function PokemonDetails() {
                     )}
 
                     {/* Form Collection Section - Main Focus */}
-                    <div className="w-full space-y-8 rounded-lg border border-border bg-card p-6 text-card-foreground shadow-2xl">
-                        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-border">
+                    <div className="w-full space-y-8 rounded-xl border border-border/80 bg-gradient-to-b from-muted/95 to-card/95 p-6 text-card-foreground shadow-2xl backdrop-blur dark:from-muted/55 dark:to-card/95">
+                        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-border/80">
                             <div className="text-left">
                                 <h2 className="text-3xl font-black tracking-tight flex items-center gap-3">
                                     <span className="w-2 h-8 bg-primary rounded-full shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
@@ -589,7 +601,7 @@ export default function PokemonDetails() {
                                 </h2>
                                 <p className="text-muted-foreground mt-1 font-medium">Visualizza e segna le varianti cromatiche catturate.</p>
                             </div>
-                            <div className="flex items-center gap-3 rounded-lg border border-border bg-muted px-5 py-2.5 text-card-foreground shadow-sm">
+                            <div className="flex items-center gap-3 rounded-xl border border-border/80 bg-gradient-to-b from-muted/90 to-background/95 px-5 py-2.5 text-card-foreground shadow-inner dark:from-muted/60 dark:to-background/95">
                                 <Sparkles className="h-4 w-4 text-primary" />
                                 <span className="text-sm font-bold text-foreground">
                                     {caughtForms.size} <span className="text-muted-foreground mx-1">/</span> {variants.length}
@@ -608,14 +620,19 @@ export default function PokemonDetails() {
                                         key={variant.name}
                                         onClick={() => toggleCaught(variant)}
                                         className={cn(
-                                            "group relative flex flex-col items-center justify-center rounded-lg border border-border p-4 text-card-foreground shadow-sm transition-all duration-500 transform active:scale-95",
+                                            "group relative flex flex-col items-center justify-center overflow-hidden rounded-xl border border-border/80 p-4 text-card-foreground shadow-md transition-all duration-500 transform active:scale-95",
                                             isCaught
-                                                ? "bg-background border-2 shadow-lg"
-                                                : "bg-muted/50 hover:bg-muted"
+                                                ? "border-2 shadow-lg"
+                                                : "bg-gradient-to-b from-muted/85 to-card/95 hover:from-muted hover:to-background dark:from-muted/45 dark:to-card/95"
                                         )}
                                         style={{
                                             borderColor: isCaught ? accentColor : undefined,
-                                            boxShadow: isCaught ? `0 12px 28px ${accentColor}30` : undefined
+                                            backgroundImage: isCaught
+                                                ? `linear-gradient(180deg, color-mix(in srgb, ${accentColor} 22%, hsl(var(--card)) 78%), color-mix(in srgb, ${accentColor} 12%, hsl(var(--background)) 88%))`
+                                                : undefined,
+                                            boxShadow: isCaught
+                                                ? `inset 0 1px 0 rgba(255,255,255,0.18), 0 14px 30px ${accentColor}35`
+                                                : undefined
                                         }}
                                     >
                                         <div className="relative w-full aspect-square mb-3 flex items-center justify-center">
@@ -631,9 +648,12 @@ export default function PokemonDetails() {
                                             {isCaught && (
                                                 <div
                                                     className="absolute -top-2 -right-2 p-1.5 rounded-full shadow-lg z-30 animate-in zoom-in-50 duration-300"
-                                                    style={{ backgroundColor: accentColor }}
+                                                    style={{
+                                                        backgroundImage: `linear-gradient(180deg, color-mix(in srgb, ${accentColor} 92%, white 8%), color-mix(in srgb, ${accentColor} 74%, black 26%))`,
+                                                        boxShadow: `0 0 14px ${accentColor}70`
+                                                    }}
                                                 >
-                                                    <CheckCircle2 className="w-4 h-4 text-primary-foreground font-bold" />
+                                                    <CheckCircle2 className="w-4 h-4 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.75)]" />
                                                 </div>
                                             )}
                                             {isLoading && (
@@ -645,12 +665,12 @@ export default function PokemonDetails() {
 
                                         <div className="text-center w-full relative z-10 space-y-1">
                                             <div className={cn(
-                                                "text-xs font-black uppercase tracking-widest transition-colors",
-                                                isCaught ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
+                                                "text-xs font-black uppercase tracking-widest transition-colors drop-shadow-[0_1px_1px_rgba(0,0,0,0.28)]",
+                                                isCaught ? "text-foreground" : "text-foreground/80 group-hover:text-foreground"
                                             )}>
                                                 {(overrides[`${variant.id}-${variant.name}`] as any)?.custom_display_name || variant.displayName}
                                             </div>
-                                            <div className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-[0.2em]">
+                                            <div className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
                                                 {variant.category}
                                             </div>
                                         </div>

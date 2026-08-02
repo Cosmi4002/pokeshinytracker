@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Plus, Filter, LogIn, List } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Navbar } from '@/components/layout/Navbar';
@@ -6,8 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { GAMES } from '@/lib/pokemon-data';
+import { findHuntingMethod, GAMES } from '@/lib/pokemon-data';
 import { usePokemonList } from '@/hooks/use-pokemon';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/auth-context';
@@ -55,6 +54,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
   // Filters
   const [filterGen, setFilterGen] = useState<string>('all');
   const [filterGame, setFilterGame] = useState<string>('all');
+  const [filterMethod, setFilterMethod] = useState<string>('all');
   const [filterPlaylist, setFilterPlaylist] = useState<string>('all');
   const [sortBy, setSortBy] = useState<CollectionSort>('date_desc');
   const [dexOrder, setDexOrder] = useState<DexOrder>('none');
@@ -71,6 +71,8 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
   const collectionLayoutClassName = useMemo(() => {
     return 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 xl:gap-5';
   }, []);
+  const nativeSelectClassName =
+    'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2';
 
   const isAbortLikeError = (err: unknown) => {
     if (!err || typeof err !== 'object') return false;
@@ -273,6 +275,39 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
     return entries.filter((e) => isFailOrUncatchable(e));
   }, [entries, mode]);
 
+  const getMethodFilterLabel = useCallback((rawMethod: string | null | undefined) => {
+    const raw = (rawMethod || '').toString().trim();
+    if (!raw) return '';
+
+    const key = raw.toLowerCase();
+    const method = findHuntingMethod(raw);
+    return key === 'distribution/event' || key === 'event'
+      ? 'Distribution / Event'
+      : method?.name || raw;
+  }, []);
+
+  const methodOptions = useMemo(() => {
+    const byLabel = new Map<string, string>();
+
+    scopedEntries.forEach((entry) => {
+      const label = getMethodFilterLabel(entry.method);
+      if (!label) return;
+
+      byLabel.set(normalize(label), label);
+    });
+
+    return [...byLabel.entries()]
+      .map(([value, label]) => ({ value, label }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, [getMethodFilterLabel, scopedEntries]);
+
+  useEffect(() => {
+    if (filterMethod === 'all') return;
+    if (!methodOptions.some((method) => method.value === filterMethod)) {
+      setFilterMethod('all');
+    }
+  }, [filterMethod, methodOptions]);
+
   const filteredEntries = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
 
@@ -303,6 +338,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
           if (!poke || poke.generation.toString() !== filterGen) return false;
         }
         if (filterGame !== 'all' && entry.game !== filterGame) return false;
+        if (filterMethod !== 'all' && normalize(getMethodFilterLabel(entry.method)) !== filterMethod) return false;
         if (filterPlaylist !== 'all') {
           const plName = entry.playlist_id ? playlistMap[entry.playlist_id] : null;
           if (plName !== filterPlaylist) return false;
@@ -338,7 +374,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
         if (sortBy === 'date_desc') return bCreated - aCreated;
         return bCreated - aCreated;
       });
-  }, [scopedEntries, searchQuery, filterGen, filterGame, filterPlaylist, playlistMap, pokemonById, pokemonByName, pokemonByDisplayName, sortBy, dexOrder]);
+  }, [scopedEntries, searchQuery, filterGen, filterGame, filterMethod, filterPlaylist, playlistMap, pokemonById, pokemonByName, pokemonByDisplayName, sortBy, dexOrder, getMethodFilterLabel]);
 
   if (authLoading || (user && loading)) {
     return (
@@ -485,7 +521,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
                 <div>
                   <Label>Cerca</Label>
                   <Input
@@ -496,77 +532,87 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
                 </div>
                 <div>
                   <Label>Generazione</Label>
-                  <Select value={filterGen} onValueChange={setFilterGen}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Tutte</SelectItem>
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((gen) => (
-                        <SelectItem key={gen} value={gen.toString()}>
+                  <select
+                    value={filterGen}
+                    onChange={(e) => setFilterGen(e.target.value)}
+                    className={nativeSelectClassName}
+                  >
+                    <option value="all">Tutte</option>
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((gen) => (
+                        <option key={gen} value={gen.toString()}>
                           Gen {gen}
-                        </SelectItem>
+                        </option>
                       ))}
-                    </SelectContent>
-                  </Select>
+                  </select>
                 </div>
                 <div>
                   <Label>Gioco</Label>
-                  <Select value={filterGame} onValueChange={setFilterGame}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                      <SelectContent className="max-h-72 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-muted [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-muted-foreground">
-                      <SelectItem value="all">Tutti</SelectItem>
+                  <select
+                    value={filterGame}
+                    onChange={(e) => setFilterGame(e.target.value)}
+                    className={nativeSelectClassName}
+                  >
+                      <option value="all">Tutti</option>
                       {GAMES.map((game) => (
-                        <SelectItem key={game.id} value={game.id}>
+                        <option key={game.id} value={game.id}>
                           {game.name}
-                        </SelectItem>
+                        </option>
                       ))}
-                    </SelectContent>
-                  </Select>
+                  </select>
+                </div>
+                <div>
+                  <Label>Metodo</Label>
+                  <select
+                    value={filterMethod}
+                    onChange={(e) => setFilterMethod(e.target.value)}
+                    className={nativeSelectClassName}
+                  >
+                    <option value="all">Tutti</option>
+                      {methodOptions.map((method) => (
+                        <option key={method.value} value={method.value}>
+                          {method.label}
+                        </option>
+                      ))}
+                  </select>
                 </div>
                 <div>
                   <Label>Ordina</Label>
-                  <Select value={sortBy} onValueChange={(v) => setSortBy(v as CollectionSort)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="date_desc">Data: recenti -&gt; vecchi</SelectItem>
-                      <SelectItem value="date_asc">Data: vecchi -&gt; recenti</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as CollectionSort)}
+                    className={nativeSelectClassName}
+                  >
+                    <option value="date_desc">Data: recenti -&gt; vecchi</option>
+                    <option value="date_asc">Data: vecchi -&gt; recenti</option>
+                  </select>
                 </div>
                 <div>
                   <Label>Pokédex</Label>
-                  <Select value={dexOrder} onValueChange={(v) => setDexOrder(v as DexOrder)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">—</SelectItem>
-                      <SelectItem value="dex_asc">Crescente</SelectItem>
-                      <SelectItem value="dex_desc">Decrescente</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <select
+                    value={dexOrder}
+                    onChange={(e) => setDexOrder(e.target.value as DexOrder)}
+                    className={nativeSelectClassName}
+                  >
+                    <option value="none">—</option>
+                    <option value="dex_asc">Crescente</option>
+                    <option value="dex_desc">Decrescente</option>
+                  </select>
                 </div>
                 {playlists.length > 0 && (
                   <div>
                     <Label>Playlist</Label>
-                    <Select value={filterPlaylist} onValueChange={setFilterPlaylist}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Tutte</SelectItem>
+                    <select
+                      value={filterPlaylist}
+                      onChange={(e) => setFilterPlaylist(e.target.value)}
+                      className={nativeSelectClassName}
+                    >
+                        <option value="all">Tutte</option>
                         {playlists.map((pl) => (
-                          <SelectItem key={pl.id} value={pl.name}>
+                          <option key={pl.id} value={pl.name}>
                             {pl.name}
-                          </SelectItem>
+                          </option>
                         ))}
-                      </SelectContent>
-                    </Select>
+                    </select>
                   </div>
                 )}
               </div>

@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Calculator, Search, Grid3X3, LogOut, Sparkles, Settings2, Pencil, Users } from 'lucide-react';
+import { Check, Calculator, Search, Grid3X3, LogOut, Move, Sparkles, Settings2, Pencil, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { supabaseProjectRef } from '@/integrations/supabase/client';
@@ -25,6 +25,26 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { trainerAvatars } from '@/lib/trainer-avatars';
 
+type TrainerAvatarId = (typeof trainerAvatars)[number]['id'];
+
+const AVATAR_ORDER_VERSION = 'playable-gen-order-v4';
+const DEFAULT_AVATAR_ORDER_IDS = trainerAvatars.map((avatar) => avatar.id) as TrainerAvatarId[];
+
+const getSafeAvatarOrder = (raw: unknown) => {
+  const safeOrder = Array.isArray(raw)
+    ? raw.filter((id): id is TrainerAvatarId => (
+      typeof id === 'string' && DEFAULT_AVATAR_ORDER_IDS.includes(id as TrainerAvatarId)
+    ))
+    : [];
+
+  return safeOrder.length > 0
+    ? [
+      ...safeOrder,
+      ...DEFAULT_AVATAR_ORDER_IDS.filter((id) => !safeOrder.includes(id)),
+    ]
+    : null;
+};
+
 export function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -32,13 +52,13 @@ export function Navbar() {
   const { accentColor } = useRandomColor();
   const { toast } = useToast();
   const [profileUsername, setProfileUsername] = useState<string | null>(null);
-  const [selectedAvatarId, setSelectedAvatarId] = useState<(typeof trainerAvatars)[number]['id']>('red');
-  const [avatarOrderIds, setAvatarOrderIds] = useState<Array<(typeof trainerAvatars)[number]['id']>>(
-    () => trainerAvatars.map((avatar) => avatar.id)
-  );
-  const [draggedAvatarId, setDraggedAvatarId] = useState<(typeof trainerAvatars)[number]['id'] | null>(null);
-  const [movingAvatarId, setMovingAvatarId] = useState<(typeof trainerAvatars)[number]['id'] | null>(null);
-  const [avatarOrderLoaded, setAvatarOrderLoaded] = useState(false);
+  const [selectedAvatarId, setSelectedAvatarId] = useState<TrainerAvatarId>('red');
+  const [avatarOrderIds, setAvatarOrderIds] = useState<TrainerAvatarId[]>(() => DEFAULT_AVATAR_ORDER_IDS);
+  const [draggedAvatarId, setDraggedAvatarId] = useState<TrainerAvatarId | null>(null);
+  const [movingAvatarId, setMovingAvatarId] = useState<TrainerAvatarId | null>(null);
+  const [avatarPickerMode, setAvatarPickerMode] = useState<'select' | 'move'>('select');
+  const [avatarPreferencesLoaded, setAvatarPreferencesLoaded] = useState(false);
+  const [avatarOrderTouched, setAvatarOrderTouched] = useState(false);
   const [avatarPickerOpen, setAvatarPickerOpen] = useState(false);
 
   const navLinks = [
@@ -52,6 +72,18 @@ export function Navbar() {
   const metadataUsername = useMemo(() => {
     const raw = (user?.user_metadata as Record<string, unknown> | undefined)?.username;
     return typeof raw === 'string' && raw.trim() ? raw.trim() : null;
+  }, [user?.user_metadata]);
+  const metadataAvatarId = useMemo(() => {
+    const raw = (user?.user_metadata as Record<string, unknown> | undefined)?.trainer_avatar;
+    return typeof raw === 'string' && trainerAvatars.some((avatar) => avatar.id === raw)
+      ? (raw as TrainerAvatarId)
+      : null;
+  }, [user?.user_metadata]);
+  const metadataAvatarOrderIds = useMemo(() => {
+    const metadata = user?.user_metadata as Record<string, unknown> | undefined;
+    if (metadata?.trainer_avatar_order_version !== AVATAR_ORDER_VERSION) return null;
+
+    return getSafeAvatarOrder(metadata.trainer_avatar_order);
   }, [user?.user_metadata]);
 
   const displayUsername = profileUsername || metadataUsername;
@@ -68,14 +100,17 @@ export function Navbar() {
   }, [avatarOrderIds]);
   const selectedAvatar =
     trainerAvatars.find((avatar) => avatar.id === selectedAvatarId) ?? trainerAvatars[0];
+  const getAvatarImageStyle = (avatar: (typeof trainerAvatars)[number]) => ({
+    transform: 'imageTransform' in avatar ? avatar.imageTransform : 'scale(1.72)',
+    transformOrigin: 'imageTransformOrigin' in avatar ? avatar.imageTransformOrigin : 'top center',
+  });
 
-  const handleAvatarDrop = useCallback((targetAvatarId: (typeof trainerAvatars)[number]['id']) => {
+  const handleAvatarDrop = useCallback((targetAvatarId: TrainerAvatarId) => {
     if (!draggedAvatarId || draggedAvatarId === targetAvatarId) return;
 
     setAvatarOrderIds((currentOrder) => {
-      const avatarIds = trainerAvatars.map((avatar) => avatar.id);
-      const currentIds = currentOrder.filter((id) => avatarIds.includes(id));
-      const missingIds = avatarIds.filter((id) => !currentIds.includes(id));
+      const currentIds = currentOrder.filter((id) => DEFAULT_AVATAR_ORDER_IDS.includes(id));
+      const missingIds = DEFAULT_AVATAR_ORDER_IDS.filter((id) => !currentIds.includes(id));
       const nextOrder = [...currentIds, ...missingIds];
       const fromIndex = nextOrder.indexOf(draggedAvatarId);
       const toIndex = nextOrder.indexOf(targetAvatarId);
@@ -84,22 +119,22 @@ export function Navbar() {
 
       const [movedAvatarId] = nextOrder.splice(fromIndex, 1);
       nextOrder.splice(toIndex, 0, movedAvatarId);
+      setAvatarOrderTouched(true);
       return nextOrder;
     });
   }, [draggedAvatarId]);
 
   const moveAvatarToTarget = useCallback((
-    avatarId: (typeof trainerAvatars)[number]['id'],
-    targetAvatarId: (typeof trainerAvatars)[number]['id']
+    avatarId: TrainerAvatarId,
+    targetAvatarId: TrainerAvatarId
   ) => {
     if (avatarId === targetAvatarId) return;
 
     setAvatarOrderIds((currentOrder) => {
-      const avatarIds = trainerAvatars.map((avatar) => avatar.id);
-      const currentIds = currentOrder.filter((id) => avatarIds.includes(id));
+      const currentIds = currentOrder.filter((id) => DEFAULT_AVATAR_ORDER_IDS.includes(id));
       const nextOrder = [
         ...currentIds,
-        ...avatarIds.filter((id) => !currentIds.includes(id)),
+        ...DEFAULT_AVATAR_ORDER_IDS.filter((id) => !currentIds.includes(id)),
       ];
       const fromIndex = nextOrder.indexOf(avatarId);
       const toIndex = nextOrder.indexOf(targetAvatarId);
@@ -107,21 +142,37 @@ export function Navbar() {
       if (fromIndex === -1 || toIndex === -1) return currentOrder;
 
       const [movedAvatarId] = nextOrder.splice(fromIndex, 1);
-      const targetIndex = nextOrder.indexOf(targetAvatarId);
-      nextOrder.splice(targetIndex, 0, movedAvatarId);
+      nextOrder.splice(toIndex, 0, movedAvatarId);
+      setAvatarOrderTouched(true);
       return nextOrder;
     });
   }, []);
 
-  const handleAvatarDoubleClick = useCallback((avatarId: (typeof trainerAvatars)[number]['id']) => {
+  const handleAvatarPickerOpenChange = useCallback((open: boolean) => {
+    setAvatarPickerOpen(open);
+    if (!open) {
+      setMovingAvatarId(null);
+      setAvatarPickerMode('select');
+    }
+  }, []);
+
+  const handleAvatarPress = useCallback((avatarId: TrainerAvatarId) => {
+    if (avatarPickerMode === 'select') {
+      setSelectedAvatarId(avatarId);
+      if (window.innerWidth < 640) setAvatarPickerOpen(false);
+      return;
+    }
+
     if (!movingAvatarId) {
       setMovingAvatarId(avatarId);
       return;
     }
 
-    moveAvatarToTarget(movingAvatarId, avatarId);
+    if (movingAvatarId !== avatarId) {
+      moveAvatarToTarget(movingAvatarId, avatarId);
+    }
     setMovingAvatarId(null);
-  }, [moveAvatarToTarget, movingAvatarId]);
+  }, [avatarPickerMode, moveAvatarToTarget, movingAvatarId]);
 
   const handleSetUsername = async () => {
     if (!user) return;
@@ -177,44 +228,54 @@ export function Navbar() {
   useEffect(() => {
     if (!user) {
       setSelectedAvatarId('red');
-      setAvatarOrderIds(trainerAvatars.map((avatar) => avatar.id));
-      setAvatarOrderLoaded(false);
+      setAvatarOrderIds(DEFAULT_AVATAR_ORDER_IDS);
+      setAvatarOrderTouched(false);
+      setAvatarPreferencesLoaded(false);
       return;
     }
 
-    setAvatarOrderLoaded(false);
+    setAvatarPreferencesLoaded(false);
     const storageKey = `trainer-avatar-${user.id}`;
     const stored = window.localStorage.getItem(storageKey);
     const exists = trainerAvatars.some((avatar) => avatar.id === stored);
-    setSelectedAvatarId(exists ? (stored as (typeof trainerAvatars)[number]['id']) : 'red');
+    setSelectedAvatarId(metadataAvatarId || (exists ? (stored as TrainerAvatarId) : 'red'));
 
     const orderStorageKey = `trainer-avatar-order-${user.id}`;
+    const orderVersionStorageKey = `trainer-avatar-order-version-${user.id}`;
     const storedOrder = window.localStorage.getItem(orderStorageKey);
+    const storedOrderVersion = window.localStorage.getItem(orderVersionStorageKey);
     try {
       const parsedOrder = JSON.parse(storedOrder || '[]');
-      const avatarIds = trainerAvatars.map((avatar) => avatar.id);
-      const safeOrder = Array.isArray(parsedOrder)
-        ? parsedOrder.filter((id): id is (typeof trainerAvatars)[number]['id'] => avatarIds.includes(id))
-        : [];
-      setAvatarOrderIds([
-        ...safeOrder,
-        ...avatarIds.filter((id) => !safeOrder.includes(id)),
-      ]);
+      const safeStoredOrder = storedOrderVersion === AVATAR_ORDER_VERSION
+        ? getSafeAvatarOrder(parsedOrder)
+        : null;
+      setAvatarOrderIds(metadataAvatarOrderIds || safeStoredOrder || DEFAULT_AVATAR_ORDER_IDS);
     } catch {
-      setAvatarOrderIds(trainerAvatars.map((avatar) => avatar.id));
+      setAvatarOrderIds(metadataAvatarOrderIds || DEFAULT_AVATAR_ORDER_IDS);
     }
-    setAvatarOrderLoaded(true);
-  }, [user?.id]);
+    setAvatarOrderTouched(false);
+    setAvatarPreferencesLoaded(true);
+  }, [metadataAvatarId, metadataAvatarOrderIds, user?.id]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !avatarPreferencesLoaded) return;
     window.localStorage.setItem(`trainer-avatar-${user.id}`, selectedAvatarId);
-  }, [selectedAvatarId, user?.id]);
+    void supabase.auth.updateUser({
+      data: { trainer_avatar: selectedAvatarId },
+    });
+  }, [avatarPreferencesLoaded, selectedAvatarId, user?.id]);
 
   useEffect(() => {
-    if (!user || !avatarOrderLoaded) return;
+    if (!user || !avatarPreferencesLoaded || !avatarOrderTouched) return;
     window.localStorage.setItem(`trainer-avatar-order-${user.id}`, JSON.stringify(avatarOrderIds));
-  }, [avatarOrderIds, avatarOrderLoaded, user?.id]);
+    window.localStorage.setItem(`trainer-avatar-order-version-${user.id}`, AVATAR_ORDER_VERSION);
+    void supabase.auth.updateUser({
+      data: {
+        trainer_avatar_order: avatarOrderIds,
+        trainer_avatar_order_version: AVATAR_ORDER_VERSION,
+      },
+    });
+  }, [avatarOrderIds, avatarOrderTouched, avatarPreferencesLoaded, user?.id]);
 
   useEffect(() => {
     let active = true;
@@ -249,8 +310,19 @@ export function Navbar() {
   }, [user?.id]);
 
   return (
-    <nav className="sticky top-0 z-50 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4 gap-2">
+    <nav
+      className="sticky top-0 z-50 border-b border-border/55 bg-card/78 shadow-[0_16px_42px_rgba(0,0,0,0.16)] outline outline-1 outline-black/10 backdrop-blur-2xl supports-[backdrop-filter]:bg-card/68 dark:border-white/10 dark:outline-white/15 dark:supports-[backdrop-filter]:bg-card/62"
+      style={{
+        boxShadow: `0 16px 42px rgba(0,0,0,0.16), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 ${accentColor}30`,
+      }}
+    >
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-px"
+        style={{
+          background: `linear-gradient(90deg, transparent, ${accentColor}90, transparent)`,
+        }}
+      />
+      <div className="container mx-auto flex h-[4.25rem] items-center justify-between gap-2 px-4">
         <Link to="/" className="flex items-center gap-2 shrink-0">
           <Sparkles className="h-6 w-6" style={{ color: accentColor }} />
           <span
@@ -264,7 +336,7 @@ export function Navbar() {
         </Link>
 
         <div className="flex items-center gap-1 sm:gap-1">
-          {navLinks.map((link) => {
+        {navLinks.map((link) => {
             const Icon = link.icon;
             const isActive = location.pathname === link.to;
 
@@ -274,7 +346,7 @@ export function Navbar() {
                   variant={isActive ? 'default' : 'ghost'}
                   size="sm"
                   className={cn(
-                    'h-9 px-2 sm:px-3 gap-1.5 sm:gap-2',
+                    'h-9 px-2 sm:px-3 gap-1.5 sm:gap-2 outline outline-1 outline-black/5 dark:outline-white/10',
                     isActive && 'bg-primary text-primary-foreground shadow-sm'
                   )}
                 >
@@ -292,18 +364,33 @@ export function Navbar() {
             <>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-12 w-12">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-[3.25rem] w-[3.25rem] rounded-xl border-2 bg-muted p-0 outline outline-1 outline-black/10 transition-all duration-300 hover:bg-muted dark:outline-white/15"
+                  style={{
+                    borderColor: accentColor,
+                    boxShadow: `inset 0 1px 0 rgba(255,255,255,0.18), 0 0 14px ${accentColor}40`,
+                  }}
+                >
                   <span
-                    className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl border-2 bg-gradient-to-br from-white/30 to-white/10 ring-1 ring-white/40"
+                    className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-[0.65rem] bg-muted text-card-foreground shadow-sm"
                     style={{
-                      borderColor: accentColor,
-                      boxShadow: `0 0 12px ${accentColor}40`,
+                      boxShadow: `inset 0 1px 0 rgba(255,255,255,0.2)`,
                     }}
                   >
+                    <span
+                      className="absolute inset-0 opacity-80"
+                      style={{
+                        background: `radial-gradient(circle at 50% 15%, ${accentColor}30, transparent 58%)`,
+                      }}
+                    />
+                    <span className="absolute inset-x-1 bottom-1 h-3 rounded-full bg-black/20 blur-sm" />
                     <img
                       src={selectedAvatar.src}
                       alt={selectedAvatar.label}
-                      className="h-full w-full origin-top scale-[1.58] object-cover object-[50%_10%] [image-rendering:pixelated]"
+                      className="relative z-10 h-full w-full object-cover drop-shadow-[0_2px_3px_rgba(0,0,0,0.65)] [image-rendering:pixelated]"
+                      style={getAvatarImageStyle(selectedAvatar)}
                     />
                   </span>
                 </Button>
@@ -328,7 +415,7 @@ export function Navbar() {
                   <img
                     src={selectedAvatar.src}
                     alt={selectedAvatar.label}
-                    className="mr-2 h-4 w-4 rounded-md border border-primary/70 bg-gradient-to-br from-white/30 to-white/10 p-0.5 object-contain"
+                    className="mr-2 h-4 w-4 rounded-md border border-primary/70 bg-card p-0.5 object-contain"
                     onError={(e) => ((e.currentTarget as HTMLImageElement).src = '/placeholder.svg')}
                   />
                   Avatar
@@ -348,30 +435,64 @@ export function Navbar() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Dialog open={avatarPickerOpen} onOpenChange={setAvatarPickerOpen}>
-              <DialogContent className="w-[calc(100vw-1rem)] max-w-2xl max-h-[85dvh] overflow-hidden p-0">
-                <DialogHeader className="border-b border-border p-4 pr-10 text-left">
+            <Dialog open={avatarPickerOpen} onOpenChange={handleAvatarPickerOpenChange}>
+              <DialogContent className="w-[calc(100vw-1rem)] max-w-2xl max-h-[85dvh] overflow-hidden border-border bg-card p-0 text-card-foreground shadow-2xl">
+                <DialogHeader className="border-b border-border bg-card p-4 pr-10 text-left">
                   <DialogTitle>Avatar</DialogTitle>
                   <DialogDescription>
-                    Scegli il trainer. Doppio click su un avatar, poi doppio click dove vuoi metterlo.
+                    Scegli il trainer oppure usa Sposta per riordinare con un tap.
                   </DialogDescription>
                 </DialogHeader>
-                <div className="max-h-[66dvh] overflow-y-auto p-4">
+                <div className="border-b border-border bg-card p-3">
+                  <div className="grid grid-cols-2 gap-2 rounded-lg border border-border bg-background/60 p-1">
+                    <Button
+                      type="button"
+                      variant={avatarPickerMode === 'select' ? 'default' : 'ghost'}
+                      size="sm"
+                      className="h-9 justify-center gap-2"
+                      onClick={() => {
+                        setAvatarPickerMode('select');
+                        setMovingAvatarId(null);
+                      }}
+                    >
+                      <Check className="h-4 w-4" />
+                      Scegli
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={avatarPickerMode === 'move' ? 'default' : 'ghost'}
+                      size="sm"
+                      className="h-9 justify-center gap-2"
+                      onClick={() => {
+                        setAvatarPickerMode('move');
+                        setMovingAvatarId(null);
+                      }}
+                    >
+                      <Move className="h-4 w-4" />
+                      Sposta
+                    </Button>
+                  </div>
+                  {avatarPickerMode === 'move' && (
+                    <div className="mt-2 rounded-md border border-primary/25 bg-primary/10 px-3 py-2 text-xs text-muted-foreground">
+                      {movingAvatarId
+                        ? 'Ora tocca la posizione dove vuoi inserirlo.'
+                        : 'Tocca un avatar da spostare.'}
+                    </div>
+                  )}
+                </div>
+                <div className="max-h-[58dvh] overflow-y-auto bg-card p-4">
                   <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 md:grid-cols-8">
                     {orderedTrainerAvatars.map((avatar, index) => (
                       <div
                         key={`${avatar.id}-${index}`}
-                        className="group flex min-w-0 flex-col items-center gap-1 rounded-lg border border-transparent p-1.5 text-center transition hover:bg-accent"
+                        className="group flex min-w-0 flex-col items-center gap-1 rounded-lg border border-border bg-background/60 p-1.5 text-center transition hover:bg-muted"
                       >
                         <button
                           type="button"
-                          draggable
-                          onClick={() => {
-                            setSelectedAvatarId(avatar.id);
-                            if (window.innerWidth < 640) setAvatarPickerOpen(false);
-                          }}
-                          onDoubleClick={() => handleAvatarDoubleClick(avatar.id)}
+                          draggable={avatarPickerMode === 'select'}
+                          onClick={() => handleAvatarPress(avatar.id)}
                           onDragStart={(event) => {
+                            if (avatarPickerMode !== 'select') return;
                             setDraggedAvatarId(avatar.id);
                             event.dataTransfer.effectAllowed = 'move';
                             event.dataTransfer.setData('text/plain', avatar.id);
@@ -387,23 +508,41 @@ export function Navbar() {
                           }}
                           onDragEnd={() => setDraggedAvatarId(null)}
                           className="focus:outline-none focus:ring-2 focus:ring-ring rounded-lg"
-                          aria-label={`Seleziona o trascina ${avatar.label}`}
+                          aria-label={avatarPickerMode === 'move' ? `Sposta ${avatar.label}` : `Seleziona ${avatar.label}`}
                         >
                           <span
                             className={cn(
-                              'flex h-14 w-14 cursor-grab items-center justify-center overflow-hidden rounded-lg border-2 bg-gradient-to-br from-white/30 to-white/10 shadow-sm transition-all active:cursor-grabbing',
-                              selectedAvatarId === avatar.id
+                              'relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-lg border-2 bg-card shadow-sm ring-1 ring-border/60 transition-all',
+                              avatarPickerMode === 'select' ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer',
+                              movingAvatarId === avatar.id
+                                ? 'border-primary bg-primary/15 ring-2 ring-primary/60 scale-105'
+                                : selectedAvatarId === avatar.id
                                 ? 'border-primary ring-1 ring-primary/60'
-                                : draggedAvatarId === avatar.id || movingAvatarId === avatar.id
+                                : draggedAvatarId === avatar.id
                                   ? 'border-primary/80 opacity-60'
+                                  : avatarPickerMode === 'move' && movingAvatarId
+                                    ? 'border-primary/40 border-dashed hover:border-primary'
                                   : 'border-border hover:border-primary/60'
                             )}
+                            style={{
+                              boxShadow: selectedAvatarId === avatar.id
+                                ? `inset 0 1px 0 rgba(255,255,255,0.14), 0 0 12px ${accentColor}35`
+                                : undefined,
+                            }}
                           >
+                            <span
+                              className="absolute inset-0 opacity-80"
+                              style={{
+                                background: `radial-gradient(circle at 50% 15%, ${accentColor}24, transparent 58%)`,
+                              }}
+                            />
+                            <span className="absolute inset-x-1 bottom-1 h-3 rounded-full bg-black/20 blur-sm" />
                             <img
                               src={avatar.src}
                               alt={avatar.label}
                               title={avatar.label}
-                              className="h-full w-full origin-top scale-[1.58] object-cover object-[50%_10%] [image-rendering:pixelated]"
+                              className="relative z-10 h-full w-full object-cover drop-shadow-[0_2px_3px_rgba(0,0,0,0.65)] [image-rendering:pixelated]"
+                              style={getAvatarImageStyle(avatar)}
                               onError={(e) => ((e.currentTarget as HTMLImageElement).src = '/placeholder.svg')}
                             />
                           </span>

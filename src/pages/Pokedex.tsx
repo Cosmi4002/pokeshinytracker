@@ -225,29 +225,29 @@ export default function Pokedex() {
                             </p>
                         </div>
 
-                        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-center">
+                        <div className="flex w-full flex-col items-center gap-3 rounded-xl border border-border/80 bg-gradient-to-b from-muted/95 to-card/95 p-3 shadow-md backdrop-blur sm:w-auto sm:flex-row dark:from-muted/70 dark:to-card/90">
                             <div className="relative w-full sm:w-72">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground/75" />
                                 <Input
                                     placeholder="Cerca Pokémon..."
                                     value={search}
                                     onChange={e => setSearch(e.target.value)}
-                                    className="pl-10 h-11 bg-white/5 border-primary/20 focus:border-primary transition-all text-foreground"
+                                    className="h-11 border-border/80 bg-gradient-to-b from-muted/90 to-background/95 pl-10 text-[0.95rem] font-bold text-foreground shadow-inner transition-all placeholder:font-semibold placeholder:text-foreground/70 hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 dark:from-muted/60 dark:to-background/95"
                                 />
                             </div>
                             <Select value={generationFilter} onValueChange={setGenerationFilter}>
-                                <SelectTrigger className="w-full sm:w-[160px] h-11 bg-white/5 border-primary/20">
+                                <SelectTrigger className="h-11 w-full border-border/80 bg-gradient-to-b from-muted/90 to-background/95 text-[0.95rem] font-bold text-foreground shadow-inner transition-all hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 sm:w-[160px] dark:from-muted/60 dark:to-background/95">
                                     <SelectValue placeholder="Generazione" />
                                 </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">Tutti</SelectItem>
+                                <SelectContent className="border-border bg-gradient-to-b from-muted to-popover text-popover-foreground shadow-lg dark:from-muted/80 dark:to-popover">
+                                    <SelectItem value="all" className="font-bold text-foreground">Tutti</SelectItem>
                                     {Object.keys(GENERATION_RANGES).map(g => (
-                                        <SelectItem key={g} value={g}>Gen {g}</SelectItem>
+                                        <SelectItem key={g} value={g} className="font-bold text-foreground">Gen {g}</SelectItem>
                                     ))}
-                                    <SelectItem value="Alola">Alola Forms</SelectItem>
-                                    <SelectItem value="Galar">Galar Forms</SelectItem>
-                                    <SelectItem value="Hisui">Hisui Forms</SelectItem>
-                                    <SelectItem value="Paldea">Paldea Forms</SelectItem>
+                                    <SelectItem value="Alola" className="font-bold text-foreground">Alola Forms</SelectItem>
+                                    <SelectItem value="Galar" className="font-bold text-foreground">Galar Forms</SelectItem>
+                                    <SelectItem value="Hisui" className="font-bold text-foreground">Hisui Forms</SelectItem>
+                                    <SelectItem value="Paldea" className="font-bold text-foreground">Paldea Forms</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
