@@ -52,6 +52,17 @@ export const findHuntingMethod = (value?: string | null): HuntingMethod | undefi
 };
 
 // Helper to calculate odds based on method mechanics
+const shinyRollProbability = (rolls: number, base = 4096) => 1 - Math.pow((base - 1) / base, rolls);
+const oddsFromProbability = (probability: number) => 1 / probability;
+
+export const formatOdds = (odds: number) => {
+  if (Number.isInteger(odds)) return odds.toLocaleString();
+  return odds.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+};
+
 export const getDynamicOdds = (methodId: string, encounters: number, hasShinyCharm: boolean): number => {
   const method = findHuntingMethod(methodId);
   if (!method) return 4096;
@@ -81,6 +92,10 @@ export const getDynamicOdds = (methodId: string, encounters: number, hasShinyCha
   // --- Gen 6 ---
   if (methodId === 'gen6-egg-hatching') return hasShinyCharm ? 512 : 683;
   if (methodId === 'gen6-masuda') return hasShinyCharm ? 512 : 683;
+  if (methodId === 'gen6-friend-safari') {
+    const totalRolls = hasShinyCharm ? 7 : 5;
+    return oddsFromProbability(shinyRollProbability(totalRolls));
+  }
   if (methodId === 'gen6-chain-fishing') {
     const chain = Math.min(encounters, 20);
     const bonusRolls = 2 * chain;
@@ -257,7 +272,7 @@ export const HUNTING_METHODS: HuntingMethod[] = [
   { id: 'gen6-dexnav', name: 'DexNav', baseOdds: 4096, generation: 6, supportsShinyCharm: true, description: 'Increases with Search Level' },
   { id: 'gen6-egg-hatching', name: 'Egg Hatching', baseOdds: 683, generation: 6, supportsShinyCharm: true },
   { id: 'gen6-fossil-restore', name: 'Fossil Restore', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
-  { id: 'gen6-friend-safari', name: 'Friend Safari', baseOdds: 512, generation: 6, supportsShinyCharm: true },
+  { id: 'gen6-friend-safari', name: 'Friend Safari', baseOdds: oddsFromProbability(shinyRollProbability(5)), generation: 6, supportsShinyCharm: true },
   { id: 'gen6-gift', name: 'Gift Pokémon', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
   { id: 'gen6-horde', name: 'Horde Encounter', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
   { id: 'gen6-masuda', name: 'Masuda Method', baseOdds: 683, generation: 6, supportsShinyCharm: true },
@@ -414,7 +429,7 @@ export function calculateShinyStats(encounters: number, methodId: string, hasShi
   const binomialProb = (1 - Math.pow(1 - (1 / currentOdds), encounters)) * 100;
 
   return {
-    currentOdds: Math.round(currentOdds),
+    currentOdds,
     percentage: (probability * 100).toFixed(4), // Single encounter chance
     binomialProbability: binomialProb.toFixed(2), // Cumulative chance
   };
@@ -422,6 +437,7 @@ export function calculateShinyStats(encounters: number, methodId: string, hasShi
 
 export const SHINY_CHARM_ICON = '/img/items/shiny-charm.png';
 export const GIGAMAX_ICON = '/img/items/dynamax-icon.png';
+export const POKEMON_EGG_ICON = '/img/items/pokemon-egg.png';
 export const supportsGigamaxMark = (game: string) => game === 'sword' || game === 'shield';
 
 

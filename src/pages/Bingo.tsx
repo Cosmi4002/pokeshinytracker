@@ -637,12 +637,34 @@ export default function Bingo() {
           </div>
 
           <aside className="order-1 space-y-4 lg:order-2">
-            <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
-              <div className="mb-3 flex items-center justify-between">
-                <div className="text-sm font-semibold">Generazioni</div>
-                <div className="text-xs text-muted-foreground">{pendingGenerations.size}/{availableGenerations.length}</div>
+            <div className="rounded-lg border border-border bg-card p-3 shadow-sm">
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <div>
+                  <div className="text-sm font-semibold">Generazioni</div>
+                  <div className="text-xs text-muted-foreground">
+                    {pendingGenerations.size} di {availableGenerations.length} attive
+                  </div>
+                </div>
+                <div className="flex overflow-hidden rounded-md border border-border">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={selectAllGenerations}
+                    className="h-8 rounded-none px-2.5 text-xs"
+                  >
+                    Tutte
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={clearGenerations}
+                    className="h-8 rounded-none border-l border-border px-2.5 text-xs"
+                  >
+                    Nessuna
+                  </Button>
+                </div>
               </div>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-2">
                 {availableGenerations.map((gen) => {
                   const isActive = pendingGenerations.has(gen);
                   return (
@@ -651,20 +673,21 @@ export default function Bingo() {
                       variant={isActive ? 'default' : 'outline'}
                       size="sm"
                       onClick={() => toggleGeneration(gen)}
-                      className="h-9 px-2"
+                      className={cn(
+                        'h-12 justify-start gap-2 rounded-md px-3 text-left transition-all',
+                        isActive ? 'shadow-sm' : 'bg-background/60'
+                      )}
                     >
-                      {gen}
+                      <span
+                        className={cn(
+                          'h-2.5 w-2.5 rounded-full border',
+                          isActive ? 'border-primary-foreground bg-primary-foreground' : 'border-muted-foreground/50'
+                        )}
+                      />
+                      <span className="font-semibold">Gen {gen}</span>
                     </Button>
                   );
                 })}
-              </div>
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                <Button variant="outline" size="sm" onClick={selectAllGenerations} className="h-9">
-                  Tutte
-                </Button>
-                <Button variant="outline" size="sm" onClick={clearGenerations} className="h-9">
-                  Nessuna
-                </Button>
               </div>
             </div>
 

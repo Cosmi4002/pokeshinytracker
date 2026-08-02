@@ -1,7 +1,7 @@
 import { Pencil, Trash2, Calendar, ArrowUpCircle, Crosshair, Sparkles, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getGameTheme, GAME_LOGOS, type GameTheme } from '@/lib/game-themes';
-import { GIGAMAX_ICON, POKEBALLS, findHuntingMethod, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, handlePokemonSpriteError, supportsGigamaxMark, toLocalPokemonSpriteUrl } from '@/lib/pokemon-data';
+import { GIGAMAX_ICON, POKEBALLS, POKEMON_EGG_ICON, findHuntingMethod, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, handlePokemonSpriteError, supportsGigamaxMark, toLocalPokemonSpriteUrl } from '@/lib/pokemon-data';
 import type { Tables } from '@/integrations/supabase/types';
 import { useMemo, useCallback } from 'react';
 import { cn } from '@/lib/utils';
@@ -462,7 +462,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                     <div className="relative flex min-h-[72px] min-w-0 items-center justify-center overflow-hidden rounded-xl bg-black/30 px-3.5 py-2.5">
                       {isMasuda && (
                         <img
-                          src="https://archives.bulbagarden.net/media/upload/2/26/Egg.png"
+                          src={POKEMON_EGG_ICON}
                           alt="Pokemon egg"
                           className="pointer-events-none absolute left-1.5 top-1/2 h-[4.25rem] w-[4.25rem] -translate-y-1/2 object-contain opacity-95 drop-shadow-[0_2px_6px_rgba(0,0,0,0.55)]"
                           onError={(e) => ((e.currentTarget as HTMLImageElement).src = '/placeholder.svg')}

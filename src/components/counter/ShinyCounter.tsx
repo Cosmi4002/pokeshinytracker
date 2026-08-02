@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { PokemonSelector } from './PokemonSelector';
 import { MethodSelector } from './MethodSelector';
-import { calculateShinyStats, findHuntingMethod, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, getGameSpecificSpriteUrl } from '@/lib/pokemon-data';
+import { calculateShinyStats, findHuntingMethod, HUNTING_METHODS, HuntingMethod, POKEMON_EGG_ICON, SHINY_CHARM_ICON, getGameSpecificSpriteUrl, formatOdds } from '@/lib/pokemon-data';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
 import { FinishHuntDialog } from './FinishHuntDialog';
@@ -591,6 +591,7 @@ export function ShinyCounter({
                         const slotFormOptions = getFormOptions(slot.details);
                         const currentVariant = slotFormOptions.find(f => f.name === slot.form);
                         const spriteId = currentVariant ? currentVariant.id : slot.id;
+                        const eggMethod = safeSelectedMethod.id.includes('egg') || safeSelectedMethod.id.includes('masuda');
                         const spriteUrl = getGameSpecificSpriteUrl(
                           spriteId || slot.id,
                           safeSelectedMethod.id,
@@ -598,6 +599,7 @@ export function ShinyCounter({
                           slot.form,
                           slot.gender
                         );
+                        const displaySpriteUrl = eggMethod ? POKEMON_EGG_ICON : spriteUrl;
                         const setSlotForm = slot.slot === 1
                           ? setSelectedForm
                           : slot.slot === 2
@@ -612,14 +614,17 @@ export function ShinyCounter({
                         return (
                           <div key={`${slot.slot}-${slot.id}-${slot.name}`} className="flex w-32 flex-col items-center gap-1.5 sm:w-40">
                             <img
-                              src={spriteUrl}
+                              src={displaySpriteUrl}
                               alt={slot.name}
                               className="h-32 w-32 sm:h-40 sm:w-40 object-contain pokemon-sprite animate-in fade-in zoom-in duration-500"
                               style={{ imageRendering: 'auto' }}
                               loading="eager"
                               decoding="async"
                               onError={(e) => {
-                                (e.target as HTMLImageElement).src = '/placeholder.svg';
+                                const image = e.target as HTMLImageElement;
+                                image.src = eggMethod && !image.src.endsWith(POKEMON_EGG_ICON)
+                                  ? POKEMON_EGG_ICON
+                                  : '/placeholder.svg';
                               }}
                             />
                             {slotFormOptions.length > 0 && (
@@ -644,13 +649,17 @@ export function ShinyCounter({
                               </Select>
                             )}
                             {slot.details?.hasGenderDifference && (
-                              <div className="grid w-full grid-cols-2 gap-1">
+                              <div className="flex w-full justify-center gap-2">
                                 <Button
                                   type="button"
-                                  variant={slot.gender === 'female' ? 'outline' : 'default'}
+                                  variant="ghost"
                                   size="icon"
-                                  className="h-8 w-full rounded-full"
-                                  style={slot.gender === 'female' ? { borderColor: accentColor, color: accentColor } : { backgroundColor: accentColor }}
+                                  className={[
+                                    "h-9 w-9 rounded-full border-2 bg-card text-lg font-bold shadow-sm transition-all duration-200 hover:bg-muted",
+                                    slot.gender === 'female'
+                                      ? "border-border text-blue-500 opacity-70 hover:opacity-100"
+                                      : "border-blue-500 text-blue-500 ring-2 ring-blue-500/30 scale-105",
+                                  ].join(' ')}
                                   onClick={() => setSlotGender('')}
                                   aria-pressed={slot.gender !== 'female'}
                                   title="Maschio"
@@ -659,10 +668,14 @@ export function ShinyCounter({
                                 </Button>
                                 <Button
                                   type="button"
-                                  variant={slot.gender === 'female' ? 'default' : 'outline'}
+                                  variant="ghost"
                                   size="icon"
-                                  className="h-8 w-full rounded-full"
-                                  style={slot.gender === 'female' ? { backgroundColor: accentColor } : { borderColor: accentColor, color: accentColor }}
+                                  className={[
+                                    "h-9 w-9 rounded-full border-2 bg-card text-lg font-bold shadow-sm transition-all duration-200 hover:bg-muted",
+                                    slot.gender === 'female'
+                                      ? "border-pink-500 text-pink-500 ring-2 ring-pink-500/30 scale-105"
+                                      : "border-border text-pink-500 opacity-70 hover:opacity-100",
+                                  ].join(' ')}
                                   onClick={() => setSlotGender('female')}
                                   aria-pressed={slot.gender === 'female'}
                                   title="Femmina"
@@ -807,7 +820,7 @@ export function ShinyCounter({
             <div>
               <div className="text-sm text-muted-foreground mb-1">Odds Correnti</div>
               <div className="font-mono font-bold text-base sm:text-lg text-primary break-all">
-                1 / {stats.currentOdds.toLocaleString()}
+                1 / {formatOdds(stats.currentOdds)}
               </div>
               <div className="text-xs text-muted-foreground">
                 {stats.percentage}%
