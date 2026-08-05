@@ -51,7 +51,8 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   const method = useMemo(() => findHuntingMethod(entry.method), [entry.method]);
   const hasBottomMeta = isGigamax || isLegendsArceus || entry.is_fail || entry.is_unobtainable;
   const isGameCorner = normalizedMethod.includes('game corner') || normalizedMethod.includes('game-corner') || method?.name.toLowerCase() === 'game corner';
-  const encountersLabel = isGameCorner ? 'Seen' : (isMasuda ? 'Hatched' : 'Encounters');
+  const isPokeRadar = normalizedMethod.includes('pokeradar') || normalizedMethod.includes('poke radar') || method?.name.toLowerCase().includes('poke radar');
+  const encountersLabel = isPokeRadar ? 'Chain' : (isGameCorner ? 'Seen' : (isMasuda ? 'Hatched' : 'Encounters'));
   const showEncounters = useMemo(() => {
     if (entry.attempts === null) return false;
     if (!showEncountersPreference) return false;
