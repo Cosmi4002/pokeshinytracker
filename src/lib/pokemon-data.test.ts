@@ -55,4 +55,52 @@ describe('shiny odds calculations', () => {
     expect(calculateShinyStats(0, 'gen6-pokeradar-bonus-music', false).currentOdds).toBe(100);
     expect(calculateShinyStats(20, 'gen6-pokeradar-bonus-music', false).currentOdds).toBe(100);
   });
+
+  it('keeps regular egg hatching separate from Masuda odds', () => {
+    expect(calculateShinyStats(1, 'gen3-egg-hatching', false).currentOdds).toBe(8192);
+    expect(calculateShinyStats(1, 'gen4-egg-hatching', false).currentOdds).toBe(8192);
+    expect(calculateShinyStats(1, 'gen6-egg-hatching', false).currentOdds).toBe(4096);
+    expect(calculateShinyStats(1, 'gen8-egg-hatching', true).currentOdds).toBeCloseTo(2048.25, 2);
+  });
+
+  it('uses generation-specific Masuda odds', () => {
+    expect(calculateShinyStats(1, 'gen4-masuda', false).currentOdds).toBeCloseTo(1638.8, 1);
+    expect(calculateShinyStats(1, 'gen5-masuda', false).currentOdds).toBeCloseTo(1365.75, 2);
+    expect(calculateShinyStats(1, 'gen5-masuda', true).currentOdds).toBeCloseTo(1024.4, 1);
+    expect(calculateShinyStats(1, 'gen6-masuda', false).currentOdds).toBeCloseTo(683.1, 1);
+    expect(calculateShinyStats(1, 'gen8-masuda', true).currentOdds).toBeCloseTo(512.4, 1);
+  });
+
+  it('uses documented Gen 2 Odd Egg odds', () => {
+    expect(calculateShinyStats(1, 'gen2-odd-egg', false).currentOdds).toBeCloseTo(7.1429, 4);
+    expect(calculateShinyStats(1, 'gen2-odd-egg-jp', false).currentOdds).toBe(2);
+  });
+
+  it("uses SOS and Let's Go combo chain tiers", () => {
+    expect(calculateShinyStats(31, 'gen7-sos', false).currentOdds).toBeCloseTo(315.54, 2);
+    expect(calculateShinyStats(31, 'gen7-sos', true).currentOdds).toBeCloseTo(273.53, 2);
+    expect(calculateShinyStats(31, 'gen7-lgpe-combo', false).currentOdds).toBeCloseTo(341.79, 2);
+    expect(calculateShinyStats(31, 'gen7-lgpe-combo', true).currentOdds).toBeCloseTo(293.04, 2);
+  });
+
+  it('uses the BDSP Poke Radar chain table and ignores Shiny Charm', () => {
+    expect(calculateShinyStats(0, 'gen8-bdsp-pokeradar', false).currentOdds).toBe(4096);
+    expect(calculateShinyStats(20, 'gen8-bdsp-pokeradar', false).currentOdds).toBe(1820);
+    expect(calculateShinyStats(39, 'gen8-bdsp-pokeradar', false).currentOdds).toBe(200);
+    expect(calculateShinyStats(40, 'gen8-bdsp-pokeradar', true).currentOdds).toBe(99);
+  });
+
+  it('uses corrected Legends Arceus and Sword Shield special-method odds', () => {
+    expect(calculateShinyStats(1, 'pla-massive', false).currentOdds).toBeCloseTo(315.54, 2);
+    expect(calculateShinyStats(1, 'pla-massive', true).currentOdds).toBeCloseTo(241.41, 2);
+    expect(calculateShinyStats(500, 'gen8-murder', false).currentOdds).toBeCloseTo(585.57, 2);
+    expect(calculateShinyStats(500, 'gen8-murder', true).currentOdds).toBeCloseTo(455.56, 2);
+  });
+
+  it('stacks Scarlet and Violet outbreak, sandwich, and charm rolls', () => {
+    expect(calculateShinyStats(60, 'gen9-outbreak', false).currentOdds).toBeCloseTo(1365.67, 2);
+    expect(calculateShinyStats(60, 'gen9-outbreak', true).currentOdds).toBeCloseTo(819.6, 1);
+    expect(calculateShinyStats(1, 'gen9-sandwich-lv3', false).currentOdds).toBeCloseTo(1024.38, 2);
+    expect(calculateShinyStats(60, 'gen9-outbreak-sandwich', true).currentOdds).toBeCloseTo(512.44, 2);
+  });
 });
