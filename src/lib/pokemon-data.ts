@@ -177,10 +177,15 @@ export const getDynamicOdds = (methodId: string, encounters: number, hasShinyCha
   if (methodId === 'gen8-egg-hatching') return oddsFromRolls(hasShinyCharm ? 2 : 1);
   if (methodId === 'gen8-masuda' || methodId === 'gen8-bdsp-masuda') return oddsFromRolls(hasShinyCharm ? 8 : 6);
   if (methodId === 'gen8-murder') return oddsFromRolls(hasShinyCharm ? 9 : 7);
+  if (methodId === 'gen8-max-raid') return 4096;
+  if (methodId === 'gen8-bdsp-underground-diglett') return 2048;
   if (methodId === 'gen8-dynamax') return hasShinyCharm ? 100 : 300;
   if (methodId === 'gen8-bdsp-pokeradar') {
     const chain = Math.min(Math.max(Math.floor(encounters), 0), 40);
     return BDSP_POKERADAR_ODDS[chain];
+  }
+  if (methodId === 'pla-mass-outbreak') {
+    return oddsFromRolls(hasShinyCharm ? 29 : 26);
   }
   if (methodId === 'pla-massive') {
     return oddsFromRolls(hasShinyCharm ? 17 : 13);
@@ -321,15 +326,18 @@ export const HUNTING_METHODS: HuntingMethod[] = [
   // --- Gen 8 ---
   { id: 'gen8-bdsp-masuda', name: 'BDSP Masuda Method', baseOdds: oddsFromRolls(6), generation: 8, supportsShinyCharm: true },
   { id: 'gen8-bdsp-pokeradar', name: 'BDSP Poke Radar', baseOdds: 4096, generation: 8, supportsShinyCharm: false, description: 'Increases with Chain; Shiny Charm does not affect Radar' },
+  { id: 'gen8-bdsp-underground-diglett', name: 'BDSP Grand Underground Diglett Bonus', baseOdds: 2048, generation: 8, supportsShinyCharm: false },
   { id: 'gen8-dynamax', name: 'Dynamax Adventure', baseOdds: 300, generation: 8, supportsShinyCharm: true },
   { id: 'gen8-fossil-restore', name: 'Fossil Restore', baseOdds: 4096, generation: 8, supportsShinyCharm: false },
   { id: 'gen8-gift', name: 'Gift Pokémon', baseOdds: 4096, generation: 8, supportsShinyCharm: true },
+  { id: 'gen8-max-raid', name: 'Max Raid Battle', baseOdds: 4096, generation: 8, supportsShinyCharm: false },
   { id: 'gen8-masuda', name: 'Masuda Method', baseOdds: oddsFromRolls(6), generation: 8, supportsShinyCharm: true },
   { id: 'gen8-murder', name: 'Brilliant Aura (500+ battled)', baseOdds: oddsFromRolls(7), generation: 8, supportsShinyCharm: true },
   { id: 'gen8-random', name: 'Random Encounter', baseOdds: 4096, generation: 8, supportsShinyCharm: true },
   { id: 'gen8-soft-reset', name: 'Soft Reset', baseOdds: 4096, generation: 8, supportsShinyCharm: true },
 
   // --- Legends Arceus ---
+  { id: 'pla-mass-outbreak', name: 'Mass Outbreak', baseOdds: oddsFromRolls(26), generation: 8, supportsShinyCharm: true },
   { id: 'pla-massive', name: 'Massive Mass Outbreak', baseOdds: 4096, generation: 8, supportsShinyCharm: true },
   { id: 'pla-random', name: 'Random Encounter', baseOdds: 4096, generation: 8, supportsShinyCharm: true },
 
