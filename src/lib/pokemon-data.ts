@@ -83,11 +83,7 @@ const getDexNavForceShinyProbability = (searchLevel: number, hasShinyCharm: bool
 };
 
 export const formatOdds = (odds: number) => {
-  if (Number.isInteger(odds)) return odds.toLocaleString();
-  return odds.toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
+  return Math.round(odds).toLocaleString();
 };
 
 export const isBreedingMethod = (methodId?: string | null) => {
@@ -273,7 +269,7 @@ export const HUNTING_METHODS: HuntingMethod[] = [
   { id: 'gen4-gift', name: 'Gift Pokémon', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
   { id: 'gen4-headbutt', name: 'Headbutt', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
   { id: 'gen4-honey-tree', name: 'Honey Tree', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
-  { id: 'gen4-masuda', name: 'Masuda Method (Different Languages)', baseOdds: oddsFromRolls(5, 8192), generation: 4, supportsShinyCharm: false },
+  { id: 'gen4-masuda', name: 'Masuda Method', baseOdds: oddsFromRolls(5, 8192), generation: 4, supportsShinyCharm: false },
   { id: 'gen4-pokeradar', name: 'Poke Radar', baseOdds: 8192, generation: 4, supportsShinyCharm: false, description: 'Increases with Chain' },
   { id: 'gen4-random', name: 'Random Encounter', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
   { id: 'gen4-roaming', name: 'Roaming', baseOdds: 8192, generation: 4, supportsShinyCharm: false },
@@ -289,7 +285,7 @@ export const HUNTING_METHODS: HuntingMethod[] = [
   { id: 'gen5-egg-hatching', name: 'Breeding', baseOdds: 8192, generation: 5, supportsShinyCharm: true },
   { id: 'gen5-fossil-restore', name: 'Fossil Restore', baseOdds: 8192, generation: 5, supportsShinyCharm: true },
   { id: 'gen5-gift', name: 'Gift Pokémon', baseOdds: 8192, generation: 5, supportsShinyCharm: true },
-  { id: 'gen5-masuda', name: 'Masuda Method (Different Languages)', baseOdds: oddsFromRolls(6, 8192), generation: 5, supportsShinyCharm: true },
+  { id: 'gen5-masuda', name: 'Masuda Method', baseOdds: oddsFromRolls(6, 8192), generation: 5, supportsShinyCharm: true },
   { id: 'gen5-random', name: 'Random Encounter', baseOdds: 8192, generation: 5, supportsShinyCharm: true },
   { id: 'gen5-rippling-waters', name: 'Rippling Waters', baseOdds: 8192, generation: 5, supportsShinyCharm: true },
   { id: 'gen5-rustling-grass', name: 'Rustling Grass', baseOdds: 8192, generation: 5, supportsShinyCharm: true },
@@ -303,7 +299,7 @@ export const HUNTING_METHODS: HuntingMethod[] = [
   { id: 'gen6-friend-safari', name: 'Friend Safari', baseOdds: oddsFromProbability(shinyRollProbability(5)), generation: 6, supportsShinyCharm: true },
   { id: 'gen6-gift', name: 'Gift Pokémon', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
   { id: 'gen6-horde', name: 'Horde Encounter', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
-  { id: 'gen6-masuda', name: 'Masuda Method (Different Languages)', baseOdds: oddsFromRolls(6), generation: 6, supportsShinyCharm: true },
+  { id: 'gen6-masuda', name: 'Masuda Method', baseOdds: oddsFromRolls(6), generation: 6, supportsShinyCharm: true },
   { id: 'gen6-pokeradar', name: 'Poke Radar', baseOdds: 8100, generation: 6, supportsShinyCharm: false, description: 'Sparkling patch odds improve by 200 per chain, capped at 40' },
   { id: 'gen6-pokeradar-bonus-music', name: 'Poke Radar (Bonus Music)', baseOdds: 100, generation: 6, supportsShinyCharm: false, description: 'Bonus music keeps sparkling patch odds at 1/100' },
   { id: 'gen6-random', name: 'Random Encounter', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
@@ -315,7 +311,7 @@ export const HUNTING_METHODS: HuntingMethod[] = [
   { id: 'gen7-gift', name: 'Gift Pokémon', baseOdds: 4096, generation: 7, supportsShinyCharm: true },
   { id: 'gen7-lgpe-combo', name: 'Let\'s Go Catch Combo', baseOdds: 4096, generation: 7, supportsShinyCharm: true, description: 'Boost applies to the next spawn after a catch' },
   { id: 'gen7-lgpe-random', name: 'Let\'s Go Random', baseOdds: 4096, generation: 7, supportsShinyCharm: true },
-  { id: 'gen7-masuda', name: 'Masuda Method (Different Languages)', baseOdds: oddsFromRolls(6), generation: 7, supportsShinyCharm: true },
+  { id: 'gen7-masuda', name: 'Masuda Method', baseOdds: oddsFromRolls(6), generation: 7, supportsShinyCharm: true },
   { id: 'gen7-random', name: 'Random Encounter', baseOdds: 4096, generation: 7, supportsShinyCharm: true },
   { id: 'gen7-runaway', name: 'Runaway', baseOdds: 4096, generation: 7, supportsShinyCharm: true },
   { id: 'gen7-soft-reset', name: 'Soft Reset', baseOdds: 4096, generation: 7, supportsShinyCharm: true },
@@ -323,12 +319,12 @@ export const HUNTING_METHODS: HuntingMethod[] = [
   { id: 'gen7-wormhole', name: 'Ultra Wormhole', baseOdds: 100, generation: 7, supportsShinyCharm: false, description: 'Default non-legendary wormhole minimum; exact odds depend on distance and wormhole type' },
 
   // --- Gen 8 ---
-  { id: 'gen8-bdsp-masuda', name: 'BDSP Masuda Method (Different Languages)', baseOdds: oddsFromRolls(6), generation: 8, supportsShinyCharm: true },
+  { id: 'gen8-bdsp-masuda', name: 'BDSP Masuda Method', baseOdds: oddsFromRolls(6), generation: 8, supportsShinyCharm: true },
   { id: 'gen8-bdsp-pokeradar', name: 'BDSP Poke Radar', baseOdds: 4096, generation: 8, supportsShinyCharm: false, description: 'Increases with Chain; Shiny Charm does not affect Radar' },
   { id: 'gen8-dynamax', name: 'Dynamax Adventure', baseOdds: 300, generation: 8, supportsShinyCharm: true },
   { id: 'gen8-fossil-restore', name: 'Fossil Restore', baseOdds: 4096, generation: 8, supportsShinyCharm: false },
   { id: 'gen8-gift', name: 'Gift Pokémon', baseOdds: 4096, generation: 8, supportsShinyCharm: true },
-  { id: 'gen8-masuda', name: 'Masuda Method (Different Languages)', baseOdds: oddsFromRolls(6), generation: 8, supportsShinyCharm: true },
+  { id: 'gen8-masuda', name: 'Masuda Method', baseOdds: oddsFromRolls(6), generation: 8, supportsShinyCharm: true },
   { id: 'gen8-murder', name: 'Brilliant Aura (500+ battled)', baseOdds: oddsFromRolls(7), generation: 8, supportsShinyCharm: true },
   { id: 'gen8-random', name: 'Random Encounter', baseOdds: 4096, generation: 8, supportsShinyCharm: true },
   { id: 'gen8-soft-reset', name: 'Soft Reset', baseOdds: 4096, generation: 8, supportsShinyCharm: true },
@@ -339,7 +335,7 @@ export const HUNTING_METHODS: HuntingMethod[] = [
 
   // --- Gen 9 ---
   { id: 'gen9-outbreak', name: 'Mass Outbreak', baseOdds: 4096, generation: 9, supportsShinyCharm: true, description: 'KO 60+' },
-  { id: 'gen9-masuda', name: 'Masuda Method (Different Languages)', baseOdds: oddsFromRolls(6), generation: 9, supportsShinyCharm: true },
+  { id: 'gen9-masuda', name: 'Masuda Method', baseOdds: oddsFromRolls(6), generation: 9, supportsShinyCharm: true },
   { id: 'gen9-random', name: 'Random Encounter', baseOdds: 4096, generation: 9, supportsShinyCharm: true },
   { id: 'gen9-sandwich-lv3', name: 'Sandwich (Sparkling Power)', baseOdds: 1024, generation: 9, supportsShinyCharm: true },
   { id: 'gen9-outbreak-sandwich', name: 'Outbreak + Sandwich Lv3', baseOdds: 1024, generation: 9, supportsShinyCharm: true },

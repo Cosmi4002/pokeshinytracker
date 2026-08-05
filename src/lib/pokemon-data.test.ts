@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { HUNTING_METHODS, calculateShinyStats, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, isBreedingMethod } from './pokemon-data';
+import { HUNTING_METHODS, calculateShinyStats, formatOdds, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, isBreedingMethod } from './pokemon-data';
 
 describe('pokemon sprite helpers', () => {
   it('returns a stable fallback asset for missing sprite images', () => {
@@ -65,10 +65,15 @@ describe('shiny odds calculations', () => {
 
   it('labels standard breeding, Masuda, and Gen 2 shiny Ditto breeding distinctly', () => {
     expect(HUNTING_METHODS.find((method) => method.id === 'gen6-egg-hatching')?.name).toBe('Breeding');
-    expect(HUNTING_METHODS.find((method) => method.id === 'gen6-masuda')?.name).toBe('Masuda Method (Different Languages)');
+    expect(HUNTING_METHODS.find((method) => method.id === 'gen6-masuda')?.name).toBe('Masuda Method');
     expect(HUNTING_METHODS.find((method) => method.id === 'gen2-breeding-shiny')?.name).toBe('Breeding (Shiny Ditto / Shiny Gene)');
     expect(isBreedingMethod('gen2-breeding-shiny')).toBe(true);
     expect(isBreedingMethod('gen6-masuda')).toBe(true);
+  });
+
+  it('formats displayed odds without decimals', () => {
+    expect(formatOdds(683.08)).toBe('683');
+    expect(formatOdds(1024.38)).toBe('1,024');
   });
 
   it('uses generation-specific Masuda odds', () => {
