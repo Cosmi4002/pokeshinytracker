@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { PokemonSelector } from './PokemonSelector';
 import { MethodSelector } from './MethodSelector';
-import { calculateShinyStats, findHuntingMethod, HUNTING_METHODS, HuntingMethod, POKEMON_EGG_ICON, SHINY_CHARM_ICON, getGameSpecificSpriteUrl, formatOdds } from '@/lib/pokemon-data';
+import { calculateShinyStats, findHuntingMethod, HUNTING_METHODS, HuntingMethod, POKEMON_EGG_ICON, SHINY_CHARM_ICON, getGameSpecificSpriteUrl, formatOdds, isBreedingMethod } from '@/lib/pokemon-data';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
 import { FinishHuntDialog } from './FinishHuntDialog';
@@ -591,7 +591,7 @@ export function ShinyCounter({
                         const slotFormOptions = getFormOptions(slot.details);
                         const currentVariant = slotFormOptions.find(f => f.name === slot.form);
                         const spriteId = currentVariant ? currentVariant.id : slot.id;
-                        const eggMethod = safeSelectedMethod.id.includes('egg') || safeSelectedMethod.id.includes('masuda');
+                        const eggMethod = isBreedingMethod(safeSelectedMethod.id);
                         const spriteUrl = getGameSpecificSpriteUrl(
                           spriteId || slot.id,
                           safeSelectedMethod.id,

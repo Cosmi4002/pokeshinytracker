@@ -1,7 +1,7 @@
 import { Pencil, Trash2, Calendar, ArrowUpCircle, Crosshair, Sparkles, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getGameTheme, GAME_LOGOS, type GameTheme } from '@/lib/game-themes';
-import { GIGAMAX_ICON, POKEBALLS, POKEMON_EGG_ICON, findHuntingMethod, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, handlePokemonSpriteError, supportsGigamaxMark, toLocalPokemonSpriteUrl } from '@/lib/pokemon-data';
+import { GIGAMAX_ICON, POKEBALLS, POKEMON_EGG_ICON, findHuntingMethod, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, handlePokemonSpriteError, isBreedingMethod, supportsGigamaxMark, toLocalPokemonSpriteUrl } from '@/lib/pokemon-data';
 import type { Tables } from '@/integrations/supabase/types';
 import { useMemo, useCallback } from 'react';
 import { cn } from '@/lib/utils';
@@ -37,7 +37,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   const isLegendsArceus = entry.is_legends_arceus === true;
   const isEvent = (entry.method || '').toString().trim().toLowerCase() === 'distribution/event';
   const normalizedMethod = (entry.method || '').toString().trim().toLowerCase();
-  const isMasuda = normalizedMethod.includes('masuda');
+  const isBreeding = isBreedingMethod(normalizedMethod);
   const showEncountersPreference = (entry as any).show_encounters !== false;
   const evolvedFromId = (entry as any).evolved_from_id as number | null | undefined;
   const evolvedFromName = (entry as any).evolved_from_name as string | null | undefined;
@@ -52,7 +52,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   const hasBottomMeta = isGigamax || isLegendsArceus || entry.is_fail || entry.is_unobtainable;
   const isGameCorner = normalizedMethod.includes('game corner') || normalizedMethod.includes('game-corner') || method?.name.toLowerCase() === 'game corner';
   const isPokeRadar = normalizedMethod.includes('pokeradar') || normalizedMethod.includes('poke radar') || method?.name.toLowerCase().includes('poke radar');
-  const encountersLabel = isPokeRadar ? 'Chain' : (isGameCorner ? 'Seen' : (isMasuda ? 'Hatched' : 'Encounters'));
+  const encountersLabel = isPokeRadar ? 'Chain' : (isGameCorner ? 'Seen' : (isBreeding ? 'Hatched' : 'Encounters'));
   const showEncounters = useMemo(() => {
     if (entry.attempts === null) return false;
     if (!showEncountersPreference) return false;
@@ -461,7 +461,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                     (entry as any).show_seen ? "grid-cols-[minmax(0,1fr)_72px]" : "grid-cols-1"
                   )}>
                     <div className="relative flex min-h-[72px] min-w-0 items-center justify-center overflow-hidden rounded-xl bg-black/30 px-3.5 py-2.5">
-                      {isMasuda && (
+                      {isBreeding && (
                         <img
                           src={POKEMON_EGG_ICON}
                           alt="Pokemon egg"
