@@ -178,6 +178,7 @@ export const getDynamicOdds = (methodId: string, encounters: number, hasShinyCha
   if (methodId === 'gen8-masuda' || methodId === 'gen8-bdsp-masuda') return oddsFromRolls(hasShinyCharm ? 8 : 6);
   if (methodId === 'gen8-murder') return oddsFromRolls(hasShinyCharm ? 9 : 7);
   if (methodId === 'gen8-max-raid') return 4096;
+  if (methodId === 'gen8-bdsp-underground') return 4096;
   if (methodId === 'gen8-bdsp-underground-diglett') return 2048;
   if (methodId === 'gen8-dynamax') return hasShinyCharm ? 100 : 300;
   if (methodId === 'gen8-bdsp-pokeradar') {
@@ -326,6 +327,7 @@ export const HUNTING_METHODS: HuntingMethod[] = [
   // --- Gen 8 ---
   { id: 'gen8-bdsp-masuda', name: 'BDSP Masuda Method', baseOdds: oddsFromRolls(6), generation: 8, supportsShinyCharm: true },
   { id: 'gen8-bdsp-pokeradar', name: 'BDSP Poke Radar', baseOdds: 4096, generation: 8, supportsShinyCharm: false, description: 'Increases with Chain; Shiny Charm does not affect Radar' },
+  { id: 'gen8-bdsp-underground', name: 'BDSP Grand Underground', baseOdds: 4096, generation: 8, supportsShinyCharm: false },
   { id: 'gen8-bdsp-underground-diglett', name: 'BDSP Grand Underground Diglett Bonus', baseOdds: 2048, generation: 8, supportsShinyCharm: false },
   { id: 'gen8-dynamax', name: 'Dynamax Adventure', baseOdds: 300, generation: 8, supportsShinyCharm: true },
   { id: 'gen8-fossil-restore', name: 'Fossil Restore', baseOdds: 4096, generation: 8, supportsShinyCharm: false },

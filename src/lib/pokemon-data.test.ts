@@ -105,6 +105,7 @@ describe('shiny odds calculations', () => {
 
   it('uses corrected Legends Arceus and Sword Shield special-method odds', () => {
     expect(calculateShinyStats(1, 'gen8-max-raid', true).currentOdds).toBe(4096);
+    expect(calculateShinyStats(1, 'gen8-bdsp-underground', true).currentOdds).toBe(4096);
     expect(calculateShinyStats(1, 'gen8-bdsp-underground-diglett', true).currentOdds).toBe(2048);
     expect(calculateShinyStats(1, 'pla-mass-outbreak', false).currentOdds).toBeCloseTo(158.02, 2);
     expect(calculateShinyStats(1, 'pla-mass-outbreak', true).currentOdds).toBeCloseTo(141.72, 2);

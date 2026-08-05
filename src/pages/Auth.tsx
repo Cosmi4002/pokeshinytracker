@@ -47,7 +47,7 @@ const FloatingInput = ({ label, icon: Icon, error, accentColor, className, value
           <Input
             {...props}
             value={value}
-            className="border-0 shadow-none focus-visible:ring-0 bg-transparent h-full pb-2 px-3 text-base placeholder:opacity-0"
+            className="border-0 shadow-none focus-visible:ring-0 bg-transparent h-full pb-2 px-3 text-base text-white caret-white placeholder:opacity-0"
             onFocus={(e) => {
               setIsFocused(true);
               props.onFocus?.(e);
