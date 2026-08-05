@@ -110,28 +110,14 @@ export const getDynamicOdds = (methodId: string, encounters: number, hasShinyCha
     const totalRolls = 5 + (hasShinyCharm ? 2 : 0);
     return Math.round(4096 / totalRolls);
   }
+  if (methodId === 'gen6-pokeradar-bonus-music') return 100;
   if (methodId === 'gen6-pokeradar') {
-    // App-facing Gen 6 Radar odds: standard Gen 6 base rate, then chain boosts up to 40.
-    const chain = Math.min(Math.max(encounters, 0), 40);
-    const totalRolls = 1 + chain + charmRolls;
-    return Math.max(100, Math.round(4096 / totalRolls));
-  }
-  if (methodId === 'gen6-pokeradar') {
-    // Gen 6 Poke Radar (XY): rapidly-shaking shiny patches use
+    // Gen 6 Poke Radar (XY): sparkling rapidly-shaking patches use
     // 1 / (8100 - chain * 200), capped at 1/100 from chain 40.
+    // The first Radar use at chain 0 cannot create a sparkling patch, but
+    // 1/8100 is still the reset rate after catching a Radar shiny.
     const chain = Math.min(Math.max(encounters, 0), 40);
     return Math.max(100, 8100 - chain * 200);
-
-    // Gen 6 Poke Radar (XY/ORAS): odds increase with chain length, caps at chain 40.
-    // Shiny Charm is supported in Gen 6 and roughly doubles the shiny chance.
-    const oldChain = Math.min(encounters, 40);
-    if (oldChain >= 40) return hasShinyCharm ? 100 : 200;
-    if (chain >= 30) {
-      // Linear interpolation: chain 30 → ~1/1300, chain 40 → 1/200
-      const baseOdds = 200 + (40 - oldChain) * 110;
-      return hasShinyCharm ? Math.round(baseOdds / 2) : baseOdds;
-    }
-    return hasShinyCharm ? 1365 : 4096;
   }
 
   // --- Gen 7 ---
@@ -276,7 +262,8 @@ export const HUNTING_METHODS: HuntingMethod[] = [
   { id: 'gen6-gift', name: 'Gift Pokémon', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
   { id: 'gen6-horde', name: 'Horde Encounter', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
   { id: 'gen6-masuda', name: 'Masuda Method', baseOdds: 683, generation: 6, supportsShinyCharm: true },
-  { id: 'gen6-pokeradar', name: 'Poke Radar', baseOdds: 4096, generation: 6, supportsShinyCharm: true, description: 'Base 1/4096, chain boosts up to 40' },
+  { id: 'gen6-pokeradar', name: 'Poke Radar', baseOdds: 8100, generation: 6, supportsShinyCharm: false, description: 'Sparkling patch odds improve by 200 per chain, capped at 40' },
+  { id: 'gen6-pokeradar-bonus-music', name: 'Poke Radar (Bonus Music)', baseOdds: 100, generation: 6, supportsShinyCharm: false, description: 'Bonus music keeps sparkling patch odds at 1/100' },
   { id: 'gen6-random', name: 'Random Encounter', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
   { id: 'gen6-rock-smash', name: 'Rock Smash', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
   { id: 'gen6-runaway', name: 'Runaway', baseOdds: 4096, generation: 6, supportsShinyCharm: true },
