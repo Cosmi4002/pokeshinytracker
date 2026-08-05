@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import type { Tables } from '@/integrations/supabase/types';
 import { getPokemonSpriteUrl } from '@/hooks/use-pokemon';
-import { SHINY_CHARM_ICON, isBreedingMethod } from '@/lib/pokemon-data';
+import { SHINY_CHARM_ICON, findHuntingMethod, isBreedingMethod } from '@/lib/pokemon-data';
 import { GAME_LOGOS } from '@/lib/game-themes';
 import { toLocalISODate } from '@/lib/date';
 import { cn } from '@/lib/utils';
@@ -56,7 +56,10 @@ export default function UserCollectionsSearch() {
 
   const getEncounterLabel = (method?: string | null) => {
     const raw = normalizeMethod(method);
-    if (raw.includes('game corner') || raw.includes('game-corner')) return 'Seen';
+    const huntingMethod = findHuntingMethod(method);
+    const methodName = huntingMethod?.name.toLowerCase() || '';
+    if (raw.includes('pokeradar') || raw.includes('poke radar') || methodName.includes('poke radar')) return 'Chain';
+    if (raw.includes('game corner') || raw.includes('game-corner') || methodName === 'game corner') return 'Seen';
     if (isBreedingMethod(raw)) return 'Hatched';
     return 'Encounters';
   };
