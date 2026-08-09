@@ -673,13 +673,10 @@ export function _getPokemonSpriteUrlRaw(pokemonId: number, options: { shiny?: bo
     }
   }
 
-  // Castform (and its weather forms) overrides
+  // Castform override
   if (name && name.toLowerCase().includes('castform')) {
     const sName = name.toLowerCase();
     if (sName === 'castform') return 'https://img.pokemondb.net/sprites/home/shiny/castform.png';
-    if (sName === 'castform-sunny' || sName.includes('sunny')) return 'https://www.pokepedia.fr/images/8/88/Sprite_0351_Solaire_chromatique_HOME-v1.png';
-    if (sName === 'castform-rainy' || sName.includes('rainy')) return 'https://www.pokepedia.fr/images/1/1a/Sprite_0351_Eau_de_Pluie_chromatique_HOME-v1.png';
-    if (sName === 'castform-snowy' || sName.includes('snowy')) return 'https://www.pokepedia.fr/images/d/d7/Sprite_0351_Blizzard_chromatique_HOME-v1.png';
   }
 
   // Furfrou overrides
@@ -936,7 +933,6 @@ export const POKEMON_FORM_COUNTS: Record<number, number> = {
   // Gen 2
   201: 28, // Unown
   // Gen 3
-  351: 4, // Castform
   386: 4, // Deoxys
   // Gen 4
   413: 3, // Burmy

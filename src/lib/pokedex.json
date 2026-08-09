@@ -2376,24 +2376,6 @@
     "generation": 3
   },
   {
-    "id": 10245,
-    "baseId": 351,
-    "name": "castform-sunny",
-    "generation": 3
-  },
-  {
-    "id": 10246,
-    "baseId": 351,
-    "name": "castform-rainy",
-    "generation": 3
-  },
-  {
-    "id": 10247,
-    "baseId": 351,
-    "name": "castform-snowy",
-    "generation": 3
-  },
-  {
     "id": 352,
     "baseId": 352,
     "name": "kecleon",
