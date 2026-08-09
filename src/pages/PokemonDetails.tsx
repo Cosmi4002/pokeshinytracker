@@ -29,7 +29,6 @@ import { todayLocalISODate } from "@/lib/date";
 import { getGameTheme, GAME_LOGOS } from "@/lib/game-themes";
 import { GAMES } from "@/lib/pokemon-data";
 import {
-    AVAILABILITY_RULE_LABEL,
     getAvailabilitySourceLinks,
     getCuratedShinyOriginGameIds
 } from "@/lib/pokemon-game-availability";
@@ -248,9 +247,10 @@ export default function PokemonDetails() {
     }, [details]);
 
     const availabilitySourceLinks = useMemo(() => {
-        if (!details || !curatedGameIds) return [];
-        return getAvailabilitySourceLinks(details.displayName, details.name);
-    }, [curatedGameIds, details]);
+        if (!details) return [];
+        const defaultSpeciesName = details.varieties.find(variant => variant.isDefault)?.pokemon.name || details.name;
+        return getAvailabilitySourceLinks(details.displayName, defaultSpeciesName);
+    }, [details]);
 
     const availableGames = useMemo(() => {
         if (!details) return [];
@@ -502,12 +502,9 @@ export default function PokemonDetails() {
                                         <span className="h-7 w-2 rounded-full bg-primary shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
                                         Giochi salvati
                                     </h2>
-                                    <p className="mt-1 text-sm font-medium text-muted-foreground">
-                                        {curatedGameIds ? AVAILABILITY_RULE_LABEL : `Da Gen ${Math.max(details.generation || 1, 2)} in poi`}
-                                    </p>
                                     {availabilitySourceLinks.length > 0 && (
                                         <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                                            <span>Fonti</span>
+                                            <span>Info: varie fonti</span>
                                             {availabilitySourceLinks.map(source => (
                                                 <a
                                                     key={source.url}

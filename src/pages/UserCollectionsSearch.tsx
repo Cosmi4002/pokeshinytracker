@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Calendar, Radio, Search, Sparkles, UserRound, Users, ArrowUpCircle } from 'lucide-react';
+import { useEffect, useMemo, useState, type ComponentType } from 'react';
+import { BarChart3, Calendar, Crown, Gamepad2, Grid3X3, Radio, Search, Sparkles, Target, TrendingUp, UserRound, Users, ArrowUpCircle } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import type { Tables } from '@/integrations/supabase/types';
 import { getPokemonSpriteUrl } from '@/hooks/use-pokemon';
-import { SHINY_CHARM_ICON, findHuntingMethod, isBreedingMethod } from '@/lib/pokemon-data';
+import { SHINY_CHARM_ICON, findHuntingMethod, isBreedingMethod, GAMES } from '@/lib/pokemon-data';
 import { GAME_LOGOS } from '@/lib/game-themes';
 import { toLocalISODate } from '@/lib/date';
 import { cn } from '@/lib/utils';
@@ -18,6 +18,32 @@ type PublicCaughtRow = Pick<
   'id' | 'pokemon_id' | 'pokemon_name' | 'form' | 'gender' | 'caught_date' | 'created_at' | 'sprite_url' | 'game' | 'is_fail' | 'is_unobtainable' | 'hunt_start_date' | 'method' | 'attempts' | 'has_shiny_charm' | 'is_evolved' | 'show_encounters'
 >;
 type PublicRecentRow = PublicCaughtRow & { user_id: string; username: string | null };
+
+const numberFormatter = new Intl.NumberFormat('it-IT');
+
+type StatTileProps = {
+  label: string;
+  value: string;
+  note: string;
+  icon: ComponentType<{ className?: string }>;
+};
+
+function StatTile({ label, value, note, icon: Icon }: StatTileProps) {
+  return (
+    <div className="relative overflow-hidden rounded-lg border border-border bg-card p-3 shadow-sm">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="text-[11px] font-black uppercase tracking-[0.12em] text-muted-foreground">{label}</div>
+          <div className="mt-1 truncate text-2xl font-black tabular-nums">{value}</div>
+          <div className="mt-1 truncate text-xs text-muted-foreground">{note}</div>
+        </div>
+        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md bg-muted">
+          <Icon className="h-4 w-4 text-muted-foreground" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function UserCollectionsSearch() {
   const [query, setQuery] = useState('');
@@ -94,6 +120,9 @@ export default function UserCollectionsSearch() {
     ) return 'Random Encounter (Safari Zone)';
     return method || '-';
   };
+
+  const getGameLabel = (game?: string | null) =>
+    GAMES.find((g) => g.id === game)?.name || game || 'Sconosciuto';
 
   useEffect(() => {
     const term = query.trim();
@@ -263,23 +292,46 @@ export default function UserCollectionsSearch() {
     };
   }, [selectedProfile?.user_id]);
 
-  const groupedByPokemon = useMemo(() => {
-    const map = new Map<string, { name: string; count: number; pokemonId: number; form: string | null }>();
-    entries.forEach((entry) => {
-      const key = `${entry.pokemon_id}-${entry.form || ''}`;
-      const current = map.get(key);
-      if (current) {
-        current.count += 1;
-      } else {
-        map.set(key, {
-          name: entry.pokemon_name,
-          count: 1,
-          pokemonId: entry.pokemon_id,
-          form: entry.form,
-        });
+  const userStats = useMemo(() => {
+    const obtained = entries.filter((entry) => !entry.is_fail && !entry.is_unobtainable);
+    const species = new Set<number>();
+    const forms = new Set<string>();
+    const gameCounts = new Map<string, number>();
+    const methodCounts = new Map<string, number>();
+    let trackedAttempts = 0;
+    let trackedRows = 0;
+    let charmCount = 0;
+
+    obtained.forEach((entry) => {
+      species.add(entry.pokemon_id);
+      forms.add(`${entry.pokemon_id}:${entry.form || 'base'}:${entry.gender || ''}`);
+      gameCounts.set(entry.game || 'unknown', (gameCounts.get(entry.game || 'unknown') || 0) + 1);
+      methodCounts.set(entry.method || 'unknown', (methodCounts.get(entry.method || 'unknown') || 0) + 1);
+      if (entry.has_shiny_charm) charmCount += 1;
+
+      if (
+        Number(entry.attempts || 0) > 0 &&
+        shouldShowEncounters(entry.method, entry.game, entry.attempts, entry.show_encounters ?? true)
+      ) {
+        trackedAttempts += Number(entry.attempts || 0);
+        trackedRows += 1;
       }
     });
-    return Array.from(map.values()).sort((a, b) => b.count - a.count);
+
+    const topGame = Array.from(gameCounts.entries()).sort((a, b) => b[1] - a[1])[0];
+    const topMethod = Array.from(methodCounts.entries()).sort((a, b) => b[1] - a[1])[0];
+
+    return {
+      obtainedCount: obtained.length,
+      speciesCount: species.size,
+      formsCount: forms.size,
+      averageAttempts: trackedRows > 0 ? Math.round(trackedAttempts / trackedRows) : 0,
+      trackedRows,
+      charmPercent: obtained.length > 0 ? Math.round((charmCount / obtained.length) * 100) : 0,
+      failCount: entries.filter((entry) => entry.is_fail).length,
+      topGame: topGame ? { label: getGameLabel(topGame[0]), count: topGame[1] } : null,
+      topMethod: topMethod ? { label: formatMethodLabel(topMethod[0]), count: topMethod[1] } : null,
+    };
   }, [entries]);
 
   const renderGenderIcon = (gender: string | null) => {
@@ -533,28 +585,20 @@ export default function UserCollectionsSearch() {
                 <p className="text-sm text-muted-foreground">Nessuna cattura trovata per questo username.</p>
               )}
 
-              {!entriesLoading && groupedByPokemon.length > 0 && (
+              {!entriesLoading && entries.length > 0 && (
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between gap-3">
-                    <h3 className="font-semibold">Riepilogo collezione</h3>
-                    <span className="rounded-full border border-border bg-muted px-3 py-1 text-xs font-black text-muted-foreground">
-                      Top {Math.min(groupedByPokemon.length, 24)}
-                    </span>
+                  <div className="flex items-center gap-2">
+                    <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                    <h3 className="font-semibold">Statistiche utente</h3>
                   </div>
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-                    {groupedByPokemon.slice(0, 24).map((item, index) => (
-                      <div
-                        key={`${item.pokemonId}-${item.form}-${index}`}
-                        className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card px-3 py-2 text-sm shadow-sm"
-                      >
-                        <span className="min-w-0 truncate font-bold">
-                          {item.name} {item.form ? `(${item.form})` : ''}
-                        </span>
-                        <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-black tabular-nums text-muted-foreground">
-                          x{item.count}
-                        </span>
-                      </div>
-                    ))}
+                  <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                    <StatTile label="Shiny" value={numberFormatter.format(userStats.obtainedCount)} note="Collezione principale" icon={Sparkles} />
+                    <StatTile label="Specie" value={numberFormatter.format(userStats.speciesCount)} note={`${numberFormatter.format(userStats.formsCount)} forme`} icon={Grid3X3} />
+                    <StatTile label="Media" value={userStats.averageAttempts ? numberFormatter.format(userStats.averageAttempts) : '-'} note={`${numberFormatter.format(userStats.trackedRows)} con encounters`} icon={TrendingUp} />
+                    <StatTile label="Charm" value={`${userStats.charmPercent}%`} note="Catture con cromamuleto" icon={Crown} />
+                    <StatTile label="Gioco top" value={userStats.topGame?.label || '-'} note={userStats.topGame ? `${userStats.topGame.count} catture` : 'Nessun dato'} icon={Gamepad2} />
+                    <StatTile label="Metodo top" value={userStats.topMethod?.label || '-'} note={userStats.topMethod ? `${userStats.topMethod.count} catture` : 'Nessun dato'} icon={Target} />
+                    <StatTile label="Fail" value={numberFormatter.format(userStats.failCount)} note="Separati dai shiny principali" icon={Radio} />
                   </div>
                 </div>
               )}

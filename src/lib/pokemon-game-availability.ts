@@ -2131,9 +2131,6 @@ const CURATED_SHINY_ORIGIN_BY_NAME: AvailabilityByName = {
   'zygarde-10': ["sword","shield"],
 };
 
-export const AVAILABILITY_RULE_LABEL =
-  'Shiny origin: cattura/regalo/evoluzione/uovo nel gioco; lo scambio conta solo come genitore per uova nei giochi con breeding.';
-
 export function getCuratedShinyOriginGameIds(pokemonId: number, pokemonName?: string): readonly TrackedGameId[] | null {
   if (pokemonName && pokemonName in CURATED_SHINY_ORIGIN_BY_NAME) {
     return CURATED_SHINY_ORIGIN_BY_NAME[pokemonName] || [];
@@ -2146,43 +2143,80 @@ export function getCuratedShinyOriginGameIds(pokemonId: number, pokemonName?: st
   return null;
 }
 
-function getBulbapediaPageName(displayName: string, pokemonName?: string) {
-  const baseName = pokemonName
-    ?.replace(/-(alola|galar|hisui|paldea)$/i, '')
-    .replace(/-partner-cap$/i, '')
-    .replace(/^farfetchd$/i, "farfetch'd");
+function getSerebiiPokemonPageSlug(pokemonName?: string) {
+  const normalized = (pokemonName || '').toLowerCase().trim();
+  const explicitBaseSlugs: Record<string, string> = {
+    'pikachu-partner-cap': 'pikachu',
+    'zygarde-10': 'zygarde',
+    'zygarde-50': 'zygarde',
+    'urshifu-single-strike': 'urshifu',
+    'urshifu-rapid-strike': 'urshifu',
+    'maushold-family-of-three': 'maushold',
+    'maushold-family-of-four': 'maushold',
+    'dudunsparce-two-segment': 'dudunsparce',
+    'dudunsparce-three-segment': 'dudunsparce',
+    'pumpkaboo-average': 'pumpkaboo',
+    'pumpkaboo-small': 'pumpkaboo',
+    'pumpkaboo-large': 'pumpkaboo',
+    'pumpkaboo-super': 'pumpkaboo',
+    'gourgeist-average': 'gourgeist',
+    'gourgeist-small': 'gourgeist',
+    'gourgeist-large': 'gourgeist',
+    'gourgeist-super': 'gourgeist',
+    'sinistea-antique': 'sinistea',
+    'polteageist-antique': 'polteageist',
+    'poltchageist-artisan': 'poltchageist',
+    'sinistcha-masterpiece': 'sinistcha',
+  };
 
-  const source = baseName || displayName;
-  return encodeURIComponent(source
-    .split(/[\s-]+/)
+  if (explicitBaseSlugs[normalized]) return explicitBaseSlugs[normalized];
+
+  return normalized
+    .replace(/-(alola|galar|hisui|paldea)$/i, '')
+    .replace(/-(male|female)$/i, '')
+    .replace(/^farfetchd$/i, 'farfetchd')
+    .replace(/^sirfetchd$/i, 'sirfetchd');
+}
+
+function getBulbapediaPokemonPageName(pokemonName?: string) {
+  const serebiiSlug = getSerebiiPokemonPageSlug(pokemonName);
+  const specialNames: Record<string, string> = {
+    farfetchd: "Farfetch'd",
+    sirfetchd: "Sirfetch'd",
+    mrmime: 'Mr._Mime',
+    mrrime: 'Mr._Rime',
+    mimejr: 'Mime_Jr.',
+    'type-null': 'Type:_Null',
+    'ho-oh': 'Ho-Oh',
+    'jangmo-o': 'Jangmo-o',
+    'hakamo-o': 'Hakamo-o',
+    'kommo-o': 'Kommo-o',
+    'porygon-z': 'Porygon-Z',
+    'nidoran-f': 'Nidoran♀',
+    'nidoran-m': 'Nidoran♂',
+  };
+
+  if (specialNames[serebiiSlug]) return encodeURIComponent(specialNames[serebiiSlug]);
+
+  return encodeURIComponent(serebiiSlug
+    .split('-')
     .filter(Boolean)
     .map(part => part.charAt(0).toUpperCase() + part.slice(1))
     .join('_'));
 }
 
-export function getAvailabilitySourceLinks(displayName: string, pokemonName?: string) {
-  const pokemonPageName = getBulbapediaPageName(displayName, pokemonName);
+export function getAvailabilitySourceLinks(_displayName: string, pokemonName?: string) {
+  const pokemonPageSlug = getSerebiiPokemonPageSlug(pokemonName);
+  const bulbapediaPageName = getBulbapediaPokemonPageName(pokemonName);
 
   return [
     {
+      label: 'Serebii',
+      url: `https://www.serebii.net/pokemon/${pokemonPageSlug}/?utm_source=pokepcnet&utm_medium=referral`,
+    },
+    {
       label: 'Bulbapedia',
-      url: `https://bulbapedia.bulbagarden.net/wiki/${pokemonPageName}_(Pok%C3%A9mon)`,
-    },
-    {
-      label: 'Availability',
-      url: 'https://bulbapedia.bulbagarden.net/wiki/List_of_Pok%C3%A9mon_by_availability',
-    },
-    {
-      label: 'Shiny locks',
-      url: 'https://bulbapedia.bulbagarden.net/wiki/List_of_unobtainable_Shiny_Pok%C3%A9mon',
-    },
-    {
-      label: 'Egg Groups',
-      url: 'https://bulbapedia.bulbagarden.net/wiki/List_of_Pok%C3%A9mon_by_Egg_Group',
-    },
-    {
-      label: 'Serebii Z-A',
-      url: 'https://www.serebii.net/legendsz-a/availablepokemon.shtml',
+      url: `https://bulbapedia.bulbagarden.net/wiki/${bulbapediaPageName}_(Pok%C3%A9mon)`,
     },
   ];
 }

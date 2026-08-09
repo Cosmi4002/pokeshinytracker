@@ -17,6 +17,7 @@ import CollectionSpecial from "./pages/CollectionSpecial";
 import CollectionFailUncatchable from "./pages/CollectionFailUncatchable";
 import UserCollectionsSearch from "./pages/UserCollectionsSearch";
 import Bingo from "./pages/Bingo";
+import Stats from "./pages/Stats";
 import { ScrollRestoration } from "@/components/layout/ScrollRestoration";
 import { ApplyAppearance } from "@/components/layout/ApplyAppearance";
 
@@ -51,6 +52,7 @@ function AppContent() {
           <Route path="/collection/fail-uncatchable" element={<CollectionFailUncatchable />} />
           <Route path="/users" element={<UserCollectionsSearch />} />
           <Route path="/bingo" element={<Bingo />} />
+          <Route path="/stats" element={<Stats />} />
           <Route path="/debug" element={<Debug />} />
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

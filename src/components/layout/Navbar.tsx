@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Check, Calculator, Search, Grid3X3, LogOut, Move, Sparkles, Settings2, Pencil, Users } from 'lucide-react';
+import { Check, Calculator, Search, Grid3X3, LogOut, Move, Sparkles, Settings2, Pencil, Users, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { supabaseProjectRef } from '@/integrations/supabase/client';
@@ -80,6 +80,7 @@ export function Navbar() {
     { to: '/counter', label: 'Counter', icon: Calculator },
     { to: '/pokedex', label: 'Pokedex', icon: Search },
     { to: '/collection', label: 'Collection', icon: Grid3X3 },
+    { to: '/stats', label: 'Stats', icon: BarChart3 },
     { to: '/bingo', label: 'Bingo', icon: Sparkles },
     { to: '/users', label: 'Users', icon: Users },
   ];
