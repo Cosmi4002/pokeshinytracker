@@ -51,6 +51,23 @@ interface CaughtGameRow {
     secondary_game: string | null;
 }
 
+type CaughtGender = 'male' | 'female';
+type CaughtGameGenderMap = Record<string, CaughtGender[]>;
+
+const isCaughtGender = (gender?: string | null): gender is CaughtGender => gender === 'male' || gender === 'female';
+
+const addCaughtGameGender = (
+    map: CaughtGameGenderMap,
+    gameId: string | null,
+    gender: CaughtGender | null
+) => {
+    if (!gameId || gameId === 'unknown' || !GAME_LOGOS[gameId] || !gender) return;
+    const existing = map[gameId] || [];
+    if (!existing.includes(gender)) {
+        map[gameId] = [...existing, gender];
+    }
+};
+
 export default function PokemonDetails() {
     const { pokemonId } = useParams();
     const navigate = useNavigate();
@@ -76,6 +93,7 @@ export default function PokemonDetails() {
 
     const [caughtForms, setCaughtForms] = useState<Set<string>>(new Set());
     const [caughtGames, setCaughtGames] = useState<Set<string>>(new Set());
+    const [caughtGameGenders, setCaughtGameGenders] = useState<CaughtGameGenderMap>({});
     const [actionLoading, setActionLoading] = useState<string | null>(null);
 
     // Fetch caught status
@@ -85,6 +103,7 @@ export default function PokemonDetails() {
         } else {
             setCaughtForms(new Set());
             setCaughtGames(new Set());
+            setCaughtGameGenders({});
         }
     }, [user, pokemonId, details]);
 
@@ -106,14 +125,20 @@ export default function PokemonDetails() {
 
             const caughtSet = new Set<string>();
             const gameSet = new Set<string>();
+            const gameGenderMap: CaughtGameGenderMap = {};
             const rows = (data || []) as CaughtGameRow[];
 
             rows.forEach(row => {
                 let matchedThisPokemon = false;
+                let matchedGender: CaughtGender | null = isCaughtGender(row.gender) ? row.gender : null;
 
                 // Priority 1: Exact form name match (new standard)
                 if (row.form) {
                     caughtSet.add(row.form);
+                    const matchedVariant = variants.find(v => v.name === row.form);
+                    if (!matchedGender && isCaughtGender(matchedVariant?.gender)) {
+                        matchedGender = matchedVariant.gender;
+                    }
                     matchedThisPokemon = true;
                 } else {
                     // Priority 2: Legacy fallback using ID and gender
@@ -135,6 +160,9 @@ export default function PokemonDetails() {
 
                     if (matchedVariant) {
                         caughtSet.add(matchedVariant.name);
+                        if (!matchedGender && isCaughtGender(matchedVariant.gender)) {
+                            matchedGender = matchedVariant.gender;
+                        }
                         matchedThisPokemon = true;
                     }
                 }
@@ -143,12 +171,14 @@ export default function PokemonDetails() {
                     [row.game, row.secondary_game].forEach(gameId => {
                         if (gameId && gameId !== 'unknown' && GAME_LOGOS[gameId]) {
                             gameSet.add(gameId);
+                            addCaughtGameGender(gameGenderMap, gameId, matchedGender);
                         }
                     });
                 }
             });
             setCaughtForms(caughtSet);
             setCaughtGames(gameSet);
+            setCaughtGameGenders(gameGenderMap);
         } catch (err) {
             console.error("Error fetching caught status:", err);
         }
@@ -580,6 +610,32 @@ export default function PokemonDetails() {
                                                             }}
                                                         >
                                                             <CheckCircle2 className="h-3.5 w-3.5 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]" />
+                                                        </span>
+                                                    )}
+                                                    {details.hasGenderDifference && game.isCaught && (
+                                                        <span className="absolute bottom-1.5 right-1.5 flex items-center gap-1 rounded-full border border-white/15 bg-black/40 px-1.5 py-0.5 text-[12px] font-black leading-none shadow-sm backdrop-blur-sm">
+                                                            <span
+                                                                className={cn(
+                                                                    "transition-all",
+                                                                    caughtGameGenders[game.id]?.includes('male')
+                                                                        ? "text-blue-200 drop-shadow-[0_0_5px_rgba(147,197,253,0.95)]"
+                                                                        : "text-white/25"
+                                                                )}
+                                                                title="Maschio"
+                                                            >
+                                                                ♂
+                                                            </span>
+                                                            <span
+                                                                className={cn(
+                                                                    "transition-all",
+                                                                    caughtGameGenders[game.id]?.includes('female')
+                                                                        ? "text-pink-200 drop-shadow-[0_0_5px_rgba(251,207,232,0.95)]"
+                                                                        : "text-white/25"
+                                                                )}
+                                                                title="Femmina"
+                                                            >
+                                                                ♀
+                                                            </span>
                                                         </span>
                                                     )}
                                                 </div>

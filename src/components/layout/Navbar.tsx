@@ -27,7 +27,7 @@ import { trainerAvatars } from '@/lib/trainer-avatars';
 
 type TrainerAvatarId = (typeof trainerAvatars)[number]['id'];
 
-const AVATAR_ORDER_VERSION = 'playable-gen-order-v4';
+const AVATAR_ORDER_VERSION = 'playable-gen-order-v5';
 const DEFAULT_AVATAR_ORDER_IDS = trainerAvatars.map((avatar) => avatar.id) as TrainerAvatarId[];
 
 const getValidAvatarId = (raw: unknown) => (

@@ -16,6 +16,14 @@ import { useQuery } from '@tanstack/react-query';
 type CaughtEntryStats = { count: number; genders: Set<string>; forms: Set<string> };
 type CaughtDataMap = Record<number, CaughtEntryStats>;
 
+const normalizePokedexForm = (value?: string | null) => (value || '').toString().trim().toLowerCase();
+
+const hasCaughtForm = (stats: CaughtEntryStats | undefined, formName?: string | null) => {
+    const normalizedForm = normalizePokedexForm(formName);
+    if (!stats || !normalizedForm) return false;
+    return Array.from(stats.forms).some(form => normalizePokedexForm(form) === normalizedForm);
+};
+
 export default function Pokedex() {
     const { pokemon, loading: pokemonLoading, error: pokemonError } = usePokemonList();
     const { accentColor } = useRandomColor();
@@ -294,25 +302,26 @@ export default function Pokedex() {
 
                                 // Granular caught status
                                 // 1. Primary sprite (Male or Single Strike)
-                                const formsForId = caughtData[p.id]?.forms;
+                                const statsForPrimary = caughtData[p.id];
+                                const formsForId = statsForPrimary?.forms;
                                 const isSpecialFormId = p.id > 10000 || p.id !== p.baseId;
-                                const hasFormMatch = !!formsForId?.has(p.name);
-                                const isPrimaryCaught = caughtData[p.id]?.count > 0 &&
+                                const hasFormMatch = hasCaughtForm(statsForPrimary, p.name);
+                                const hasPrimaryCaughtRows = (statsForPrimary?.count || 0) > 0;
+                                const hasPrimaryLegacyRows = hasPrimaryCaughtRows && !formsForId?.size && !statsForPrimary?.genders.size;
+                                const isPrimaryCaught = hasPrimaryCaughtRows &&
                                     (isSpecialFormId
-                                        ? hasFormMatch
-                                        : (!hasGenderDiff || caughtData[p.id]?.genders.has('male') || hasFormMatch));
+                                        ? hasFormMatch || hasPrimaryLegacyRows
+                                        : (!hasGenderDiff || statsForPrimary?.genders.has('male') || hasFormMatch || hasPrimaryLegacyRows));
 
                                 // 2. Secondary sprite (Female or Rapid Strike)
                                 let isSecondaryCaught = false;
                                 if (hasGenderDiff) {
                                     isSecondaryCaught = (femaleId && caughtData[femaleId]?.count > 0) ||
-                                        (!femaleId && caughtData[p.id]?.genders.has('female'));
+                                        (!femaleId && statsForPrimary?.genders.has('female'));
                                 } else if (hasFormDiff && secondaryForm) {
                                     isSecondaryCaught = caughtData[secondaryForm.id]?.count > 0 ||
-                                        caughtData[p.id]?.forms.has(secondaryForm.name);
+                                        hasCaughtForm(statsForPrimary, secondaryForm.name);
                                 }
-
-                                const isCaught = isPrimaryCaught || isSecondaryCaught;
 
                                 let totalVars = 1;
                                 if (hasMultipleSprites) totalVars = 2;
@@ -328,16 +337,18 @@ export default function Pokedex() {
                                 let caughtCount = (isPrimaryCaught ? 1 : 0) + (isSecondaryCaught ? 1 : 0);
                                 if (formTotal && formTotal > 1) {
                                     const caughtForms = new Set<string>();
-                                    const legacyFormsForBase = caughtData[p.id]?.forms;
                                     group.forEach(v => {
                                         const stats = caughtData[v.id];
                                         const isFormId = v.id > 10000 || v.id !== v.baseId;
-                                        const formHit = (isFormId ? !!stats?.forms?.has(v.name) : (stats?.count || 0) > 0);
-                                        const legacyHit = !!legacyFormsForBase?.has(v.name);
+                                        const formHit = (isFormId ? hasCaughtForm(stats, v.name) : (stats?.count || 0) > 0);
+                                        const legacyHit = hasCaughtForm(statsForPrimary, v.name);
                                         if (formHit || legacyHit) caughtForms.add(v.name);
                                     });
                                     if (caughtForms.size > 0) caughtCount = caughtForms.size;
                                 }
+                                const hasAnyCaughtRows = group.some(v => (caughtData[v.id]?.count || 0) > 0);
+                                if (caughtCount === 0 && hasAnyCaughtRows) caughtCount = 1;
+                                const isCaught = isPrimaryCaught || isSecondaryCaught || caughtCount > 0 || hasAnyCaughtRows;
                                 const pct = Math.min(100, (caughtCount / totalVars) * 100);
 
                                 // Add a safeguard to prevent errors when clicking on non-evolving Pokémon icons
