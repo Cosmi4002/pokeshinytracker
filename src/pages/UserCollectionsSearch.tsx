@@ -59,6 +59,7 @@ export default function UserCollectionsSearch() {
     const huntingMethod = findHuntingMethod(method);
     const methodName = huntingMethod?.name.toLowerCase() || '';
     if (raw.includes('pokeradar') || raw.includes('poke radar') || methodName.includes('poke radar')) return 'Chain';
+    if (raw.includes('chain fishing') || methodName.includes('chain fishing')) return 'Chain';
     if (raw.includes('game corner') || raw.includes('game-corner') || methodName === 'game corner') return 'Seen';
     if (isBreedingMethod(raw)) return 'Hatched';
     return 'Encounters';
@@ -291,10 +292,10 @@ export default function UserCollectionsSearch() {
     if (!isEvolved) return null;
     return (
       <div
-        className="absolute top-2 right-2 h-6 w-6 rounded-full bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 flex items-center justify-center backdrop-blur-sm"
+        className="absolute top-2 right-2 z-20 flex h-6 w-6 items-center justify-center rounded-full border border-white/55 bg-emerald-700 text-white shadow-[0_3px_12px_rgba(0,0,0,0.6),0_0_0_1px_rgba(0,0,0,0.45)] ring-1 ring-emerald-200/45 backdrop-blur-sm"
         title="Pokemon evoluto"
       >
-        <ArrowUpCircle className="h-3.5 w-3.5" />
+        <ArrowUpCircle className="h-3.5 w-3.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]" />
       </div>
     );
   };

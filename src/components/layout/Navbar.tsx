@@ -30,6 +30,12 @@ type TrainerAvatarId = (typeof trainerAvatars)[number]['id'];
 const AVATAR_ORDER_VERSION = 'playable-gen-order-v4';
 const DEFAULT_AVATAR_ORDER_IDS = trainerAvatars.map((avatar) => avatar.id) as TrainerAvatarId[];
 
+const getValidAvatarId = (raw: unknown) => (
+  typeof raw === 'string' && trainerAvatars.some((avatar) => avatar.id === raw)
+    ? (raw as TrainerAvatarId)
+    : null
+);
+
 const getSafeAvatarOrder = (raw: unknown) => {
   const safeOrder = Array.isArray(raw)
     ? raw.filter((id): id is TrainerAvatarId => (
@@ -45,6 +51,13 @@ const getSafeAvatarOrder = (raw: unknown) => {
     : null;
 };
 
+const readAvatarPreferencesFromMetadata = (metadata: Record<string, unknown> | null | undefined) => ({
+  avatarId: getValidAvatarId(metadata?.trainer_avatar),
+  avatarOrderIds: metadata?.trainer_avatar_order_version === AVATAR_ORDER_VERSION
+    ? getSafeAvatarOrder(metadata.trainer_avatar_order)
+    : null,
+});
+
 export function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -58,6 +71,8 @@ export function Navbar() {
   const [movingAvatarId, setMovingAvatarId] = useState<TrainerAvatarId | null>(null);
   const [avatarPickerMode, setAvatarPickerMode] = useState<'select' | 'move'>('select');
   const [avatarPreferencesLoaded, setAvatarPreferencesLoaded] = useState(false);
+  const [avatarPreferencesUserId, setAvatarPreferencesUserId] = useState<string | null>(null);
+  const [avatarTouched, setAvatarTouched] = useState(false);
   const [avatarOrderTouched, setAvatarOrderTouched] = useState(false);
   const [avatarPickerOpen, setAvatarPickerOpen] = useState(false);
 
@@ -75,9 +90,7 @@ export function Navbar() {
   }, [user?.user_metadata]);
   const metadataAvatarId = useMemo(() => {
     const raw = (user?.user_metadata as Record<string, unknown> | undefined)?.trainer_avatar;
-    return typeof raw === 'string' && trainerAvatars.some((avatar) => avatar.id === raw)
-      ? (raw as TrainerAvatarId)
-      : null;
+    return getValidAvatarId(raw);
   }, [user?.user_metadata]);
   const metadataAvatarOrderIds = useMemo(() => {
     const metadata = user?.user_metadata as Record<string, unknown> | undefined;
@@ -159,6 +172,7 @@ export function Navbar() {
   const handleAvatarPress = useCallback((avatarId: TrainerAvatarId) => {
     if (avatarPickerMode === 'select') {
       setSelectedAvatarId(avatarId);
+      setAvatarTouched(true);
       if (window.innerWidth < 640) setAvatarPickerOpen(false);
       return;
     }
@@ -226,47 +240,81 @@ export function Navbar() {
   };
 
   useEffect(() => {
+    let active = true;
+
     if (!user) {
       setSelectedAvatarId('red');
       setAvatarOrderIds(DEFAULT_AVATAR_ORDER_IDS);
+      setAvatarTouched(false);
       setAvatarOrderTouched(false);
       setAvatarPreferencesLoaded(false);
-      return;
+      setAvatarPreferencesUserId(null);
+      return () => {
+        active = false;
+      };
     }
 
     setAvatarPreferencesLoaded(false);
-    const storageKey = `trainer-avatar-${user.id}`;
-    const stored = window.localStorage.getItem(storageKey);
-    const exists = trainerAvatars.some((avatar) => avatar.id === stored);
-    setSelectedAvatarId(metadataAvatarId || (exists ? (stored as TrainerAvatarId) : 'red'));
+    setAvatarPreferencesUserId(null);
 
-    const orderStorageKey = `trainer-avatar-order-${user.id}`;
-    const orderVersionStorageKey = `trainer-avatar-order-version-${user.id}`;
-    const storedOrder = window.localStorage.getItem(orderStorageKey);
-    const storedOrderVersion = window.localStorage.getItem(orderVersionStorageKey);
-    try {
-      const parsedOrder = JSON.parse(storedOrder || '[]');
-      const safeStoredOrder = storedOrderVersion === AVATAR_ORDER_VERSION
-        ? getSafeAvatarOrder(parsedOrder)
-        : null;
-      setAvatarOrderIds(metadataAvatarOrderIds || safeStoredOrder || DEFAULT_AVATAR_ORDER_IDS);
-    } catch {
-      setAvatarOrderIds(metadataAvatarOrderIds || DEFAULT_AVATAR_ORDER_IDS);
-    }
-    setAvatarOrderTouched(false);
-    setAvatarPreferencesLoaded(true);
+    const loadAvatarPreferences = async () => {
+      const storageKey = `trainer-avatar-${user.id}`;
+      const storedAvatarId = getValidAvatarId(window.localStorage.getItem(storageKey));
+      const orderStorageKey = `trainer-avatar-order-${user.id}`;
+      const orderVersionStorageKey = `trainer-avatar-order-version-${user.id}`;
+      const storedOrderVersion = window.localStorage.getItem(orderVersionStorageKey);
+      let storedOrderIds: TrainerAvatarId[] | null = null;
+
+      try {
+        storedOrderIds = storedOrderVersion === AVATAR_ORDER_VERSION
+          ? getSafeAvatarOrder(JSON.parse(window.localStorage.getItem(orderStorageKey) || '[]'))
+          : null;
+      } catch {
+        storedOrderIds = null;
+      }
+
+      let remoteAvatarId = metadataAvatarId;
+      let remoteAvatarOrderIds = metadataAvatarOrderIds;
+
+      try {
+        const { data, error } = await supabase.auth.getUser();
+        if (!error && data.user?.id === user.id) {
+          const remotePreferences = readAvatarPreferencesFromMetadata(
+            data.user.user_metadata as Record<string, unknown> | undefined
+          );
+          remoteAvatarId = remotePreferences.avatarId;
+          remoteAvatarOrderIds = remotePreferences.avatarOrderIds;
+        }
+      } catch {
+        // Fall back to the current session metadata/local cache if the refresh fails.
+      }
+
+      if (!active) return;
+      setSelectedAvatarId(remoteAvatarId || storedAvatarId || 'red');
+      setAvatarOrderIds(remoteAvatarOrderIds || storedOrderIds || DEFAULT_AVATAR_ORDER_IDS);
+      setAvatarTouched(false);
+      setAvatarOrderTouched(false);
+      setAvatarPreferencesLoaded(true);
+      setAvatarPreferencesUserId(user.id);
+    };
+
+    loadAvatarPreferences();
+
+    return () => {
+      active = false;
+    };
   }, [metadataAvatarId, metadataAvatarOrderIds, user?.id]);
 
   useEffect(() => {
-    if (!user || !avatarPreferencesLoaded) return;
+    if (!user || !avatarPreferencesLoaded || avatarPreferencesUserId !== user.id || !avatarTouched) return;
     window.localStorage.setItem(`trainer-avatar-${user.id}`, selectedAvatarId);
     void supabase.auth.updateUser({
       data: { trainer_avatar: selectedAvatarId },
     });
-  }, [avatarPreferencesLoaded, selectedAvatarId, user?.id]);
+  }, [avatarPreferencesLoaded, avatarPreferencesUserId, avatarTouched, selectedAvatarId, user?.id]);
 
   useEffect(() => {
-    if (!user || !avatarPreferencesLoaded || !avatarOrderTouched) return;
+    if (!user || !avatarPreferencesLoaded || avatarPreferencesUserId !== user.id || !avatarOrderTouched) return;
     window.localStorage.setItem(`trainer-avatar-order-${user.id}`, JSON.stringify(avatarOrderIds));
     window.localStorage.setItem(`trainer-avatar-order-version-${user.id}`, AVATAR_ORDER_VERSION);
     void supabase.auth.updateUser({
@@ -275,7 +323,54 @@ export function Navbar() {
         trainer_avatar_order_version: AVATAR_ORDER_VERSION,
       },
     });
-  }, [avatarOrderIds, avatarOrderTouched, avatarPreferencesLoaded, user?.id]);
+  }, [avatarOrderIds, avatarOrderTouched, avatarPreferencesLoaded, avatarPreferencesUserId, user?.id]);
+
+  useEffect(() => {
+    if (!user || !avatarPreferencesLoaded || avatarPreferencesUserId !== user.id) return;
+
+    let active = true;
+
+    const refreshRemoteAvatarPreferences = async () => {
+      try {
+        const { data, error } = await supabase.auth.getUser();
+        if (!active || error || data.user?.id !== user.id) return;
+
+        const remotePreferences = readAvatarPreferencesFromMetadata(
+          data.user.user_metadata as Record<string, unknown> | undefined
+        );
+
+        if (remotePreferences.avatarId) {
+          setSelectedAvatarId(remotePreferences.avatarId);
+          window.localStorage.setItem(`trainer-avatar-${user.id}`, remotePreferences.avatarId);
+          setAvatarTouched(false);
+        }
+
+        if (remotePreferences.avatarOrderIds) {
+          setAvatarOrderIds(remotePreferences.avatarOrderIds);
+          window.localStorage.setItem(`trainer-avatar-order-${user.id}`, JSON.stringify(remotePreferences.avatarOrderIds));
+          window.localStorage.setItem(`trainer-avatar-order-version-${user.id}`, AVATAR_ORDER_VERSION);
+          setAvatarOrderTouched(false);
+        }
+      } catch {
+        // Keep the current avatar on transient network failures.
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        void refreshRemoteAvatarPreferences();
+      }
+    };
+
+    window.addEventListener('focus', refreshRemoteAvatarPreferences);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      active = false;
+      window.removeEventListener('focus', refreshRemoteAvatarPreferences);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [avatarPreferencesLoaded, avatarPreferencesUserId, user?.id]);
 
   useEffect(() => {
     let active = true;

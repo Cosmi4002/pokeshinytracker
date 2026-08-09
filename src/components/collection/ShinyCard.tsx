@@ -52,7 +52,8 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   const hasBottomMeta = isGigamax || isLegendsArceus || entry.is_fail || entry.is_unobtainable;
   const isGameCorner = normalizedMethod.includes('game corner') || normalizedMethod.includes('game-corner') || method?.name.toLowerCase() === 'game corner';
   const isPokeRadar = normalizedMethod.includes('pokeradar') || normalizedMethod.includes('poke radar') || method?.name.toLowerCase().includes('poke radar');
-  const encountersLabel = isPokeRadar ? 'Chain' : (isGameCorner ? 'Seen' : (isBreeding ? 'Hatched' : 'Encounters'));
+  const isChainFishing = normalizedMethod.includes('chain fishing') || method?.name.toLowerCase().includes('chain fishing');
+  const encountersLabel = isPokeRadar || isChainFishing ? 'Chain' : (isGameCorner ? 'Seen' : (isBreeding ? 'Hatched' : 'Encounters'));
   const showEncounters = useMemo(() => {
     if (entry.attempts === null) return false;
     if (!showEncountersPreference) return false;
@@ -227,12 +228,12 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                 size="icon"
                 onClick={onToggleEvolved}
                 className={cn(
-                  "h-7 w-7 rounded-full border border-white/10 text-white shadow-lg backdrop-blur-md",
-                  isEvolved ? "bg-emerald-600 hover:bg-emerald-700" : "bg-black/55 hover:bg-emerald-500"
+                  "h-7 w-7 rounded-full border text-white shadow-[0_3px_12px_rgba(0,0,0,0.55)] ring-1 ring-black/35 backdrop-blur-md",
+                  isEvolved ? "border-white/45 bg-emerald-700 hover:bg-emerald-800" : "border-white/25 bg-black/70 hover:bg-emerald-700"
                 )}
                 title={isEvolved ? 'Segna come non evoluto' : 'Segna come evoluto'}
               >
-                <ArrowUpCircle className="h-3.5 w-3.5" />
+                <ArrowUpCircle className="h-3.5 w-3.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]" />
               </Button>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
@@ -266,10 +267,10 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
             {isEvolved && (
               <div className="absolute right-2 top-2 z-30 flex w-9 flex-col items-center gap-1">
                 <div
-                  className="flex h-7 w-7 items-center justify-center rounded-full border border-emerald-400/50 bg-emerald-500/20 text-emerald-300 shadow-lg backdrop-blur-md"
+                  className="flex h-7 w-7 items-center justify-center rounded-full border border-white/55 bg-emerald-700 text-white shadow-[0_3px_12px_rgba(0,0,0,0.6),0_0_0_1px_rgba(0,0,0,0.45)] ring-1 ring-emerald-200/45 backdrop-blur-md"
                   title="Pokemon evoluto"
                 >
-                  <ArrowUpCircle className="h-3.5 w-3.5" />
+                  <ArrowUpCircle className="h-3.5 w-3.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]" />
                 </div>
                 {evolvedFromSpriteUrl && (
                   <img
