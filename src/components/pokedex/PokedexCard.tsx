@@ -238,8 +238,8 @@ export const PokedexCard = memo(function PokedexCard({
         POKEDEX_SMALL_SPRITE_SCALE_BY_BASE_ID[baseId] ||
         "";
     const spriteFrameClass = hasMultipleSprites
-        ? "h-[7.2rem] w-[7.2rem] sm:h-[7.8rem] sm:w-[7.8rem]"
-        : "h-[8.6rem] w-[8.6rem] sm:h-[9.2rem] sm:w-[9.2rem]";
+        ? "h-[6.5rem] w-[46%] max-w-[6.5rem] min-[380px]:h-[7rem] min-[380px]:max-w-[7rem] sm:h-[7.8rem] sm:w-[7.8rem] sm:max-w-none"
+        : "h-[8rem] w-[82%] max-w-[8rem] min-[380px]:h-[8.4rem] min-[380px]:max-w-[8.4rem] sm:h-[9.2rem] sm:w-[9.2rem] sm:max-w-none";
 
     return (
         <button
@@ -374,7 +374,7 @@ export const PokedexCard = memo(function PokedexCard({
             )}
 
             {/* Sprites container */}
-            <div className="relative z-10 mt-2 flex h-[168px] w-full items-center justify-center overflow-hidden rounded-xl border border-white/15 bg-black/20 px-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.22),inset_0_-10px_20px_rgba(0,0,0,0.18)]">
+            <div className="relative z-10 mt-2 flex h-[164px] w-full items-center justify-center overflow-hidden rounded-xl border border-white/15 bg-black/20 px-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.22),inset_0_-10px_20px_rgba(0,0,0,0.18)] sm:h-[168px] sm:px-3">
                 <div
                     className="pointer-events-none absolute inset-0 z-[1] opacity-70"
                     style={{
