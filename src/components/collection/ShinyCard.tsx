@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { getGameTheme, GAME_LOGOS, type GameTheme } from '@/lib/game-themes';
 import { GIGAMAX_ICON, POKEBALLS, POKEMON_EGG_ICON, findHuntingMethod, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, handlePokemonSpriteError, isBreedingMethod, supportsGigamaxMark, toLocalPokemonSpriteUrl } from '@/lib/pokemon-data';
 import type { Tables } from '@/integrations/supabase/types';
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useId } from 'react';
 import { cn } from '@/lib/utils';
 import {
   AlertDialog,
@@ -30,7 +30,16 @@ interface ShinyCardProps {
   spriteName?: string;
 }
 
+const getEvolvedFromSpriteScale = (name?: string | null) => {
+  const normalized = (name || '').toString().trim().toLowerCase();
+  if (normalized.includes('buizel')) return 1.22;
+  return 1;
+};
+
+const getEvolvedFromSpriteSize = (name?: string | null) => `${2.58 * getEvolvedFromSpriteScale(name)}rem`;
+
 export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverride, secondaryThemeOverride, applyBlackEffect = false, spriteName }: ShinyCardProps) {
+  const evolvedSpriteOutlineId = `evolved-sprite-outline-${useId().replace(/:/g, '')}`;
   const isFail = entry.is_fail === true;
   const isEvolved = entry.is_evolved === true;
   const isGigamax = entry.is_gigamax === true && supportsGigamaxMark(entry.game);
@@ -273,16 +282,36 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                   <ArrowUpCircle className="h-3.5 w-3.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]" />
                 </div>
                 {evolvedFromSpriteUrl && (
-                  <img
-                    src={toLocalPokemonSpriteUrl(evolvedFromSpriteUrl)}
-                    alt="Evoluto da"
-                    className="h-[2.58rem] w-[2.58rem] object-contain drop-shadow-[0_4px_10px_rgba(0,0,0,0.65)]"
-                    title={`Evoluto da ${evolvedFromName || 'pokemon precedente'}`}
-                    referrerPolicy="no-referrer"
-                    onError={(e) => {
-                      handlePokemonSpriteError(e.currentTarget);
-                    }}
-                  />
+                  <>
+                    <svg className="absolute h-0 w-0" aria-hidden="true" focusable="false">
+                      <filter id={evolvedSpriteOutlineId} x="-24%" y="-24%" width="148%" height="148%" colorInterpolationFilters="sRGB">
+                        <feMorphology in="SourceAlpha" operator="dilate" radius="0.5" result="outline" />
+                        <feFlood floodColor="#050505" result="outlineColor" />
+                        <feComposite in="outlineColor" in2="outline" operator="in" result="outlineShape" />
+                        <feMerge>
+                          <feMergeNode in="outlineShape" />
+                          <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                      </filter>
+                    </svg>
+                    <span className="inline-flex h-[2.58rem] w-[2.58rem] items-center justify-center">
+                      <img
+                        src={toLocalPokemonSpriteUrl(evolvedFromSpriteUrl)}
+                        alt="Evoluto da"
+                        className="max-w-none object-contain"
+                        style={{
+                          height: getEvolvedFromSpriteSize(evolvedFromName),
+                          width: getEvolvedFromSpriteSize(evolvedFromName),
+                          filter: `url(#${evolvedSpriteOutlineId}) drop-shadow(0 4px 8px rgba(0,0,0,0.85))`,
+                        }}
+                        title={`Evoluto da ${evolvedFromName || 'pokemon precedente'}`}
+                        referrerPolicy="no-referrer"
+                        onError={(e) => {
+                          handlePokemonSpriteError(e.currentTarget);
+                        }}
+                      />
+                    </span>
+                  </>
                 )}
               </div>
             )}

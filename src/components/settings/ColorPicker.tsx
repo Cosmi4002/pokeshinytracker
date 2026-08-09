@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Check } from 'lucide-react';
+import { Check, Palette } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 
@@ -25,8 +25,11 @@ const DEFAULT_PRESETS = [
     '#f43f5e', // Rose
 ];
 
+const isHexColor = (color: string) => /^#[0-9a-fA-F]{6}$/.test(color);
+
 export function ColorPicker({ label, value, onChange, presets = DEFAULT_PRESETS }: ColorPickerProps) {
     const [customColor, setCustomColor] = useState(value);
+    const pickerColor = isHexColor(customColor) ? customColor : value;
 
     useEffect(() => {
         setCustomColor(value);
@@ -37,10 +40,18 @@ export function ColorPicker({ label, value, onChange, presets = DEFAULT_PRESETS 
         onChange(color);
     };
 
-    const handleCustomChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleColorInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const color = e.target.value;
         setCustomColor(color);
         onChange(color);
+    };
+
+    const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const color = e.target.value;
+        setCustomColor(color);
+        if (isHexColor(color)) {
+            onChange(color);
+        }
     };
 
     return (
@@ -75,17 +86,28 @@ export function ColorPicker({ label, value, onChange, presets = DEFAULT_PRESETS 
             </div>
 
             {/* Custom Color Input */}
-            <div className="flex gap-2 items-center">
-                <Input
-                    type="color"
-                    value={customColor}
-                    onChange={handleCustomChange}
-                    className="h-11 w-14 cursor-pointer rounded-xl p-1"
-                />
+            <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_8rem]">
+                <label className="relative flex h-12 cursor-pointer items-center gap-3 overflow-hidden rounded-xl border border-border bg-background px-3 shadow-sm transition hover:border-primary/50">
+                    <span
+                        className="h-8 w-8 shrink-0 rounded-full border border-border shadow-inner"
+                        style={{ backgroundColor: pickerColor }}
+                    />
+                    <span className="min-w-0 flex-1 text-left text-sm font-semibold text-foreground">
+                        Ruota colori
+                    </span>
+                    <Palette className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <Input
+                        type="color"
+                        value={pickerColor}
+                        onChange={handleColorInputChange}
+                        className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                        aria-label={`Scegli ${label}`}
+                    />
+                </label>
                 <Input
                     type="text"
                     value={customColor}
-                    onChange={handleCustomChange}
+                    onChange={handleTextChange}
                     placeholder="#000000"
                     className="h-11 flex-1 rounded-xl font-mono text-sm uppercase"
                     maxLength={7}
