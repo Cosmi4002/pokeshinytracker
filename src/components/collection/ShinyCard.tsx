@@ -36,10 +36,13 @@ const getEvolvedFromSpriteScale = (name?: string | null) => {
   return 1;
 };
 
-const getEvolvedFromSpriteSize = (name?: string | null) => `${2.58 * getEvolvedFromSpriteScale(name)}rem`;
+const getEvolvedFromSpriteSize = (name?: string | null, compact = false) =>
+  `${2.58 * getEvolvedFromSpriteScale(name) * (compact ? 0.82 : 1)}rem`;
 
 export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverride, secondaryThemeOverride, applyBlackEffect = false, spriteName }: ShinyCardProps) {
-  const evolvedSpriteOutlineId = `evolved-sprite-outline-${useId().replace(/:/g, '')}`;
+  const spriteOutlineSeed = useId().replace(/:/g, '');
+  const evolvedSpriteOutlineId = `evolved-sprite-outline-${spriteOutlineSeed}`;
+  const mainSpriteOutlineId = `main-sprite-outline-${spriteOutlineSeed}`;
   const isFail = entry.is_fail === true;
   const isEvolved = entry.is_evolved === true;
   const isGigamax = entry.is_gigamax === true && supportsGigamaxMark(entry.game);
@@ -140,6 +143,11 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
       linear-gradient(155deg, rgba(18,18,20,0.9) 0%, rgba(20,20,24,0.84) 48%, rgba(18,18,20,0.92) 100%)
     `
     : null;
+  const spritePanelBackground = hasDualGameTheme
+    ? `linear-gradient(135deg, ${theme.secondary} 0%, color-mix(in srgb, ${theme.secondary} 50%, ${secondaryTheme!.secondary}) 50%, ${secondaryTheme!.secondary} 100%)`
+    : entry.game === 'violet'
+      ? `linear-gradient(135deg, ${theme.secondary} 0%, color-mix(in srgb, ${theme.secondary} 55%, ${theme.primary}) 52%, color-mix(in srgb, ${theme.primary} 86%, #111) 100%)`
+      : `linear-gradient(135deg, ${theme.secondary} 0%, color-mix(in srgb, ${theme.secondary} 55%, ${theme.primary}) 52%, ${theme.primary} 100%)`;
   const evolvedFromSpriteUrl = useMemo(() => {
     if (!isEvolved || !evolvedFromId) return '';
     const byName = getPokemonSpriteUrl(evolvedFromId, {
@@ -217,9 +225,8 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
           <div
             className="relative min-h-[162px] sm:min-h-[178px] rounded-[1.5rem] border border-white/10 bg-black/40 p-3 shadow-inner overflow-hidden"
             style={{
-              background: hasDualGameTheme
-                ? `linear-gradient(135deg, ${theme.secondary} 0%, color-mix(in srgb, ${theme.secondary} 50%, ${secondaryTheme!.secondary}) 50%, ${secondaryTheme!.secondary} 100%)`
-                : `linear-gradient(135deg, ${theme.secondary} 0%, color-mix(in srgb, ${theme.secondary} 55%, ${theme.primary}) 52%, ${theme.primary} 100%)`,
+              background: spritePanelBackground,
+              backgroundClip: 'padding-box',
             }}
           >
             <div className="absolute left-2 top-2 z-30 flex gap-1.5">
@@ -300,8 +307,8 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                         alt="Evoluto da"
                         className="max-w-none object-contain"
                         style={{
-                          height: getEvolvedFromSpriteSize(evolvedFromName),
-                          width: getEvolvedFromSpriteSize(evolvedFromName),
+                          height: getEvolvedFromSpriteSize(evolvedFromName, !showEncounters),
+                          width: getEvolvedFromSpriteSize(evolvedFromName, !showEncounters),
                           filter: `url(#${evolvedSpriteOutlineId}) drop-shadow(0 4px 8px rgba(0,0,0,0.85))`,
                         }}
                         title={`Evoluto da ${evolvedFromName || 'pokemon precedente'}`}
@@ -318,6 +325,17 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
             <div className="absolute inset-0 bg-[linear-gradient(135deg,transparent_0%,rgba(255,255,255,0.04)_45%,transparent_70%)]" />
             <div className="relative flex items-center justify-center">
               <div className="relative h-[7.3rem] w-[7.3rem] sm:h-[8.4rem] sm:w-[8.4rem]">
+                <svg className="absolute h-0 w-0" aria-hidden="true" focusable="false">
+                  <filter id={mainSpriteOutlineId} x="-24%" y="-24%" width="148%" height="148%" colorInterpolationFilters="sRGB">
+                    <feMorphology in="SourceAlpha" operator="dilate" radius="0.5" result="outline" />
+                    <feFlood floodColor="#050505" result="outlineColor" />
+                    <feComposite in="outlineColor" in2="outline" operator="in" result="outlineShape" />
+                    <feMerge>
+                      <feMergeNode in="outlineShape" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                </svg>
                 <img
                   key={spriteUrl}
                   src={toLocalPokemonSpriteUrl(spriteUrl)}
@@ -327,12 +345,14 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                   alt={entry.pokemon_name}
                   className={cn(
                     "relative z-10 h-full w-full object-contain pokemon-sprite transition-all duration-300",
-                    isFail
-                      ? "drop-shadow-[0_0_12px_rgba(255,255,255,0.25)]"
-                      : "drop-shadow-[0_8px_16px_rgba(0,0,0,0.75)]",
                     entry.is_unobtainable ? "grayscale brightness-105" : ""
                   )}
-                  style={{ imageRendering: 'auto' }}
+                  style={{
+                    imageRendering: 'auto',
+                    filter: `url(#${mainSpriteOutlineId}) ${isFail
+                      ? 'drop-shadow(0 0 12px rgba(255,255,255,0.25))'
+                      : 'drop-shadow(0 8px 16px rgba(0,0,0,0.75))'}`,
+                  }}
                   onError={(e) => {
                     handlePokemonSpriteError(e.currentTarget);
                   }}
@@ -357,45 +377,57 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                       title={pokeball.name}
                     />
                   )}
-                  <h3 className="min-w-0 truncate pb-0.5 text-[1.18rem] font-black leading-tight text-white sm:text-[1.26rem]">
-                    {displayName}
-                  </h3>
-                  {entry.gender && (entry.gender === 'male' || entry.gender === 'female') && (
-                    entry.gender === 'male' ? (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="h-[1.1rem] w-[1.1rem] flex-shrink-0 text-blue-400"
-                      >
-                        <path d="M16 3h5v5" />
-                        <path d="m21 3-6.75 6.75" />
-                        <circle cx="10" cy="14" r="6" />
-                      </svg>
-                    ) : (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="h-[1.1rem] w-[1.1rem] flex-shrink-0 text-pink-400"
-                      >
-                        <path d="M12 15v7" />
-                        <path d="M9 19h6" />
-                        <circle cx="12" cy="9" r="6" />
-                      </svg>
-                    )
+                  <span className="flex min-w-0 items-center gap-2">
+                    <h3 className="min-w-0 truncate pb-0.5 text-[1.18rem] font-black leading-tight text-white sm:text-[1.26rem]">
+                      {displayName}
+                    </h3>
+                    {entry.gender && (entry.gender === 'male' || entry.gender === 'female') && (
+                      entry.gender === 'male' ? (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="h-[1.1rem] w-[1.1rem] flex-shrink-0 text-blue-400"
+                        >
+                          <path d="M16 3h5v5" />
+                          <path d="m21 3-6.75 6.75" />
+                          <circle cx="10" cy="14" r="6" />
+                        </svg>
+                      ) : (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="h-[1.1rem] w-[1.1rem] flex-shrink-0 text-pink-400"
+                        >
+                          <path d="M12 15v7" />
+                          <path d="M9 19h6" />
+                          <circle cx="12" cy="9" r="6" />
+                        </svg>
+                      )
+                    )}
+                  </span>
+                  {entry.has_shiny_charm && (
+                    <img
+                      src="/img/items/shiny-charm.png"
+                      loading="lazy"
+                      decoding="async"
+                      className="ml-auto h-7 w-7 flex-shrink-0 object-contain animate-pulse drop-shadow-[0_0_10px_rgba(234,179,8,0.72)] sm:hidden"
+                      alt="Shiny Charm"
+                      title="Shiny Charm Active"
+                    />
                   )}
                 </div>
               </div>
@@ -430,7 +462,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                       src="/img/items/shiny-charm.png"
                       loading="lazy"
                       decoding="async"
-                      className="h-8 w-8 flex-shrink-0 object-contain animate-pulse drop-shadow-[0_0_10px_rgba(234,179,8,0.72)]"
+                      className="hidden h-8 w-8 flex-shrink-0 object-contain animate-pulse drop-shadow-[0_0_10px_rgba(234,179,8,0.72)] sm:block"
                       alt="Shiny Charm"
                       title="Shiny Charm Active"
                     />
