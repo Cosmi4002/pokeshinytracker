@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { memo } from "react";
+import { memo, useId } from "react";
 import { useRandomColor } from '@/lib/random-color-context';
 import type { ShinyAvailability } from '@/lib/shiny-availability';
 import { Lock, UserX } from "lucide-react";
@@ -21,6 +21,191 @@ interface PokedexCardProps {
     onClick: () => void;
 }
 
+const POKEDEX_SPRITE_SCALE_BY_BASE_ID: Record<number, string> = {
+    74: "scale-90", // Geodude
+    75: "scale-90", // Graveler
+    76: "scale-90", // Golem
+    81: "scale-90", // Magnemite
+    82: "scale-90", // Magneton
+    88: "scale-90", // Grimer
+    89: "scale-90", // Muk
+    90: "scale-90", // Shellder
+    91: "scale-90", // Cloyster
+    92: "scale-90", // Gastly
+    93: "scale-90", // Haunter
+    94: "scale-90", // Gengar
+    100: "scale-90", // Voltorb
+    101: "scale-90", // Electrode
+    109: "scale-90", // Koffing
+    110: "scale-90", // Weezing
+    120: "scale-90", // Staryu
+    121: "scale-90", // Starmie
+    128: "scale-90", // Tauros / Paldean Tauros forms
+    137: "scale-90", // Porygon
+    201: "scale-90", // Unown
+    205: "scale-90", // Forretress
+    233: "scale-90", // Porygon2
+    337: "scale-90", // Lunatone
+    338: "scale-90", // Solrock
+    343: "scale-90", // Baltoy
+    344: "scale-90", // Claydol
+    374: "scale-90", // Beldum
+    375: "scale-90", // Metang
+    376: "scale-90", // Metagross
+    436: "scale-90", // Bronzor
+    437: "scale-90", // Bronzong
+    462: "scale-90", // Magnezone
+    474: "scale-90", // Porygon-Z
+    524: "scale-90", // Roggenrola
+    525: "scale-90", // Boldore
+    526: "scale-90", // Gigalith
+    562: "scale-90", // Yamask
+    563: "scale-90", // Cofagrigus
+    597: "scale-90", // Ferroseed
+    598: "scale-90", // Ferrothorn
+    599: "scale-90", // Klink
+    600: "scale-90", // Klang
+    601: "scale-90", // Klinklang
+    615: "scale-90", // Cryogonal
+    618: "scale-90", // Stunfisk
+    707: "scale-90", // Klefki
+    774: "scale-90", // Minior
+    777: "scale-90", // Togedemaru
+    781: "scale-90", // Dhelmise
+    790: "scale-90", // Cosmoem
+    808: "scale-90", // Meltan
+    809: "scale-90", // Melmetal
+    870: "scale-90", // Falinks
+    877: "scale-90", // Morpeko
+    881: "scale-90", // Arctozolt
+    882: "scale-90", // Dracovish
+    883: "scale-90", // Arctovish
+    894: "scale-90", // Regieleki
+    895: "scale-90", // Regidrago
+    989: "scale-90", // Sandy Shocks
+    991: "scale-90", // Iron Bundle
+    1001: "scale-90", // Wo-Chien
+    1002: "scale-90", // Chien-Pao
+    1003: "scale-90", // Ting-Lu
+    1004: "scale-90", // Chi-Yu
+};
+
+const POKEDEX_SPRITE_SCALE_BY_NAME: Array<[string, string]> = [
+    ["paldean tauros", "scale-90"],
+    ["paldea tauros", "scale-90"],
+    ["combat breed", "scale-90"],
+    ["blaze breed", "scale-90"],
+    ["aqua breed", "scale-90"],
+    ["great tusk", "scale-90"],
+    ["iron treads", "scale-90"],
+    ["orthworm", "scale-90"],
+    ["garganacl", "scale-90"],
+    ["klawf", "scale-90"],
+    ["bombirdier", "scale-90"],
+    ["cetoddle", "scale-90"],
+    ["cetitan", "scale-90"],
+    ["dondozo", "scale-90"],
+    ["baxcalibur", "scale-90"],
+    ["ting-lu", "scale-90"],
+    ["okidogi", "scale-90"],
+    ["gouging fire", "scale-90"],
+    ["raging bolt", "scale-90"],
+    ["iron boulder", "scale-90"],
+    ["iron crown", "scale-90"],
+];
+
+const POKEDEX_SMALL_SPRITE_SCALE_BY_BASE_ID: Record<number, string> = {
+    10: "scale-110", // Caterpie
+    11: "scale-110", // Metapod
+    13: "scale-110", // Weedle
+    14: "scale-110", // Kakuna
+    16: "scale-110", // Pidgey
+    19: "scale-110", // Rattata
+    21: "scale-110", // Spearow
+    23: "scale-110", // Ekans
+    27: "scale-110", // Sandshrew
+    41: "scale-110", // Zubat
+    46: "scale-110", // Paras
+    48: "scale-110", // Venonat
+    50: "scale-110", // Diglett
+    60: "scale-110", // Poliwag
+    63: "scale-110", // Abra
+    66: "scale-110", // Machop
+    98: "scale-110", // Krabby
+    129: "scale-110", // Magikarp
+    132: "scale-110", // Ditto
+    133: "scale-110", // Eevee
+    138: "scale-110", // Omanyte
+    140: "scale-110", // Kabuto
+    172: "scale-110", // Pichu
+    173: "scale-110", // Cleffa
+    174: "scale-110", // Igglybuff
+    175: "scale-110", // Togepi
+    177: "scale-110", // Natu
+    183: "scale-110", // Marill
+    191: "scale-110", // Sunkern
+    194: "scale-110", // Wooper
+    204: "scale-110", // Pineco
+    206: "scale-110", // Dunsparce
+    209: "scale-110", // Snubbull
+    220: "scale-110", // Swinub
+    228: "scale-110", // Houndour
+    231: "scale-110", // Phanpy
+    238: "scale-110", // Smoochum
+    239: "scale-110", // Elekid
+    240: "scale-110", // Magby
+    263: "scale-110", // Zigzagoon
+    265: "scale-110", // Wurmple
+    266: "scale-110", // Silcoon
+    268: "scale-110", // Cascoon
+    270: "scale-110", // Lotad
+    273: "scale-110", // Seedot
+    276: "scale-110", // Taillow
+    280: "scale-110", // Ralts
+    283: "scale-110", // Surskit
+    285: "scale-110", // Shroomish
+    287: "scale-110", // Slakoth
+    290: "scale-110", // Nincada
+    293: "scale-110", // Whismur
+    298: "scale-110", // Azurill
+    300: "scale-110", // Skitty
+    316: "scale-110", // Gulpin
+    325: "scale-110", // Spoink
+    328: "scale-110", // Trapinch
+    333: "scale-110", // Swablu
+    339: "scale-110", // Barboach
+    349: "scale-110", // Feebas
+    353: "scale-110", // Shuppet
+    355: "scale-110", // Duskull
+    361: "scale-110", // Snorunt
+    363: "scale-110", // Spheal
+    366: "scale-110", // Clamperl
+    401: "scale-110", // Kricketot
+    403: "scale-110", // Shinx
+    406: "scale-110", // Budew
+    412: "scale-110", // Burmy
+    415: "scale-110", // Combee
+    418: "scale-110", // Buizel
+    420: "scale-110", // Cherubi
+    422: "scale-110", // Shellos
+    425: "scale-110", // Drifloon
+    427: "scale-110", // Buneary
+    431: "scale-110", // Glameow
+    433: "scale-110", // Chingling
+    438: "scale-110", // Bonsly
+    439: "scale-110", // Mime Jr.
+    440: "scale-110", // Happiny
+    443: "scale-110", // Gible
+    446: "scale-110", // Munchlax
+    447: "scale-110", // Riolu
+    449: "scale-110", // Hippopotas
+    451: "scale-110", // Skorupi
+    453: "scale-110", // Croagunk
+    456: "scale-110", // Finneon
+    458: "scale-110", // Mantyke
+    459: "scale-110", // Snover
+};
+
 export const PokedexCard = memo(function PokedexCard({
     pokemonId,
     baseId,
@@ -37,22 +222,35 @@ export const PokedexCard = memo(function PokedexCard({
     onClick
 }: PokedexCardProps) {
     const { accentColor } = useRandomColor();
+    const outlineSeed = useId().replace(/:/g, '');
+    const primaryOutlineId = `pokedex-primary-outline-${outlineSeed}`;
+    const secondaryOutlineId = `pokedex-secondary-outline-${outlineSeed}`;
 
     // Calculate glow intensity based on caught percentage
     const glowIntensity = caughtPercentage / 100;
     const isPartial = caughtPercentage > 0 && caughtPercentage < 100;
     const isComplete = caughtPercentage >= 100;
     const primarySpriteScaleClass = pokemonId === 978 ? "scale-90" : "";
+    const normalizedDisplayName = displayName.toLowerCase();
+    const spriteBalanceScaleClass =
+        POKEDEX_SPRITE_SCALE_BY_NAME.find(([namePart]) => normalizedDisplayName.includes(namePart))?.[1] ||
+        POKEDEX_SPRITE_SCALE_BY_BASE_ID[baseId] ||
+        POKEDEX_SMALL_SPRITE_SCALE_BY_BASE_ID[baseId] ||
+        "";
+    const spriteFrameClass = hasMultipleSprites
+        ? "h-[7.2rem] w-[7.2rem] sm:h-[7.8rem] sm:w-[7.8rem]"
+        : "h-[8.6rem] w-[8.6rem] sm:h-[9.2rem] sm:w-[9.2rem]";
 
     return (
         <button
             type="button"
             onClick={onClick}
             className={cn(
-                "relative group flex flex-col items-center justify-center p-3 rounded-2xl transition-all duration-500 border-2",
-                "backdrop-blur-sm overflow-hidden cursor-pointer w-full min-h-[210px]",
-                "hover:scale-105 active:scale-95",
-                !hasCaughtAny && !isEvolutionSourceHighlighted && "border-white/5 grayscale hover:grayscale-0",
+                "relative group flex min-h-[236px] w-full cursor-pointer flex-col overflow-hidden rounded-xl border-2 p-3",
+                "backdrop-blur-sm transition-all duration-300",
+                "shadow-[inset_0_1px_0_rgba(255,255,255,0.32),0_14px_28px_rgba(0,0,0,0.24)]",
+                "hover:-translate-y-0.5 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.42),0_18px_34px_rgba(0,0,0,0.32)] active:translate-y-0",
+                !hasCaughtAny && !isEvolutionSourceHighlighted && "border-white/5",
             )}
             style={{
                 borderColor: isEvolutionSourceHighlighted
@@ -61,15 +259,15 @@ export const PokedexCard = memo(function PokedexCard({
                         ? `color-mix(in srgb, ${accentColor}, transparent ${isComplete ? 0 : 40}%)`
                         : undefined,
                 boxShadow: isEvolutionSourceHighlighted
-                    ? '0 0 24px rgba(251, 191, 36, 0.45), inset 0 0 12px rgba(251, 191, 36, 0.2)'
+                    ? '0 0 24px rgba(251, 191, 36, 0.45), inset 0 1px 0 rgba(255,255,255,0.42)'
                     : isComplete
-                        ? `0 0 25px ${accentColor}60`
+                        ? `0 0 25px ${accentColor}66, inset 0 1px 0 rgba(255,255,255,0.42)`
                         : undefined,
                 backgroundColor: isEvolutionSourceHighlighted
                     ? 'rgba(120, 83, 18, 0.35)'
                     : !hasCaughtAny
-                    ? 'rgba(0, 0, 0, 0.6)'
-                    : `color-mix(in srgb, ${accentColor}, black 85%)`,
+                    ? 'rgba(12, 12, 15, 0.72)'
+                    : `color-mix(in srgb, ${accentColor} 42%, #17171d 58%)`,
                 '--glow-opacity': glowIntensity,
             } as React.CSSProperties}
             onMouseEnter={(e) => {
@@ -79,6 +277,33 @@ export const PokedexCard = memo(function PokedexCard({
                 if (!hasCaughtAny) e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)';
             }}
         >
+            <div
+                className="pointer-events-none absolute inset-[1px] z-[2] rounded-[0.65rem] border border-white/20 opacity-70 transition-opacity duration-300 group-hover:opacity-95"
+                style={{
+                    background: `linear-gradient(118deg, rgba(255,255,255,0.22) 0%, rgba(134,239,172,0.10) 18%, rgba(125,211,252,0.12) 35%, transparent 49%, rgba(216,180,254,0.14) 67%, rgba(255,255,255,0.16) 100%)`,
+                    mixBlendMode: 'screen',
+                }}
+            />
+            <div
+                className="pointer-events-none absolute inset-0 z-[2] opacity-45 transition-opacity duration-300 group-hover:opacity-80"
+                style={{
+                    backgroundImage: `radial-gradient(circle at 18% 22%, rgba(255,255,255,0.95) 0 1px, transparent 2px), radial-gradient(circle at 76% 18%, rgba(255,255,255,0.8) 0 1px, transparent 2px), radial-gradient(circle at 62% 68%, rgba(255,255,255,0.65) 0 1px, transparent 2px), radial-gradient(circle at 30% 78%, rgba(255,255,255,0.7) 0 1px, transparent 2px)`,
+                    backgroundSize: '74px 86px, 96px 82px, 88px 92px, 110px 94px',
+                    mixBlendMode: 'screen',
+                }}
+                aria-hidden="true"
+            />
+            <div
+                className="pointer-events-none absolute -left-10 top-8 z-[2] h-16 w-[150%] -rotate-12 bg-gradient-to-r from-transparent via-white/16 to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-90"
+                aria-hidden="true"
+            />
+            {hasCaughtAny && (
+                <div
+                    className="absolute inset-x-0 top-0 z-[1] h-1"
+                    style={{ backgroundColor: accentColor }}
+                />
+            )}
+
             {/* Background gradient for partial completion */}
             {isPartial && (
                 <div
@@ -97,8 +322,25 @@ export const PokedexCard = memo(function PokedexCard({
                 )} />
             )}
 
+            <div className="relative z-20 flex w-full items-center justify-between gap-2">
+                <span className="rounded-md border border-white/10 bg-black/25 px-2 py-1 text-[11px] font-black leading-none text-white/75 tabular-nums backdrop-blur-sm">
+                    #{baseId.toString().padStart(4, '0')}
+                </span>
+                {hasCaughtAny && (
+                    <span
+                        className={cn(
+                            "inline-flex h-6 min-w-6 items-center justify-center rounded-md px-2 text-[10px] font-black leading-none text-white shadow-sm",
+                            isComplete ? "bg-primary" : "bg-white/10"
+                        )}
+                        style={isComplete ? { backgroundColor: accentColor } : undefined}
+                    >
+                        {isComplete ? "✓" : `${Math.round(caughtPercentage)}%`}
+                    </span>
+                )}
+            </div>
+
             {isEvolutionSourceHighlighted && (
-                <div className="absolute top-2 left-2 z-20 rounded-full border border-amber-300/70 bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold text-amber-100">
+                <div className="absolute left-2 top-9 z-20 rounded-full border border-amber-300/70 bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold text-amber-100">
                     EVO
                 </div>
             )}
@@ -107,7 +349,7 @@ export const PokedexCard = memo(function PokedexCard({
                 <div
                     className={cn(
                         "absolute z-20 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold shadow-sm backdrop-blur",
-                        isEvolutionSourceHighlighted ? "top-7 left-2" : "top-2 left-2",
+                        isEvolutionSourceHighlighted ? "top-14 left-2" : "top-9 left-2",
                         shinyAvailability === 'unobtainable'
                             ? "border-fuchsia-200/70 bg-fuchsia-500/20 text-fuchsia-50 ring-1 ring-fuchsia-300/30"
                             : "border-amber-200/70 bg-amber-500/20 text-amber-50 ring-1 ring-amber-300/30"
@@ -132,12 +374,49 @@ export const PokedexCard = memo(function PokedexCard({
             )}
 
             {/* Sprites container */}
-            <div className="relative flex items-center justify-center z-10 h-44 w-full px-2">
-                <div className="flex items-center justify-center gap-1 w-full translate-y-2">
+            <div className="relative z-10 mt-2 flex h-[168px] w-full items-center justify-center overflow-hidden rounded-xl border border-white/15 bg-black/20 px-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.22),inset_0_-10px_20px_rgba(0,0,0,0.18)]">
+                <div
+                    className="pointer-events-none absolute inset-0 z-[1] opacity-70"
+                    style={{
+                        background: `linear-gradient(128deg, rgba(255,255,255,0.20) 0%, rgba(125,211,252,0.10) 22%, transparent 42%, rgba(244,114,182,0.10) 72%, transparent 100%)`,
+                        mixBlendMode: 'screen',
+                    }}
+                    aria-hidden="true"
+                />
+                <div
+                    className="pointer-events-none absolute inset-0 z-[1] opacity-35"
+                    style={{
+                        backgroundImage: `radial-gradient(circle at 24% 30%, rgba(255,255,255,0.9) 0 1px, transparent 2px), radial-gradient(circle at 72% 42%, rgba(255,255,255,0.75) 0 1px, transparent 2px), radial-gradient(circle at 46% 78%, rgba(255,255,255,0.65) 0 1px, transparent 2px)`,
+                        backgroundSize: '62px 58px, 84px 70px, 96px 76px',
+                        mixBlendMode: 'screen',
+                    }}
+                    aria-hidden="true"
+                />
+                <svg className="absolute h-0 w-0" aria-hidden="true" focusable="false">
+                    <filter id={primaryOutlineId} x="-24%" y="-24%" width="148%" height="148%" colorInterpolationFilters="sRGB">
+                        <feMorphology in="SourceAlpha" operator="dilate" radius="0.5" result="outline" />
+                        <feFlood floodColor="#050505" result="outlineColor" />
+                        <feComposite in="outlineColor" in2="outline" operator="in" result="outlineShape" />
+                        <feMerge>
+                            <feMergeNode in="outlineShape" />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+                    <filter id={secondaryOutlineId} x="-24%" y="-24%" width="148%" height="148%" colorInterpolationFilters="sRGB">
+                        <feMorphology in="SourceAlpha" operator="dilate" radius="0.5" result="outline" />
+                        <feFlood floodColor="#050505" result="outlineColor" />
+                        <feComposite in="outlineColor" in2="outline" operator="in" result="outlineShape" />
+                        <feMerge>
+                            <feMergeNode in="outlineShape" />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+                </svg>
+                <div className="flex h-full w-full items-center justify-center gap-1">
                     {/* Primary sprite */}
                     <div className={cn(
-                        "relative flex items-center justify-center transition-all duration-500",
-                        hasMultipleSprites ? "w-[48%]" : "w-full max-w-[180px]",
+                        "relative flex shrink-0 items-center justify-center transition-all duration-500",
+                        spriteFrameClass,
                         primarySpriteScaleClass
                     )}>
                         <img
@@ -145,12 +424,18 @@ export const PokedexCard = memo(function PokedexCard({
                             src={toLocalPokemonSpriteUrl(spriteUrl)}
                             alt={`${displayName} shiny`}
                             className={cn(
-                                "h-full w-full pokemon-sprite transition-all duration-500 object-contain max-h-48",
+                                "pokemon-sprite h-full w-full object-contain transition-all duration-500",
                                 isPrimaryCaught
-                                    ? "drop-shadow-[0_0_12px_rgba(255,255,255,0.8)] scale-105 brightness-110"
-                                    : "opacity-40 grayscale group-hover:opacity-60"
+                                    ? "brightness-110"
+                                    : "",
+                                spriteBalanceScaleClass
                             )}
-                            style={{ imageRendering: 'auto' }}
+                            style={{
+                                imageRendering: 'auto',
+                                filter: isPrimaryCaught
+                                    ? `url(#${primaryOutlineId}) drop-shadow(0 4px 8px rgba(0,0,0,0.85))`
+                                    : `grayscale(1) brightness(0.78) url(#${primaryOutlineId}) drop-shadow(0 4px 8px rgba(0,0,0,0.85))`,
+                            }}
                             loading="lazy"
                             decoding="async"
                             referrerPolicy="no-referrer"
@@ -162,18 +447,27 @@ export const PokedexCard = memo(function PokedexCard({
 
                     {/* Secondary sprite if applicable */}
                     {hasMultipleSprites && secondarySprite && (
-                        <div className="relative w-[48%] flex items-center justify-center transition-all duration-500">
+                        <div className={cn(
+                            "relative flex shrink-0 items-center justify-center transition-all duration-500",
+                            spriteFrameClass
+                        )}>
                             <img
                                 key={secondarySprite}
                                 src={toLocalPokemonSpriteUrl(secondarySprite)}
                                 alt={`${displayName} shiny secondary`}
                                 className={cn(
-                                    "h-full w-full pokemon-sprite transition-all duration-500 object-contain max-h-40",
+                                    "pokemon-sprite h-full w-full object-contain transition-all duration-500",
                                     isSecondaryCaught
-                                        ? "drop-shadow-[0_0_12px_rgba(255,255,255,0.8)] scale-105 brightness-110"
-                                        : "opacity-40 grayscale group-hover:opacity-60"
+                                        ? "brightness-110"
+                                        : "",
+                                    spriteBalanceScaleClass
                                 )}
-                                style={{ imageRendering: 'auto' }}
+                                style={{
+                                    imageRendering: 'auto',
+                                    filter: isSecondaryCaught
+                                        ? `url(#${secondaryOutlineId}) drop-shadow(0 4px 8px rgba(0,0,0,0.85))`
+                                        : `grayscale(1) brightness(0.78) url(#${secondaryOutlineId}) drop-shadow(0 4px 8px rgba(0,0,0,0.85))`,
+                                }}
                                 loading="lazy"
                                 decoding="async"
                                 referrerPolicy="no-referrer"
@@ -187,12 +481,9 @@ export const PokedexCard = memo(function PokedexCard({
             </div>
 
             {/* Pokemon info */}
-            <div className="flex flex-col items-center mt-2 z-10">
-                <p className="text-xs text-muted-foreground">
-                    #{baseId.toString().padStart(4, '0')}
-                </p>
+            <div className="z-10 mt-2 flex min-h-[40px] w-full flex-col items-center justify-center rounded-lg border border-white/10 bg-black/20 px-2 py-2">
                 <p className={cn(
-                    "text-sm font-medium truncate max-w-full transition-colors",
+                    "max-w-full truncate text-center text-sm font-medium transition-colors",
                     isComplete ? "text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.5)]" : "text-muted-foreground"
                 )}>
                     {displayName}
@@ -200,7 +491,7 @@ export const PokedexCard = memo(function PokedexCard({
             </div>
 
             {/* Completion indicator */}
-            {hasCaughtAny && (
+            {false && hasCaughtAny && (
                 <div className={cn(
                     "absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold shadow-sm",
                     isComplete

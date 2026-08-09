@@ -303,16 +303,18 @@ export default function Pokedex() {
                                 const hasFormMatch = hasCaughtForm(statsForPrimary, p.name);
                                 const hasPrimaryCaughtRows = (statsForPrimary?.count || 0) > 0;
                                 const hasPrimaryLegacyRows = hasPrimaryCaughtRows && !formsForId?.size && !statsForPrimary?.genders.size;
-                                const isPrimaryCaught = hasPrimaryCaughtRows &&
+                                const isPrimaryCaught = Boolean(hasPrimaryCaughtRows &&
                                     (isSpecialFormId
                                         ? hasFormMatch || hasPrimaryLegacyRows
-                                        : (!hasGenderDiff || statsForPrimary?.genders.has('male') || hasFormMatch || hasPrimaryLegacyRows));
+                                        : hasGenderDiff
+                                            ? statsForPrimary?.genders.has('male')
+                                            : hasFormMatch || hasPrimaryLegacyRows || hasPrimaryCaughtRows));
 
                                 // 2. Secondary sprite (Female or Rapid Strike)
                                 let isSecondaryCaught = false;
                                 if (hasGenderDiff) {
-                                    isSecondaryCaught = (femaleId && caughtData[femaleId]?.count > 0) ||
-                                        (!femaleId && statsForPrimary?.genders.has('female'));
+                                    isSecondaryCaught = Boolean((femaleId && caughtData[femaleId]?.count > 0) ||
+                                        statsForPrimary?.genders.has('female'));
                                 } else if (hasFormDiff && secondaryForm) {
                                     isSecondaryCaught = caughtData[secondaryForm.id]?.count > 0 ||
                                         hasCaughtForm(statsForPrimary, secondaryForm.name);
