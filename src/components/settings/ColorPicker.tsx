@@ -43,39 +43,37 @@ const rgbToHex = (r: number, g: number, b: number) => (
     `#${[r, g, b].map((value) => clamp(Math.round(value), 0, 255).toString(16).padStart(2, '0')).join('')}`
 );
 
-const rgbToHsl = (hex: string) => {
+const rgbToHsv = (hex: string) => {
     const rgb = hexToRgb(hex);
-    if (!rgb) return { h: 260, s: 70, l: 55 };
+    if (!rgb) return { h: 260, s: 76, v: 80 };
 
     const r = rgb.r / 255;
     const g = rgb.g / 255;
     const b = rgb.b / 255;
     const max = Math.max(r, g, b);
     const min = Math.min(r, g, b);
-    const l = (max + min) / 2;
     const d = max - min;
 
-    if (d === 0) return { h: 0, s: 0, l: Math.round(l * 100) };
-
-    const s = d / (1 - Math.abs(2 * l - 1));
     let h = 0;
-    if (max === r) h = 60 * (((g - b) / d) % 6);
-    if (max === g) h = 60 * ((b - r) / d + 2);
-    if (max === b) h = 60 * ((r - g) / d + 4);
+    if (d !== 0) {
+        if (max === r) h = 60 * (((g - b) / d) % 6);
+        if (max === g) h = 60 * ((b - r) / d + 2);
+        if (max === b) h = 60 * ((r - g) / d + 4);
+    }
 
     return {
         h: Math.round((h + 360) % 360),
-        s: Math.round(s * 100),
-        l: Math.round(l * 100),
+        s: max === 0 ? 0 : Math.round((d / max) * 100),
+        v: Math.round(max * 100),
     };
 };
 
-const hslToHex = (h: number, s: number, l: number) => {
+const hsvToHex = (h: number, s: number, v: number) => {
     const saturation = clamp(s, 0, 100) / 100;
-    const lightness = clamp(l, 0, 100) / 100;
-    const chroma = (1 - Math.abs(2 * lightness - 1)) * saturation;
+    const value = clamp(v, 0, 100) / 100;
+    const chroma = value * saturation;
     const x = chroma * (1 - Math.abs(((h / 60) % 2) - 1));
-    const m = lightness - chroma / 2;
+    const m = value - chroma;
     const hue = ((h % 360) + 360) % 360;
     let r = 0;
     let g = 0;
@@ -94,12 +92,9 @@ const hslToHex = (h: number, s: number, l: number) => {
 export function ColorPicker({ label, value, onChange, presets = DEFAULT_PRESETS }: ColorPickerProps) {
     const [customColor, setCustomColor] = useState(value);
     const pickerColor = isHexColor(customColor) ? customColor : value;
-    const wheelRef = useRef<HTMLButtonElement | null>(null);
-    const hsl = useMemo(() => rgbToHsl(pickerColor), [pickerColor]);
-    const wheelHandle = {
-        x: 50 + Math.cos((hsl.h - 90) * Math.PI / 180) * 39,
-        y: 50 + Math.sin((hsl.h - 90) * Math.PI / 180) * 39,
-    };
+    const shadeRef = useRef<HTMLButtonElement | null>(null);
+    const hueRef = useRef<HTMLButtonElement | null>(null);
+    const hsv = useMemo(() => rgbToHsv(pickerColor), [pickerColor]);
 
     useEffect(() => {
         setCustomColor(value);
@@ -124,14 +119,24 @@ export function ColorPicker({ label, value, onChange, presets = DEFAULT_PRESETS 
         }
     };
 
-    const setColorFromWheelPointer = (event: PointerEvent<HTMLButtonElement>) => {
-        const rect = wheelRef.current?.getBoundingClientRect();
+    const setColorFromShadePointer = (event: PointerEvent<HTMLButtonElement>) => {
+        const rect = shadeRef.current?.getBoundingClientRect();
         if (!rect) return;
 
-        const x = event.clientX - rect.left - rect.width / 2;
-        const y = event.clientY - rect.top - rect.height / 2;
-        const hue = Math.round((Math.atan2(y, x) * 180 / Math.PI + 450) % 360);
-        const nextColor = hslToHex(hue, hsl.s || 76, clamp(hsl.l, 28, 72));
+        const saturation = clamp(((event.clientX - rect.left) / rect.width) * 100, 0, 100);
+        const value = clamp(100 - ((event.clientY - rect.top) / rect.height) * 100, 0, 100);
+        const nextColor = hsvToHex(hsv.h, saturation, value);
+
+        setCustomColor(nextColor);
+        onChange(nextColor);
+    };
+
+    const setColorFromHuePointer = (event: PointerEvent<HTMLButtonElement>) => {
+        const rect = hueRef.current?.getBoundingClientRect();
+        if (!rect) return;
+
+        const hue = Math.round(clamp(((event.clientX - rect.left) / rect.width) * 359, 0, 359));
+        const nextColor = hsvToHex(hue, hsv.s || 76, hsv.v || 80);
 
         setCustomColor(nextColor);
         onChange(nextColor);
@@ -169,33 +174,62 @@ export function ColorPicker({ label, value, onChange, presets = DEFAULT_PRESETS 
             </div>
 
             {/* Custom Color Input */}
-            <div className="grid gap-3 sm:grid-cols-[8rem_minmax(0,1fr)]">
-                <div className="flex items-center justify-center">
+            <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_8.5rem]">
+                <div className="grid gap-2">
                     <button
-                        ref={wheelRef}
+                        ref={shadeRef}
                         type="button"
-                        className="relative h-28 w-28 touch-none rounded-full border border-border shadow-inner outline-none ring-offset-background transition focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                        className="relative h-40 w-full touch-none overflow-hidden rounded-xl border border-border shadow-inner outline-none ring-offset-background transition focus:ring-2 focus:ring-ring focus:ring-offset-2 sm:h-36"
                         style={{
-                            background: 'conic-gradient(from 0deg, #ef4444, #f97316, #facc15, #22c55e, #06b6d4, #3b82f6, #8b5cf6, #ec4899, #ef4444)',
+                            backgroundColor: `hsl(${hsv.h} 100% 50%)`,
                         }}
-                        aria-label={`Ruota colori ${label}`}
+                        aria-label={`Sfumatura ${label}`}
                         onPointerDown={(event) => {
+                            event.preventDefault();
                             event.currentTarget.setPointerCapture(event.pointerId);
-                            setColorFromWheelPointer(event);
+                            setColorFromShadePointer(event);
                         }}
                         onPointerMove={(event) => {
                             if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-                                setColorFromWheelPointer(event);
+                                setColorFromShadePointer(event);
                             }
                         }}
                     >
-                        <span className="absolute inset-[22%] rounded-full border border-black/20 bg-background shadow-inner" />
+                        <span className="absolute inset-0 bg-gradient-to-r from-white to-transparent" />
+                        <span className="absolute inset-0 bg-gradient-to-t from-black to-transparent" />
                         <span
-                            className="absolute h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow-[0_1px_4px_rgba(0,0,0,0.7)]"
+                            className="absolute h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow-[0_1px_5px_rgba(0,0,0,0.85)] ring-1 ring-black/40"
                             style={{
-                                left: `${wheelHandle.x}%`,
-                                top: `${wheelHandle.y}%`,
+                                left: `${hsv.s}%`,
+                                top: `${100 - hsv.v}%`,
                                 backgroundColor: pickerColor,
+                            }}
+                        />
+                    </button>
+                    <button
+                        ref={hueRef}
+                        type="button"
+                        className="relative h-8 w-full touch-none rounded-full border border-border shadow-inner outline-none ring-offset-background transition focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                        style={{
+                            background: 'linear-gradient(90deg, #ef4444, #f97316, #facc15, #22c55e, #06b6d4, #3b82f6, #8b5cf6, #ec4899, #ef4444)',
+                        }}
+                        aria-label={`Tonalita ${label}`}
+                        onPointerDown={(event) => {
+                            event.preventDefault();
+                            event.currentTarget.setPointerCapture(event.pointerId);
+                            setColorFromHuePointer(event);
+                        }}
+                        onPointerMove={(event) => {
+                            if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+                                setColorFromHuePointer(event);
+                            }
+                        }}
+                    >
+                        <span
+                            className="absolute top-1/2 h-7 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow-[0_1px_5px_rgba(0,0,0,0.8)]"
+                            style={{
+                                left: `${hsv.h / 3.6}%`,
+                                backgroundColor: `hsl(${hsv.h} 100% 50%)`,
                             }}
                         />
                     </button>
