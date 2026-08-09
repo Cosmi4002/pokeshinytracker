@@ -184,18 +184,17 @@ export const MANUAL_VARIETIES: Record<number, { id: number, name: string }[]> = 
     { id: 10085, name: 'furfrou-pharaoh' }
   ],
   710: [ // Pumpkaboo
-    { id: 10086, name: 'pumpkaboo-small' },
-    { id: 10087, name: 'pumpkaboo-large' },
-    { id: 10088, name: 'pumpkaboo-super' }
+    { id: 10027, name: 'pumpkaboo-small' },
+    { id: 10028, name: 'pumpkaboo-large' },
+    { id: 10029, name: 'pumpkaboo-super' }
   ],
   711: [ // Gourgeist
-    { id: 10089, name: 'gourgeist-small' },
-    { id: 10090, name: 'gourgeist-large' },
-    { id: 10091, name: 'gourgeist-super' }
+    { id: 10030, name: 'gourgeist-small' },
+    { id: 10031, name: 'gourgeist-large' },
+    { id: 10032, name: 'gourgeist-super' }
   ],
   718: [ // Zygarde
-    { id: 10118, name: 'zygarde-10' },
-    { id: 10120, name: 'zygarde-complete' }
+    { id: 10118, name: 'zygarde-10' }
   ],
   745: [ // Lycanroc
     { id: 10126, name: 'lycanroc-midnight' },
@@ -341,8 +340,8 @@ export function formatPokemonName(name: string, id: number, baseId?: number): st
   if (name.toLowerCase().includes('indeedee-female')) return 'Indeedee Femmina';
 
   // Urshifu name overrides
-  if (name.toLowerCase().includes('urshifu-single-strike')) return 'Urshifu';
-  if (name.toLowerCase().includes('urshifu-rapid-strike')) return 'Urshifu';
+  if (name.toLowerCase().includes('urshifu-single-strike')) return 'Urshifu (Single Strike)';
+  if (name.toLowerCase().includes('urshifu-rapid-strike')) return 'Urshifu (Rapid Strike)';
 
   // Wishiwashi name overrides
   if (name.toLowerCase().includes('wishiwashi-solo')) return 'Wishiwashi';
@@ -462,6 +461,27 @@ export function formatPokemonName(name: string, id: number, baseId?: number): st
     if (name.includes('super')) return `${base} (Maxi)`;
     if (name.includes('average')) return `${base} (Medio)`;
     return base;
+  }
+
+  // Teacup/tea form naming
+  if (name.toLowerCase().includes('sinistea')) {
+    if (name.includes('antique')) return 'Sinistea (Antique)';
+    return 'Sinistea (Phony)';
+  }
+
+  if (name.toLowerCase().includes('polteageist')) {
+    if (name.includes('antique')) return 'Polteageist (Antique)';
+    return 'Polteageist (Phony)';
+  }
+
+  if (name.toLowerCase().includes('poltchageist')) {
+    if (name.includes('artisan')) return 'Poltchageist (Artisan)';
+    return 'Poltchageist (Counterfeit)';
+  }
+
+  if (name.toLowerCase().includes('sinistcha')) {
+    if (name.includes('masterpiece')) return 'Sinistcha (Masterpiece)';
+    return 'Sinistcha (Unremarkable)';
   }
 
   // Toxtricity naming

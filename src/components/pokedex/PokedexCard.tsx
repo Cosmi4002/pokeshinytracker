@@ -42,6 +42,7 @@ export const PokedexCard = memo(function PokedexCard({
     const glowIntensity = caughtPercentage / 100;
     const isPartial = caughtPercentage > 0 && caughtPercentage < 100;
     const isComplete = caughtPercentage >= 100;
+    const primarySpriteScaleClass = pokemonId === 978 ? "scale-90" : "";
 
     return (
         <button
@@ -136,7 +137,8 @@ export const PokedexCard = memo(function PokedexCard({
                     {/* Primary sprite */}
                     <div className={cn(
                         "relative flex items-center justify-center transition-all duration-500",
-                        hasMultipleSprites ? "w-[48%]" : "w-full max-w-[180px]"
+                        hasMultipleSprites ? "w-[48%]" : "w-full max-w-[180px]",
+                        primarySpriteScaleClass
                     )}>
                         <img
                             key={spriteUrl}

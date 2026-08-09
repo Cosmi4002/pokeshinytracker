@@ -165,7 +165,7 @@
     "id": 10148,
     "baseId": 25,
     "name": "pikachu-partner-cap",
-    "generation": 1
+    "generation": 7
   },
   {
     "id": 26,
@@ -4632,18 +4632,18 @@
     "name": "pumpkaboo-average",
     "generation": 6
   },
-  { "id": 10023, "baseId": 710, "name": "pumpkaboo-small", "generation": 6 },
-  { "id": 10024, "baseId": 710, "name": "pumpkaboo-large", "generation": 6 },
-  { "id": 10025, "baseId": 710, "name": "pumpkaboo-super", "generation": 6 },
+  { "id": 10027, "baseId": 710, "name": "pumpkaboo-small", "generation": 6 },
+  { "id": 10028, "baseId": 710, "name": "pumpkaboo-large", "generation": 6 },
+  { "id": 10029, "baseId": 710, "name": "pumpkaboo-super", "generation": 6 },
   {
     "id": 711,
     "baseId": 711,
     "name": "gourgeist-average",
     "generation": 6
   },
-  { "id": 10026, "baseId": 711, "name": "gourgeist-small", "generation": 6 },
-  { "id": 10027, "baseId": 711, "name": "gourgeist-large", "generation": 6 },
-  { "id": 10028, "baseId": 711, "name": "gourgeist-super", "generation": 6 },
+  { "id": 10030, "baseId": 711, "name": "gourgeist-small", "generation": 6 },
+  { "id": 10031, "baseId": 711, "name": "gourgeist-large", "generation": 6 },
+  { "id": 10032, "baseId": 711, "name": "gourgeist-super", "generation": 6 },
   {
     "id": 712,
     "baseId": 712,
@@ -5532,12 +5532,14 @@
     "name": "sinistea",
     "generation": 8
   },
+  { "id": 10388, "baseId": 854, "name": "sinistea-antique", "generation": 8 },
   {
     "id": 855,
     "baseId": 855,
     "name": "polteageist",
     "generation": 8
   },
+  { "id": 10389, "baseId": 855, "name": "polteageist-antique", "generation": 8 },
   {
     "id": 856,
     "baseId": 856,
@@ -6486,12 +6488,14 @@
     "name": "poltchageist",
     "generation": 9
   },
+  { "id": 10390, "baseId": 1012, "name": "poltchageist-artisan", "generation": 9 },
   {
     "id": 1013,
     "baseId": 1013,
     "name": "sinistcha",
     "generation": 9
   },
+  { "id": 10391, "baseId": 1013, "name": "sinistcha-masterpiece", "generation": 9 },
   {
     "id": 1014,
     "baseId": 1014,

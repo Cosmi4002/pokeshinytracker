@@ -2129,7 +2129,6 @@ const CURATED_SHINY_ORIGIN_BY_NAME: AvailabilityByName = {
   'shaymin': ["platinum","brilliantdiamond","shiningpearl"],
   'zygarde-50': ["sword","shield"],
   'zygarde-10': ["sword","shield"],
-  'zygarde-complete': ["sword","shield"],
 };
 
 export const AVAILABILITY_RULE_LABEL =

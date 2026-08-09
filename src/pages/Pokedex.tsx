@@ -96,14 +96,11 @@ export default function Pokedex() {
             671: 'florges',
             676: 'furfrou',
             773: 'silvally',
-            710: 'pumpkaboo-average',
-            711: 'gourgeist-average',
             741: 'oricorio-baile',
             774: 'minior-red-meteor',
             801: 'magearna',
             849: 'toxtricity-amped',
             869: 'alcremie-vanilla-cream-strawberry-sweet',
-            892: 'urshifu-single-strike',
             925: 'maushold-family-of-three',
             931: 'squawkabilly-green-plumage',
             982: 'dudunsparce-three-segment',
@@ -112,7 +109,7 @@ export default function Pokedex() {
         };
         // Always show these full species lines even if some forms were hidden via overrides.
         const forceVisibleBaseIds = new Set([351, 386, 666]);
-        const forceSingleCardBaseIds = new Set([201, 493, 669, 670, 671, 676, 773, 710, 711, 741, 774, 849, 869, 925, 931, 1017, 1024]);
+        const forceSingleCardBaseIds = new Set([201, 493, 669, 670, 671, 676, 773, 741, 774, 849, 869, 925, 931, 1017, 1024]);
         // Some species are easier to track as separate entries (each form as its own "base" card).
         // Keep them as individual Pokédex cards instead of a single % card.
         const splitIntoSeparateCardsBaseIds = new Set([
@@ -155,7 +152,7 @@ export default function Pokedex() {
         const searchLower = search.toLowerCase();
 
         // Lista di baseId che devono mostrare solo la forma base
-        const ONLY_BASE_FORM = [493, 669, 670, 671, 676, 773, 710, 711, 741, 774, 849, 869, 925, 931, 1017, 1024];
+        const ONLY_BASE_FORM = [493, 669, 670, 671, 676, 773, 741, 774, 849, 869, 925, 931, 1017, 1024];
         // Mappa baseId -> nome forma base
         const BASE_FORM_NAME: Record<number, string> = {
             493: 'arceus',
@@ -164,8 +161,6 @@ export default function Pokedex() {
             671: 'florges',
             676: 'furfrou',
             773: 'silvally',
-            710: 'pumpkaboo-average',
-            711: 'gourgeist-average',
             741: 'oricorio-baile',
             774: 'minior-red-meteor',
             849: 'toxtricity-amped',
@@ -294,8 +289,8 @@ export default function Pokedex() {
                                 const femaleVariant = group.find(v => v.name.endsWith('-female') && v.id !== p.id);
                                 const femaleId = femaleVariant ? femaleVariant.id : undefined;
 
-                                // Form diff logic (e.g. Urshifu 892)
-                                const hasFormDiff = p.baseId === 892 && group.length >= 2;
+                                // Form diff logic
+                                const hasFormDiff = false;
                                 const secondaryForm = hasFormDiff ? group.find(v => v.id !== p.id) : undefined;
 
                                 const hasMultipleSprites = hasGenderDiff || hasFormDiff;

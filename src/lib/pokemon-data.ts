@@ -706,6 +706,7 @@ export function _getPokemonSpriteUrlRaw(pokemonId: number, options: { shiny?: bo
   if (name && name.toLowerCase().includes('pumpkaboo')) {
     const sName = name.toLowerCase();
     const subPath = shiny ? 'shiny' : 'normal';
+    if (sName.includes('average')) return `https://img.pokemondb.net/sprites/home/${subPath}/pumpkaboo.png`;
     if (sName.includes('small')) return `https://img.pokemondb.net/sprites/home/${subPath}/pumpkaboo-small.png`;
     if (sName.includes('large')) return `https://img.pokemondb.net/sprites/home/${subPath}/pumpkaboo-large.png`;
     if (sName.includes('super')) return `https://img.pokemondb.net/sprites/home/${subPath}/pumpkaboo-super.png`;
@@ -715,9 +716,37 @@ export function _getPokemonSpriteUrlRaw(pokemonId: number, options: { shiny?: bo
   if (name && name.toLowerCase().includes('gourgeist')) {
     const sName = name.toLowerCase();
     const subPath = shiny ? 'shiny' : 'normal';
+    if (sName.includes('average')) return `https://img.pokemondb.net/sprites/home/${subPath}/gourgeist.png`;
     if (sName.includes('small')) return `https://img.pokemondb.net/sprites/home/${subPath}/gourgeist-small.png`;
     if (sName.includes('large')) return `https://img.pokemondb.net/sprites/home/${subPath}/gourgeist-large.png`;
     if (sName.includes('super')) return `https://img.pokemondb.net/sprites/home/${subPath}/gourgeist-super.png`;
+  }
+
+  // Teacup/tea form overrides
+  if (name && name.toLowerCase().includes('sinistea')) {
+    const sName = name.toLowerCase();
+    const subPath = shiny ? 'shiny' : 'normal';
+    if (sName.includes('antique')) return `https://img.pokemondb.net/sprites/home/${subPath}/sinistea-antique.png`;
+    return `https://img.pokemondb.net/sprites/home/${subPath}/sinistea.png`;
+  }
+
+  if (name && name.toLowerCase().includes('polteageist')) {
+    const sName = name.toLowerCase();
+    const subPath = shiny ? 'shiny' : 'normal';
+    if (sName.includes('antique')) return `https://img.pokemondb.net/sprites/home/${subPath}/polteageist-antique.png`;
+    return `https://img.pokemondb.net/sprites/home/${subPath}/polteageist.png`;
+  }
+
+  if (name && name.toLowerCase().includes('poltchageist')) {
+    const sName = name.toLowerCase();
+    const subPath = shiny ? 'shiny' : 'normal';
+    if (sName.includes('artisan')) return `https://img.pokemondb.net/sprites/home/${subPath}/poltchageist-artisan.png`;
+    return `https://img.pokemondb.net/sprites/home/${subPath}/poltchageist.png`;
+  }
+
+  if (name && name.toLowerCase().includes('sinistcha')) {
+    const subPath = shiny ? 'shiny' : 'normal';
+    return `https://img.pokemondb.net/sprites/home/${subPath}/sinistcha.png`;
   }
 
   // Deerling seasonal overrides
@@ -964,7 +993,7 @@ export const POKEMON_FORM_COUNTS: Record<number, number> = {
   681: 2, // Aegislash
   710: 4, // Pumpkaboo
   711: 4, // Gourgeist
-  718: 3, // Zygarde (10, 50, Complete)
+  718: 2, // Zygarde (10, 50)
   720: 2, // Hoopa
   // Gen 7
   741: 4, // Oricorio
@@ -996,6 +1025,8 @@ export const POKEMON_FORM_COUNTS: Record<number, number> = {
   978: 3, // Tatsugiri
   982: 2, // Dudunsparce
   999: 2, // Gimmighoul
+  1012: 2, // Poltchageist
+  1013: 2, // Sinistcha
   1011: 4, // Dipplin/Hydra - Ogerpon (4 masks)
   1024: 3, // Terapagos
 };
