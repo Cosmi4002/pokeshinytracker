@@ -1,15 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
-import type { ComponentType } from 'react';
+import type { ComponentType, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
   BarChart3,
+  CalendarDays,
   CircleDot,
   Crown,
+  Dice5,
   Gamepad2,
   Grid3X3,
+  Hash,
   LogIn,
   Medal,
   Sparkles,
+  Target,
   TrendingUp,
 } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
@@ -107,17 +111,6 @@ const getLuckScore = (entry: CaughtShinyRow) => {
   return attempts / Math.max(odds, 1);
 };
 
-const formatRecordHunt = (entry: CaughtShinyRow | null, showOdds = false) => {
-  if (!entry) return '-';
-
-  const attempts = Number(entry.attempts || 0);
-  const base = `${entry.pokemon_name} (${getGameLabel(entry.game)}) - ${numberFormatter.format(attempts)}`;
-  if (!showOdds) return base;
-
-  const odds = Math.round(getDynamicOdds(entry.method, attempts, entry.has_shiny_charm === true));
-  return `${base} / 1:${numberFormatter.format(odds)}`;
-};
-
 function StatCard({
   title,
   value,
@@ -152,6 +145,71 @@ function StatCard({
         <p className="mt-1 text-xs text-muted-foreground">{note}</p>
       </CardContent>
     </Card>
+  );
+}
+
+function RecordDetail({
+  icon: Icon,
+  children,
+}: {
+  icon: ComponentType<{ className?: string }>;
+  children: ReactNode;
+}) {
+  return (
+    <span className="inline-flex min-w-0 items-center gap-1.5 rounded-md border bg-background/70 px-2.5 py-1 text-xs text-muted-foreground">
+      <Icon className="h-3.5 w-3.5 shrink-0" />
+      <span className="min-w-0 truncate">{children}</span>
+    </span>
+  );
+}
+
+function RecordHunt({
+  label,
+  entry,
+  accentColor,
+}: {
+  label: string;
+  entry: CaughtShinyRow | null;
+  accentColor: string;
+}) {
+  if (!entry) {
+    return (
+      <div className="rounded-md border bg-muted/20 p-3">
+        <div className="text-xs font-medium uppercase text-muted-foreground">{label}</div>
+        <div className="mt-1 font-semibold">-</div>
+      </div>
+    );
+  }
+
+  const attempts = Number(entry.attempts || 0);
+  const odds = Math.round(getDynamicOdds(entry.method, attempts, entry.has_shiny_charm === true));
+
+  return (
+    <div className="rounded-md border bg-muted/20 p-3">
+      <div className="text-xs font-medium uppercase text-muted-foreground">{label}</div>
+      <div className="mt-1 min-w-0 text-base font-semibold leading-tight">
+        <span className="break-words">{entry.pokemon_name}</span>
+      </div>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <RecordDetail icon={Gamepad2}>{getGameLabel(entry.game)}</RecordDetail>
+        <RecordDetail icon={Target}>{getMethodLabel(entry.method)}</RecordDetail>
+        <RecordDetail icon={Hash}>{numberFormatter.format(attempts)} enc.</RecordDetail>
+        <RecordDetail icon={Dice5}>1/{numberFormatter.format(odds)}</RecordDetail>
+        {entry.has_shiny_charm && (
+          <span
+            className="inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium"
+            style={{
+              borderColor: `color-mix(in srgb, ${accentColor}, transparent 55%)`,
+              color: accentColor,
+              backgroundColor: `color-mix(in srgb, ${accentColor}, transparent 92%)`,
+            }}
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+            Cromamuleto
+          </span>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -423,18 +481,15 @@ export default function Stats() {
               <CardTitle className="text-base">Record</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 text-sm">
-              <div>
-                <div className="text-muted-foreground">Mese migliore</div>
-                <div className="font-semibold">{stats.bestMonth ? `${stats.bestMonth.label} (${stats.bestMonth.value})` : '-'}</div>
+              <div className="rounded-md border bg-muted/20 p-3">
+                <div className="text-xs font-medium uppercase text-muted-foreground">Mese migliore</div>
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <RecordDetail icon={CalendarDays}>{stats.bestMonth?.label || '-'}</RecordDetail>
+                  {stats.bestMonth && <RecordDetail icon={Sparkles}>{numberFormatter.format(stats.bestMonth.value)} shiny</RecordDetail>}
+                </div>
               </div>
-              <div>
-                <div className="text-muted-foreground">Caccia più lunga</div>
-                <div className="font-semibold">{formatRecordHunt(stats.longestHunt)}</div>
-              </div>
-              <div>
-                <div className="text-muted-foreground">Caccia più fortunata</div>
-                <div className="font-semibold">{formatRecordHunt(stats.luckiestHunt, true)}</div>
-              </div>
+              <RecordHunt label="Caccia più lunga" entry={stats.longestHunt} accentColor={accentColor} />
+              <RecordHunt label="Caccia più fortunata" entry={stats.luckiestHunt} accentColor={accentColor} />
             </CardContent>
           </Card>
         </div>

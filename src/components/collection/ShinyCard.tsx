@@ -222,7 +222,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
             : `${theme.accent}66`,
         }}
       >
-        <div className="space-y-3 flex flex-1 flex-col">
+        <div className="flex flex-1 flex-col gap-3">
           <div
             className="relative min-h-[162px] sm:min-h-[178px] rounded-[1.5rem] border border-white/10 bg-black/40 p-3 shadow-inner overflow-hidden"
             style={{
@@ -503,7 +503,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
           </div>
 
           {isEvent ? null : (
-            <div className="grid gap-2.5">
+            <div className="flex flex-1 flex-col gap-2.5">
               {showEncounters ? (
                 <div
                   className="rounded-2xl px-2.5 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
@@ -621,14 +621,14 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                 </div>
               ) : (entry as any).show_seen ? (
                 <div
-                  className="relative overflow-hidden rounded-xl px-3 py-2.5"
+                  className="relative flex min-h-[184px] items-center overflow-hidden rounded-xl px-3 py-2.5"
                   style={{
                     background: hasDualGameTheme
                       ? `linear-gradient(145deg, color-mix(in srgb, ${theme.primary} 30%, rgba(14,14,14,0.96)), color-mix(in srgb, ${secondaryTheme!.secondary} 30%, rgba(10,10,10,0.94)))`
                       : `linear-gradient(145deg, color-mix(in srgb, ${theme.primary} 46%, #101010), color-mix(in srgb, ${theme.secondary} 38%, #0f0f0f))`,
                   }}
                 >
-                  <div className="flex items-center justify-between gap-3">
+                  <div className="flex w-full items-center justify-between gap-3">
                     <div className="flex items-center gap-1.5">
                       <Crosshair className="h-3.5 w-3.5 text-white/[0.65]" />
                       <span className="text-[8px] font-black uppercase tracking-[0.16em] text-white/[0.55] sm:text-[9px]">
@@ -643,10 +643,12 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                     </div>
                   </div>
                 </div>
-              ) : null}
+              ) : (
+                <div className="min-h-[184px] shrink-0" aria-hidden="true" />
+              )}
 
               <div
-                className="rounded-2xl px-3 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+                className="mt-auto rounded-2xl px-3 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
                 style={{
                   background: hasDualGameTheme
                     ? `linear-gradient(145deg, color-mix(in srgb, ${theme.secondary} 34%, rgba(16,16,16,0.96)), color-mix(in srgb, ${secondaryTheme!.primary} 26%, rgba(12,12,12,0.94)))`
