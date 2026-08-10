@@ -17,6 +17,14 @@ export const CARD_FILTER_OPTIONS: CardFilterOption[] = [
   { id: 'shadow', name: 'Shadow', description: 'Contrasto scuro e vignettatura.' },
 ];
 
+export const POKEDEX_CARD_FILTER_OPTIONS: CardFilterOption[] = CARD_FILTER_OPTIONS.filter(
+  (option) => option.id !== 'pixel' && option.id !== 'neon'
+);
+
+export const COLLECTION_CARD_FILTER_OPTIONS: CardFilterOption[] = CARD_FILTER_OPTIONS.filter(
+  (option) => option.id !== 'cosmic' && option.id !== 'pixel' && option.id !== 'neon'
+);
+
 export const isCardFilterId = (value: unknown): value is CardFilterId =>
   typeof value === 'string' && CARD_FILTER_OPTIONS.some((option) => option.id === value);
 

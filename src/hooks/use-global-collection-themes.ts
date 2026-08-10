@@ -57,16 +57,16 @@ function sanitizeOverrides(input: unknown): CollectionThemeOverrides {
 function sanitizeEffects(input: unknown): CollectionThemeEffects {
   if (!input || typeof input !== 'object') return DEFAULT_EFFECTS;
   const raw = input as Record<string, unknown>;
-  const normalizeFilter = (value: unknown, fallback: CardFilterId): CardFilterId => {
+  const normalizeFilter = (value: unknown, fallback: CardFilterId, allowed: CardFilterId[]): CardFilterId => {
     if (value === 'frost') return 'prism';
     if (value === 'comic') return 'none';
-    return isCardFilterId(value) ? value : fallback;
+    return isCardFilterId(value) && allowed.includes(value) ? value : fallback;
   };
 
   return {
     blackEffectEnabled: raw.blackEffectEnabled === true,
-    pokedexCardFilter: normalizeFilter(raw.pokedexCardFilter, DEFAULT_EFFECTS.pokedexCardFilter),
-    collectionCardFilter: normalizeFilter(raw.collectionCardFilter, DEFAULT_EFFECTS.collectionCardFilter),
+    pokedexCardFilter: normalizeFilter(raw.pokedexCardFilter, DEFAULT_EFFECTS.pokedexCardFilter, ['none', 'holo', 'cosmic', 'prism', 'ember', 'shadow']),
+    collectionCardFilter: normalizeFilter(raw.collectionCardFilter, DEFAULT_EFFECTS.collectionCardFilter, ['none', 'holo', 'prism', 'ember', 'shadow']),
   };
 }
 
