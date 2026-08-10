@@ -23,12 +23,10 @@ interface PokedexCardProps {
 
 const POKEDEX_SPRITE_SCALE_BY_BASE_ID: Record<number, string> = {
     74: "scale-90", // Geodude
-    75: "scale-90", // Graveler
     76: "scale-90", // Golem
     81: "scale-90", // Magnemite
     82: "scale-90", // Magneton
     88: "scale-90", // Grimer
-    89: "scale-90", // Muk
     90: "scale-90", // Shellder
     91: "scale-90", // Cloyster
     92: "scale-90", // Gastly
@@ -113,6 +111,20 @@ const POKEDEX_SPRITE_SCALE_BY_NAME: Array<[string, string]> = [
     ["iron boulder", "scale-90"],
     ["iron crown", "scale-90"],
 ];
+
+const POKEDEX_SPRITE_POSITION_BY_BASE_ID: Record<number, string> = {
+    75: "scale-[1.38] -translate-y-7 translate-x-1", // Graveler
+    89: "scale-[1.24] -translate-y-5", // Muk
+    98: "scale-[1.24] -translate-y-4", // Krabby
+    99: "scale-[1.2] -translate-y-4", // Kingler
+};
+
+const POKEDEX_SPRITE_POSITION_BY_NAME: Array<[string, string]> = [
+    ["galarian farfetch", "scale-[1.2] -translate-y-3"],
+    ["galar farfetch", "scale-[1.2] -translate-y-3"],
+];
+
+const POKEDEX_SPRITE_EDGE_SHADOW = 'drop-shadow(0 1px 0 rgba(0,0,0,0.88)) drop-shadow(1px 0 0 rgba(0,0,0,0.72)) drop-shadow(0 4px 8px rgba(0,0,0,0.85))';
 
 const POKEDEX_SMALL_SPRITE_SCALE_BY_BASE_ID: Record<number, string> = {
     10: "scale-110", // Caterpie
@@ -235,11 +247,14 @@ export const PokedexCard = memo(function PokedexCard({
     const spriteBalanceScaleClass =
         POKEDEX_SPRITE_SCALE_BY_NAME.find(([namePart]) => normalizedDisplayName.includes(namePart))?.[1] ||
         POKEDEX_SPRITE_SCALE_BY_BASE_ID[baseId] ||
-        POKEDEX_SMALL_SPRITE_SCALE_BY_BASE_ID[baseId] ||
+        "";
+    const spritePositionClass =
+        POKEDEX_SPRITE_POSITION_BY_NAME.find(([namePart]) => normalizedDisplayName.includes(namePart))?.[1] ||
+        POKEDEX_SPRITE_POSITION_BY_BASE_ID[baseId] ||
         "";
     const spriteFrameClass = hasMultipleSprites
-        ? "h-[6.5rem] w-[46%] max-w-[6.5rem] min-[380px]:h-[7rem] min-[380px]:max-w-[7rem] sm:h-[7.8rem] sm:w-[7.8rem] sm:max-w-none"
-        : "h-[8rem] w-[82%] max-w-[8rem] min-[380px]:h-[8.4rem] min-[380px]:max-w-[8.4rem] sm:h-[9.2rem] sm:w-[9.2rem] sm:max-w-none";
+        ? "h-[6.25rem] w-[45%] max-w-[6.25rem] sm:h-[6.8rem] sm:w-[6.8rem] sm:max-w-none"
+        : "h-[7.5rem] w-[78%] max-w-[7.5rem] sm:h-[8.1rem] sm:w-[8.1rem] sm:max-w-none";
 
     return (
         <button
@@ -393,7 +408,7 @@ export const PokedexCard = memo(function PokedexCard({
                     aria-hidden="true"
                 />
                 <svg className="absolute h-0 w-0" aria-hidden="true" focusable="false">
-                    <filter id={primaryOutlineId} x="-24%" y="-24%" width="148%" height="148%" colorInterpolationFilters="sRGB">
+                    <filter id={primaryOutlineId} x="-32%" y="-32%" width="164%" height="164%" colorInterpolationFilters="sRGB">
                         <feMorphology in="SourceAlpha" operator="dilate" radius="0.5" result="outline" />
                         <feFlood floodColor="#050505" result="outlineColor" />
                         <feComposite in="outlineColor" in2="outline" operator="in" result="outlineShape" />
@@ -402,7 +417,7 @@ export const PokedexCard = memo(function PokedexCard({
                             <feMergeNode in="SourceGraphic" />
                         </feMerge>
                     </filter>
-                    <filter id={secondaryOutlineId} x="-24%" y="-24%" width="148%" height="148%" colorInterpolationFilters="sRGB">
+                    <filter id={secondaryOutlineId} x="-32%" y="-32%" width="164%" height="164%" colorInterpolationFilters="sRGB">
                         <feMorphology in="SourceAlpha" operator="dilate" radius="0.5" result="outline" />
                         <feFlood floodColor="#050505" result="outlineColor" />
                         <feComposite in="outlineColor" in2="outline" operator="in" result="outlineShape" />
@@ -428,13 +443,14 @@ export const PokedexCard = memo(function PokedexCard({
                                 isPrimaryCaught
                                     ? "brightness-110"
                                     : "",
-                                spriteBalanceScaleClass
+                                spriteBalanceScaleClass,
+                                spritePositionClass
                             )}
                             style={{
                                 imageRendering: 'auto',
                                 filter: isPrimaryCaught
-                                    ? `url(#${primaryOutlineId}) drop-shadow(0 4px 8px rgba(0,0,0,0.85))`
-                                    : `grayscale(1) brightness(0.78) url(#${primaryOutlineId}) drop-shadow(0 4px 8px rgba(0,0,0,0.85))`,
+                                    ? `url(#${primaryOutlineId}) ${POKEDEX_SPRITE_EDGE_SHADOW}`
+                                    : `grayscale(1) brightness(0.78) url(#${primaryOutlineId}) ${POKEDEX_SPRITE_EDGE_SHADOW}`,
                             }}
                             loading="lazy"
                             decoding="async"
@@ -460,13 +476,14 @@ export const PokedexCard = memo(function PokedexCard({
                                     isSecondaryCaught
                                         ? "brightness-110"
                                         : "",
-                                    spriteBalanceScaleClass
+                                    spriteBalanceScaleClass,
+                                    spritePositionClass
                                 )}
                                 style={{
                                     imageRendering: 'auto',
                                     filter: isSecondaryCaught
-                                        ? `url(#${secondaryOutlineId}) drop-shadow(0 4px 8px rgba(0,0,0,0.85))`
-                                        : `grayscale(1) brightness(0.78) url(#${secondaryOutlineId}) drop-shadow(0 4px 8px rgba(0,0,0,0.85))`,
+                                        ? `url(#${secondaryOutlineId}) ${POKEDEX_SPRITE_EDGE_SHADOW}`
+                                        : `grayscale(1) brightness(0.78) url(#${secondaryOutlineId}) ${POKEDEX_SPRITE_EDGE_SHADOW}`,
                                 }}
                                 loading="lazy"
                                 decoding="async"
