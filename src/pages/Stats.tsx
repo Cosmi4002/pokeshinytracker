@@ -62,7 +62,7 @@ const mapToRanked = (map: Map<string, RankedItem>, limit?: number) => {
 
 const percentage = (value: number, total: number) => (total > 0 ? Math.round((value / total) * 1000) / 10 : 0);
 
-const statsPanelClass = 'border-border/70 bg-muted/30 shadow-sm';
+const statsPanelClass = 'border-border/70 bg-card text-card-foreground';
 const statsInnerPanelClass = 'border bg-muted/30';
 
 const hasTrackedAttempts = (entry: CaughtShinyRow) => {
