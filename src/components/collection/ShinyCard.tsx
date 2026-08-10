@@ -1,7 +1,7 @@
 import { Pencil, Trash2, Calendar, ArrowUpCircle, Crosshair, Sparkles, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getGameTheme, GAME_LOGOS, type GameTheme } from '@/lib/game-themes';
-import { GIGAMAX_ICON, POKEBALLS, POKEMON_EGG_ICON, findHuntingMethod, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, handlePokemonSpriteError, isBreedingMethod, supportsGigamaxMark, toLocalPokemonSpriteUrl } from '@/lib/pokemon-data';
+import { GIGAMAX_ICON, POKEBALLS, POKEMON_EGG_ICON, findHuntingMethod, getDynamicOdds, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, handlePokemonSpriteError, isBreedingMethod, supportsGigamaxMark, toLocalPokemonSpriteUrl } from '@/lib/pokemon-data';
 import type { Tables } from '@/integrations/supabase/types';
 import { useMemo, useCallback, useId } from 'react';
 import { cn } from '@/lib/utils';
@@ -61,6 +61,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   }, [(entry as any).secondary_game, secondaryThemeOverride]);
   const pokeball = useMemo(() => POKEBALLS.find((b) => b.id === entry.pokeball), [entry.pokeball]);
   const method = useMemo(() => findHuntingMethod(entry.method), [entry.method]);
+  const odds = Math.round(getDynamicOdds(entry.method, Number(entry.attempts || 0), entry.has_shiny_charm === true));
   const hasBottomMeta = isGigamax || isLegendsArceus || entry.is_fail || entry.is_unobtainable;
   const isGameCorner = normalizedMethod.includes('game corner') || normalizedMethod.includes('game-corner') || method?.name.toLowerCase() === 'game corner';
   const isPokeRadar = normalizedMethod.includes('pokeradar') || normalizedMethod.includes('poke radar') || method?.name.toLowerCase().includes('poke radar');
@@ -531,14 +532,21 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                           onError={(e) => ((e.currentTarget as HTMLImageElement).src = '/placeholder.svg')}
                         />
                       )}
-                      <span
-                        className="relative z-10 w-full max-w-full truncate text-center text-[2rem] font-black leading-none text-white tabular-nums sm:text-[1.86rem]"
-                        style={{
-                          textShadow: '1px 0 0 #050505, -1px 0 0 #050505, 0 1px 0 #050505, 0 -1px 0 #050505, 0 2px 5px rgba(0,0,0,0.9)',
-                        }}
-                      >
-                        {entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-'}
-                      </span>
+                      <div className="relative z-10 flex max-w-full items-baseline justify-center gap-4 text-center">
+                        <span
+                          className="min-w-0 truncate text-[2rem] font-black leading-none text-white tabular-nums sm:text-[1.86rem]"
+                          style={{
+                            textShadow: '1px 0 0 #050505, -1px 0 0 #050505, 0 1px 0 #050505, 0 -1px 0 #050505, 0 2px 5px rgba(0,0,0,0.9)',
+                          }}
+                        >
+                          {entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-'}
+                        </span>
+                        {entry.attempts && entry.attempts > 0 && (
+                          <span className="shrink-0 text-xs font-bold text-white/65 tabular-nums sm:text-sm">
+                            1/{odds.toLocaleString()}
+                          </span>
+                        )}
+                      </div>
                     </div>
                     {(entry as any).show_seen && (
                       <div className="flex min-h-[72px] flex-col items-center justify-center rounded-xl bg-black/25 px-2 py-2 text-center">

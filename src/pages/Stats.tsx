@@ -51,15 +51,6 @@ const getGameLabel = (gameId?: string | null) =>
 const getMethodLabel = (method?: string | null) =>
   findHuntingMethod(method)?.name || method || 'Metodo sconosciuto';
 
-const getGenderLabel = (gender?: string | null) => {
-  const normalized = normalize(gender);
-  if (normalized === 'male' || normalized === 'm') return 'Maschio';
-  if (normalized === 'female' || normalized === 'f') return 'Femmina';
-  if (normalized === 'genderless' || normalized === 'none') return 'Senza sesso';
-  if (normalized === 'both') return 'Entrambi';
-  return gender || 'Non indicato';
-};
-
 const getCaughtDate = (entry: CaughtShinyRow) => {
   const rawDate = entry.caught_date || entry.created_at;
   const date = new Date(rawDate);
@@ -262,7 +253,6 @@ export default function Stats() {
     const methodCounts = new Map<string, RankedItem>();
     const gameCounts = new Map<string, RankedItem>();
     const generationCounts = new Map<string, RankedItem>();
-    const genderCounts = new Map<string, RankedItem>();
     const monthlyCounts = new Map<string, RankedItem>();
     let totalAttempts = 0;
     let attemptsRows = 0;
@@ -290,10 +280,6 @@ export default function Stats() {
         generation ? `gen-${generation}` : 'unknown',
         generation ? `Gen ${generation}` : 'Gen sconosciuta',
       );
-
-      if (entry.gender) {
-        addCount(genderCounts, normalize(entry.gender), getGenderLabel(entry.gender));
-      }
 
       const caughtDate = getCaughtDate(entry);
       if (caughtDate) {
@@ -329,7 +315,6 @@ export default function Stats() {
       methodTop: mapToRanked(methodCounts, 6),
       gameTop: mapToRanked(gameCounts, 6),
       generationTop: mapToRanked(generationCounts),
-      genderTop: mapToRanked(genderCounts),
       monthly,
       bestMonth,
       longestHunt,
@@ -433,7 +418,25 @@ export default function Stats() {
           <RankedList title="Metodi più usati" items={stats.methodTop} total={obtainedTotal} empty="Nessun metodo registrato." accentColor={accentColor} />
           <RankedList title="Giochi più usati" items={stats.gameTop} total={obtainedTotal} empty="Nessun gioco registrato." accentColor={accentColor} />
           <RankedList title="Distribuzione per generazione" items={stats.generationTop} total={obtainedTotal} empty="Nessuna generazione calcolabile." accentColor={accentColor} />
-          <RankedList title="Sesso registrato" items={stats.genderTop} total={obtainedTotal} empty="Nessun sesso registrato." accentColor={accentColor} />
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Record</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 text-sm">
+              <div>
+                <div className="text-muted-foreground">Mese migliore</div>
+                <div className="font-semibold">{stats.bestMonth ? `${stats.bestMonth.label} (${stats.bestMonth.value})` : '-'}</div>
+              </div>
+              <div>
+                <div className="text-muted-foreground">Caccia più lunga</div>
+                <div className="font-semibold">{formatRecordHunt(stats.longestHunt)}</div>
+              </div>
+              <div>
+                <div className="text-muted-foreground">Caccia più fortunata</div>
+                <div className="font-semibold">{formatRecordHunt(stats.luckiestHunt, true)}</div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         <div className="grid gap-4">
@@ -464,29 +467,6 @@ export default function Stats() {
             </CardContent>
           </Card>
 
-          <Card className="order-1">
-            <CardHeader>
-              <CardTitle className="text-base">Record</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 text-sm">
-              <div>
-                <div className="text-muted-foreground">Mese migliore</div>
-                <div className="font-semibold">{stats.bestMonth ? `${stats.bestMonth.label} (${stats.bestMonth.value})` : '-'}</div>
-              </div>
-              <div>
-                <div className="text-muted-foreground">Caccia più lunga</div>
-                <div className="font-semibold">
-                  {formatRecordHunt(stats.longestHunt)}
-                </div>
-              </div>
-              <div>
-                <div className="text-muted-foreground">Caccia più fortunata</div>
-                <div className="font-semibold">
-                  {formatRecordHunt(stats.luckiestHunt, true)}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </main>
     </div>
