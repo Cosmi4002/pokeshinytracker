@@ -10,6 +10,7 @@ import { getPokemonSpriteUrl } from '@/hooks/use-pokemon';
 import { SHINY_CHARM_ICON, findHuntingMethod, getDynamicOdds, isBreedingMethod, GAMES } from '@/lib/pokemon-data';
 import { GAME_LOGOS } from '@/lib/game-themes';
 import { toLocalISODate } from '@/lib/date';
+import { useRandomColor } from '@/lib/random-color-context';
 import { cn } from '@/lib/utils';
 
 type ProfileRow = Pick<Tables<'profiles'>, 'user_id' | 'username'>;
@@ -46,6 +47,7 @@ function StatTile({ label, value, note, icon: Icon }: StatTileProps) {
 }
 
 export default function UserCollectionsSearch() {
+  const { accentColor } = useRandomColor();
   const [query, setQuery] = useState('');
   const [profiles, setProfiles] = useState<ProfileRow[]>([]);
   const [profilesLoading, setProfilesLoading] = useState(false);
@@ -357,7 +359,11 @@ export default function UserCollectionsSearch() {
     if (!isEvolved) return null;
     return (
       <div
-        className="absolute top-2 right-2 z-20 flex h-6 w-6 items-center justify-center rounded-full border border-white/55 bg-emerald-700 text-white shadow-[0_3px_12px_rgba(0,0,0,0.6),0_0_0_1px_rgba(0,0,0,0.45)] ring-1 ring-emerald-200/45 backdrop-blur-sm"
+        className="absolute top-2 right-2 z-20 flex h-6 w-6 items-center justify-center rounded-full border border-white/55 text-white shadow-[0_3px_12px_rgba(0,0,0,0.6),0_0_0_1px_rgba(0,0,0,0.45)] ring-1 ring-white/30 backdrop-blur-sm"
+        style={{
+          background: `linear-gradient(145deg, ${accentColor}, color-mix(in srgb, ${accentColor} 72%, #111))`,
+          boxShadow: `0 3px 12px color-mix(in srgb, ${accentColor} 36%, rgba(0,0,0,0.55)), 0 0 0 1px rgba(0,0,0,0.45)`,
+        }}
         title="Pokemon evoluto"
       >
         <ArrowUpCircle className="h-3.5 w-3.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]" />

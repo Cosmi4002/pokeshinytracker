@@ -115,17 +115,12 @@ function StatCard({
   accentColor: string;
 }) {
   return (
-    <Card className={`group relative overflow-hidden border transition-shadow hover:shadow-lg ${statsPanelClass}`}>
-      <div className="absolute inset-x-0 top-0 h-1" style={{ backgroundColor: accentColor }} />
-      <div
-        className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full opacity-15 blur-2xl transition-opacity group-hover:opacity-25"
-        style={{ backgroundColor: accentColor }}
-      />
-      <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0 pb-2">
+    <Card className={`overflow-hidden border ${statsPanelClass}`}>
+      <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold tabular-nums text-foreground">{value}</div>
+        <div className="text-2xl font-bold tabular-nums" style={{ color: accentColor }}>{value}</div>
         <p className="mt-1 text-xs text-muted-foreground">{note}</p>
       </CardContent>
     </Card>
@@ -230,10 +225,7 @@ function RankedList({
   return (
     <Card className={`overflow-hidden border ${statsPanelClass}`}>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base">
-          <span className="h-2 w-2 rounded-full" style={{ backgroundColor: accentColor }} />
-          {title}
-        </CardTitle>
+        <CardTitle className="text-base">{title}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         {items.length === 0 ? (
