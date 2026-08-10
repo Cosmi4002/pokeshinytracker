@@ -320,14 +320,46 @@ export const PokedexCard = memo(function PokedexCard({
             {cardFilter === 'cosmic' && (
                 <>
                     <div className="pointer-events-none absolute inset-0 z-[2] opacity-70 mix-blend-screen" style={{ background: 'radial-gradient(circle at 20% 22%, rgba(129,140,248,0.40), transparent 34%), radial-gradient(circle at 78% 18%, rgba(236,72,153,0.28), transparent 30%), radial-gradient(circle at 50% 78%, rgba(56,189,248,0.26), transparent 36%)' }} />
-                    <div className="pointer-events-none absolute inset-0 z-[2] opacity-70 mix-blend-screen" style={{ backgroundImage: 'radial-gradient(circle at 14% 18%, white 0 1px, transparent 2px), radial-gradient(circle at 32% 44%, rgba(255,255,255,0.95) 0 1px, transparent 2px), radial-gradient(circle at 72% 26%, white 0 1px, transparent 2px), radial-gradient(circle at 86% 68%, rgba(255,255,255,0.8) 0 1px, transparent 2px), radial-gradient(circle at 48% 78%, white 0 1px, transparent 2px), radial-gradient(circle at 60% 54%, rgba(255,255,255,0.7) 0 1px, transparent 2px)', backgroundSize: '70px 72px, 94px 86px, 82px 76px, 98px 92px, 76px 88px, 112px 96px' }} />
+                    <div className="pointer-events-none absolute inset-0 z-[2] mix-blend-screen" aria-hidden="true">
+                        {[
+                            ['14%', '18%', 'h-4 w-4 opacity-90'],
+                            ['32%', '44%', 'h-2.5 w-2.5 opacity-75'],
+                            ['72%', '26%', 'h-3.5 w-3.5 opacity-85'],
+                            ['86%', '68%', 'h-2 w-2 opacity-70'],
+                            ['48%', '78%', 'h-3 w-3 opacity-80'],
+                        ].map(([left, top, size], index) => (
+                            <span key={index} className={`absolute ${size} -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-[1px] bg-white shadow-[0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(125,211,252,0.65)]`} style={{ left, top }} />
+                        ))}
+                    </div>
                 </>
             )}
+            {cardFilter === 'pixel' && (
+                <div className="pointer-events-none absolute inset-0 z-[2] rounded-xl opacity-50 mix-blend-screen">
+                    <div className="absolute inset-0" style={{ backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.13) 1px, transparent 1px), linear-gradient(0deg, rgba(255,255,255,0.09) 1px, transparent 1px)', backgroundSize: '14px 14px' }} />
+                    <div className="absolute left-[12%] top-[18%] h-3 w-3 bg-cyan-200 shadow-[0_0_10px_rgba(125,211,252,0.85)]" />
+                    <div className="absolute right-[18%] top-[34%] h-2 w-2 bg-fuchsia-200 shadow-[0_0_9px_rgba(244,114,182,0.8)]" />
+                    <div className="absolute bottom-[18%] left-[44%] h-2.5 w-2.5 bg-lime-200 shadow-[0_0_9px_rgba(190,242,100,0.75)]" />
+                </div>
+            )}
+            {cardFilter === 'comic' && (
+                <div className="pointer-events-none absolute inset-0 z-[2] rounded-xl opacity-65">
+                    <div className="absolute inset-[2px] rounded-[0.7rem] border-2 border-white/16 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.24)]" />
+                    <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full opacity-42 mix-blend-screen" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.30) 0 1px, transparent 1.5px)', backgroundSize: '9px 9px' }} />
+                    <div className="absolute inset-x-0 bottom-0 h-16 opacity-18" style={{ background: 'repeating-linear-gradient(-18deg, transparent 0 8px, rgba(255,255,255,0.30) 8px 9px, transparent 9px 15px)' }} />
+                </div>
+            )}
+            {cardFilter === 'neon' && (
+                <div className="pointer-events-none absolute inset-0 z-[2] rounded-xl opacity-55 mix-blend-screen">
+                    <div className="absolute inset-0" style={{ backgroundImage: 'linear-gradient(rgba(34,211,238,0.20) 1px, transparent 1px), linear-gradient(90deg, rgba(217,70,239,0.16) 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
+                    <div className="absolute inset-x-4 top-4 h-px bg-gradient-to-r from-transparent via-cyan-200/65 to-transparent shadow-[0_0_12px_rgba(34,211,238,0.75)]" />
+                    <div className="absolute inset-y-4 left-5 w-px bg-gradient-to-b from-transparent via-fuchsia-200/50 to-transparent shadow-[0_0_12px_rgba(217,70,239,0.65)]" />
+                </div>
+            )}
             {cardFilter === 'prism' && (
-                <div className="pointer-events-none absolute inset-[1px] z-[2] rounded-[0.65rem] opacity-70 mix-blend-screen" style={{ background: 'linear-gradient(130deg, transparent 0 10%, rgba(255,255,255,0.26) 12%, rgba(244,114,182,0.20) 20%, transparent 31%), linear-gradient(42deg, transparent 0 18%, rgba(34,211,238,0.22) 24%, rgba(167,139,250,0.18) 34%, transparent 48%), linear-gradient(158deg, transparent 0 44%, rgba(250,204,21,0.18) 52%, rgba(74,222,128,0.16) 62%, transparent 78%)' }} />
+                <div className="pointer-events-none absolute inset-[1px] z-[2] rounded-[0.65rem] opacity-45 mix-blend-screen" style={{ background: 'linear-gradient(130deg, transparent 0 13%, rgba(255,255,255,0.18) 16%, rgba(244,114,182,0.10) 24%, transparent 36%), linear-gradient(42deg, transparent 0 24%, rgba(34,211,238,0.13) 31%, rgba(167,139,250,0.10) 40%, transparent 56%), linear-gradient(158deg, transparent 0 48%, rgba(250,204,21,0.10) 58%, transparent 76%)' }} />
             )}
             {cardFilter === 'ember' && (
-                <div className="pointer-events-none absolute inset-0 z-[2] opacity-85 mix-blend-screen" style={{ background: 'radial-gradient(circle at 20% 82%, rgba(251,146,60,0.58), transparent 38%), radial-gradient(circle at 76% 26%, rgba(248,113,113,0.38), transparent 34%), radial-gradient(circle at 48% 55%, rgba(250,204,21,0.24), transparent 28%), linear-gradient(22deg, transparent 12%, rgba(255,237,213,0.18) 42%, transparent 66%)' }} />
+                <div className="pointer-events-none absolute inset-0 z-[2] opacity-52 mix-blend-screen" style={{ background: 'radial-gradient(circle at 18% 88%, rgba(251,146,60,0.34), transparent 34%), radial-gradient(circle at 82% 22%, rgba(248,113,113,0.20), transparent 30%), linear-gradient(22deg, transparent 18%, rgba(255,237,213,0.10) 44%, transparent 68%)' }} />
             )}
             {cardFilter === 'shadow' && (
                 <div className="pointer-events-none absolute inset-0 z-[2] rounded-xl bg-[radial-gradient(circle_at_center,transparent_34%,rgba(0,0,0,0.42)_100%)] opacity-70" />
@@ -408,15 +440,6 @@ export const PokedexCard = memo(function PokedexCard({
                     className="pointer-events-none absolute inset-0 z-[1] opacity-70"
                     style={{
                         background: `linear-gradient(128deg, rgba(255,255,255,0.20) 0%, rgba(125,211,252,0.10) 22%, transparent 42%, rgba(244,114,182,0.10) 72%, transparent 100%)`,
-                        mixBlendMode: 'screen',
-                    }}
-                    aria-hidden="true"
-                />
-                <div
-                    className="pointer-events-none absolute inset-0 z-[1] opacity-35"
-                    style={{
-                        backgroundImage: `radial-gradient(circle at 24% 30%, rgba(255,255,255,0.9) 0 1px, transparent 2px), radial-gradient(circle at 72% 42%, rgba(255,255,255,0.75) 0 1px, transparent 2px), radial-gradient(circle at 46% 78%, rgba(255,255,255,0.65) 0 1px, transparent 2px)`,
-                        backgroundSize: '62px 58px, 84px 70px, 96px 76px',
                         mixBlendMode: 'screen',
                     }}
                     aria-hidden="true"

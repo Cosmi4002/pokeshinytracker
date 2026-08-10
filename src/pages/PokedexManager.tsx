@@ -28,31 +28,79 @@ import { CARD_FILTER_OPTIONS, getCardFilterOption, type CardFilterId } from "@/l
 const previewFilterOverlay = (filter: CardFilterId) => {
     if (filter === "holo") {
         return (
-            <div className="absolute inset-0 rounded-xl opacity-70 mix-blend-screen">
-                <div className="absolute inset-[1px] rounded-xl border border-white/20 bg-[linear-gradient(118deg,rgba(255,255,255,0.22),rgba(134,239,172,0.10)_18%,rgba(125,211,252,0.12)_35%,transparent_49%,rgba(216,180,254,0.14)_67%,rgba(255,255,255,0.16))]" />
+            <div className="absolute inset-0 rounded-xl opacity-95 mix-blend-screen">
+                <div className="absolute inset-[1px] rounded-xl border border-white/30 bg-[linear-gradient(118deg,rgba(255,255,255,0.24),rgba(134,239,172,0.12)_18%,rgba(125,211,252,0.14)_35%,transparent_52%,rgba(216,180,254,0.16)_70%,rgba(255,255,255,0.18))]" />
+                <div className="absolute inset-x-5 top-3 h-px bg-gradient-to-r from-transparent via-white/55 to-transparent" />
+                <div className="absolute inset-y-6 right-3 w-px bg-gradient-to-b from-transparent via-cyan-100/40 to-transparent" />
             </div>
         );
     }
 
     if (filter === "cosmic") {
         return (
-            <div
-                className="absolute inset-0 rounded-xl opacity-80 mix-blend-screen"
-                style={{
-                    background:
-                        "radial-gradient(circle at 18% 20%, rgba(129,140,248,0.44), transparent 34%), radial-gradient(circle at 80% 24%, rgba(236,72,153,0.30), transparent 30%), radial-gradient(circle at 50% 78%, rgba(56,189,248,0.26), transparent 36%), radial-gradient(circle at 16% 22%, white 0 1px, transparent 2px), radial-gradient(circle at 34% 52%, white 0 1px, transparent 2px), radial-gradient(circle at 74% 28%, white 0 1px, transparent 2px), radial-gradient(circle at 86% 72%, rgba(255,255,255,0.8) 0 1px, transparent 2px), radial-gradient(circle at 52% 74%, white 0 1px, transparent 2px)",
-                }}
-            />
+            <div className="absolute inset-0 rounded-xl mix-blend-screen">
+                <div
+                    className="absolute inset-0 opacity-80"
+                    style={{
+                        background:
+                            "radial-gradient(circle at 18% 20%, rgba(129,140,248,0.44), transparent 34%), radial-gradient(circle at 80% 24%, rgba(236,72,153,0.30), transparent 30%), radial-gradient(circle at 50% 78%, rgba(56,189,248,0.26), transparent 36%)",
+                    }}
+                />
+                {[
+                    ["16%", "22%", "h-4 w-4 opacity-90"],
+                    ["34%", "52%", "h-2.5 w-2.5 opacity-75"],
+                    ["74%", "28%", "h-3.5 w-3.5 opacity-85"],
+                    ["86%", "72%", "h-2 w-2 opacity-70"],
+                    ["52%", "74%", "h-3 w-3 opacity-80"],
+                ].map(([left, top, size], index) => (
+                    <span
+                        key={index}
+                        className={`absolute ${size} -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-[1px] bg-white shadow-[0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(125,211,252,0.65)]`}
+                        style={{ left, top }}
+                    />
+                ))}
+            </div>
+        );
+    }
+
+    if (filter === "pixel") {
+        return (
+            <div className="absolute inset-0 rounded-xl opacity-55 mix-blend-screen">
+                <div className="absolute inset-0" style={{ backgroundImage: "linear-gradient(90deg, rgba(255,255,255,0.14) 1px, transparent 1px), linear-gradient(0deg, rgba(255,255,255,0.10) 1px, transparent 1px)", backgroundSize: "14px 14px" }} />
+                <div className="absolute left-[12%] top-[18%] h-3 w-3 bg-cyan-200 shadow-[0_0_10px_rgba(125,211,252,0.85)]" />
+                <div className="absolute right-[18%] top-[34%] h-2 w-2 bg-fuchsia-200 shadow-[0_0_9px_rgba(244,114,182,0.8)]" />
+                <div className="absolute bottom-[18%] left-[44%] h-2.5 w-2.5 bg-lime-200 shadow-[0_0_9px_rgba(190,242,100,0.75)]" />
+            </div>
+        );
+    }
+
+    if (filter === "comic") {
+        return (
+            <div className="absolute inset-0 rounded-xl opacity-70">
+                <div className="absolute inset-[2px] rounded-[0.7rem] border-2 border-white/18 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.25)]" />
+                <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full opacity-45 mix-blend-screen" style={{ backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.32) 0 1px, transparent 1.5px)", backgroundSize: "9px 9px" }} />
+                <div className="absolute inset-x-0 bottom-0 h-16 opacity-20" style={{ background: "repeating-linear-gradient(-18deg, transparent 0 8px, rgba(255,255,255,0.32) 8px 9px, transparent 9px 15px)" }} />
+            </div>
+        );
+    }
+
+    if (filter === "neon") {
+        return (
+            <div className="absolute inset-0 rounded-xl opacity-60 mix-blend-screen">
+                <div className="absolute inset-0" style={{ backgroundImage: "linear-gradient(rgba(34,211,238,0.22) 1px, transparent 1px), linear-gradient(90deg, rgba(217,70,239,0.18) 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
+                <div className="absolute inset-x-4 top-4 h-px bg-gradient-to-r from-transparent via-cyan-200/70 to-transparent shadow-[0_0_12px_rgba(34,211,238,0.8)]" />
+                <div className="absolute inset-y-4 left-5 w-px bg-gradient-to-b from-transparent via-fuchsia-200/55 to-transparent shadow-[0_0_12px_rgba(217,70,239,0.7)]" />
+            </div>
         );
     }
 
     if (filter === "prism") {
         return (
             <div
-                className="absolute inset-0 rounded-xl opacity-75 mix-blend-screen"
+                className="absolute inset-0 rounded-xl opacity-[0.42] mix-blend-screen"
                 style={{
                     background:
-                        "linear-gradient(130deg, transparent 0 10%, rgba(255,255,255,0.28) 12%, rgba(244,114,182,0.22) 20%, transparent 31%), linear-gradient(42deg, transparent 0 18%, rgba(34,211,238,0.24) 24%, rgba(167,139,250,0.20) 34%, transparent 48%), linear-gradient(158deg, transparent 0 44%, rgba(250,204,21,0.20) 52%, rgba(74,222,128,0.18) 62%, transparent 78%)",
+                        "linear-gradient(130deg, transparent 0 13%, rgba(255,255,255,0.18) 16%, rgba(244,114,182,0.10) 24%, transparent 36%), linear-gradient(42deg, transparent 0 24%, rgba(34,211,238,0.13) 31%, rgba(167,139,250,0.10) 40%, transparent 56%), linear-gradient(158deg, transparent 0 48%, rgba(250,204,21,0.10) 58%, transparent 76%)",
                 }}
             />
         );
@@ -61,10 +109,10 @@ const previewFilterOverlay = (filter: CardFilterId) => {
     if (filter === "ember") {
         return (
             <div
-                className="absolute inset-0 rounded-xl opacity-85 mix-blend-screen"
+                className="absolute inset-0 rounded-xl opacity-50 mix-blend-screen"
                 style={{
                     background:
-                        "radial-gradient(circle at 20% 82%, rgba(251,146,60,0.62), transparent 38%), radial-gradient(circle at 76% 26%, rgba(248,113,113,0.42), transparent 34%), radial-gradient(circle at 48% 55%, rgba(250,204,21,0.28), transparent 28%), linear-gradient(22deg, transparent 12%, rgba(255,237,213,0.20) 42%, transparent 66%)",
+                        "radial-gradient(circle at 18% 88%, rgba(251,146,60,0.34), transparent 34%), radial-gradient(circle at 82% 22%, rgba(248,113,113,0.20), transparent 30%), linear-gradient(22deg, transparent 18%, rgba(255,237,213,0.10) 44%, transparent 68%)",
                 }}
             />
         );

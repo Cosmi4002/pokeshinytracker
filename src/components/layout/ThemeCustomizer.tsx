@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
-import { Check, Image, Moon, Palette, Paintbrush, Pipette, Save, Sparkles, Sun } from 'lucide-react';
+import { Check, Layers, Moon, Palette, Paintbrush, Pipette, Save, Sparkles, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -16,6 +16,8 @@ import { useUserPreferences } from '@/hooks/use-user-preferences';
 import { ColorPicker } from '@/components/settings/ColorPicker';
 import { useToast } from '@/hooks/use-toast';
 import { useRandomColor } from '@/lib/random-color-context';
+import { useGlobalCollectionThemes } from '@/hooks/use-global-collection-themes';
+import { CARD_FILTER_OPTIONS, getCardFilterOption, type CardFilterId } from '@/lib/card-effects';
 import {
   type BackgroundStyle,
   type UiStyle,
@@ -57,29 +59,11 @@ declare global {
 
 const DEFAULT_THEME_COLOR = '#8b5cf6';
 const DEFAULT_BACKGROUND_COLOR = '#0f172a';
-const DEFAULT_BG_ACCENT_3 = '#38bdf8';
-
-function getBackgroundPreview(style: BackgroundStyle, backgroundColor: string, themeColor: string, color2: string, color3: string) {
-  if (style === 'plain') return 'none';
-  if (style === 'diagonal') {
-    return `linear-gradient(135deg, ${themeColor}38, transparent 42%), radial-gradient(circle at 80% 20%, ${color2}35, transparent 48%), radial-gradient(circle at 20% 90%, ${color3}28, transparent 48%)`;
-  }
-  if (style === 'aurora') {
-    return `radial-gradient(circle at 12% 24%, ${color2}42, transparent 44%), radial-gradient(circle at 88% 22%, ${color3}36, transparent 48%), radial-gradient(circle at 45% 92%, ${themeColor}34, transparent 52%)`;
-  }
-  if (style === 'mesh') {
-    return `radial-gradient(circle at 20% 30%, ${themeColor}48, transparent 45%), radial-gradient(circle at 82% 28%, ${color2}3d, transparent 47%), radial-gradient(circle at 62% 82%, ${color3}32, transparent 48%)`;
-  }
-  if (style === 'noise') {
-    return `radial-gradient(circle at 20% 25%, rgba(255,255,255,0.10), transparent 52%), repeating-linear-gradient(0deg, rgba(255,255,255,0.12) 0 1px, transparent 1px 5px)`;
-  }
-  return `radial-gradient(circle at 20% 25%, ${themeColor}35, transparent 46%), radial-gradient(circle at 84% 35%, ${color2}32, transparent 48%), radial-gradient(circle at 16px 16px, rgba(255,255,255,0.20) 2px, transparent 2.5px)`;
-}
-
 export function ThemeCustomizer() {
   const { setColorScheme, colorScheme } = useTheme();
   const { accentColor, setManualColor, resetToRandom, isRandom } = useRandomColor();
   const { preferences, loading, savePreferences } = useUserPreferences();
+  const { overrides, effects, saveConfig: saveCardConfig } = useGlobalCollectionThemes();
   const { toast } = useToast();
 
   const [themeColor, setThemeColor] = useState(preferences?.theme_color || DEFAULT_THEME_COLOR);
@@ -90,6 +74,8 @@ export function ThemeCustomizer() {
   const [backgroundStyle, setBackgroundStyle] = useState<BackgroundStyle>(getStoredBackgroundStyle());
   const [backgroundColor2, setBackgroundColor2] = useState(getStoredBackgroundAccent2());
   const [backgroundColor3, setBackgroundColor3] = useState(getStoredBackgroundAccent3());
+  const [pokedexCardFilter, setPokedexCardFilter] = useState<CardFilterId>(effects.pokedexCardFilter);
+  const [collectionCardFilter, setCollectionCardFilter] = useState<CardFilterId>(effects.collectionCardFilter);
   const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState(false);
   const skipNextOpenSyncRef = useRef(false);
@@ -120,15 +106,6 @@ export function ThemeCustomizer() {
     { id: 'paldea-neon', name: 'Paldea Neon', themeColor: '#7c3aed', backgroundColor: '#09051a', uiStyle: 'neon', backgroundStyle: 'aurora', backgroundColor2: '#f59e0b', backgroundColor3: '#06b6d4' },
     { id: 'rocket-radio', name: 'Rocket Radio', themeColor: '#ef4444', backgroundColor: '#070707', uiStyle: 'neon', backgroundStyle: 'noise', backgroundColor2: '#f9fafb', backgroundColor3: '#71717a' },
     { id: 'master-ball', name: 'Master Ball', themeColor: '#8b5cf6', backgroundColor: '#0b0714', uiStyle: 'glass', backgroundStyle: 'pokemon', backgroundColor2: '#ec4899', backgroundColor3: '#f8fafc' },
-  ]), []);
-
-  const backgroundStyleOptions = useMemo<Array<{ id: BackgroundStyle; label: string }>>(() => ([
-    { id: 'plain', label: 'Plain' },
-    { id: 'mesh', label: 'Mesh' },
-    { id: 'aurora', label: 'Aurora' },
-    { id: 'diagonal', label: 'Diagonal' },
-    { id: 'noise', label: 'Noise' },
-    { id: 'pokemon', label: 'Pokemon' },
   ]), []);
 
   const backgroundPresets = [
@@ -167,7 +144,9 @@ export function ThemeCustomizer() {
     setBackgroundStyle(current.backgroundStyle);
     setBackgroundColor2(current.backgroundColor2);
     setBackgroundColor3(current.backgroundColor3);
-  }, [preferences, open, isRandom, accentColor]);
+    setPokedexCardFilter(effects.pokedexCardFilter);
+    setCollectionCardFilter(effects.collectionCardFilter);
+  }, [preferences, open, isRandom, accentColor, effects.pokedexCardFilter, effects.collectionCardFilter]);
 
   useEffect(() => {
     if (!open) return;
@@ -194,6 +173,8 @@ export function ThemeCustomizer() {
     applyUiStyleToRoot(original.uiStyle);
     applyBackgroundStyleToRoot(original.backgroundStyle);
     applyBackgroundAccentsToRoot(original.backgroundColor2, original.backgroundColor3);
+    setPokedexCardFilter(effects.pokedexCardFilter);
+    setCollectionCardFilter(effects.collectionCardFilter);
   };
 
   const applyPreset = (id: string) => {
@@ -224,19 +205,34 @@ export function ThemeCustomizer() {
       layout_style: layoutStyle,
     });
 
-    setSaving(false);
-
     if (result?.success) {
-      setStoredUiStyle(uiStyle);
-      setStoredBackgroundStyle(backgroundStyle);
-      setStoredBackgroundAccent2(backgroundColor2);
-      setStoredBackgroundAccent3(backgroundColor3);
-      toast({
-        title: 'Preferenze salvate',
-        description: 'Colori aggiornati correttamente',
-      });
-      setOpen(false);
+      try {
+        await saveCardConfig(overrides, {
+          ...effects,
+          pokedexCardFilter,
+          collectionCardFilter,
+          blackEffectEnabled: false,
+        });
+        setStoredUiStyle(uiStyle);
+        setStoredBackgroundStyle(backgroundStyle);
+        setStoredBackgroundAccent2(backgroundColor2);
+        setStoredBackgroundAccent3(backgroundColor3);
+        toast({
+          title: 'Preferenze salvate',
+          description: 'Colori e filtri aggiornati correttamente',
+        });
+        setOpen(false);
+      } catch (error: any) {
+        toast({
+          variant: 'destructive',
+          title: 'Errore',
+          description: error?.message || 'Impossibile salvare i filtri card',
+        });
+      } finally {
+        setSaving(false);
+      }
     } else {
+      setSaving(false);
       toast({
         variant: 'destructive',
         title: 'Errore',
@@ -306,9 +302,6 @@ export function ThemeCustomizer() {
       });
     }
   };
-
-  const previewAccent2 = backgroundColor2 || themeColor;
-  const previewAccent3 = backgroundColor3 || DEFAULT_BG_ACCENT_3;
 
   return (
     <Dialog open={open} onOpenChange={(v) => {
@@ -489,60 +482,55 @@ export function ThemeCustomizer() {
 
           <section className="space-y-3 rounded-lg border border-border bg-card p-3 shadow-sm sm:p-4">
             <Label className="flex items-center gap-2 text-sm font-semibold">
-              <Image className="h-4 w-4" />
-              Sfondo
+              <Layers className="h-4 w-4" />
+              Filtri card
             </Label>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {backgroundStyleOptions.map((option) => (
-                <button
-                  key={option.id}
-                  type="button"
-                  onClick={() => {
-                    setPresetId('custom');
-                    setBackgroundStyle(option.id);
-                  }}
-                  className={`overflow-hidden rounded-xl border text-left transition-all hover:border-primary/60 hover:bg-muted/40 ${
-                    backgroundStyle === option.id ? 'border-primary bg-primary/10 shadow-sm' : 'border-border bg-background'
-                  }`}
-                >
-                  <span
-                    className="block h-14 border-b border-border/70"
-                    style={{
-                      backgroundColor,
-                      backgroundImage: getBackgroundPreview(option.id, backgroundColor, themeColor, previewAccent2, previewAccent3),
-                      backgroundSize: option.id === 'pokemon' ? '40px 40px, auto, auto' : 'cover',
-                    }}
-                  />
-                  <span className="flex items-center justify-between gap-2 p-3">
-                    <span className="truncate text-sm font-medium">{option.label}</span>
-                    {backgroundStyle === option.id && <Check className="h-4 w-4 shrink-0 text-primary" />}
-                  </span>
-                </button>
-              ))}
+            <div className="grid gap-4 md:grid-cols-2">
+              {([
+                {
+                  id: 'theme-pokedex-filter',
+                  label: 'Card Pokedex',
+                  value: pokedexCardFilter,
+                  onChange: setPokedexCardFilter,
+                },
+                {
+                  id: 'theme-collection-filter',
+                  label: 'Card Collezione',
+                  value: collectionCardFilter,
+                  onChange: setCollectionCardFilter,
+                },
+              ] as const).map((control) => {
+                const selected = getCardFilterOption(control.value);
+                return (
+                  <div key={control.id} className="space-y-2 rounded-lg border border-border bg-background/70 p-3">
+                    <div className="flex min-h-10 items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <Label htmlFor={control.id} className="text-sm font-bold">{control.label}</Label>
+                        <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{selected.description}</p>
+                      </div>
+                      <span className="shrink-0 rounded-full border border-border bg-card px-2 py-0.5 text-[10px] font-bold uppercase text-muted-foreground">
+                        {selected.name}
+                      </span>
+                    </div>
+                    <div id={control.id} className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+                      {CARD_FILTER_OPTIONS.map((option) => (
+                        <button
+                          key={option.id}
+                          type="button"
+                          onClick={() => control.onChange(option.id)}
+                          className={`flex min-h-9 items-center justify-between gap-2 rounded-md border px-2.5 py-2 text-left text-xs font-semibold transition hover:border-primary/60 hover:bg-primary/5 ${
+                            control.value === option.id ? 'border-primary bg-primary/10 text-foreground shadow-sm' : 'border-border bg-card text-muted-foreground'
+                          }`}
+                        >
+                          <span className="truncate">{option.name}</span>
+                          {control.value === option.id && <Check className="h-3.5 w-3.5 shrink-0 text-primary" />}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-
-            {backgroundStyle !== 'plain' && (
-              <div className="grid gap-3 pt-1 md:grid-cols-2">
-                <ColorPicker
-                  label="Colore sfondo 2"
-                  value={previewAccent2}
-                  hideDesktopAdvancedPicker
-                  onChange={(color) => {
-                    setPresetId('custom');
-                    setBackgroundColor2(color);
-                  }}
-                />
-                <ColorPicker
-                  label="Colore sfondo 3"
-                  value={previewAccent3}
-                  hideDesktopAdvancedPicker
-                  onChange={(color) => {
-                    setPresetId('custom');
-                    setBackgroundColor3(color);
-                  }}
-                />
-              </div>
-            )}
           </section>
 
           <div className="flex gap-2 border-t border-border/70 pt-4">
