@@ -1,4 +1,4 @@
-export type CardFilterId = 'none' | 'holo' | 'cosmic' | 'frost' | 'ember' | 'shadow';
+export type CardFilterId = 'none' | 'holo' | 'cosmic' | 'prism' | 'ember' | 'shadow';
 
 export type CardFilterOption = {
   id: CardFilterId;
@@ -8,10 +8,10 @@ export type CardFilterOption = {
 
 export const CARD_FILTER_OPTIONS: CardFilterOption[] = [
   { id: 'none', name: 'No filter', description: 'Card pulita, senza overlay.' },
-  { id: 'holo', name: 'Holo', description: 'Riflessi cromati e piccoli sparkle.' },
-  { id: 'cosmic', name: 'Cosmic', description: 'Bagliore freddo viola/blu con stelle leggere.' },
-  { id: 'frost', name: 'Frost', description: 'Velatura chiara e cristallina.' },
-  { id: 'ember', name: 'Ember', description: 'Luce calda con particelle morbide.' },
+  { id: 'holo', name: 'Holo', description: 'Riflessi cromati senza stelline.' },
+  { id: 'cosmic', name: 'Cosmic', description: 'Nebulosa viola/blu con campo stellato.' },
+  { id: 'prism', name: 'Prism', description: 'Lame di luce colorata stile cristallo.' },
+  { id: 'ember', name: 'Ember', description: 'Fiamma calda piu intensa e visibile.' },
   { id: 'shadow', name: 'Shadow', description: 'Contrasto scuro e vignettatura.' },
 ];
 

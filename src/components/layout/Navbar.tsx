@@ -492,12 +492,10 @@ export function Navbar() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {user.email === 'chritel04@gmail.com' && (
-                  <DropdownMenuItem onClick={() => navigate('/pokedex/manage')}>
-                    <Settings2 className="mr-2 h-4 w-4" />
-                    Gestione card
-                  </DropdownMenuItem>
-                )}
+                <DropdownMenuItem onClick={() => navigate('/pokedex/manage')}>
+                  <Settings2 className="mr-2 h-4 w-4" />
+                  Gestione card
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleSetUsername}>
                   <Pencil className="mr-2 h-4 w-4" />
                   Imposta username

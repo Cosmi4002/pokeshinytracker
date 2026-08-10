@@ -646,7 +646,6 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
                         ? mergedThemes[(entry as any).secondary_game]
                         : undefined
                     }
-                    applyBlackEffect={effects.blackEffectEnabled}
                     cardFilter={effects.collectionCardFilter}
                     spriteName={resolved?.name}
                     onEdit={() => {

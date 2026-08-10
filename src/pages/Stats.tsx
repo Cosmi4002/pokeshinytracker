@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import type { ComponentType } from 'react';
+import type { ComponentType, CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import {
   BarChart3,
@@ -119,7 +119,7 @@ function StatCard({
   title: string;
   value: string;
   note: string;
-  icon: ComponentType<{ className?: string }>;
+  icon: ComponentType<{ className?: string; style?: CSSProperties }>;
   accentColor: string;
 }) {
   return (

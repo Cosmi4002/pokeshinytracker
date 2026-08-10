@@ -23,7 +23,7 @@ interface CollectionThemeConfig {
 
 const DEFAULT_EFFECTS: CollectionThemeEffects = {
   blackEffectEnabled: false,
-  pokedexCardFilter: 'holo',
+  pokedexCardFilter: 'none',
   collectionCardFilter: 'none',
 };
 
@@ -56,10 +56,15 @@ function sanitizeOverrides(input: unknown): CollectionThemeOverrides {
 function sanitizeEffects(input: unknown): CollectionThemeEffects {
   if (!input || typeof input !== 'object') return DEFAULT_EFFECTS;
   const raw = input as Record<string, unknown>;
+  const normalizeFilter = (value: unknown, fallback: CardFilterId): CardFilterId => {
+    if (value === 'frost') return 'prism';
+    return isCardFilterId(value) ? value : fallback;
+  };
+
   return {
     blackEffectEnabled: raw.blackEffectEnabled === true,
-    pokedexCardFilter: isCardFilterId(raw.pokedexCardFilter) ? raw.pokedexCardFilter : DEFAULT_EFFECTS.pokedexCardFilter,
-    collectionCardFilter: isCardFilterId(raw.collectionCardFilter) ? raw.collectionCardFilter : DEFAULT_EFFECTS.collectionCardFilter,
+    pokedexCardFilter: normalizeFilter(raw.pokedexCardFilter, DEFAULT_EFFECTS.pokedexCardFilter),
+    collectionCardFilter: normalizeFilter(raw.collectionCardFilter, DEFAULT_EFFECTS.collectionCardFilter),
   };
 }
 
@@ -91,12 +96,15 @@ export function useGlobalCollectionThemes() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let hasLocalConfig = false;
+
     try {
       const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (localData) {
         const parsedLocal = parseStoredConfig(JSON.parse(localData));
         setOverrides(parsedLocal.overrides);
         setEffects(parsedLocal.effects);
+        hasLocalConfig = true;
       }
     } catch {
       // Ignore local parse errors.
@@ -112,8 +120,9 @@ export function useGlobalCollectionThemes() {
           .eq('pokemon_name', COLLECTION_THEME_ROW.pokemon_name)
           .maybeSingle();
 
-        if (error || !data?.custom_display_name) return;
-        const parsed = parseStoredConfig(JSON.parse(data.custom_display_name));
+        const row = data as { custom_display_name?: string } | null;
+        if (error || !row?.custom_display_name || hasLocalConfig) return;
+        const parsed = parseStoredConfig(JSON.parse(row.custom_display_name));
         setOverrides(parsed.overrides);
         setEffects(parsed.effects);
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(parsed));
@@ -150,22 +159,6 @@ export function useGlobalCollectionThemes() {
     setOverrides(clean);
     setEffects(cleanEffects);
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(fullConfig));
-
-    const payload = {
-      user_id: GLOBAL_CONFIG_ID,
-      pokemon_id: COLLECTION_THEME_ROW.pokemon_id,
-      pokemon_name: COLLECTION_THEME_ROW.pokemon_name,
-      custom_display_name: JSON.stringify(fullConfig),
-      updated_at: new Date().toISOString(),
-    };
-
-    const { error } = await supabase
-      .from('pokedex_overrides' as any)
-      .upsert(payload, { onConflict: 'user_id,pokemon_id,pokemon_name' } as any);
-
-    if (error) {
-      throw new Error(error.message);
-    }
   };
 
   return {
