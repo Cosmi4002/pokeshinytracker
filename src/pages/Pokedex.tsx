@@ -12,6 +12,7 @@ import { POKEMON_FORM_COUNTS } from '@/lib/pokemon-data';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth-context';
 import { useQuery } from '@tanstack/react-query';
+import { useGlobalCollectionThemes } from '@/hooks/use-global-collection-themes';
 
 type CaughtEntryStats = { count: number; genders: Set<string>; forms: Set<string> };
 type CaughtDataMap = Record<number, CaughtEntryStats>;
@@ -28,6 +29,7 @@ export default function Pokedex() {
     const { pokemon, loading: pokemonLoading, error: pokemonError } = usePokemonList();
     const { accentColor } = useRandomColor();
     const { user } = useAuth();
+    const { effects } = useGlobalCollectionThemes();
     const navigate = useNavigate();
     const { pathname } = useLocation();
 
@@ -370,6 +372,7 @@ export default function Pokedex() {
                                         isSecondaryCaught={isSecondaryCaught}
                                         caughtPercentage={pct}
                                         hasCaughtAny={isCaught}
+                                        cardFilter={effects.pokedexCardFilter}
                                         onClick={() => {
                                             navigate(`/pokedex/${p.id}`);
                                         }}

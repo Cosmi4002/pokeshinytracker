@@ -1,10 +1,11 @@
 import { Pencil, Trash2, Calendar, ArrowUpCircle, Crosshair, Sparkles, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getGameTheme, GAME_LOGOS, type GameTheme } from '@/lib/game-themes';
-import { GIGAMAX_ICON, POKEBALLS, POKEMON_EGG_ICON, findHuntingMethod, getDynamicOdds, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, handlePokemonSpriteError, isBreedingMethod, supportsGigamaxMark, toLocalPokemonSpriteUrl } from '@/lib/pokemon-data';
+import { GIGAMAX_ICON, POKEBALLS, POKEMON_EGG_ICON, findHuntingMethod, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, handlePokemonSpriteError, isBreedingMethod, supportsGigamaxMark, toLocalPokemonSpriteUrl } from '@/lib/pokemon-data';
 import type { Tables } from '@/integrations/supabase/types';
 import { useMemo, useCallback, useId } from 'react';
 import { cn } from '@/lib/utils';
+import type { CardFilterId } from '@/lib/card-effects';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,6 +28,7 @@ interface ShinyCardProps {
   themeOverride?: GameTheme;
   secondaryThemeOverride?: GameTheme;
   applyBlackEffect?: boolean;
+  cardFilter?: CardFilterId;
   spriteName?: string;
 }
 
@@ -39,7 +41,7 @@ const getEvolvedFromSpriteScale = (name?: string | null) => {
 const getEvolvedFromSpriteSize = (name?: string | null, compact = false) =>
   `${2.58 * getEvolvedFromSpriteScale(name) * (compact ? 0.82 : 1)}rem`;
 
-export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverride, secondaryThemeOverride, applyBlackEffect = false, spriteName }: ShinyCardProps) {
+export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverride, secondaryThemeOverride, applyBlackEffect = false, cardFilter = 'none', spriteName }: ShinyCardProps) {
   const spriteOutlineSeed = useId().replace(/:/g, '');
   const evolvedSpriteOutlineId = `evolved-sprite-outline-${spriteOutlineSeed}`;
   const mainSpriteOutlineId = `main-sprite-outline-${spriteOutlineSeed}`;
@@ -61,7 +63,6 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   }, [(entry as any).secondary_game, secondaryThemeOverride]);
   const pokeball = useMemo(() => POKEBALLS.find((b) => b.id === entry.pokeball), [entry.pokeball]);
   const method = useMemo(() => findHuntingMethod(entry.method), [entry.method]);
-  const odds = Math.round(getDynamicOdds(entry.method, Number(entry.attempts || 0), entry.has_shiny_charm === true));
   const hasBottomMeta = isGigamax || isLegendsArceus || entry.is_fail || entry.is_unobtainable;
   const isGameCorner = normalizedMethod.includes('game corner') || normalizedMethod.includes('game-corner') || method?.name.toLowerCase() === 'game corner';
   const isPokeRadar = normalizedMethod.includes('pokeradar') || normalizedMethod.includes('poke radar') || method?.name.toLowerCase().includes('poke radar');
@@ -208,6 +209,25 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
           <div className="absolute -inset-[1px] rounded-xl ring-2 ring-fuchsia-400/25" />
           <div className="absolute left-0 right-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-fuchsia-300/70 to-transparent" />
         </div>
+      )}
+      {cardFilter === 'holo' && (
+        <div className="pointer-events-none absolute inset-0 z-20 rounded-xl opacity-70 mix-blend-screen">
+          <div className="absolute inset-[1px] rounded-xl border border-white/20 bg-[linear-gradient(118deg,rgba(255,255,255,0.22),rgba(134,239,172,0.10)_18%,rgba(125,211,252,0.12)_35%,transparent_49%,rgba(216,180,254,0.14)_67%,rgba(255,255,255,0.16))]" />
+          <div className="absolute inset-0 opacity-55" style={{ backgroundImage: 'radial-gradient(circle at 18% 22%, white 0 1px, transparent 2px), radial-gradient(circle at 76% 18%, white 0 1px, transparent 2px), radial-gradient(circle at 62% 68%, white 0 1px, transparent 2px)', backgroundSize: '74px 86px, 96px 82px, 88px 92px' }} />
+          <div className="absolute -left-10 top-16 h-16 w-[150%] -rotate-12 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+        </div>
+      )}
+      {cardFilter === 'cosmic' && (
+        <div className="pointer-events-none absolute inset-0 z-20 rounded-xl opacity-65 mix-blend-screen" style={{ background: 'radial-gradient(circle at 18% 20%, rgba(129,140,248,0.38), transparent 34%), radial-gradient(circle at 82% 16%, rgba(236,72,153,0.26), transparent 32%), radial-gradient(circle at 52% 80%, rgba(56,189,248,0.24), transparent 36%)' }} />
+      )}
+      {cardFilter === 'frost' && (
+        <div className="pointer-events-none absolute inset-[1px] z-20 rounded-xl opacity-60 mix-blend-screen" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.32), rgba(125,211,252,0.14) 42%, transparent 70%), repeating-linear-gradient(115deg, rgba(255,255,255,0.14) 0 1px, transparent 1px 12px)' }} />
+      )}
+      {cardFilter === 'ember' && (
+        <div className="pointer-events-none absolute inset-0 z-20 rounded-xl opacity-55 mix-blend-screen" style={{ background: 'radial-gradient(circle at 22% 78%, rgba(251,146,60,0.34), transparent 36%), radial-gradient(circle at 76% 26%, rgba(248,113,113,0.24), transparent 32%), linear-gradient(20deg, transparent, rgba(250,204,21,0.12), transparent)' }} />
+      )}
+      {cardFilter === 'shadow' && (
+        <div className="pointer-events-none absolute inset-0 z-20 rounded-xl bg-[radial-gradient(circle_at_center,transparent_34%,rgba(0,0,0,0.46)_100%)] opacity-70" />
       )}
       <div
         className="flex-1 w-full min-w-0 p-3.5 bg-[#222] relative z-10 border-t border-white/10 flex flex-col"
@@ -532,7 +552,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                           onError={(e) => ((e.currentTarget as HTMLImageElement).src = '/placeholder.svg')}
                         />
                       )}
-                      <div className="relative z-10 flex max-w-full items-baseline justify-center gap-4 text-center">
+                      <div className="relative z-10 flex max-w-full items-baseline justify-center text-center">
                         <span
                           className="min-w-0 truncate text-[2rem] font-black leading-none text-white tabular-nums sm:text-[1.86rem]"
                           style={{
@@ -541,11 +561,6 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                         >
                           {entry.attempts && entry.attempts > 0 ? entry.attempts.toLocaleString() : '-'}
                         </span>
-                        {entry.attempts && entry.attempts > 0 && (
-                          <span className="shrink-0 text-xs font-bold text-white/65 tabular-nums sm:text-sm">
-                            1/{odds.toLocaleString()}
-                          </span>
-                        )}
                       </div>
                     </div>
                     {(entry as any).show_seen && (

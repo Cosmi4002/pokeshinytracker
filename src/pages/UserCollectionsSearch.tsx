@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ComponentType } from 'react';
-import { BarChart3, Calendar, Crown, Gamepad2, Grid3X3, Radio, Search, Sparkles, Target, TrendingUp, UserRound, Users, ArrowUpCircle } from 'lucide-react';
+import { BarChart3, Calendar, Crown, Dice5, Gamepad2, Hash, Radio, Search, Sparkles, Target, TrendingUp, UserRound, Users, ArrowUpCircle } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import type { Tables } from '@/integrations/supabase/types';
 import { getPokemonSpriteUrl } from '@/hooks/use-pokemon';
-import { SHINY_CHARM_ICON, findHuntingMethod, isBreedingMethod, GAMES } from '@/lib/pokemon-data';
+import { SHINY_CHARM_ICON, findHuntingMethod, getDynamicOdds, isBreedingMethod, GAMES } from '@/lib/pokemon-data';
 import { GAME_LOGOS } from '@/lib/game-themes';
 import { toLocalISODate } from '@/lib/date';
 import { cn } from '@/lib/utils';
@@ -30,7 +30,7 @@ type StatTileProps = {
 
 function StatTile({ label, value, note, icon: Icon }: StatTileProps) {
   return (
-    <div className="relative overflow-hidden rounded-lg border border-border bg-card p-3 shadow-sm">
+    <div className="relative overflow-hidden rounded-lg border border-border/70 bg-muted/30 p-3 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="text-[11px] font-black uppercase tracking-[0.12em] text-muted-foreground">{label}</div>
@@ -301,6 +301,8 @@ export default function UserCollectionsSearch() {
     let trackedAttempts = 0;
     let trackedRows = 0;
     let charmCount = 0;
+    let longestHunt: PublicCaughtRow | null = null;
+    let luckiestHunt: PublicCaughtRow | null = null;
 
     obtained.forEach((entry) => {
       species.add(entry.pokemon_id);
@@ -313,8 +315,17 @@ export default function UserCollectionsSearch() {
         Number(entry.attempts || 0) > 0 &&
         shouldShowEncounters(entry.method, entry.game, entry.attempts, entry.show_encounters ?? true)
       ) {
-        trackedAttempts += Number(entry.attempts || 0);
+        const attempts = Number(entry.attempts || 0);
+        trackedAttempts += attempts;
         trackedRows += 1;
+        if (!longestHunt || attempts > Number(longestHunt.attempts || 0)) longestHunt = entry;
+
+        const odds = getDynamicOdds(entry.method, attempts, entry.has_shiny_charm === true);
+        const luckScore = attempts / Math.max(odds, 1);
+        const currentLuckScore = luckiestHunt
+          ? Number(luckiestHunt.attempts || 0) / Math.max(getDynamicOdds(luckiestHunt.method, Number(luckiestHunt.attempts || 0), luckiestHunt.has_shiny_charm === true), 1)
+          : Number.POSITIVE_INFINITY;
+        if (!luckiestHunt || luckScore < currentLuckScore) luckiestHunt = entry;
       }
     });
 
@@ -331,6 +342,8 @@ export default function UserCollectionsSearch() {
       failCount: entries.filter((entry) => entry.is_fail).length,
       topGame: topGame ? { label: getGameLabel(topGame[0]), count: topGame[1] } : null,
       topMethod: topMethod ? { label: formatMethodLabel(topMethod[0]), count: topMethod[1] } : null,
+      longestHunt,
+      luckiestHunt,
     };
   }, [entries]);
 
@@ -505,6 +518,80 @@ export default function UserCollectionsSearch() {
     );
   };
 
+  const renderRecordHuntCard = (label: string, entry: PublicCaughtRow | null) => {
+    if (!entry) {
+      return (
+        <div className="rounded-lg border bg-background/60 p-3 shadow-sm">
+          <div className="text-xs font-black uppercase tracking-[0.14em] text-muted-foreground">{label}</div>
+          <div className="mt-1 font-semibold">-</div>
+        </div>
+      );
+    }
+
+    const attempts = Number(entry.attempts || 0);
+    const odds = Math.round(getDynamicOdds(entry.method, attempts, entry.has_shiny_charm === true));
+    const sprite = entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, {
+      shiny: true,
+      name: entry.form || entry.pokemon_name,
+      female: entry.gender === 'female',
+    });
+
+    return (
+      <div className="overflow-hidden rounded-lg border bg-background/60 shadow-sm">
+        <div className="grid gap-3 p-3 sm:grid-cols-[86px_minmax(0,1fr)]">
+          <div className="flex min-h-[86px] items-center justify-center rounded-md bg-muted/60">
+            <img
+              src={sprite}
+              alt={entry.pokemon_name}
+              className="h-20 w-20 object-contain drop-shadow"
+              loading="lazy"
+              onError={(event) => {
+                event.currentTarget.src = '/placeholder.svg';
+              }}
+            />
+          </div>
+          <div className="min-w-0">
+            <div className="flex items-center justify-between gap-3">
+              <div className="text-xs font-black uppercase tracking-[0.14em] text-muted-foreground">{label}</div>
+              {entry.has_shiny_charm && <Sparkles className="h-4 w-4 shrink-0 text-amber-500" />}
+            </div>
+            <div className="mt-1 truncate text-lg font-black leading-tight">{entry.pokemon_name}</div>
+            <div className="mt-3 grid gap-x-4 gap-y-2 text-xs sm:grid-cols-2">
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5 font-black uppercase tracking-[0.12em] text-muted-foreground">
+                  <Gamepad2 className="h-3.5 w-3.5" />
+                  Gioco
+                </div>
+                <div className="mt-0.5 truncate font-semibold">{getGameLabel(entry.game)}</div>
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5 font-black uppercase tracking-[0.12em] text-muted-foreground">
+                  <Target className="h-3.5 w-3.5" />
+                  Metodo
+                </div>
+                <div className="mt-0.5 truncate font-semibold">{formatMethodLabel(entry.method)}</div>
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5 font-black uppercase tracking-[0.12em] text-muted-foreground">
+                  <Hash className="h-3.5 w-3.5" />
+                  Encounters
+                </div>
+                <div className="mt-0.5 font-semibold tabular-nums">{numberFormatter.format(attempts)}</div>
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5 font-black uppercase tracking-[0.12em] text-muted-foreground">
+                  <Dice5 className="h-3.5 w-3.5" />
+                  Odds
+                </div>
+                <div className="mt-0.5 font-semibold tabular-nums">1/{numberFormatter.format(odds)}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -586,20 +673,54 @@ export default function UserCollectionsSearch() {
               )}
 
               {!entriesLoading && entries.length > 0 && (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <div className="flex items-center gap-2">
                     <BarChart3 className="h-4 w-4 text-muted-foreground" />
                     <h3 className="font-semibold">Statistiche utente</h3>
                   </div>
+
+                  <Card className="overflow-hidden border-border/70">
+                    <CardContent className="grid gap-4 p-5 sm:grid-cols-[1fr_auto] sm:items-center">
+                      <div className="space-y-2">
+                        <div className="text-sm font-medium text-muted-foreground">Panoramica collezione</div>
+                        <div className="flex flex-wrap items-end gap-x-4 gap-y-2">
+                          <div className="text-5xl font-black tabular-nums tracking-tight">
+                            {numberFormatter.format(userStats.obtainedCount)}
+                          </div>
+                          <div className="pb-1 text-sm text-muted-foreground">
+                            shiny principali, {numberFormatter.format(userStats.speciesCount)} specie uniche
+                          </div>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-sm sm:min-w-64">
+                        <div className="rounded-md border bg-muted/30 p-3">
+                          <div className="font-mono text-lg font-bold">{numberFormatter.format(userStats.formsCount)}</div>
+                          <div className="text-xs text-muted-foreground">forme</div>
+                        </div>
+                        <div className="rounded-md border bg-muted/30 p-3">
+                          <div className="font-mono text-lg font-bold">{numberFormatter.format(userStats.failCount)}</div>
+                          <div className="text-xs text-muted-foreground">fail</div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
                   <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                    <StatTile label="Shiny" value={numberFormatter.format(userStats.obtainedCount)} note="Collezione principale" icon={Sparkles} />
-                    <StatTile label="Specie" value={numberFormatter.format(userStats.speciesCount)} note={`${numberFormatter.format(userStats.formsCount)} forme`} icon={Grid3X3} />
                     <StatTile label="Media" value={userStats.averageAttempts ? numberFormatter.format(userStats.averageAttempts) : '-'} note={`${numberFormatter.format(userStats.trackedRows)} con encounters`} icon={TrendingUp} />
                     <StatTile label="Charm" value={`${userStats.charmPercent}%`} note="Catture con cromamuleto" icon={Crown} />
                     <StatTile label="Gioco top" value={userStats.topGame?.label || '-'} note={userStats.topGame ? `${userStats.topGame.count} catture` : 'Nessun dato'} icon={Gamepad2} />
                     <StatTile label="Metodo top" value={userStats.topMethod?.label || '-'} note={userStats.topMethod ? `${userStats.topMethod.count} catture` : 'Nessun dato'} icon={Target} />
-                    <StatTile label="Fail" value={numberFormatter.format(userStats.failCount)} note="Separati dai shiny principali" icon={Radio} />
                   </div>
+
+                  <Card className="border-border/70 bg-muted/30 shadow-sm">
+                    <CardHeader>
+                      <CardTitle className="text-base">Record</CardTitle>
+                    </CardHeader>
+                    <CardContent className="grid gap-3 lg:grid-cols-2">
+                      {renderRecordHuntCard('Caccia più lunga', userStats.longestHunt)}
+                      {renderRecordHuntCard('Caccia più fortunata', userStats.luckiestHunt)}
+                    </CardContent>
+                  </Card>
                 </div>
               )}
 

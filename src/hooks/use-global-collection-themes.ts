@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { GAME_THEMES, type GameTheme } from '@/lib/game-themes';
+import { isCardFilterId, type CardFilterId } from '@/lib/card-effects';
 
 const GLOBAL_CONFIG_ID = 'global';
 const COLLECTION_THEME_ROW = {
@@ -12,6 +13,8 @@ const LOCAL_STORAGE_KEY = 'collection_theme_overrides';
 export type CollectionThemeOverrides = Record<string, Partial<GameTheme>>;
 export interface CollectionThemeEffects {
   blackEffectEnabled: boolean;
+  pokedexCardFilter: CardFilterId;
+  collectionCardFilter: CardFilterId;
 }
 interface CollectionThemeConfig {
   overrides: CollectionThemeOverrides;
@@ -20,6 +23,8 @@ interface CollectionThemeConfig {
 
 const DEFAULT_EFFECTS: CollectionThemeEffects = {
   blackEffectEnabled: false,
+  pokedexCardFilter: 'holo',
+  collectionCardFilter: 'none',
 };
 
 function isValidHex(value: unknown): value is string {
@@ -53,6 +58,8 @@ function sanitizeEffects(input: unknown): CollectionThemeEffects {
   const raw = input as Record<string, unknown>;
   return {
     blackEffectEnabled: raw.blackEffectEnabled === true,
+    pokedexCardFilter: isCardFilterId(raw.pokedexCardFilter) ? raw.pokedexCardFilter : DEFAULT_EFFECTS.pokedexCardFilter,
+    collectionCardFilter: isCardFilterId(raw.collectionCardFilter) ? raw.collectionCardFilter : DEFAULT_EFFECTS.collectionCardFilter,
   };
 }
 

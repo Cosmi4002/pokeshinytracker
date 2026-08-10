@@ -1,14 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-import type { ComponentType, ReactNode } from 'react';
+import type { ComponentType } from 'react';
 import { Link } from 'react-router-dom';
 import {
   BarChart3,
   CalendarDays,
-  CircleDot,
   Crown,
   Dice5,
   Gamepad2,
-  Grid3X3,
   Hash,
   LogIn,
   Medal,
@@ -24,7 +22,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useRandomColor } from '@/lib/random-color-context';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { usePokemonList } from '@/hooks/use-pokemon';
+import { getPokemonSpriteUrl, usePokemonList } from '@/hooks/use-pokemon';
 import { findHuntingMethod, GAMES, getDynamicOdds } from '@/lib/pokemon-data';
 import type { Tables } from '@/integrations/supabase/types';
 
@@ -125,7 +123,7 @@ function StatCard({
   accentColor: string;
 }) {
   return (
-    <Card className="group relative overflow-hidden border-border/70 bg-card/95 transition-shadow hover:shadow-lg">
+    <Card className="group relative overflow-hidden border-border/70 bg-muted/30 shadow-sm transition-shadow hover:shadow-lg">
       <div className="absolute inset-x-0 top-0 h-1" style={{ backgroundColor: accentColor }} />
       <div
         className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full opacity-10 blur-2xl transition-opacity group-hover:opacity-20"
@@ -141,25 +139,10 @@ function StatCard({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold tabular-nums">{value}</div>
+        <div className="text-2xl font-bold tabular-nums text-foreground">{value}</div>
         <p className="mt-1 text-xs text-muted-foreground">{note}</p>
       </CardContent>
     </Card>
-  );
-}
-
-function RecordDetail({
-  icon: Icon,
-  children,
-}: {
-  icon: ComponentType<{ className?: string }>;
-  children: ReactNode;
-}) {
-  return (
-    <span className="inline-flex min-w-0 items-center gap-1.5 rounded-md border bg-background/70 px-2.5 py-1 text-xs text-muted-foreground">
-      <Icon className="h-3.5 w-3.5 shrink-0" />
-      <span className="min-w-0 truncate">{children}</span>
-    </span>
   );
 }
 
@@ -183,31 +166,83 @@ function RecordHunt({
 
   const attempts = Number(entry.attempts || 0);
   const odds = Math.round(getDynamicOdds(entry.method, attempts, entry.has_shiny_charm === true));
+  const sprite = entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, {
+    shiny: true,
+    name: entry.form || entry.pokemon_name,
+    female: entry.gender === 'female',
+  });
 
   return (
-    <div className="rounded-md border bg-muted/20 p-3">
-      <div className="text-xs font-medium uppercase text-muted-foreground">{label}</div>
-      <div className="mt-1 min-w-0 text-base font-semibold leading-tight">
-        <span className="break-words">{entry.pokemon_name}</span>
-      </div>
-      <div className="mt-3 flex flex-wrap gap-2">
-        <RecordDetail icon={Gamepad2}>{getGameLabel(entry.game)}</RecordDetail>
-        <RecordDetail icon={Target}>{getMethodLabel(entry.method)}</RecordDetail>
-        <RecordDetail icon={Hash}>{numberFormatter.format(attempts)} enc.</RecordDetail>
-        <RecordDetail icon={Dice5}>1/{numberFormatter.format(odds)}</RecordDetail>
-        {entry.has_shiny_charm && (
-          <span
-            className="inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium"
-            style={{
-              borderColor: `color-mix(in srgb, ${accentColor}, transparent 55%)`,
-              color: accentColor,
-              backgroundColor: `color-mix(in srgb, ${accentColor}, transparent 92%)`,
+    <div className="overflow-hidden rounded-lg border bg-background/60 shadow-sm">
+      <div className="grid gap-3 p-3 sm:grid-cols-[86px_minmax(0,1fr)]">
+        <div className="flex min-h-[86px] items-center justify-center rounded-md bg-muted/60">
+          <img
+            src={sprite}
+            alt={entry.pokemon_name}
+            className="h-20 w-20 object-contain drop-shadow"
+            loading="lazy"
+            onError={(event) => {
+              event.currentTarget.src = '/placeholder.svg';
             }}
-          >
-            <Sparkles className="h-3.5 w-3.5" />
-            Cromamuleto
-          </span>
-        )}
+          />
+        </div>
+        <div className="min-w-0">
+          <div className="flex items-center justify-between gap-3">
+            <div className="text-xs font-black uppercase tracking-[0.14em] text-muted-foreground">{label}</div>
+            {entry.has_shiny_charm && <Sparkles className="h-4 w-4 shrink-0" style={{ color: accentColor }} />}
+          </div>
+          <div className="mt-1 truncate text-lg font-black leading-tight">{entry.pokemon_name}</div>
+          <div className="mt-3 grid gap-x-4 gap-y-2 text-xs sm:grid-cols-2">
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 font-black uppercase tracking-[0.12em] text-muted-foreground">
+                <Gamepad2 className="h-3.5 w-3.5" />
+                Gioco
+              </div>
+              <div className="mt-0.5 truncate font-semibold">{getGameLabel(entry.game)}</div>
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 font-black uppercase tracking-[0.12em] text-muted-foreground">
+                <Target className="h-3.5 w-3.5" />
+                Metodo
+              </div>
+              <div className="mt-0.5 truncate font-semibold">{getMethodLabel(entry.method)}</div>
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 font-black uppercase tracking-[0.12em] text-muted-foreground">
+                <Hash className="h-3.5 w-3.5" />
+                Encounters
+              </div>
+              <div className="mt-0.5 font-semibold tabular-nums">{numberFormatter.format(attempts)}</div>
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 font-black uppercase tracking-[0.12em] text-muted-foreground">
+                <Dice5 className="h-3.5 w-3.5" />
+                Odds
+              </div>
+              <div className="mt-0.5 font-semibold tabular-nums">1/{numberFormatter.format(odds)}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MonthRecord({ item }: { item?: RankedItem }) {
+  return (
+    <div className="rounded-lg border bg-background/60 p-3 shadow-sm">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <div className="text-xs font-black uppercase tracking-[0.14em] text-muted-foreground">Mese migliore</div>
+          <div className="mt-1 text-base font-black">{item?.label || '-'}</div>
+        </div>
+        <div className="flex items-center gap-2 text-right">
+          <CalendarDays className="h-4 w-4 text-muted-foreground" />
+          <div>
+            <div className="text-lg font-black tabular-nums">{item ? numberFormatter.format(item.value) : '-'}</div>
+            <div className="text-[10px] font-black uppercase tracking-[0.12em] text-muted-foreground">shiny</div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -436,7 +471,7 @@ export default function Stats() {
           </p>
         </div>
 
-        <Card className="overflow-hidden border-border/70">
+        <Card className="overflow-hidden border-border/70 bg-muted/30 shadow-sm">
           <CardContent className="grid gap-4 p-5 sm:grid-cols-[1fr_auto] sm:items-center">
             <div className="space-y-2">
               <div className="text-sm font-medium text-muted-foreground">Panoramica collezione</div>
@@ -463,31 +498,21 @@ export default function Stats() {
         </Card>
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          <StatCard title="Shiny ottenuti" value={numberFormatter.format(obtainedTotal)} note="Solo collezione principale" icon={Sparkles} accentColor={accentColor} />
-          <StatCard title="Specie uniche" value={numberFormatter.format(stats.uniqueSpecies)} note="Forme della stessa specie contate una volta" icon={Grid3X3} accentColor={accentColor} />
-          <StatCard title="Forme registrate" value={numberFormatter.format(stats.uniqueForms)} note="Include forma e sesso salvati" icon={CircleDot} accentColor={accentColor} />
           <StatCard title="Media encounters" value={stats.averageAttempts ? numberFormatter.format(stats.averageAttempts) : '-'} note={`${numberFormatter.format(stats.totalAttempts)} encounters con counter`} icon={TrendingUp} accentColor={accentColor} />
           <StatCard title="Con cromamuleto" value={`${percentage(stats.shinyCharmCount, obtainedTotal)}%`} note={`${numberFormatter.format(stats.shinyCharmCount)} shiny segnati con charm`} icon={Crown} accentColor={accentColor} />
           <StatCard title="Evoluti" value={numberFormatter.format(stats.evolvedCount)} note="Pokemon con evoluzione registrata" icon={Medal} accentColor={accentColor} />
-          <StatCard title="Fail" value={numberFormatter.format(stats.fail.length)} note="Fail e uncatchable separati dal totale" icon={Gamepad2} accentColor={accentColor} />
         </div>
 
         <div className="grid gap-4 lg:grid-cols-2">
           <RankedList title="Metodi più usati" items={stats.methodTop} total={obtainedTotal} empty="Nessun metodo registrato." accentColor={accentColor} />
           <RankedList title="Giochi più usati" items={stats.gameTop} total={obtainedTotal} empty="Nessun gioco registrato." accentColor={accentColor} />
           <RankedList title="Distribuzione per generazione" items={stats.generationTop} total={obtainedTotal} empty="Nessuna generazione calcolabile." accentColor={accentColor} />
-          <Card>
+          <Card className="border-border/70 bg-muted/30 shadow-sm">
             <CardHeader>
               <CardTitle className="text-base">Record</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 text-sm">
-              <div className="rounded-md border bg-muted/20 p-3">
-                <div className="text-xs font-medium uppercase text-muted-foreground">Mese migliore</div>
-                <div className="mt-2 flex flex-wrap items-center gap-2">
-                  <RecordDetail icon={CalendarDays}>{stats.bestMonth?.label || '-'}</RecordDetail>
-                  {stats.bestMonth && <RecordDetail icon={Sparkles}>{numberFormatter.format(stats.bestMonth.value)} shiny</RecordDetail>}
-                </div>
-              </div>
+              <MonthRecord item={stats.bestMonth} />
               <RecordHunt label="Caccia più lunga" entry={stats.longestHunt} accentColor={accentColor} />
               <RecordHunt label="Caccia più fortunata" entry={stats.luckiestHunt} accentColor={accentColor} />
             </CardContent>
@@ -495,7 +520,7 @@ export default function Stats() {
         </div>
 
         <div className="grid gap-4">
-          <Card className="order-2">
+          <Card className="order-2 border-border/70 bg-muted/30 shadow-sm">
             <CardHeader>
               <CardTitle className="text-base">Andamento ultimi mesi</CardTitle>
             </CardHeader>

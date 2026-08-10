@@ -550,7 +550,7 @@ export default function PokemonDetails() {
                                                     key={game.id}
                                                     title={game.name}
                                                     className={cn(
-                                                        "relative flex min-h-[104px] flex-col items-center justify-start gap-2 overflow-hidden rounded-xl border p-2.5 shadow-md transition-all duration-300",
+                                                        "relative flex min-h-[104px] flex-col items-center justify-center gap-2 overflow-hidden rounded-xl border p-2.5 shadow-md transition-all duration-300",
                                                         game.isCaught
                                                             ? "scale-[1.01] border-2 text-white shadow-xl"
                                                             : "border-border/80 bg-gradient-to-b from-muted/85 to-card/95 text-foreground opacity-95 hover:from-muted hover:to-background dark:from-muted/45 dark:to-card/95"
@@ -590,6 +590,7 @@ export default function PokemonDetails() {
                                                     <span
                                                         className={cn(
                                                             "flex min-h-[1.35rem] max-w-full items-center text-center text-[10px] font-black uppercase leading-[1.05] tracking-wide",
+                                                            details.hasGenderDifference && game.isCaught ? "mb-4" : "",
                                                             game.isCaught
                                                                 ? "text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
                                                                 : "text-foreground/80"
@@ -610,7 +611,7 @@ export default function PokemonDetails() {
                                                         </span>
                                                     )}
                                                     {details.hasGenderDifference && game.isCaught && (
-                                                        <span className="mt-auto flex items-center gap-1 rounded-full border border-white/15 bg-black/40 px-1.5 py-0.5 text-[12px] font-black leading-none shadow-sm backdrop-blur-sm">
+                                                        <span className="absolute bottom-1.5 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full border border-white/15 bg-black/40 px-1.5 py-0.5 text-[12px] font-black leading-none shadow-sm backdrop-blur-sm">
                                                             <span
                                                                 className={cn(
                                                                     "transition-all",

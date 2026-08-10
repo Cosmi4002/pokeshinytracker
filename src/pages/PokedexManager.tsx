@@ -5,6 +5,7 @@ import {
     Settings2,
     ShieldCheck,
     AlertCircle,
+    Layers,
     Palette,
     Save
 } from "lucide-react";
@@ -21,6 +22,7 @@ import { useGlobalCollectionThemes } from "@/hooks/use-global-collection-themes"
 import { GAMES } from "@/lib/pokemon-data";
 import { getGameTheme } from "@/lib/game-themes";
 import { cn } from "@/lib/utils";
+import { CARD_FILTER_OPTIONS, getCardFilterOption, type CardFilterId } from "@/lib/card-effects";
 
 export default function PokedexManager() {
     const navigate = useNavigate();
@@ -33,6 +35,8 @@ export default function PokedexManager() {
     const [selectedGame, setSelectedGame] = useState('black2');
     const [draftOverrides, setDraftOverrides] = useState(overrides);
     const [isBlackEffectEnabled, setIsBlackEffectEnabled] = useState(effects.blackEffectEnabled);
+    const [pokedexCardFilter, setPokedexCardFilter] = useState<CardFilterId>(effects.pokedexCardFilter);
+    const [collectionCardFilter, setCollectionCardFilter] = useState<CardFilterId>(effects.collectionCardFilter);
     const [isSavingThemes, setIsSavingThemes] = useState(false);
 
     const isAdmin = user?.email === 'chritel04@gmail.com';
@@ -56,7 +60,9 @@ export default function PokedexManager() {
 
     useEffect(() => {
         setIsBlackEffectEnabled(effects.blackEffectEnabled);
-    }, [effects.blackEffectEnabled]);
+        setPokedexCardFilter(effects.pokedexCardFilter);
+        setCollectionCardFilter(effects.collectionCardFilter);
+    }, [effects.blackEffectEnabled, effects.collectionCardFilter, effects.pokedexCardFilter]);
 
     const gameBaseTheme = getGameTheme(selectedGame);
     const activeTheme = {
@@ -94,10 +100,14 @@ export default function PokedexManager() {
     const handleSaveGlobalThemes = async () => {
         setIsSavingThemes(true);
         try {
-            await saveConfig(draftOverrides, { blackEffectEnabled: isBlackEffectEnabled });
+            await saveConfig(draftOverrides, {
+                blackEffectEnabled: isBlackEffectEnabled,
+                pokedexCardFilter,
+                collectionCardFilter,
+            });
             toast({
-                title: 'Palette salvata',
-                description: 'Le nuove sfumature/effetti collection sono ora globali per tutti gli utenti.',
+                title: 'Gestione card salvata',
+                description: 'Colori e filtri delle card sono stati aggiornati globalmente.',
             });
         } catch (error: any) {
             toast({
@@ -124,7 +134,7 @@ export default function PokedexManager() {
         <div className="min-h-screen bg-background pb-20">
             <Navbar />
 
-            <main className="container mx-auto py-12 px-4 max-w-2xl">
+            <main className="container mx-auto max-w-5xl px-4 py-10">
                 <div className="mb-8">
                     <Button
                         variant="ghost"
@@ -139,10 +149,10 @@ export default function PokedexManager() {
                         <div className="p-2 bg-primary/10 rounded-lg">
                             <Settings2 className="h-6 w-6 text-primary" />
                         </div>
-                        <h1 className="text-3xl font-bold tracking-tight">Pannello Gestione</h1>
+                        <h1 className="text-3xl font-bold tracking-tight">Gestione card</h1>
                     </div>
                     <p className="text-muted-foreground">
-                        Configura le opzioni avanzate del tracker.
+                        Configura editor, colori e filtri visuali delle card in modo separato.
                     </p>
                 </div>
 
@@ -181,13 +191,89 @@ export default function PokedexManager() {
                     </CardContent>
                 </Card>
 
+                <Card className="mt-6 overflow-hidden border-white/10 bg-white/5 shadow-2xl backdrop-blur-xl">
+                    <CardHeader className="border-b border-white/5 bg-white/[0.02]">
+                        <div className="mb-1 flex items-center gap-2 text-primary">
+                            <Layers className="h-4 w-4" />
+                            <span className="text-xs font-bold uppercase tracking-widest">Filtri separati</span>
+                        </div>
+                        <CardTitle>Filtri card</CardTitle>
+                        <CardDescription>
+                            Scegli effetti indipendenti per card PokÃ©dex e card Collezione. Ogni gruppo puÃ² restare su No filter.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="grid gap-4 pt-6 md:grid-cols-2">
+                        {([
+                            {
+                                id: 'pokedex-card-filter',
+                                label: 'Card PokÃ©dex',
+                                value: pokedexCardFilter,
+                                onChange: setPokedexCardFilter,
+                                preview: 'Pokedex',
+                            },
+                            {
+                                id: 'collection-card-filter',
+                                label: 'Card Collezione',
+                                value: collectionCardFilter,
+                                onChange: setCollectionCardFilter,
+                                preview: 'Collection',
+                            },
+                        ] as const).map((control) => {
+                            const selected = getCardFilterOption(control.value);
+                            return (
+                                <div key={control.id} className="space-y-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                                    <div className="space-y-1">
+                                        <Label htmlFor={control.id} className="text-base font-bold">{control.label}</Label>
+                                        <p className="text-xs text-muted-foreground">{selected.description}</p>
+                                    </div>
+                                    <Select value={control.value} onValueChange={(value) => control.onChange(value as CardFilterId)}>
+                                        <SelectTrigger id={control.id}>
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {CARD_FILTER_OPTIONS.map((option) => (
+                                                <SelectItem key={option.id} value={option.id}>
+                                                    {option.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <div
+                                        className={cn(
+                                            "relative flex h-24 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-slate-950 to-slate-800 text-xs font-black uppercase tracking-[0.16em] text-white shadow-inner",
+                                            control.value === 'shadow' && "from-slate-950 to-black"
+                                        )}
+                                    >
+                                        {control.value === 'holo' && (
+                                            <div className="absolute inset-0 opacity-75 mix-blend-screen" style={{ background: 'linear-gradient(118deg, rgba(255,255,255,0.24), rgba(134,239,172,0.12) 18%, rgba(125,211,252,0.15) 35%, transparent 49%, rgba(216,180,254,0.18) 67%, rgba(255,255,255,0.18))' }} />
+                                        )}
+                                        {control.value === 'cosmic' && (
+                                            <div className="absolute inset-0 opacity-75 mix-blend-screen" style={{ background: 'radial-gradient(circle at 18% 20%, rgba(129,140,248,0.42), transparent 34%), radial-gradient(circle at 80% 24%, rgba(236,72,153,0.28), transparent 30%), radial-gradient(circle at 50% 78%, rgba(56,189,248,0.24), transparent 36%)' }} />
+                                        )}
+                                        {control.value === 'frost' && (
+                                            <div className="absolute inset-0 opacity-70 mix-blend-screen" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.36), rgba(125,211,252,0.15) 45%, transparent), repeating-linear-gradient(115deg, rgba(255,255,255,0.16) 0 1px, transparent 1px 12px)' }} />
+                                        )}
+                                        {control.value === 'ember' && (
+                                            <div className="absolute inset-0 opacity-65 mix-blend-screen" style={{ background: 'radial-gradient(circle at 22% 76%, rgba(251,146,60,0.38), transparent 34%), radial-gradient(circle at 74% 26%, rgba(248,113,113,0.28), transparent 30%)' }} />
+                                        )}
+                                        {control.value === 'shadow' && (
+                                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_34%,rgba(0,0,0,0.56)_100%)]" />
+                                        )}
+                                        <span className="relative z-10">{control.preview}</span>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </CardContent>
+                </Card>
+
                 <Card className="mt-6 border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl overflow-hidden">
                     <CardHeader className="border-b border-white/5 bg-white/[0.02]">
                         <div className="flex items-center gap-2 text-primary mb-1">
                             <Palette className="h-4 w-4" />
-                            <span className="text-xs font-bold uppercase tracking-widest">Globale Collection</span>
+                            <span className="text-xs font-bold uppercase tracking-widest">Colori Collezione</span>
                         </div>
-                        <CardTitle>Palette Riquadri Collezione</CardTitle>
+                        <CardTitle>Colori card Collezione</CardTitle>
                         <CardDescription>
                             Modifica le sfumature dei riquadri per ogni gioco. Il salvataggio è globale e visibile a tutti.
                         </CardDescription>
@@ -263,7 +349,7 @@ export default function PokedexManager() {
                                 disabled={themesLoading || isSavingThemes}
                             >
                                 <Save className="mr-2 h-4 w-4" />
-                                {isSavingThemes ? 'Salvataggio...' : 'Salva Globale'}
+                                {isSavingThemes ? 'Salvataggio...' : 'Salva gestione card'}
                             </Button>
                         </div>
                     </CardContent>

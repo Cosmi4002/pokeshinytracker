@@ -647,6 +647,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
                         : undefined
                     }
                     applyBlackEffect={effects.blackEffectEnabled}
+                    cardFilter={effects.collectionCardFilter}
                     spriteName={resolved?.name}
                     onEdit={() => {
                       setEditEntry(entry);
