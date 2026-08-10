@@ -65,21 +65,10 @@ const previewFilterOverlay = (filter: CardFilterId) => {
 
     if (filter === "pixel") {
         return (
-            <div className="absolute inset-0 rounded-xl opacity-55 mix-blend-screen">
-                <div className="absolute inset-0" style={{ backgroundImage: "linear-gradient(90deg, rgba(255,255,255,0.14) 1px, transparent 1px), linear-gradient(0deg, rgba(255,255,255,0.10) 1px, transparent 1px)", backgroundSize: "14px 14px" }} />
-                <div className="absolute left-[12%] top-[18%] h-3 w-3 bg-cyan-200 shadow-[0_0_10px_rgba(125,211,252,0.85)]" />
-                <div className="absolute right-[18%] top-[34%] h-2 w-2 bg-fuchsia-200 shadow-[0_0_9px_rgba(244,114,182,0.8)]" />
-                <div className="absolute bottom-[18%] left-[44%] h-2.5 w-2.5 bg-lime-200 shadow-[0_0_9px_rgba(190,242,100,0.75)]" />
-            </div>
-        );
-    }
-
-    if (filter === "comic") {
-        return (
-            <div className="absolute inset-0 rounded-xl opacity-70">
-                <div className="absolute inset-[2px] rounded-[0.7rem] border-2 border-white/18 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.25)]" />
-                <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full opacity-45 mix-blend-screen" style={{ backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.32) 0 1px, transparent 1.5px)", backgroundSize: "9px 9px" }} />
-                <div className="absolute inset-x-0 bottom-0 h-16 opacity-20" style={{ background: "repeating-linear-gradient(-18deg, transparent 0 8px, rgba(255,255,255,0.32) 8px 9px, transparent 9px 15px)" }} />
+            <div className="absolute inset-0 rounded-xl opacity-45 mix-blend-screen">
+                <div className="absolute left-[10%] top-[16%] h-2 w-2 bg-cyan-200 shadow-[0_0_8px_rgba(125,211,252,0.75)]" />
+                <div className="absolute right-[14%] top-[28%] h-1.5 w-1.5 bg-fuchsia-200 shadow-[0_0_7px_rgba(244,114,182,0.7)]" />
+                <div className="absolute bottom-[13%] left-[42%] h-2 w-2 bg-lime-200 shadow-[0_0_7px_rgba(190,242,100,0.65)]" />
             </div>
         );
     }
@@ -87,9 +76,9 @@ const previewFilterOverlay = (filter: CardFilterId) => {
     if (filter === "neon") {
         return (
             <div className="absolute inset-0 rounded-xl opacity-60 mix-blend-screen">
-                <div className="absolute inset-0" style={{ backgroundImage: "linear-gradient(rgba(34,211,238,0.22) 1px, transparent 1px), linear-gradient(90deg, rgba(217,70,239,0.18) 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
-                <div className="absolute inset-x-4 top-4 h-px bg-gradient-to-r from-transparent via-cyan-200/70 to-transparent shadow-[0_0_12px_rgba(34,211,238,0.8)]" />
-                <div className="absolute inset-y-4 left-5 w-px bg-gradient-to-b from-transparent via-fuchsia-200/55 to-transparent shadow-[0_0_12px_rgba(217,70,239,0.7)]" />
+                <div className="absolute inset-x-4 top-3 h-px bg-gradient-to-r from-transparent via-cyan-200/70 to-transparent shadow-[0_0_12px_rgba(34,211,238,0.75)]" />
+                <div className="absolute inset-x-5 bottom-3 h-px bg-gradient-to-r from-transparent via-fuchsia-200/50 to-transparent shadow-[0_0_10px_rgba(217,70,239,0.65)]" />
+                <div className="absolute bottom-4 right-4 h-7 w-7 rounded-br-lg border-b border-r border-cyan-200/40 shadow-[4px_4px_12px_rgba(34,211,238,0.45)]" />
             </div>
         );
     }

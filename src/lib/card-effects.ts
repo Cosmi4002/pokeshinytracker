@@ -1,4 +1,4 @@
-export type CardFilterId = 'none' | 'holo' | 'cosmic' | 'pixel' | 'comic' | 'neon' | 'prism' | 'ember' | 'shadow';
+export type CardFilterId = 'none' | 'holo' | 'cosmic' | 'pixel' | 'neon' | 'prism' | 'ember' | 'shadow';
 
 export type CardFilterOption = {
   id: CardFilterId;
@@ -9,10 +9,9 @@ export type CardFilterOption = {
 export const CARD_FILTER_OPTIONS: CardFilterOption[] = [
   { id: 'none', name: 'No filter', description: 'Card pulita, senza overlay.' },
   { id: 'holo', name: 'Holo', description: 'Riflessi cromati senza stelline.' },
-  { id: 'cosmic', name: 'Cosmic', description: 'Nebulosa viola/blu con campo stellato.' },
-  { id: 'pixel', name: 'Pixel Pop', description: 'Micro pixel luminosi, stile retro arcade.' },
-  { id: 'comic', name: 'Comic Ink', description: 'Bordo inchiostrato e texture da fumetto leggera.' },
-  { id: 'neon', name: 'Neon Grid', description: 'Griglia neon sottile, futuristica ma discreta.' },
+  { id: 'cosmic', name: 'Diamond', description: 'Brillanti di luce tagliati, effetto gioiello.' },
+  { id: 'pixel', name: 'Pixel Pop', description: 'Pochi micro pixel luminosi, molto discreti.' },
+  { id: 'neon', name: 'Neon Edge', description: 'Accenti neon sui bordi, senza griglia sul contenuto.' },
   { id: 'prism', name: 'Prism', description: 'Lame di luce colorata stile cristallo.' },
   { id: 'ember', name: 'Ember', description: 'Fiamma calda piu intensa e visibile.' },
   { id: 'shadow', name: 'Shadow', description: 'Contrasto scuro e vignettatura.' },

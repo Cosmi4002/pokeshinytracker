@@ -550,7 +550,7 @@ export default function PokemonDetails() {
                                                     key={game.id}
                                                     title={game.name}
                                                     className={cn(
-                                                        "relative flex min-h-[104px] flex-col items-center justify-center gap-2 overflow-hidden rounded-xl border p-2.5 shadow-md transition-all duration-300",
+                                                        "relative flex min-h-[112px] flex-col items-center justify-start gap-1.5 overflow-hidden rounded-xl border px-2.5 pb-2 pt-4 shadow-md transition-all duration-300",
                                                         game.isCaught
                                                             ? "scale-[1.01] border-2 text-white shadow-xl"
                                                             : "border-border/80 bg-gradient-to-b from-muted/85 to-card/95 text-foreground opacity-95 hover:from-muted hover:to-background dark:from-muted/45 dark:to-card/95"
@@ -575,29 +575,30 @@ export default function PokemonDetails() {
                                                         />
                                                     )}
 
-                                                    <img
-                                                        src={game.logo}
-                                                        alt={game.name}
-                                                        loading="lazy"
-                                                        className={cn(
-                                                            "h-7 w-full object-contain transition-all duration-300 sm:h-8",
-                                                            game.isCaught
-                                                                ? "opacity-100 saturate-150 brightness-110 drop-shadow-[0_2px_8px_rgba(0,0,0,0.75)]"
-                                                                : "opacity-55 grayscale saturate-0"
-                                                        )}
-                                                    />
+                                                    <div className="flex h-[62px] w-full flex-col items-center justify-center gap-2">
+                                                        <img
+                                                            src={game.logo}
+                                                            alt={game.name}
+                                                            loading="lazy"
+                                                            className={cn(
+                                                                "h-7 w-full object-contain transition-all duration-300 sm:h-8",
+                                                                game.isCaught
+                                                                    ? "opacity-100 saturate-150 brightness-110 drop-shadow-[0_2px_8px_rgba(0,0,0,0.75)]"
+                                                                    : "opacity-55 grayscale saturate-0"
+                                                            )}
+                                                        />
 
-                                                    <span
-                                                        className={cn(
-                                                            "flex min-h-[1.35rem] max-w-full items-center text-center text-[10px] font-black uppercase leading-[1.05] tracking-wide",
-                                                            details.hasGenderDifference && game.isCaught ? "mb-4" : "",
-                                                            game.isCaught
-                                                                ? "text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
-                                                                : "text-foreground/80"
-                                                        )}
-                                                    >
-                                                        {game.name}
-                                                    </span>
+                                                        <span
+                                                            className={cn(
+                                                                "flex min-h-[1.35rem] max-w-full items-center text-center text-[10px] font-black uppercase leading-[1.05] tracking-wide",
+                                                                game.isCaught
+                                                                    ? "text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
+                                                                    : "text-foreground/80"
+                                                            )}
+                                                        >
+                                                            {game.name}
+                                                        </span>
+                                                    </div>
 
                                                     {game.isCaught && (
                                                         <span
@@ -611,7 +612,7 @@ export default function PokemonDetails() {
                                                         </span>
                                                     )}
                                                     {details.hasGenderDifference && game.isCaught && (
-                                                        <span className="absolute bottom-1.5 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full border border-white/15 bg-black/40 px-1.5 py-0.5 text-[12px] font-black leading-none shadow-sm backdrop-blur-sm">
+                                                        <span className="flex h-5 items-center gap-1 rounded-full border border-white/15 bg-black/40 px-1.5 py-0.5 text-[12px] font-black leading-none shadow-sm backdrop-blur-sm">
                                                             <span
                                                                 className={cn(
                                                                     "transition-all",

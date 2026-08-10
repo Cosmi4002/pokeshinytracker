@@ -9,6 +9,7 @@ const COLLECTION_THEME_ROW = {
   pokemon_name: 'collection-theme-config',
 };
 const LOCAL_STORAGE_KEY = 'collection_theme_overrides';
+const CONFIG_UPDATED_EVENT = 'collection-theme-config-updated';
 
 export type CollectionThemeOverrides = Record<string, Partial<GameTheme>>;
 export interface CollectionThemeEffects {
@@ -58,6 +59,7 @@ function sanitizeEffects(input: unknown): CollectionThemeEffects {
   const raw = input as Record<string, unknown>;
   const normalizeFilter = (value: unknown, fallback: CardFilterId): CardFilterId => {
     if (value === 'frost') return 'prism';
+    if (value === 'comic') return 'none';
     return isCardFilterId(value) ? value : fallback;
   };
 
@@ -134,6 +136,16 @@ export function useGlobalCollectionThemes() {
     }
 
     fetchGlobalThemeOverrides();
+
+    const handleConfigUpdate = (event: Event) => {
+      const nextConfig = (event as CustomEvent<CollectionThemeConfig>).detail;
+      if (!nextConfig) return;
+      setOverrides(nextConfig.overrides);
+      setEffects(nextConfig.effects);
+    };
+
+    window.addEventListener(CONFIG_UPDATED_EVENT, handleConfigUpdate);
+    return () => window.removeEventListener(CONFIG_UPDATED_EVENT, handleConfigUpdate);
   }, []);
 
   const mergedThemes = useMemo<Record<string, GameTheme>>(() => {
@@ -159,6 +171,7 @@ export function useGlobalCollectionThemes() {
     setOverrides(clean);
     setEffects(cleanEffects);
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(fullConfig));
+    window.dispatchEvent(new CustomEvent(CONFIG_UPDATED_EVENT, { detail: fullConfig }));
   };
 
   return {

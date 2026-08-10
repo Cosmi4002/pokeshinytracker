@@ -1,5 +1,5 @@
 export type UiStyle = 'flat' | 'soft' | 'glass' | 'neon';
-export type BackgroundStyle = 'plain' | 'mesh' | 'aurora' | 'diagonal' | 'noise' | 'pokemon';
+export type BackgroundStyle = 'plain' | 'mesh' | 'aurora' | 'diagonal' | 'noise' | 'pokemon' | 'diamond' | 'pixel' | 'neon';
 
 const UI_STYLE_KEY = 'ui_style';
 const BG_STYLE_KEY = 'background_style';
@@ -18,7 +18,7 @@ export function setStoredUiStyle(style: UiStyle) {
 
 export function getStoredBackgroundStyle(): BackgroundStyle {
   const v = localStorage.getItem(BG_STYLE_KEY);
-  if (v === 'mesh' || v === 'aurora' || v === 'diagonal' || v === 'noise' || v === 'pokemon' || v === 'plain') return v;
+  if (v === 'mesh' || v === 'aurora' || v === 'diagonal' || v === 'noise' || v === 'pokemon' || v === 'diamond' || v === 'pixel' || v === 'neon' || v === 'plain') return v;
   return 'plain';
 }
 
@@ -50,7 +50,7 @@ export function applyUiStyleToRoot(style: UiStyle) {
 
 export function applyBackgroundStyleToRoot(style: BackgroundStyle) {
   const root = document.documentElement;
-  root.classList.remove('bg-plain', 'bg-mesh', 'bg-aurora', 'bg-diagonal', 'bg-noise', 'bg-pokemon');
+  root.classList.remove('bg-plain', 'bg-mesh', 'bg-aurora', 'bg-diagonal', 'bg-noise', 'bg-pokemon', 'bg-diamond', 'bg-pixel', 'bg-neon');
   root.classList.add(`bg-${style}`);
 }
 
