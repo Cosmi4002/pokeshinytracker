@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
+  ArrowUpCircle,
   BarChart3,
-  CalendarDays,
-  GitBranch,
   LogIn,
 } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
@@ -63,6 +62,9 @@ const mapToRanked = (map: Map<string, RankedItem>, limit?: number) => {
 
 const percentage = (value: number, total: number) => (total > 0 ? Math.round((value / total) * 1000) / 10 : 0);
 
+const statsPanelClass = 'border-border/70 bg-card/95 shadow-sm backdrop-blur';
+const statsInnerPanelClass = 'border-border/70 bg-secondary/90 shadow-sm backdrop-blur dark:bg-muted/80';
+
 const hasTrackedAttempts = (entry: CaughtShinyRow) => {
   const attempts = Number(entry.attempts || 0);
   if (entry.attempts === null || attempts <= 0) return false;
@@ -113,10 +115,10 @@ function StatCard({
   accentColor: string;
 }) {
   return (
-    <Card className="group relative overflow-hidden border-border/70 bg-card/95 shadow-sm backdrop-blur transition-shadow hover:shadow-lg">
+    <Card className={`group relative overflow-hidden border transition-shadow hover:shadow-lg ${statsPanelClass}`}>
       <div className="absolute inset-x-0 top-0 h-1" style={{ backgroundColor: accentColor }} />
       <div
-        className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full opacity-10 blur-2xl transition-opacity group-hover:opacity-20"
+        className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full opacity-15 blur-2xl transition-opacity group-hover:opacity-25"
         style={{ backgroundColor: accentColor }}
       />
       <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0 pb-2">
@@ -141,7 +143,7 @@ function RecordHunt({
 }) {
   if (!entry) {
     return (
-      <div className="rounded-md border border-border/70 bg-card/95 p-3 shadow-sm backdrop-blur">
+      <div className={`rounded-md border p-3 ${statsInnerPanelClass}`}>
         <div className="text-xs font-medium uppercase text-muted-foreground">{label}</div>
         <div className="mt-1 font-semibold">-</div>
       </div>
@@ -158,21 +160,21 @@ function RecordHunt({
   const isEvolved = entry.is_evolved || entry.evolved_from_id || entry.evolved_from_name;
 
   return (
-    <div className="relative overflow-hidden rounded-lg border border-border/70 bg-card/95 shadow-sm backdrop-blur">
+    <div className={`relative overflow-hidden rounded-lg border ${statsInnerPanelClass}`}>
       {isEvolved && (
         <div
-          className="absolute left-2 top-2 z-10 flex h-6 w-6 items-center justify-center rounded-md border border-border/60 shadow-sm"
+          className="absolute left-2 top-2 z-10 flex h-7 w-7 items-center justify-center rounded-full border border-white/45 text-white shadow-[0_3px_12px_rgba(0,0,0,0.45)] ring-1 backdrop-blur-md"
           style={{
-            color: accentColor,
-            backgroundColor: `color-mix(in srgb, ${accentColor}, hsl(var(--card)) 82%)`,
+            background: `linear-gradient(145deg, ${accentColor}, color-mix(in srgb, ${accentColor} 72%, #111))`,
+            boxShadow: `0 3px 12px color-mix(in srgb, ${accentColor} 36%, rgba(0,0,0,0.55))`,
           }}
           title="Pokemon evoluto"
         >
-          <GitBranch className="h-3.5 w-3.5" />
+          <ArrowUpCircle className="h-3.5 w-3.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]" />
         </div>
       )}
       <div className="grid gap-3 p-3 sm:grid-cols-[86px_minmax(0,1fr)]">
-        <div className="flex min-h-[86px] items-center justify-center rounded-md bg-muted/70">
+        <div className="flex min-h-[86px] items-center justify-center rounded-md border border-border/60 bg-card/70 dark:bg-background/35">
           <img
             src={sprite}
             alt={entry.pokemon_name}
@@ -214,18 +216,15 @@ function RecordHunt({
 
 function MonthRecord({ item }: { item?: RankedItem }) {
   return (
-    <div className="rounded-lg border border-border/70 bg-card/95 p-3 shadow-sm backdrop-blur">
+    <div className={`rounded-lg border p-3 ${statsInnerPanelClass}`}>
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="text-xs font-black uppercase tracking-[0.14em] text-muted-foreground">Mese migliore</div>
           <div className="mt-1 text-base font-black">{item?.label || '-'}</div>
         </div>
-        <div className="flex items-center gap-2 text-right">
-          <CalendarDays className="h-4 w-4 text-muted-foreground" />
-          <div>
-            <div className="text-lg font-black tabular-nums">{item ? numberFormatter.format(item.value) : '-'}</div>
-            <div className="text-[10px] font-black uppercase tracking-[0.12em] text-muted-foreground">shiny</div>
-          </div>
+        <div className="text-right">
+          <div className="text-lg font-black tabular-nums">{item ? numberFormatter.format(item.value) : '-'}</div>
+          <div className="text-[10px] font-black uppercase tracking-[0.12em] text-muted-foreground">shiny</div>
         </div>
       </div>
     </div>
@@ -246,7 +245,7 @@ function RankedList({
   accentColor: string;
 }) {
   return (
-    <Card className="overflow-hidden border-border/70 bg-card/95 shadow-sm backdrop-blur">
+    <Card className={`overflow-hidden border ${statsPanelClass}`}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <span className="h-2 w-2 rounded-full" style={{ backgroundColor: accentColor }} />
@@ -455,7 +454,7 @@ export default function Stats() {
           </p>
         </div>
 
-        <Card className="overflow-hidden border-border/70 bg-card/95 shadow-sm backdrop-blur">
+        <Card className={`overflow-hidden border ${statsPanelClass}`}>
           <CardContent className="grid gap-4 p-5 sm:grid-cols-[1fr_auto] sm:items-center">
             <div className="space-y-2">
               <div className="text-sm font-medium text-muted-foreground">Panoramica collezione</div>
@@ -469,11 +468,11 @@ export default function Stats() {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2 text-sm sm:min-w-64">
-              <div className="rounded-md border border-border/70 bg-muted/70 p-3 shadow-sm">
+              <div className={`rounded-md border p-3 ${statsInnerPanelClass}`}>
                 <div className="font-mono text-lg font-bold">{numberFormatter.format(stats.uniqueForms)}</div>
                 <div className="text-xs text-muted-foreground">forme</div>
               </div>
-              <div className="rounded-md border border-border/70 bg-muted/70 p-3 shadow-sm">
+              <div className={`rounded-md border p-3 ${statsInnerPanelClass}`}>
                 <div className="font-mono text-lg font-bold">{numberFormatter.format(stats.fail.length)}</div>
                 <div className="text-xs text-muted-foreground">fail</div>
               </div>
@@ -491,7 +490,7 @@ export default function Stats() {
           <RankedList title="Metodi più usati" items={stats.methodTop} total={obtainedTotal} empty="Nessun metodo registrato." accentColor={accentColor} />
           <RankedList title="Giochi più usati" items={stats.gameTop} total={obtainedTotal} empty="Nessun gioco registrato." accentColor={accentColor} />
           <RankedList title="Distribuzione per generazione" items={stats.generationTop} total={obtainedTotal} empty="Nessuna generazione calcolabile." accentColor={accentColor} />
-          <Card className="border-border/70 bg-muted/45 shadow-sm backdrop-blur">
+          <Card className={`border ${statsPanelClass}`}>
             <CardHeader>
               <CardTitle className="text-base">Record</CardTitle>
             </CardHeader>
@@ -504,7 +503,7 @@ export default function Stats() {
         </div>
 
         <div className="grid gap-4">
-          <Card className="order-2 border-border/70 bg-card/95 shadow-sm backdrop-blur">
+          <Card className={`order-2 border ${statsPanelClass}`}>
             <CardHeader>
               <CardTitle className="text-base">Andamento ultimi mesi</CardTitle>
             </CardHeader>
