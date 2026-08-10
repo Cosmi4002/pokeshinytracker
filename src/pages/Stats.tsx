@@ -62,8 +62,8 @@ const mapToRanked = (map: Map<string, RankedItem>, limit?: number) => {
 
 const percentage = (value: number, total: number) => (total > 0 ? Math.round((value / total) * 1000) / 10 : 0);
 
-const statsPanelClass = 'border-border/70 bg-card/95 shadow-sm backdrop-blur';
-const statsInnerPanelClass = 'border-border/70 bg-white/85 shadow-sm backdrop-blur dark:bg-zinc-800/90';
+const statsPanelClass = 'border-border/70 bg-muted/30 shadow-sm';
+const statsInnerPanelClass = 'border bg-muted/30';
 
 const hasTrackedAttempts = (entry: CaughtShinyRow) => {
   const attempts = Number(entry.attempts || 0);
@@ -143,7 +143,7 @@ function RecordHunt({
 }) {
   if (!entry) {
     return (
-      <div className="rounded-md p-3">
+      <div className="rounded-lg border bg-background/60 p-3 shadow-sm">
         <div className="text-xs font-medium uppercase text-muted-foreground">{label}</div>
         <div className="mt-1 font-semibold">-</div>
       </div>
@@ -160,7 +160,7 @@ function RecordHunt({
   const isEvolved = entry.is_evolved || entry.evolved_from_id || entry.evolved_from_name;
 
   return (
-    <div className="relative overflow-hidden rounded-md">
+    <div className="relative overflow-hidden rounded-lg border bg-background/60 shadow-sm">
       {isEvolved && (
         <div
           className="absolute left-2 top-2 z-10 flex h-7 w-7 items-center justify-center rounded-full border border-white/45 text-white shadow-[0_3px_12px_rgba(0,0,0,0.45)] ring-1 backdrop-blur-md"
@@ -174,7 +174,7 @@ function RecordHunt({
         </div>
       )}
       <div className="grid gap-3 p-3 sm:grid-cols-[86px_minmax(0,1fr)]">
-        <div className="flex min-h-[86px] items-center justify-center rounded-md bg-white/65 dark:bg-zinc-900/55">
+        <div className="flex min-h-[86px] items-center justify-center rounded-md bg-muted/60">
           <img
             src={sprite}
             alt={entry.pokemon_name}
@@ -208,23 +208,6 @@ function RecordHunt({
               <div className="mt-0.5 font-semibold tabular-nums">1/{numberFormatter.format(odds)}</div>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function MonthRecord({ item }: { item?: RankedItem }) {
-  return (
-    <div className="p-3">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <div className="text-xs font-black uppercase tracking-[0.14em] text-muted-foreground">Mese migliore</div>
-          <div className="mt-1 text-base font-black">{item?.label || '-'}</div>
-        </div>
-        <div className="text-right">
-          <div className="text-lg font-black tabular-nums">{item ? numberFormatter.format(item.value) : '-'}</div>
-          <div className="text-[10px] font-black uppercase tracking-[0.12em] text-muted-foreground">shiny</div>
         </div>
       </div>
     </div>
@@ -454,7 +437,7 @@ export default function Stats() {
           </p>
         </div>
 
-        <Card className={`overflow-hidden border ${statsPanelClass}`}>
+        <Card className="overflow-hidden border-border/70">
           <CardContent className="grid gap-4 p-5 sm:grid-cols-[1fr_auto] sm:items-center">
             <div className="space-y-2">
               <div className="text-sm font-medium text-muted-foreground">Panoramica collezione</div>
@@ -468,11 +451,11 @@ export default function Stats() {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2 text-sm sm:min-w-64">
-              <div className={`rounded-md border p-3 ${statsInnerPanelClass}`}>
+              <div className={`rounded-md p-3 ${statsInnerPanelClass}`}>
                 <div className="font-mono text-lg font-bold">{numberFormatter.format(stats.uniqueForms)}</div>
                 <div className="text-xs text-muted-foreground">forme</div>
               </div>
-              <div className={`rounded-md border p-3 ${statsInnerPanelClass}`}>
+              <div className={`rounded-md p-3 ${statsInnerPanelClass}`}>
                 <div className="font-mono text-lg font-bold">{numberFormatter.format(stats.fail.length)}</div>
                 <div className="text-xs text-muted-foreground">fail</div>
               </div>
@@ -494,8 +477,7 @@ export default function Stats() {
             <CardHeader>
               <CardTitle className="text-base">Record</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4 text-sm">
-              <MonthRecord item={stats.bestMonth} />
+            <CardContent className="grid gap-3 lg:grid-cols-2">
               <RecordHunt label="Caccia più lunga" entry={stats.longestHunt} accentColor={accentColor} />
               <RecordHunt label="Caccia più fortunata" entry={stats.luckiestHunt} accentColor={accentColor} />
             </CardContent>

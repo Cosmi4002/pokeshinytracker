@@ -535,9 +535,18 @@ export default function UserCollectionsSearch() {
       name: entry.form || entry.pokemon_name,
       female: entry.gender === 'female',
     });
+    const isEvolved = entry.is_evolved === true;
 
     return (
-      <div className="overflow-hidden rounded-lg border bg-background/60 shadow-sm">
+      <div className="relative overflow-hidden rounded-lg border bg-background/60 shadow-sm">
+        {isEvolved && (
+          <div
+            className="absolute left-2 top-2 z-20 flex h-6 w-6 items-center justify-center rounded-full border border-white/55 bg-emerald-700 text-white shadow-[0_3px_12px_rgba(0,0,0,0.6),0_0_0_1px_rgba(0,0,0,0.45)] ring-1 ring-emerald-200/45 backdrop-blur-sm"
+            title="Pokemon evoluto"
+          >
+            <ArrowUpCircle className="h-3.5 w-3.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]" />
+          </div>
+        )}
         <div className="grid gap-3 p-3 sm:grid-cols-[86px_minmax(0,1fr)]">
           <div className="flex min-h-[86px] items-center justify-center rounded-md bg-muted/60">
             <img
@@ -551,38 +560,23 @@ export default function UserCollectionsSearch() {
             />
           </div>
           <div className="min-w-0">
-            <div className="flex items-center justify-between gap-3">
-              <div className="text-xs font-black uppercase tracking-[0.14em] text-muted-foreground">{label}</div>
-              {entry.has_shiny_charm && <Sparkles className="h-4 w-4 shrink-0 text-amber-500" />}
-            </div>
+            <div className="text-xs font-black uppercase tracking-[0.14em] text-muted-foreground">{label}</div>
             <div className="mt-1 truncate text-lg font-black leading-tight">{entry.pokemon_name}</div>
             <div className="mt-3 grid gap-x-4 gap-y-2 text-xs sm:grid-cols-2">
               <div className="min-w-0">
-                <div className="flex items-center gap-1.5 font-black uppercase tracking-[0.12em] text-muted-foreground">
-                  <Gamepad2 className="h-3.5 w-3.5" />
-                  Gioco
-                </div>
+                <div className="font-black uppercase tracking-[0.12em] text-muted-foreground">Gioco</div>
                 <div className="mt-0.5 truncate font-semibold">{getGameLabel(entry.game)}</div>
               </div>
               <div className="min-w-0">
-                <div className="flex items-center gap-1.5 font-black uppercase tracking-[0.12em] text-muted-foreground">
-                  <Target className="h-3.5 w-3.5" />
-                  Metodo
-                </div>
+                <div className="font-black uppercase tracking-[0.12em] text-muted-foreground">Metodo</div>
                 <div className="mt-0.5 truncate font-semibold">{formatMethodLabel(entry.method)}</div>
               </div>
               <div className="min-w-0">
-                <div className="flex items-center gap-1.5 font-black uppercase tracking-[0.12em] text-muted-foreground">
-                  <Hash className="h-3.5 w-3.5" />
-                  Encounters
-                </div>
+                <div className="font-black uppercase tracking-[0.12em] text-muted-foreground">Encounters</div>
                 <div className="mt-0.5 font-semibold tabular-nums">{numberFormatter.format(attempts)}</div>
               </div>
               <div className="min-w-0">
-                <div className="flex items-center gap-1.5 font-black uppercase tracking-[0.12em] text-muted-foreground">
-                  <Dice5 className="h-3.5 w-3.5" />
-                  Odds
-                </div>
+                <div className="font-black uppercase tracking-[0.12em] text-muted-foreground">Odds</div>
                 <div className="mt-0.5 font-semibold tabular-nums">1/{numberFormatter.format(odds)}</div>
               </div>
             </div>
