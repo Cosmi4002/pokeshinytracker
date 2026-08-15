@@ -797,7 +797,7 @@ export function ShinyCounter({
               onChange={(e) => setIncrementAmount(Math.max(1, parseInt(e.target.value) || 1))}
               className={cn(
                 "w-16 h-8 text-center bg-background text-foreground",
-                compact ? "border border-white/15 bg-white/10 text-white shadow-none" : "border-2 border-input"
+                compact ? "border border-border/70 bg-background/80 text-foreground shadow-none dark:border-white/15 dark:bg-white/10 dark:text-white" : "border-2 border-input"
               )}
             />
           </div>
@@ -815,7 +815,7 @@ export function ShinyCounter({
               onKeyDown={handleHotkeyAssignment}
               className={cn(
                 "w-36 h-8 text-center bg-background text-foreground",
-                compact ? "border border-white/15 bg-white/10 text-white shadow-none" : "border-2 border-input"
+                compact ? "border border-border/70 bg-background/80 text-foreground shadow-none dark:border-white/15 dark:bg-white/10 dark:text-white" : "border-2 border-input"
               )}
             />
             <Button
@@ -824,7 +824,7 @@ export function ShinyCounter({
               size="sm"
               className={cn(
                 "h-8 px-3",
-                compact && "border-white/15 bg-white/10 text-white hover:bg-white/15 hover:text-white"
+                compact && "border-border/70 bg-background/80 text-foreground hover:bg-muted hover:text-foreground dark:border-white/15 dark:bg-white/10 dark:text-white dark:hover:bg-white/15 dark:hover:text-white"
               )}
               onClick={() => setIncrementHotkey('')}
             >
