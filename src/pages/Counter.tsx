@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Activity, LayoutGrid, Maximize2, Plus, Target, X } from 'lucide-react';
+import { Activity, LayoutGrid, Maximize2, Plus, SlidersHorizontal, Target, X } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { ShinyCounter } from '@/components/counter/ShinyCounter';
 import { Button } from '@/components/ui/button';
@@ -255,6 +255,15 @@ export default function Counter() {
                         compact
                         showSetup={false}
                       />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="mt-3 w-full justify-center"
+                        onClick={() => navigate(`/counter/${hunt.id}`)}
+                      >
+                        <SlidersHorizontal className="mr-2 h-4 w-4" />
+                        Configura Pokemon e metodo
+                      </Button>
                     </div>
                   </div>
                 ))}
@@ -266,7 +275,7 @@ export default function Counter() {
                     </div>
                     <h2 className="text-lg font-bold">Nessuna caccia attiva</h2>
                     <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
-                      Crea un counter e poi aprilo in focus mode per scegliere Pokemon, metodo e dettagli.
+                      Crea un counter e poi usa Configura per scegliere Pokemon, metodo e dettagli.
                     </p>
                     <Button className="mt-4" onClick={handleCreateNew} style={{ backgroundColor: accentColor }}>
                       <Plus className="mr-2 h-4 w-4" />
