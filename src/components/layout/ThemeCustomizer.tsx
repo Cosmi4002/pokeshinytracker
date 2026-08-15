@@ -56,6 +56,7 @@ type ThemePresetOverrideRow = {
   background_style: string;
   background_color2: string;
   background_color3: string;
+  is_deleted?: boolean;
 };
 
 type EyeDropperResult = {
@@ -76,6 +77,8 @@ const DEFAULT_BG_ACCENT_3 = '#38bdf8';
 const THEME_MANAGER_EMAIL = 'chritel04@gmail.com';
 
 function rowToThemePreset(row: ThemePresetOverrideRow): ThemePreset | null {
+  if (row.is_deleted) return null;
+
   const uiStyle = row.ui_style as UiStyle;
   const backgroundStyle = row.background_style as BackgroundStyle;
 
@@ -104,6 +107,7 @@ function themePresetToRow(preset: ThemePreset, userId?: string) {
     background_style: preset.backgroundStyle,
     background_color2: preset.backgroundColor2,
     background_color3: preset.backgroundColor3,
+    is_deleted: false,
     updated_at: new Date().toISOString(),
     updated_by: userId || null,
   };
@@ -173,6 +177,7 @@ export function ThemeCustomizer() {
   const [backgroundColor3, setBackgroundColor3] = useState(getStoredBackgroundAccent3());
   const [presetTone, setPresetTone] = useState<PresetTone>(colorScheme === 'light' ? 'light' : 'dark');
   const [managedThemePresets, setManagedThemePresets] = useState<ThemePreset[]>([]);
+  const [hiddenThemePresetIds, setHiddenThemePresetIds] = useState<Set<string>>(() => new Set());
   const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState(false);
   const skipNextOpenSyncRef = useRef(false);
@@ -276,11 +281,13 @@ export function ThemeCustomizer() {
 
   const allThemePresets = useMemo(() => {
     const managedPresetMap = new Map(managedThemePresets.map((preset) => [preset.id, preset]));
-    const mergedBasePresets = themePresets.map((preset) => managedPresetMap.get(preset.id) || preset);
+    const mergedBasePresets = themePresets
+      .filter((preset) => !hiddenThemePresetIds.has(preset.id))
+      .map((preset) => managedPresetMap.get(preset.id) || preset);
     const addedPresets = managedThemePresets.filter((preset) => !baseThemePresetIds.has(preset.id));
 
     return [...mergedBasePresets, ...addedPresets];
-  }, [baseThemePresetIds, managedThemePresets, themePresets]);
+  }, [baseThemePresetIds, hiddenThemePresetIds, managedThemePresets, themePresets]);
 
   const filteredThemePresets = useMemo(
     () => allThemePresets.filter((preset) => getPresetTone(preset) === presetTone),
@@ -324,7 +331,7 @@ export function ThemeCustomizer() {
 
     supabase
       .from('theme_preset_overrides')
-      .select('preset_id,name,theme_color,background_color,ui_style,background_style,background_color2,background_color3')
+      .select('*')
       .order('created_at', { ascending: true })
       .then(({ data, error }) => {
         if (!isActive) return;
@@ -334,10 +341,15 @@ export function ThemeCustomizer() {
           return;
         }
 
-        const presets = (data || [])
+        const rows = (data || []) as ThemePresetOverrideRow[];
+        const hiddenIds = rows
+          .filter((row) => row.is_deleted)
+          .map((row) => row.preset_id);
+        const presets = rows
           .map((row) => rowToThemePreset(row))
           .filter((preset): preset is ThemePreset => Boolean(preset));
 
+        setHiddenThemePresetIds(new Set(hiddenIds));
         setManagedThemePresets(presets);
       });
 
@@ -531,6 +543,37 @@ export function ThemeCustomizer() {
       return;
     }
 
+    const selectedPreset = allThemePresets.find((preset) => preset.id === id)
+      || themePresets.find((preset) => preset.id === id);
+    if (!selectedPreset) return;
+
+    if (baseThemePresetIds.has(id)) {
+      const { error } = await supabase
+        .from('theme_preset_overrides')
+        .upsert({
+          ...themePresetToRow(selectedPreset, user?.id),
+          is_deleted: true,
+        }, { onConflict: 'preset_id' });
+
+      if (error) {
+        toast({
+          variant: 'destructive',
+          title: 'Tema non eliminato',
+          description: error.message,
+        });
+        return;
+      }
+
+      setHiddenThemePresetIds((currentIds) => new Set([...currentIds, id]));
+      setManagedThemePresets((currentPresets) => currentPresets.filter((preset) => preset.id !== id));
+      if (presetId === id) setPresetId('custom');
+      toast({
+        title: 'Tema eliminato',
+        description: `${selectedPreset.name} nascosto e sincronizzato per tutti.`,
+      });
+      return;
+    }
+
     const { error } = await supabase
       .from('theme_preset_overrides')
       .delete()
@@ -547,6 +590,10 @@ export function ThemeCustomizer() {
 
     setManagedThemePresets((currentPresets) => currentPresets.filter((preset) => preset.id !== id));
     if (presetId === id) setPresetId('custom');
+    toast({
+      title: 'Tema eliminato',
+      description: `${selectedPreset.name} rimosso e sincronizzato per tutti.`,
+    });
   };
 
   const handleSave = async () => {
@@ -777,12 +824,12 @@ export function ThemeCustomizer() {
                       </span>
                       {presetId === preset.id && <Check className="h-4 w-4 text-primary" />}
                     </button>
-                    {canManageThemePresets && isManagedPreset && (
+                    {canManageThemePresets && (
                       <button
                         type="button"
                         onClick={() => void deleteCustomPreset(preset.id)}
                         className="mr-2 flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                        title={isAddedPreset ? 'Elimina tema aggiunto' : 'Ripristina tema originale'}
+                        title={isAddedPreset ? 'Elimina tema aggiunto' : 'Elimina tema dalla lista'}
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>

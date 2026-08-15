@@ -264,6 +264,7 @@ export type Database = {
           background_color3: string
           background_style: string
           created_at: string
+          is_deleted: boolean
           name: string
           preset_id: string
           theme_color: string
@@ -277,6 +278,7 @@ export type Database = {
           background_color3?: string
           background_style: string
           created_at?: string
+          is_deleted?: boolean
           name: string
           preset_id: string
           theme_color: string
@@ -290,6 +292,7 @@ export type Database = {
           background_color3?: string
           background_style?: string
           created_at?: string
+          is_deleted?: boolean
           name?: string
           preset_id?: string
           theme_color?: string

@@ -351,7 +351,12 @@ export default function PokemonDetails() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-card text-card-foreground">
+            <div
+                className="min-h-screen bg-background text-foreground transition-colors duration-1000"
+                style={{
+                    backgroundImage: `radial-gradient(circle at 50% 0%, ${accentColor}15 0%, transparent 70%)`
+                }}
+            >
                 <Navbar />
                 <div className="container mx-auto py-12 px-4 space-y-8 animate-pulse">
                     <div className="h-64 rounded-3xl bg-muted" />
@@ -384,7 +389,12 @@ export default function PokemonDetails() {
     const panelClass = "border-border/70 bg-card/95 text-card-foreground shadow-[0_18px_42px_rgba(0,0,0,0.16)] backdrop-blur dark:border-white/15 dark:bg-[#171717]/95 dark:text-white dark:shadow-[0_18px_42px_rgba(0,0,0,0.42)]";
 
     return (
-        <div className="min-h-screen bg-background text-foreground selection:bg-primary/20">
+        <div
+            className="min-h-screen bg-background text-foreground selection:bg-primary/20 transition-colors duration-1000"
+            style={{
+                backgroundImage: `radial-gradient(circle at 50% 0%, ${accentColor}15 0%, transparent 70%)`
+            }}
+        >
             <Navbar />
 
             <main className="container mx-auto py-8 px-4 relative z-10 max-w-5xl">
