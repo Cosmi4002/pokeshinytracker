@@ -790,7 +790,7 @@ export function ShinyCounter({
             />
           </div>
 
-          <div className={cn("items-center justify-center gap-2", compact ? "hidden" : "flex")}>
+          <div className="flex flex-wrap items-center justify-center gap-2">
             <Label htmlFor="increment-hotkey" className="text-xs text-muted-foreground">
               Tasto +1:
             </Label>
