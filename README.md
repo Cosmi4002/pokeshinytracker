@@ -22,8 +22,11 @@ npm install
 # Avvia server di sviluppo
 npm run dev
 
-# Build per produzione
+# Build locale veloce
 npm run build
+
+# Build completa per produzione
+npm run build:full
 ```
 
 ## 🛠️ Tecnologie

@@ -52,6 +52,9 @@ export default function UserCollectionsSearch() {
   const [profiles, setProfiles] = useState<ProfileRow[]>([]);
   const [profilesLoading, setProfilesLoading] = useState(false);
   const [profilesError, setProfilesError] = useState<string | null>(null);
+  const [discoverableProfiles, setDiscoverableProfiles] = useState<ProfileRow[]>([]);
+  const [discoverableProfilesLoading, setDiscoverableProfilesLoading] = useState(true);
+  const [discoverableProfilesError, setDiscoverableProfilesError] = useState<string | null>(null);
 
   const [selectedProfile, setSelectedProfile] = useState<ProfileRow | null>(null);
   const [entries, setEntries] = useState<PublicCaughtRow[]>([]);
@@ -126,10 +129,39 @@ export default function UserCollectionsSearch() {
   const getGameLabel = (game?: string | null) =>
     GAMES.find((g) => g.id === game)?.name || game || 'Sconosciuto';
 
+  const onlyNamedProfiles = (rows: ProfileRow[] | null) =>
+    (rows || []).filter((profile) => Boolean(profile.username?.trim()));
+
+  const loadDiscoverableProfiles = async (silent = false) => {
+    if (!silent) {
+      setDiscoverableProfilesLoading(true);
+      setDiscoverableProfilesError(null);
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('user_id, username')
+        .not('username', 'is', null)
+        .order('username', { ascending: true })
+        .limit(100);
+
+      if (error) throw error;
+      setDiscoverableProfiles(onlyNamedProfiles(data || []));
+    } catch (err: any) {
+      if (!silent) {
+        setDiscoverableProfilesError(err?.message || 'Impossibile caricare gli utenti.');
+      }
+    } finally {
+      if (!silent) setDiscoverableProfilesLoading(false);
+    }
+  };
+
   useEffect(() => {
     const term = query.trim();
     if (!term) {
       setProfiles([]);
+      setProfilesLoading(false);
       setProfilesError(null);
       return;
     }
@@ -149,7 +181,7 @@ export default function UserCollectionsSearch() {
 
         if (!active) return;
         if (error) throw error;
-        setProfiles((data || []).filter((p) => Boolean(p.username)));
+        setProfiles(onlyNamedProfiles(data || []));
       } catch (err: any) {
         if (!active) return;
         setProfilesError(err?.message || 'Errore durante la ricerca username');
@@ -235,7 +267,29 @@ export default function UserCollectionsSearch() {
   };
 
   useEffect(() => {
+    void loadDiscoverableProfiles();
     void loadGlobalRecent();
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('public-profiles-directory')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'profiles',
+        },
+        () => {
+          void loadDiscoverableProfiles(true);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
   }, []);
 
   useEffect(() => {
@@ -254,6 +308,7 @@ export default function UserCollectionsSearch() {
           table: 'caught_shinies',
         },
         () => {
+          void loadDiscoverableProfiles(true);
           void loadGlobalRecent(true);
         }
       )
@@ -524,6 +579,12 @@ export default function UserCollectionsSearch() {
     );
   };
 
+  const searchTerm = query.trim();
+  const profileSuggestions = searchTerm ? profiles : discoverableProfiles;
+  const profileSuggestionsLoading = searchTerm ? profilesLoading : discoverableProfilesLoading;
+  const profileSuggestionsError = searchTerm ? profilesError : discoverableProfilesError;
+  const profileSuggestionsTitle = searchTerm ? 'Risultati username' : 'Utenti disponibili';
+
   const renderRecordHuntCard = (label: string, entry: PublicCaughtRow | null) => {
     if (!entry) {
       return (
@@ -603,7 +664,7 @@ export default function UserCollectionsSearch() {
               Cerca Username
             </CardTitle>
             <CardDescription>
-              Cerca un utente e guarda in tempo reale i Pokemon catturati nella sua collezione.
+              Esplora le collezioni pubbliche degli utenti in tempo reale.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -617,22 +678,40 @@ export default function UserCollectionsSearch() {
               />
             </div>
 
-            {profilesLoading && <p className="text-sm text-muted-foreground">Ricerca in corso...</p>}
-            {profilesError && <p className="text-sm text-destructive">{profilesError}</p>}
-
-            {profiles.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {profiles.map((profile) => (
-                  <Button
-                    key={profile.user_id}
-                    variant={selectedProfile?.user_id === profile.user_id ? 'default' : 'outline'}
-                    onClick={() => setSelectedProfile(profile)}
-                  >
-                    <UserRound className="h-4 w-4 mr-2" />@{profile.username}
-                  </Button>
-                ))}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="font-semibold">{profileSuggestionsTitle}</h3>
+                {!profileSuggestionsLoading && profileSuggestions.length > 0 && (
+                  <span className="text-xs font-semibold text-muted-foreground">
+                    {profileSuggestions.length}
+                  </span>
+                )}
               </div>
-            )}
+              {profileSuggestionsLoading && (
+                <p className="text-sm text-muted-foreground">
+                  {searchTerm ? 'Ricerca in corso...' : 'Caricamento utenti...'}
+                </p>
+              )}
+              {profileSuggestionsError && <p className="text-sm text-destructive">{profileSuggestionsError}</p>}
+              {!profileSuggestionsLoading && !profileSuggestionsError && profileSuggestions.length === 0 && (
+                <p className="text-sm text-muted-foreground">
+                  {searchTerm ? 'Nessun username trovato.' : 'Nessun utente pubblico disponibile.'}
+                </p>
+              )}
+              {profileSuggestions.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {profileSuggestions.map((profile) => (
+                    <Button
+                      key={profile.user_id}
+                      variant={selectedProfile?.user_id === profile.user_id ? 'default' : 'outline'}
+                      onClick={() => setSelectedProfile(profile)}
+                    >
+                      <UserRound className="h-4 w-4 mr-2" />@{profile.username}
+                    </Button>
+                  ))}
+                </div>
+              )}
+            </div>
 
             {!selectedProfile && (
             <div className="space-y-2 pt-2 border-t">

@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Plus, LayoutGrid, Maximize2, X } from 'lucide-react';
+import { Activity, LayoutGrid, Maximize2, Plus, Target, X } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { ShinyCounter } from '@/components/counter/ShinyCounter';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,6 +31,7 @@ export default function Counter() {
   const [activeHunts, setActiveHunts] = useState<ActiveHunt[]>([]);
   const [loading, setLoading] = useState(true);
   const [huntToHideId, setHuntToHideId] = useState<string | null>(null);
+  const remainingSlots = Math.max(0, MAX_ACTIVE_COUNTERS - activeHunts.length);
   const isAbortLikeError = (err: unknown) => {
     if (!err || typeof err !== 'object') return false;
     const maybe = err as { name?: string; message?: string };
@@ -145,30 +146,53 @@ export default function Counter() {
       }}
     >
       <Navbar />
-      <main className="container mx-auto py-8 px-4">
+      <main className="container mx-auto px-4 py-6 space-y-5">
 
         {/* View Switcher Header (only if logged in) */}
         {user && !isSingleView && (
-          <div className="mb-6 flex justify-between items-center">
-            <h1
-              className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r"
-              style={{
-                backgroundImage: `linear-gradient(to right, ${accentColor}, color-mix(in srgb, ${accentColor}, white 30%))`
-              }}
-            >
-              Multi-Counter View
-            </h1>
-            <div className="text-sm text-muted-foreground">
-              Mostrando fino a {MAX_ACTIVE_COUNTERS} cacce attive
+          <section className="rounded-lg border border-border/70 bg-card/80 p-4 shadow-sm backdrop-blur">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div className="min-w-0">
+                <div className="mb-2 flex flex-wrap items-center gap-2">
+                  <Badge variant="outline" className="gap-1">
+                    <Activity className="h-3.5 w-3.5" />
+                    {activeHunts.length}/{MAX_ACTIVE_COUNTERS} attive
+                  </Badge>
+                  <Badge variant="secondary" className="gap-1">
+                    <Target className="h-3.5 w-3.5" />
+                    {remainingSlots} libere
+                  </Badge>
+                </div>
+                <h1
+                  className="text-2xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r"
+                  style={{
+                    backgroundImage: `linear-gradient(to right, ${accentColor}, color-mix(in srgb, ${accentColor}, white 35%))`
+                  }}
+                >
+                  Counter
+                </h1>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Tieni le cacce attive in vista e apri il focus quando devi configurare i dettagli.
+                </p>
+              </div>
+              <Button
+                onClick={handleCreateNew}
+                disabled={activeHunts.length >= MAX_ACTIVE_COUNTERS}
+                className="w-full md:w-auto"
+                style={{ backgroundColor: accentColor }}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Nuova caccia
+              </Button>
             </div>
-          </div>
+          </section>
         )}
 
         {/* CONTENT */}
         {isSingleView ? (
           /* Single Counter View (Focused) */
-          <div>
-            <div className="mb-4">
+          <div className="mx-auto max-w-3xl space-y-4">
+            <div>
               <Button variant="ghost" onClick={() => navigate('/counter')}>
                 <LayoutGrid className="mr-2 h-4 w-4" /> Torna alla vista Multipla
               </Button>
@@ -180,19 +204,24 @@ export default function Counter() {
           <ShinyCounter enableKeyboardShortcuts />
         ) : (
           /* Multi Counter Grid */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             {loading ? (
-              <div className="col-span-3 text-center py-12">Caricamento counters...</div>
+              <div className="col-span-full rounded-lg border border-border/70 bg-card/70 py-12 text-center text-sm text-muted-foreground">
+                Caricamento counter...
+              </div>
             ) : (
               <>
                 {/* Render Active Hunts */}
                 {activeHunts.map((hunt) => (
                   <div
                     key={hunt.id}
-                    className="border rounded-xl p-4 shadow-sm relative hover:shadow-md transition-shadow group/card"
-                    style={{ backgroundColor: 'color-mix(in srgb, var(--card), transparent 50%)' }}
+                    className="group/card relative overflow-hidden rounded-lg border border-border/70 bg-card/85 p-3 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
                   >
-                    <div className="absolute top-2 right-2 z-10 flex gap-1 opacity-0 group-hover/card:opacity-100 transition-opacity">
+                    <div
+                      className="pointer-events-none absolute inset-x-0 top-0 h-1"
+                      style={{ backgroundColor: accentColor }}
+                    />
+                    <div className="absolute right-2 top-2 z-10 flex gap-1 rounded-md border border-border/70 bg-background/80 p-1 opacity-100 shadow-sm backdrop-blur sm:opacity-0 sm:transition-opacity sm:group-hover/card:opacity-100">
                       <Button
                         variant="ghost"
                         size="icon"
@@ -218,43 +247,50 @@ export default function Counter() {
                         <X className="h-4 w-4" />
                       </Button>
                     </div>
-                    {/* Minimal variant could be created, but standard is fine currently as it fits in columns */}
-                    <div className="scale-100 sm:scale-95 origin-top text-xs">
+                    <div className="pt-8">
                       <ShinyCounter
                         huntId={hunt.id}
                         enableKeyboardShortcuts
                         allowGlobalPlusMinusHotkeys={false}
+                        compact
+                        showSetup={false}
                       />
                     </div>
                   </div>
                 ))}
 
-                {/* Empty Slots */}
-                {activeHunts.length < MAX_ACTIVE_COUNTERS && (
-                  Array.from({ length: MAX_ACTIVE_COUNTERS - activeHunts.length }).map((_, index) => (
-                    <Card
-                      key={`empty-${index}`}
-                      className="border-dashed border-2 flex items-center justify-center min-h-[500px] transition-colors cursor-pointer group"
-                      onClick={handleCreateNew}
-                      style={{
-                        backgroundColor: 'color-mix(in srgb, var(--muted), transparent 90%)',
-                      }}
-                    >
-                      <CardContent className="text-center pt-6 group-hover:bg-muted/10 transition-colors">
-                        <div className="mb-4 flex justify-center">
-                          <div
-                            className="h-16 w-16 rounded-full flex items-center justify-center"
-                            style={{ backgroundColor: 'color-mix(in srgb, var(--primary), transparent 90%)' }}
-                          >
-                            <Plus className="h-8 w-8 text-primary" />
-                          </div>
-                        </div>
-                        <h3 className="text-xl font-semibold mb-2">Slot Vuoto</h3>
-                        <p className="text-muted-foreground mb-4">Aggiungi una nuova caccia qui</p>
-                        <Button className="shiny-glow">Nuova Caccia</Button>
-                      </CardContent>
-                    </Card>
-                  ))
+                {activeHunts.length === 0 && (
+                  <div className="col-span-full rounded-lg border border-dashed border-border bg-muted/20 p-8 text-center">
+                    <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-md border border-border bg-background">
+                      <Plus className="h-6 w-6 text-muted-foreground" />
+                    </div>
+                    <h2 className="text-lg font-bold">Nessuna caccia attiva</h2>
+                    <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
+                      Crea un counter e poi aprilo in focus mode per scegliere Pokemon, metodo e dettagli.
+                    </p>
+                    <Button className="mt-4" onClick={handleCreateNew} style={{ backgroundColor: accentColor }}>
+                      <Plus className="mr-2 h-4 w-4" />
+                      Nuova caccia
+                    </Button>
+                  </div>
+                )}
+
+                {activeHunts.length > 0 && activeHunts.length < MAX_ACTIVE_COUNTERS && (
+                  <button
+                    type="button"
+                    onClick={handleCreateNew}
+                    className="min-h-[220px] rounded-lg border border-dashed border-border bg-muted/20 p-4 text-left transition-colors hover:bg-muted/35 focus:outline-none focus:ring-2 focus:ring-ring"
+                  >
+                    <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-md border border-border bg-background">
+                        <Plus className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                      <div>
+                        <div className="font-bold">Aggiungi counter</div>
+                        <div className="mt-1 text-sm text-muted-foreground">{remainingSlots} slot disponibili</div>
+                      </div>
+                    </div>
+                  </button>
                 )}
               </>
             )}

@@ -20,4 +20,8 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    copyPublicDir: mode !== "fast",
+    emptyOutDir: mode !== "fast",
+  },
 }));

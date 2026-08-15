@@ -156,7 +156,7 @@ Installa Node.js da https://nodejs.org e riavvia il terminale.
 Il progetto ha già `vercel.json` con le regole corrette per le SPA. Se hai copiato il progetto senza quel file, assicurati che `vercel.json` contenga i `rewrites` verso `index.html`.
 
 ### Build fallita
-Esegui in locale `npm run build` per vedere eventuali errori e correggerli prima del deploy.
+Esegui in locale `npm run typecheck` per gli errori TypeScript o `npm run build` per una build veloce senza ricopiare tutti gli asset. Per verificare esattamente la build di deploy usa `npm run build:full`, che può richiedere più tempo perché copia gli sprite in `public`.
 
 ### Login/Registrazione non funziona
 1. **Hai eseguito la migrazione SQL?** (Passo 5) Senza le tabelle il database non funziona.

@@ -30,11 +30,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { FinishHuntDialog } from './FinishHuntDialog';
 import { useRandomColor } from '@/lib/random-color-context';
 import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
+import { cn } from '@/lib/utils';
 
 interface ShinyCounterProps {
   huntId?: string;
   enableKeyboardShortcuts?: boolean;
   allowGlobalPlusMinusHotkeys?: boolean;
+  compact?: boolean;
+  showSetup?: boolean;
 }
 
 type PokemonSlot = {
@@ -123,6 +126,8 @@ export function ShinyCounter({
   huntId,
   enableKeyboardShortcuts = true,
   allowGlobalPlusMinusHotkeys = true,
+  compact = false,
+  showSetup = true,
 }: ShinyCounterProps) {
   const { user } = useAuth();
   const { accentColor } = useRandomColor();
@@ -577,12 +582,17 @@ export function ShinyCounter({
 
   try {
     return (
-      <div className="w-full h-full space-y-3">
+      <div className={cn("w-full h-full", compact ? "space-y-3" : "space-y-4")}>
         {/* Counter Display */}
-        <div className="text-center space-y-4">
+        <div
+          className={cn(
+            "text-center",
+            compact ? "space-y-3" : "space-y-4 rounded-lg border border-border/70 bg-card/70 p-4 shadow-sm"
+          )}
+        >
           {/* Pokemon Sprite */}
           {selectedPokemonSlots.length > 0 && (
-            <div key={`sprite-container-${selectedPokemonSlots.map((slot) => slot.id).join('-')}`} className="relative group/sprite flex justify-center mb-4">
+            <div key={`sprite-container-${selectedPokemonSlots.map((slot) => slot.id).join('-')}`} className={cn("relative group/sprite flex justify-center", compact ? "mb-2" : "mb-4")}>
               {(() => {
                 return (
                   <div className="flex flex-col items-center gap-2">
@@ -612,11 +622,17 @@ export function ShinyCounter({
                             : setSelectedPokemon3Gender;
 
                         return (
-                          <div key={`${slot.slot}-${slot.id}-${slot.name}`} className="flex w-32 flex-col items-center gap-1.5 sm:w-40">
+                          <div
+                            key={`${slot.slot}-${slot.id}-${slot.name}`}
+                            className={cn("flex flex-col items-center gap-1.5", compact ? "w-24 sm:w-28" : "w-32 sm:w-40")}
+                          >
                             <img
                               src={displaySpriteUrl}
                               alt={slot.name}
-                              className="h-32 w-32 sm:h-40 sm:w-40 object-contain pokemon-sprite animate-in fade-in zoom-in duration-500"
+                              className={cn(
+                                "object-contain pokemon-sprite animate-in fade-in zoom-in duration-500",
+                                compact ? "h-24 w-24 sm:h-28 sm:w-28" : "h-32 w-32 sm:h-40 sm:w-40"
+                              )}
                               style={{ imageRendering: 'auto' }}
                               loading="eager"
                               decoding="async"
@@ -703,9 +719,12 @@ export function ShinyCounter({
               onBlur={handleCounterBlur}
               onKeyDown={handleCounterKeyDown}
               autoFocus
-              className="text-6xl font-bold tabular-nums text-center h-24 border-2 bg-background focus:ring-0"
+              className={cn(
+                "font-bold tabular-nums text-center border-2 bg-background focus:ring-0",
+                compact ? "h-16 text-4xl" : "h-24 text-6xl"
+              )}
               style={{
-                fontSize: '4rem',
+                fontSize: compact ? '3rem' : '4rem',
                 color: accentColor,
                 borderColor: accentColor,
                 backgroundColor: 'var(--background)' // Force background color
@@ -714,7 +733,10 @@ export function ShinyCounter({
           ) : (
             <div
               onClick={handleCounterClick}
-              className="text-6xl font-bold tabular-nums cursor-pointer hover:scale-105 transition-transform duration-200 text-center flex justify-center items-center h-24"
+              className={cn(
+                "font-bold tabular-nums cursor-pointer hover:scale-105 transition-transform duration-200 text-center flex justify-center items-center",
+                compact ? "h-16 text-5xl" : "h-24 text-6xl"
+              )}
               title="Click to edit counter"
             >
               <span
@@ -735,7 +757,7 @@ export function ShinyCounter({
               size="lg"
               onClick={decrement}
               variant="outline"
-              className="h-12 px-6 text-xl hover:bg-background"
+              className={cn("text-xl hover:bg-background", compact ? "h-10 px-5" : "h-12 px-6")}
               style={{ borderColor: accentColor, color: accentColor }}
             >
               <Minus className="h-5 w-5" />
@@ -743,7 +765,7 @@ export function ShinyCounter({
             <Button
               size="lg"
               onClick={increment}
-              className="h-12 px-6 text-xl"
+              className={cn("text-xl", compact ? "h-10 px-5" : "h-12 px-6")}
               style={{
                 backgroundColor: accentColor,
                 boxShadow: `0 0 20px ${accentColor}40`
@@ -764,11 +786,11 @@ export function ShinyCounter({
               min={1}
               value={incrementAmount}
               onChange={(e) => setIncrementAmount(Math.max(1, parseInt(e.target.value) || 1))}
-              className="w-16 h-8 text-center bg-white text-black border-2 border-input"
+              className="w-16 h-8 text-center bg-background text-foreground border-2 border-input"
             />
           </div>
 
-          <div className="flex items-center justify-center gap-2">
+          <div className={cn("items-center justify-center gap-2", compact ? "hidden" : "flex")}>
             <Label htmlFor="increment-hotkey" className="text-xs text-muted-foreground">
               Tasto +1:
             </Label>
@@ -779,7 +801,7 @@ export function ShinyCounter({
               onFocus={() => setIsAssigningHotkey(true)}
               onBlur={() => setIsAssigningHotkey(false)}
               onKeyDown={handleHotkeyAssignment}
-              className="w-36 h-8 text-center bg-white text-black border-2 border-input"
+              className="w-36 h-8 text-center bg-background text-foreground border-2 border-input"
             />
             <Button
               type="button"
@@ -815,26 +837,27 @@ export function ShinyCounter({
         </div>
 
         {/* Stats Card */}
-        <Card>
-          <CardContent className="pt-4 grid grid-cols-2 gap-4 text-center">
+        <Card className="border-border/70 bg-card/70 shadow-sm">
+          <CardContent className={cn("grid grid-cols-2 gap-3 text-center", compact ? "p-3" : "pt-4 pb-4")}>
             <div>
-              <div className="text-sm text-muted-foreground mb-1">Odds Correnti</div>
+              <div className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground mb-1">Odds</div>
               <div className="font-mono font-bold text-base sm:text-lg text-primary break-all">
                 1 / {formatOdds(stats.currentOdds)}
               </div>
-              <div className="text-xs text-muted-foreground">
+              <div className={cn("text-xs text-muted-foreground", compact && "hidden")}>
                 {stats.percentage}%
               </div>
             </div>
             <div>
-              <div className="text-sm text-muted-foreground mb-1">Prob. Totale</div>
+              <div className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground mb-1">Chance</div>
               <span className="font-mono font-bold text-base sm:text-lg text-primary">{stats.binomialProbability}%</span>
             </div>
           </CardContent>
         </Card>
 
         {/* Setup Section */}
-        <Card>
+        {showSetup && (
+        <Card className="border-border/70 bg-card/70 shadow-sm">
           <CardContent className="pt-4 space-y-4">
             <h3 className="font-semibold text-lg">Setup</h3>
 
@@ -1052,6 +1075,7 @@ export function ShinyCounter({
             </Button>
           </CardContent>
         </Card>
+        )}
 
         <AlertDialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
           <AlertDialogContent>
