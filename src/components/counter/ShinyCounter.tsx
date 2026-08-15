@@ -582,12 +582,12 @@ export function ShinyCounter({
 
   try {
     return (
-      <div className={cn("w-full h-full", compact ? "space-y-3" : "space-y-4")}>
+      <div className={cn("w-full h-full", compact ? "mx-auto max-w-[390px] space-y-3" : "space-y-4")}>
         {/* Counter Display */}
         <div
           className={cn(
             "text-center",
-            compact ? "space-y-3" : "space-y-4 rounded-lg border border-border/70 bg-card/70 p-4 shadow-sm"
+            compact ? "space-y-3 rounded-md bg-background/35 p-3" : "space-y-4 rounded-lg border border-border/70 bg-card/70 p-4 shadow-sm"
           )}
         >
           {/* Pokemon Sprite */}
@@ -624,14 +624,14 @@ export function ShinyCounter({
                         return (
                           <div
                             key={`${slot.slot}-${slot.id}-${slot.name}`}
-                            className={cn("flex flex-col items-center gap-1.5", compact ? "w-24 sm:w-28" : "w-32 sm:w-40")}
+                            className={cn("flex flex-col items-center gap-1.5", compact ? "w-28 sm:w-32" : "w-32 sm:w-40")}
                           >
                             <img
                               src={displaySpriteUrl}
                               alt={slot.name}
                               className={cn(
                                 "object-contain pokemon-sprite animate-in fade-in zoom-in duration-500",
-                                compact ? "h-24 w-24 sm:h-28 sm:w-28" : "h-32 w-32 sm:h-40 sm:w-40"
+                                compact ? "h-28 w-28 sm:h-32 sm:w-32" : "h-32 w-32 sm:h-40 sm:w-40"
                               )}
                               style={{ imageRendering: 'auto' }}
                               loading="eager"
@@ -752,12 +752,12 @@ export function ShinyCounter({
           )}
 
           {/* Counter Buttons */}
-          <div className="flex justify-center gap-2">
+          <div className="flex justify-center gap-3">
             <Button
               size="lg"
               onClick={decrement}
               variant="outline"
-              className={cn("text-xl hover:bg-background", compact ? "h-10 px-5" : "h-12 px-6")}
+              className={cn("text-xl hover:bg-background", compact ? "h-11 min-w-20 px-6" : "h-12 px-6")}
               style={{ borderColor: accentColor, color: accentColor }}
             >
               <Minus className="h-5 w-5" />
@@ -765,7 +765,7 @@ export function ShinyCounter({
             <Button
               size="lg"
               onClick={increment}
-              className={cn("text-xl", compact ? "h-10 px-5" : "h-12 px-6")}
+              className={cn("text-xl", compact ? "h-11 min-w-20 px-6" : "h-12 px-6")}
               style={{
                 backgroundColor: accentColor,
                 boxShadow: `0 0 20px ${accentColor}40`
@@ -776,7 +776,7 @@ export function ShinyCounter({
           </div>
 
           {/* Increment Amount */}
-          <div className="flex items-center justify-center gap-2">
+          <div className={cn("flex items-center justify-center gap-2", compact && "rounded-md border border-border/60 bg-card/70 px-3 py-2")}>
             <Label htmlFor="increment" className="text-xs text-muted-foreground">
               Step:
             </Label>
@@ -790,7 +790,7 @@ export function ShinyCounter({
             />
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-2">
+          <div className={cn("flex flex-wrap items-center justify-center gap-2", compact && "rounded-md border border-border/60 bg-card/70 px-3 py-2")}>
             <Label htmlFor="increment-hotkey" className="text-xs text-muted-foreground">
               Tasto +1:
             </Label>

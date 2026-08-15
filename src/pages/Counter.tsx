@@ -215,7 +215,7 @@ export default function Counter() {
                 {activeHunts.map((hunt) => (
                   <div
                     key={hunt.id}
-                    className="group/card relative overflow-hidden rounded-lg border border-border/70 bg-card/85 p-3 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+                    className="group/card relative overflow-hidden rounded-lg border border-border/70 bg-card/85 p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
                   >
                     <div
                       className="pointer-events-none absolute inset-x-0 top-0 h-1"
@@ -247,7 +247,7 @@ export default function Counter() {
                         <X className="h-4 w-4" />
                       </Button>
                     </div>
-                    <div className="pt-8">
+                    <div className="flex flex-col items-center pt-8">
                       <ShinyCounter
                         huntId={hunt.id}
                         enableKeyboardShortcuts
