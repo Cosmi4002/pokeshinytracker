@@ -56,6 +56,7 @@ type PersistedPokemonSlot = {
 };
 
 const COUNTER_SLOTS_PREFIX = '__counter_slots_v1__:';
+const COUNTER_SPRITE_EDGE_SHADOW = 'drop-shadow(0 1px 0 rgba(0,0,0,0.88)) drop-shadow(1px 0 0 rgba(0,0,0,0.72)) drop-shadow(0 4px 8px rgba(0,0,0,0.85))';
 
 const getFormOptions = (pokemonDetails: PokemonDetails) => {
   if (!pokemonDetails) return [];
@@ -587,12 +588,12 @@ export function ShinyCounter({
         <div
           className={cn(
             "text-center",
-            compact ? "space-y-3 rounded-md bg-background/35 p-3" : "space-y-4 rounded-lg border border-border/70 bg-card/70 p-4 shadow-sm"
+            compact ? "space-y-3 px-2 py-3" : "space-y-4 rounded-lg border border-border/70 bg-card/70 p-4 shadow-sm"
           )}
         >
           {/* Pokemon Sprite */}
           {selectedPokemonSlots.length > 0 && (
-            <div key={`sprite-container-${selectedPokemonSlots.map((slot) => slot.id).join('-')}`} className={cn("relative group/sprite flex justify-center", compact ? "mb-2" : "mb-4")}>
+            <div key={`sprite-container-${selectedPokemonSlots.map((slot) => slot.id).join('-')}`} className={cn("relative group/sprite flex justify-center", compact ? "mb-5" : "mb-4")}>
               {(() => {
                 return (
                   <div className="flex flex-col items-center gap-2">
@@ -631,9 +632,12 @@ export function ShinyCounter({
                               alt={slot.name}
                               className={cn(
                                 "object-contain pokemon-sprite animate-in fade-in zoom-in duration-500",
-                                compact ? "h-28 w-28 sm:h-32 sm:w-32" : "h-32 w-32 sm:h-40 sm:w-40"
+                                compact ? "h-28 w-28 sm:h-[8.5rem] sm:w-[8.5rem]" : "h-32 w-32 sm:h-40 sm:w-40"
                               )}
-                              style={{ imageRendering: 'auto' }}
+                              style={{
+                                imageRendering: 'auto',
+                                filter: COUNTER_SPRITE_EDGE_SHADOW,
+                              }}
                               loading="eager"
                               decoding="async"
                               onError={(e) => {
@@ -758,7 +762,11 @@ export function ShinyCounter({
               onClick={decrement}
               variant="outline"
               className={cn("text-xl hover:bg-background", compact ? "h-11 min-w-20 px-6" : "h-12 px-6")}
-              style={{ borderColor: accentColor, color: accentColor }}
+              style={{
+                borderColor: accentColor,
+                color: accentColor,
+                backgroundColor: compact ? `color-mix(in srgb, ${accentColor} 12%, transparent)` : undefined,
+              }}
             >
               <Minus className="h-5 w-5" />
             </Button>
@@ -776,7 +784,7 @@ export function ShinyCounter({
           </div>
 
           {/* Increment Amount */}
-          <div className={cn("flex items-center justify-center gap-2", compact && "rounded-md border border-border/60 bg-card/70 px-3 py-2")}>
+          <div className="flex items-center justify-center gap-2">
             <Label htmlFor="increment" className="text-xs text-muted-foreground">
               Step:
             </Label>
@@ -786,11 +794,14 @@ export function ShinyCounter({
               min={1}
               value={incrementAmount}
               onChange={(e) => setIncrementAmount(Math.max(1, parseInt(e.target.value) || 1))}
-              className="w-16 h-8 text-center bg-background text-foreground border-2 border-input"
+              className={cn(
+                "w-16 h-8 text-center bg-background text-foreground",
+                compact ? "border border-border/70" : "border-2 border-input"
+              )}
             />
           </div>
 
-          <div className={cn("flex flex-wrap items-center justify-center gap-2", compact && "rounded-md border border-border/60 bg-card/70 px-3 py-2")}>
+          <div className="flex flex-wrap items-center justify-center gap-2">
             <Label htmlFor="increment-hotkey" className="text-xs text-muted-foreground">
               Tasto +1:
             </Label>
@@ -801,7 +812,10 @@ export function ShinyCounter({
               onFocus={() => setIsAssigningHotkey(true)}
               onBlur={() => setIsAssigningHotkey(false)}
               onKeyDown={handleHotkeyAssignment}
-              className="w-36 h-8 text-center bg-background text-foreground border-2 border-input"
+              className={cn(
+                "w-36 h-8 text-center bg-background text-foreground",
+                compact ? "border border-border/70" : "border-2 border-input"
+              )}
             />
             <Button
               type="button"
@@ -814,7 +828,7 @@ export function ShinyCounter({
             </Button>
           </div>
 
-          {user && (
+          {user && !compact && (
             <div className="flex justify-center items-center gap-2 text-sm text-muted-foreground h-6">
               {saveStatus === 'saving' ? (
                 <>
@@ -837,8 +851,8 @@ export function ShinyCounter({
         </div>
 
         {/* Stats Card */}
-        <Card className="border-border/70 bg-card/70 shadow-sm">
-          <CardContent className={cn("grid grid-cols-2 gap-3 text-center", compact ? "p-3" : "pt-4 pb-4")}>
+        <Card className={cn("border-border/70 bg-card/70 shadow-sm", compact && "border-0 bg-transparent shadow-none")}>
+          <CardContent className={cn("grid grid-cols-2 gap-3 text-center", compact ? "px-2 py-1" : "pt-4 pb-4")}>
             <div>
               <div className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground mb-1">Odds</div>
               <div className="font-mono font-bold text-base sm:text-lg text-primary break-all">
