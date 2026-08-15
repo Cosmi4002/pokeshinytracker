@@ -284,8 +284,8 @@ export const PokedexCard = memo(function PokedexCard({
                 backgroundColor: isEvolutionSourceHighlighted
                     ? 'rgba(120, 83, 18, 0.35)'
                     : !hasCaughtAny
-                    ? 'rgba(12, 12, 15, 0.72)'
-                    : `color-mix(in srgb, ${accentColor} 42%, #17171d 58%)`,
+                    ? 'color-mix(in srgb, hsl(var(--card)) 84%, hsl(var(--foreground)) 16%)'
+                    : `color-mix(in srgb, ${accentColor} 42%, hsl(var(--card)) 58%)`,
                 '--glow-opacity': glowIntensity,
             } as React.CSSProperties}
             onMouseEnter={(e) => {

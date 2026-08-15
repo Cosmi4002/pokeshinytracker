@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
-import { Check, Image, Moon, Palette, Paintbrush, Pipette, Save, Sparkles, Sun } from 'lucide-react';
+import { Check, Image, Moon, Palette, Paintbrush, Pipette, Save, Sparkles, Sun, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -60,6 +60,34 @@ declare global {
 const DEFAULT_THEME_COLOR = '#8b5cf6';
 const DEFAULT_BACKGROUND_COLOR = '#0f172a';
 const DEFAULT_BG_ACCENT_3 = '#38bdf8';
+const CUSTOM_THEME_PRESETS_KEY = 'shinytrack-custom-theme-presets';
+
+function loadCustomThemePresets(): ThemePreset[] {
+  try {
+    const raw = localStorage.getItem(CUSTOM_THEME_PRESETS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed.filter((preset): preset is ThemePreset => (
+      preset &&
+      typeof preset.id === 'string' &&
+      typeof preset.name === 'string' &&
+      typeof preset.themeColor === 'string' &&
+      typeof preset.backgroundColor === 'string' &&
+      typeof preset.uiStyle === 'string' &&
+      typeof preset.backgroundStyle === 'string' &&
+      typeof preset.backgroundColor2 === 'string' &&
+      typeof preset.backgroundColor3 === 'string'
+    ));
+  } catch {
+    return [];
+  }
+}
+
+function storeCustomThemePresets(presets: ThemePreset[]) {
+  localStorage.setItem(CUSTOM_THEME_PRESETS_KEY, JSON.stringify(presets));
+}
 
 function getColorLuminance(hex: string) {
   const normalized = hex.replace('#', '');
@@ -122,6 +150,7 @@ export function ThemeCustomizer() {
   const [backgroundColor2, setBackgroundColor2] = useState(getStoredBackgroundAccent2());
   const [backgroundColor3, setBackgroundColor3] = useState(getStoredBackgroundAccent3());
   const [presetTone, setPresetTone] = useState<PresetTone>(colorScheme === 'light' ? 'light' : 'dark');
+  const [customThemePresets, setCustomThemePresets] = useState<ThemePreset[]>(() => loadCustomThemePresets());
   const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState(false);
   const skipNextOpenSyncRef = useRef(false);
@@ -216,17 +245,22 @@ export function ThemeCustomizer() {
     { id: 'orchid-limeade', name: 'Orchid Limeade', themeColor: '#6f1d77', backgroundColor: '#f2ffd5', uiStyle: 'glass', backgroundStyle: 'aurora', backgroundColor2: '#00b2a9', backgroundColor3: '#ff7f11' },
   ]), []);
 
+  const allThemePresets = useMemo(
+    () => [...themePresets, ...customThemePresets],
+    [themePresets, customThemePresets],
+  );
+
   const filteredThemePresets = useMemo(
-    () => themePresets.filter((preset) => getPresetTone(preset) === presetTone),
-    [themePresets, presetTone],
+    () => allThemePresets.filter((preset) => getPresetTone(preset) === presetTone),
+    [allThemePresets, presetTone],
   );
 
   const lightPresetCount = useMemo(
-    () => themePresets.filter((preset) => getPresetTone(preset) === 'light').length,
-    [themePresets],
+    () => allThemePresets.filter((preset) => getPresetTone(preset) === 'light').length,
+    [allThemePresets],
   );
 
-  const darkPresetCount = themePresets.length - lightPresetCount;
+  const darkPresetCount = allThemePresets.length - lightPresetCount;
 
   const backgroundStyleOptions = useMemo<Array<{ id: BackgroundStyle; label: string }>>(() => ([
     { id: 'plain', label: 'Plain' },
@@ -311,7 +345,7 @@ export function ThemeCustomizer() {
       return;
     }
 
-    const preset = themePresets.find((p) => p.id === id);
+    const preset = allThemePresets.find((p) => p.id === id);
     if (!preset) return;
 
     setPresetId(id);
@@ -321,6 +355,39 @@ export function ThemeCustomizer() {
     setBackgroundStyle(preset.backgroundStyle);
     setBackgroundColor2(preset.backgroundColor2);
     setBackgroundColor3(preset.backgroundColor3);
+  };
+
+  const saveCurrentAsCustomPreset = () => {
+    const rawName = window.prompt('Nome preset personale:', 'Mio tema');
+    const name = rawName?.trim();
+    if (!name) return;
+
+    const nextPreset: ThemePreset = {
+      id: `custom-theme-${Date.now()}`,
+      name,
+      themeColor,
+      backgroundColor,
+      uiStyle,
+      backgroundStyle,
+      backgroundColor2,
+      backgroundColor3,
+    };
+    const nextPresets = [...customThemePresets, nextPreset];
+    setCustomThemePresets(nextPresets);
+    storeCustomThemePresets(nextPresets);
+    setPresetId(nextPreset.id);
+    setPresetTone(getPresetTone(nextPreset));
+    toast({
+      title: 'Preset personale salvato',
+      description: `${name} aggiunto ai temi ${getPresetTone(nextPreset) === 'light' ? 'Light' : 'Dark'}.`,
+    });
+  };
+
+  const deleteCustomPreset = (id: string) => {
+    const nextPresets = customThemePresets.filter((preset) => preset.id !== id);
+    setCustomThemePresets(nextPresets);
+    storeCustomThemePresets(nextPresets);
+    if (presetId === id) setPresetId('custom');
   };
 
   const handleSave = async () => {
@@ -458,6 +525,15 @@ export function ThemeCustomizer() {
               <Sparkles className="h-4 w-4" />
               Temi rapidi
             </Label>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={saveCurrentAsCustomPreset}
+              className="h-10 w-full justify-center gap-2 border-dashed"
+            >
+              <Save className="h-4 w-4" />
+              Salva preset personale
+            </Button>
             <div className="grid grid-cols-2 gap-1 rounded-lg border border-border bg-background p-1">
               <button
                 type="button"
@@ -501,26 +577,46 @@ export function ThemeCustomizer() {
                 {presetId === 'custom' && <Check className="h-4 w-4 text-primary" />}
               </button>
 
-              {filteredThemePresets.map((preset) => (
-                <button
-                  key={preset.id}
-                  type="button"
-                  onClick={() => applyPreset(preset.id)}
-                  className={`flex min-h-14 items-center gap-3 rounded-lg border p-2.5 text-left transition-all hover:border-primary/60 hover:bg-muted/40 ${
-                    presetId === preset.id ? 'border-primary bg-primary/10 shadow-sm' : 'border-border bg-background'
-                  }`}
-                >
-                  <span className="flex h-9 w-9 shrink-0 rounded-full border border-border p-1">
-                    <span className="h-full flex-1 rounded-l-full" style={{ backgroundColor: preset.themeColor }} />
-                    <span className="h-full flex-1 rounded-r-full" style={{ backgroundColor: preset.backgroundColor }} />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-medium">{preset.name}</span>
-                    <span className="block truncate text-xs capitalize text-muted-foreground">{preset.backgroundStyle}</span>
-                  </span>
-                  {presetId === preset.id && <Check className="h-4 w-4 text-primary" />}
-                </button>
-              ))}
+              {filteredThemePresets.map((preset) => {
+                const isCustomPreset = preset.id.startsWith('custom-theme-');
+
+                return (
+                  <div
+                    key={preset.id}
+                    className={`flex min-h-14 items-center rounded-lg border transition-all hover:border-primary/60 hover:bg-muted/40 ${
+                      presetId === preset.id ? 'border-primary bg-primary/10 shadow-sm' : 'border-border bg-background'
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => applyPreset(preset.id)}
+                      className="flex min-w-0 flex-1 items-center gap-3 p-2.5 text-left"
+                    >
+                      <span className="flex h-9 w-9 shrink-0 rounded-full border border-border p-1">
+                        <span className="h-full flex-1 rounded-l-full" style={{ backgroundColor: preset.themeColor }} />
+                        <span className="h-full flex-1 rounded-r-full" style={{ backgroundColor: preset.backgroundColor }} />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-medium">{preset.name}</span>
+                        <span className="block truncate text-xs capitalize text-muted-foreground">
+                          {isCustomPreset ? 'Personale' : preset.backgroundStyle}
+                        </span>
+                      </span>
+                      {presetId === preset.id && <Check className="h-4 w-4 text-primary" />}
+                    </button>
+                    {isCustomPreset && (
+                      <button
+                        type="button"
+                        onClick={() => deleteCustomPreset(preset.id)}
+                        className="mr-2 flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                        title="Elimina preset personale"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </section>
 

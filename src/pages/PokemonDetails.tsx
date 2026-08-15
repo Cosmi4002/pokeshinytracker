@@ -700,13 +700,19 @@ export default function PokemonDetails() {
                                         )}
                                         style={{
                                             borderColor: isCaught ? accentColor : undefined,
-                                            backgroundColor: isCaught ? `color-mix(in srgb, ${accentColor} 34%, hsl(var(--card)) 66%)` : undefined,
+                                            backgroundColor: isCaught ? `color-mix(in srgb, ${accentColor} 48%, hsl(var(--card)) 52%)` : undefined,
                                         }}
                                     >
+                                        {isCaught && (
+                                            <span
+                                                className="pointer-events-none absolute inset-0 z-0"
+                                                style={{ backgroundColor: `color-mix(in srgb, ${accentColor} 48%, hsl(var(--card)) 52%)` }}
+                                            />
+                                        )}
                                         <div
-                                            className="relative mb-3 flex aspect-square w-full items-center justify-center rounded-lg"
+                                            className="relative z-10 mb-3 flex aspect-square w-full items-center justify-center rounded-lg"
                                             style={{
-                                                backgroundColor: isCaught ? `color-mix(in srgb, ${accentColor} 22%, transparent)` : undefined,
+                                                backgroundColor: isCaught ? `color-mix(in srgb, ${accentColor} 28%, hsl(var(--background)) 72%)` : undefined,
                                             }}
                                         >
                                             <img

@@ -590,7 +590,7 @@ export function ShinyCounter({
             "text-center",
             compact
               ? "space-y-3 px-2 py-3"
-              : "space-y-4 rounded-lg border border-border/70 bg-card/95 p-4 text-card-foreground shadow-[0_18px_42px_rgba(0,0,0,0.16)] backdrop-blur dark:border-white/15 dark:bg-[#171717]/95 dark:text-white dark:shadow-[0_18px_42px_rgba(0,0,0,0.42)]"
+              : "space-y-4 rounded-lg border border-border/70 bg-card/70 p-4 text-card-foreground shadow-sm dark:border-white/15 dark:bg-[#171717]/95 dark:text-white dark:shadow-[0_18px_42px_rgba(0,0,0,0.42)]"
           )}
         >
           {/* Pokemon Sprite */}
@@ -859,7 +859,7 @@ export function ShinyCounter({
         {/* Stats Card */}
         <Card
           className={cn(
-            "border-border/70 bg-card/95 text-card-foreground shadow-[0_18px_42px_rgba(0,0,0,0.14)] backdrop-blur dark:border-white/15 dark:bg-[#171717]/95 dark:text-white dark:shadow-[0_18px_42px_rgba(0,0,0,0.38)]",
+            "border-border/70 bg-card/70 text-card-foreground shadow-sm dark:border-white/15 dark:bg-[#171717]/95 dark:text-white dark:shadow-[0_18px_42px_rgba(0,0,0,0.38)]",
             compact && "border-0 bg-transparent shadow-none dark:bg-transparent dark:shadow-none"
           )}
         >
@@ -882,7 +882,7 @@ export function ShinyCounter({
 
         {/* Setup Section */}
         {showSetup && (
-        <Card className="border-border/70 bg-card/95 text-card-foreground shadow-[0_18px_42px_rgba(0,0,0,0.14)] backdrop-blur dark:border-white/15 dark:bg-[#171717]/95 dark:text-white dark:shadow-[0_18px_42px_rgba(0,0,0,0.38)]">
+        <Card className="border-border/70 bg-card/70 text-card-foreground shadow-sm dark:border-white/15 dark:bg-[#171717]/95 dark:text-white dark:shadow-[0_18px_42px_rgba(0,0,0,0.38)]">
           <CardContent className="pt-4 space-y-4">
             <h3 className="font-semibold text-lg">Setup</h3>
 
