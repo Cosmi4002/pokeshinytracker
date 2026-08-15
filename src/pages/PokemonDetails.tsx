@@ -380,11 +380,11 @@ export default function PokemonDetails() {
     const nextId = currentId < 1025 ? currentId + 1 : null;
     const heroVariant = variants.find(variant => variant.category === 'base') || variants[0];
     const heroIsCaught = heroVariant ? caughtForms.has(heroVariant.name) : false;
-    const heroIsLoading = heroVariant ? actionLoading === heroVariant.name : false;
     const hasMultipleForms = variants.length > 1;
+    const panelClass = "border-border/70 bg-card/95 text-card-foreground shadow-[0_18px_42px_rgba(0,0,0,0.16)] backdrop-blur dark:border-white/15 dark:bg-[#171717]/95 dark:text-white dark:shadow-[0_18px_42px_rgba(0,0,0,0.42)]";
 
     return (
-        <div className="min-h-screen bg-card text-card-foreground selection:bg-primary/20">
+        <div className="min-h-screen bg-background text-foreground selection:bg-primary/20">
             <Navbar />
 
             <main className="container mx-auto py-8 px-4 relative z-10 max-w-5xl">
@@ -394,7 +394,7 @@ export default function PokemonDetails() {
                         variant="ghost"
                         size="sm"
                         onClick={() => navigate('/pokedex')}
-                        className="group rounded-lg border border-border bg-card px-4 font-medium text-muted-foreground shadow-sm hover:bg-muted hover:text-foreground"
+                        className="group rounded-lg border border-border/70 bg-card/95 px-4 font-medium text-muted-foreground shadow-sm backdrop-blur hover:bg-muted hover:text-foreground dark:border-white/15 dark:bg-[#171717]/95"
                     >
                         <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
                         Pokedex
@@ -406,7 +406,7 @@ export default function PokemonDetails() {
 
                 <div className="flex flex-col items-center text-center space-y-10">
                     {/* Centered Header */}
-                    <div className="space-y-6 w-full max-w-3xl">
+                    <section className={cn("w-full max-w-3xl space-y-6 rounded-lg border p-6 sm:p-8", panelClass)}>
                         <div className="flex flex-col items-center gap-4">
                             <h1 className="text-7xl md:text-8xl font-black tracking-tighter capitalize text-foreground drop-shadow-sm py-2">
                                 {(overrides[`${details.id}-${details.name}`] as any)?.custom_display_name || details.displayName}
@@ -415,7 +415,7 @@ export default function PokemonDetails() {
                             {details.shinyAvailability && details.shinyAvailability !== 'ok' && (
                                 <div
                                     className={cn(
-                                        "inline-flex items-center gap-2 rounded-lg border bg-card px-4 py-2 text-sm font-extrabold shadow-sm",
+                                        "inline-flex items-center gap-2 rounded-lg border bg-card/90 px-4 py-2 text-sm font-extrabold shadow-sm",
                                         details.shinyAvailability === 'unobtainable'
                                             ? "border-fuchsia-500/40 bg-fuchsia-500/10 text-fuchsia-700 dark:text-fuchsia-200"
                                             : "border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-200"
@@ -447,7 +447,7 @@ export default function PokemonDetails() {
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className="h-10 w-10 rounded-lg border border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
+                                                    className="h-10 w-10 rounded-lg border border-border/70 bg-background/80 text-muted-foreground hover:bg-muted hover:text-foreground dark:border-white/15 dark:bg-white/10"
                                                     onClick={() => {
                                                         const currentName = (overrides[`${details.id}-${details.name}`] as any)?.custom_display_name || details.displayName;
                                                         const newName = prompt("Personalizza nome display:", currentName);
@@ -491,54 +491,28 @@ export default function PokemonDetails() {
 
                         {/* Generation Badge */}
                         <div className="flex justify-center flex-wrap gap-4">
-                            <div className="flex items-center rounded-lg border border-border bg-card px-6 py-2 text-xs font-bold uppercase tracking-widest text-muted-foreground shadow-sm">
+                            <div className="flex items-center rounded-lg border border-border/70 bg-background/80 px-6 py-2 text-xs font-bold uppercase tracking-widest text-muted-foreground shadow-sm dark:border-white/15 dark:bg-white/10">
                                 Gen {details.generation}
                             </div>
                         </div>
 
                         {heroVariant && (
-                            <div className="mx-auto w-full max-w-sm rounded-2xl border border-border/80 bg-gradient-to-b from-muted/85 to-card/95 px-6 pb-5 pt-4 text-card-foreground shadow-2xl backdrop-blur dark:from-muted/45 dark:to-card/95">
-                                <div
-                                    className="mx-auto mb-3 flex aspect-square w-56 max-w-full items-center justify-center rounded-full border bg-background/80 shadow-inner sm:w-64"
-                                    style={{
-                                        borderColor: heroIsCaught ? `color-mix(in srgb, ${accentColor} 72%, hsl(var(--border)) 28%)` : undefined,
-                                        boxShadow: heroIsCaught
-                                            ? `inset 0 1px 0 rgba(255,255,255,0.18), 0 18px 42px ${accentColor}32`
-                                            : undefined
-                                    }}
-                                >
-                                    <img
-                                        src={heroVariant.spriteUrl}
-                                        alt={heroVariant.displayName}
-                                        className={cn(
-                                            "h-[88%] w-[88%] object-contain pokemon-sprite transition-all duration-500",
-                                            heroIsCaught ? "scale-105 drop-shadow-2xl" : "opacity-75 grayscale saturate-50"
-                                        )}
-                                    />
-                                </div>
-                                <div className="flex items-center justify-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-muted-foreground">
-                                    <Sparkles className="h-4 w-4 text-primary" />
-                                    <span>{heroIsCaught ? 'Ottenuto' : 'Non ottenuto'}</span>
-                                    <span className="text-border">/</span>
-                                    <span>Forma principale</span>
-                                </div>
-                                <Button
-                                    type="button"
-                                    className="mt-4 w-full rounded-xl font-bold"
-                                    variant={heroIsCaught ? "outline" : "default"}
-                                    disabled={heroIsLoading}
-                                    onClick={() => toggleCaught(heroVariant)}
-                                    style={heroIsCaught ? { borderColor: accentColor, color: accentColor } : { backgroundColor: accentColor }}
-                                >
-                                    {heroIsLoading ? 'Aggiorno...' : heroIsCaught ? 'Rimuovi ottenuto' : 'Segna ottenuto'}
-                                </Button>
+                            <div className="mx-auto flex w-full max-w-sm items-center justify-center px-4">
+                                <img
+                                    src={heroVariant.spriteUrl}
+                                    alt={heroVariant.displayName}
+                                    className={cn(
+                                        "h-56 w-56 object-contain pokemon-sprite transition-all duration-500 sm:h-64 sm:w-64",
+                                        heroIsCaught ? "scale-105 drop-shadow-2xl" : "opacity-75 grayscale saturate-50"
+                                    )}
+                                />
                             </div>
                         )}
 
-                    </div>
+                    </section>
 
                     {(availableGames.length > 0 || curatedGameIds) && (
-                        <section className="w-full space-y-5 rounded-lg border border-border bg-card p-6 text-card-foreground shadow-2xl">
+                        <section className={cn("w-full space-y-5 rounded-lg border p-6", panelClass)}>
                             <div className="flex flex-col gap-3 border-b border-border pb-5 text-left sm:flex-row sm:items-end sm:justify-between">
                                 <div>
                                     <h2 className="flex items-center gap-3 text-2xl font-black tracking-tight">
@@ -554,7 +528,7 @@ export default function PokemonDetails() {
                                                     href={source.url}
                                                     target="_blank"
                                                     rel="noreferrer"
-                                                    className="rounded-full border border-border bg-muted px-2 py-1 text-card-foreground transition-colors hover:bg-background hover:text-primary"
+                                                    className="rounded-full border border-border/70 bg-background/80 px-2 py-1 text-card-foreground transition-colors hover:bg-muted hover:text-primary dark:border-white/15 dark:bg-white/10"
                                                     onClick={(event) => event.stopPropagation()}
                                                 >
                                                     {source.label}
@@ -564,7 +538,7 @@ export default function PokemonDetails() {
                                     )}
                                 </div>
 
-                                <div className="flex w-fit items-center gap-2 rounded-lg border border-border bg-muted px-4 py-2 text-sm font-bold text-card-foreground shadow-sm">
+                                <div className="flex w-fit items-center gap-2 rounded-lg border border-border/70 bg-background/80 px-4 py-2 text-sm font-bold text-card-foreground shadow-sm dark:border-white/15 dark:bg-white/10">
                                     <Sparkles className="h-4 w-4 text-primary" />
                                     <span className="text-foreground">{caughtGameCount}</span>
                                     <span className="text-muted-foreground">/</span>
@@ -574,7 +548,7 @@ export default function PokemonDetails() {
 
                             <div className="space-y-5">
                                 {availableGames.length === 0 && curatedGameIds && (
-                                    <div className="rounded-lg border border-border bg-muted p-4 text-sm font-bold text-muted-foreground">
+                                    <div className="rounded-lg border border-border/70 bg-background/80 p-4 text-sm font-bold text-muted-foreground dark:border-white/15 dark:bg-white/10">
                                         Nessun gioco console valido per shiny origin.
                                     </div>
                                 )}
@@ -691,7 +665,7 @@ export default function PokemonDetails() {
 
                     {/* Form Collection Section - Main Focus */}
                     {hasMultipleForms && (
-                    <div className="w-full space-y-8 rounded-xl border border-border/80 bg-gradient-to-b from-muted/95 to-card/95 p-6 text-card-foreground shadow-2xl backdrop-blur dark:from-muted/55 dark:to-card/95">
+                    <div className={cn("w-full space-y-8 rounded-lg border p-6", panelClass)}>
                         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-border/80">
                             <div className="text-left">
                                 <h2 className="text-3xl font-black tracking-tight flex items-center gap-3">
@@ -700,7 +674,7 @@ export default function PokemonDetails() {
                                 </h2>
                                 <p className="text-muted-foreground mt-1 font-medium">Visualizza e segna le varianti cromatiche catturate.</p>
                             </div>
-                            <div className="flex items-center gap-3 rounded-xl border border-border/80 bg-gradient-to-b from-muted/90 to-background/95 px-5 py-2.5 text-card-foreground shadow-inner dark:from-muted/60 dark:to-background/95">
+                            <div className="flex items-center gap-3 rounded-lg border border-border/70 bg-background/80 px-5 py-2.5 text-card-foreground shadow-inner dark:border-white/15 dark:bg-white/10">
                                 <Sparkles className="h-4 w-4 text-primary" />
                                 <span className="text-sm font-bold text-foreground">
                                     {caughtForms.size} <span className="text-muted-foreground mx-1">/</span> {variants.length}
