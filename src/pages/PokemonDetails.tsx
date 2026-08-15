@@ -378,6 +378,10 @@ export default function PokemonDetails() {
     const currentId = details.id;
     const prevId = currentId > 1 && currentId < 10000 ? currentId - 1 : null;
     const nextId = currentId < 1025 ? currentId + 1 : null;
+    const heroVariant = variants.find(variant => variant.category === 'base') || variants[0];
+    const heroIsCaught = heroVariant ? caughtForms.has(heroVariant.name) : false;
+    const heroIsLoading = heroVariant ? actionLoading === heroVariant.name : false;
+    const hasMultipleForms = variants.length > 1;
 
     return (
         <div className="min-h-screen bg-card text-card-foreground selection:bg-primary/20">
@@ -492,6 +496,45 @@ export default function PokemonDetails() {
                             </div>
                         </div>
 
+                        {heroVariant && (
+                            <div className="mx-auto w-full max-w-sm rounded-2xl border border-border/80 bg-gradient-to-b from-muted/85 to-card/95 px-6 pb-5 pt-4 text-card-foreground shadow-2xl backdrop-blur dark:from-muted/45 dark:to-card/95">
+                                <div
+                                    className="mx-auto mb-3 flex aspect-square w-56 max-w-full items-center justify-center rounded-full border bg-background/80 shadow-inner sm:w-64"
+                                    style={{
+                                        borderColor: heroIsCaught ? `color-mix(in srgb, ${accentColor} 72%, hsl(var(--border)) 28%)` : undefined,
+                                        boxShadow: heroIsCaught
+                                            ? `inset 0 1px 0 rgba(255,255,255,0.18), 0 18px 42px ${accentColor}32`
+                                            : undefined
+                                    }}
+                                >
+                                    <img
+                                        src={heroVariant.spriteUrl}
+                                        alt={heroVariant.displayName}
+                                        className={cn(
+                                            "h-[88%] w-[88%] object-contain pokemon-sprite transition-all duration-500",
+                                            heroIsCaught ? "scale-105 drop-shadow-2xl" : "opacity-75 grayscale saturate-50"
+                                        )}
+                                    />
+                                </div>
+                                <div className="flex items-center justify-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-muted-foreground">
+                                    <Sparkles className="h-4 w-4 text-primary" />
+                                    <span>{heroIsCaught ? 'Ottenuto' : 'Non ottenuto'}</span>
+                                    <span className="text-border">/</span>
+                                    <span>Forma principale</span>
+                                </div>
+                                <Button
+                                    type="button"
+                                    className="mt-4 w-full rounded-xl font-bold"
+                                    variant={heroIsCaught ? "outline" : "default"}
+                                    disabled={heroIsLoading}
+                                    onClick={() => toggleCaught(heroVariant)}
+                                    style={heroIsCaught ? { borderColor: accentColor, color: accentColor } : { backgroundColor: accentColor }}
+                                >
+                                    {heroIsLoading ? 'Aggiorno...' : heroIsCaught ? 'Rimuovi ottenuto' : 'Segna ottenuto'}
+                                </Button>
+                            </div>
+                        )}
+
                     </div>
 
                     {(availableGames.length > 0 || curatedGameIds) && (
@@ -500,7 +543,7 @@ export default function PokemonDetails() {
                                 <div>
                                     <h2 className="flex items-center gap-3 text-2xl font-black tracking-tight">
                                         <span className="h-7 w-2 rounded-full bg-primary shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
-                                        Giochi salvati
+                                        Ottenuto in
                                     </h2>
                                     {availabilitySourceLinks.length > 0 && (
                                         <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
@@ -647,6 +690,7 @@ export default function PokemonDetails() {
                     )}
 
                     {/* Form Collection Section - Main Focus */}
+                    {hasMultipleForms && (
                     <div className="w-full space-y-8 rounded-xl border border-border/80 bg-gradient-to-b from-muted/95 to-card/95 p-6 text-card-foreground shadow-2xl backdrop-blur dark:from-muted/55 dark:to-card/95">
                         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-border/80">
                             <div className="text-left">
@@ -776,6 +820,7 @@ export default function PokemonDetails() {
                             })}
                         </div>
                     </div>
+                    )}
                 </div>
             </main>
         </div>

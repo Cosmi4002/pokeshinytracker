@@ -43,6 +43,8 @@ type ThemePreset = {
   backgroundColor3: string;
 };
 
+type PresetTone = 'light' | 'dark';
+
 type EyeDropperResult = {
   sRGBHex: string;
 };
@@ -58,6 +60,26 @@ declare global {
 const DEFAULT_THEME_COLOR = '#8b5cf6';
 const DEFAULT_BACKGROUND_COLOR = '#0f172a';
 const DEFAULT_BG_ACCENT_3 = '#38bdf8';
+
+function getColorLuminance(hex: string) {
+  const normalized = hex.replace('#', '');
+  const expanded = normalized.length === 3
+    ? normalized.split('').map((char) => char + char).join('')
+    : normalized;
+  const value = Number.parseInt(expanded, 16);
+
+  if (Number.isNaN(value)) return 0;
+
+  const r = (value >> 16) & 255;
+  const g = (value >> 8) & 255;
+  const b = value & 255;
+
+  return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+}
+
+function getPresetTone(preset: ThemePreset): PresetTone {
+  return getColorLuminance(preset.backgroundColor) > 0.56 ? 'light' : 'dark';
+}
 
 function getBackgroundPreview(style: BackgroundStyle, backgroundColor: string, themeColor: string, color2: string, color3: string) {
   if (style === 'plain') return 'none';
@@ -99,6 +121,7 @@ export function ThemeCustomizer() {
   const [backgroundStyle, setBackgroundStyle] = useState<BackgroundStyle>(getStoredBackgroundStyle());
   const [backgroundColor2, setBackgroundColor2] = useState(getStoredBackgroundAccent2());
   const [backgroundColor3, setBackgroundColor3] = useState(getStoredBackgroundAccent3());
+  const [presetTone, setPresetTone] = useState<PresetTone>(colorScheme === 'light' ? 'light' : 'dark');
   const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState(false);
   const skipNextOpenSyncRef = useRef(false);
@@ -118,18 +141,60 @@ export function ThemeCustomizer() {
     { id: 'solarized', name: 'Solarized', themeColor: '#268bd2', backgroundColor: '#002b36', uiStyle: 'flat', backgroundStyle: 'diagonal', backgroundColor2: '#b58900', backgroundColor3: '#2aa198' },
     { id: 'monokai', name: 'Monokai', themeColor: '#a6e22e', backgroundColor: '#272822', uiStyle: 'neon', backgroundStyle: 'pixel', backgroundColor2: '#fd971f', backgroundColor3: '#f92672' },
     { id: 'miami-synth', name: 'Miami Synth', themeColor: '#ff2bd6', backgroundColor: '#090019', uiStyle: 'neon', backgroundStyle: 'neon', backgroundColor2: '#00e5ff', backgroundColor3: '#ffe45e' },
-    { id: 'bauhaus', name: 'Bauhaus', themeColor: '#e11d48', backgroundColor: '#f5f1e8', uiStyle: 'flat', backgroundStyle: 'diagonal', backgroundColor2: '#2563eb', backgroundColor3: '#facc15' },
-    { id: 'pokeball-classic', name: 'Pokeball Classic', themeColor: '#ef233c', backgroundColor: '#f8fafc', uiStyle: 'flat', backgroundStyle: 'pokemon', backgroundColor2: '#111827', backgroundColor3: '#e5e7eb' },
+    { id: 'catppuccin-mocha', name: 'Catppuccin Mocha', themeColor: '#cba6f7', backgroundColor: '#1e1e2e', uiStyle: 'glass', backgroundStyle: 'mesh', backgroundColor2: '#89b4fa', backgroundColor3: '#f5c2e7' },
+    { id: 'rose-pine', name: 'Rose Pine', themeColor: '#ebbcba', backgroundColor: '#191724', uiStyle: 'glass', backgroundStyle: 'aurora', backgroundColor2: '#31748f', backgroundColor3: '#f6c177' },
+    { id: 'everforest', name: 'Everforest', themeColor: '#a7c080', backgroundColor: '#2d353b', uiStyle: 'soft', backgroundStyle: 'mesh', backgroundColor2: '#7fbbb3', backgroundColor3: '#dbbc7f' },
+    { id: 'ayu-mirage', name: 'Ayu Mirage', themeColor: '#ffcc66', backgroundColor: '#1f2430', uiStyle: 'soft', backgroundStyle: 'diagonal', backgroundColor2: '#5ccfe6', backgroundColor3: '#d4bfff' },
+    { id: 'pokeball-classic', name: 'Pokeball Classic', themeColor: '#ff0000', backgroundColor: '#f4f7fb', uiStyle: 'flat', backgroundStyle: 'pokemon', backgroundColor2: '#3b4cca', backgroundColor3: '#ffde00' },
     { id: 'great-ball', name: 'Great Ball', themeColor: '#2563eb', backgroundColor: '#07111f', uiStyle: 'glass', backgroundStyle: 'diamond', backgroundColor2: '#ef4444', backgroundColor3: '#dbeafe' },
-    { id: 'ultra-ball', name: 'Ultra Ball', themeColor: '#facc15', backgroundColor: '#080808', uiStyle: 'neon', backgroundStyle: 'noise', backgroundColor2: '#f97316', backgroundColor3: '#f8fafc' },
-    { id: 'luxury-ball', name: 'Luxury Ball', themeColor: '#f5d06f', backgroundColor: '#050505', uiStyle: 'glass', backgroundStyle: 'diamond', backgroundColor2: '#dc2626', backgroundColor3: '#fff7cc' },
+    { id: 'ultra-ball', name: 'Ultra Ball', themeColor: '#facc15', backgroundColor: '#171613', uiStyle: 'neon', backgroundStyle: 'noise', backgroundColor2: '#f97316', backgroundColor3: '#cbd5e1' },
+    { id: 'luxury-ball', name: 'Luxury Ball', themeColor: '#f5d06f', backgroundColor: '#17151f', uiStyle: 'glass', backgroundStyle: 'diamond', backgroundColor2: '#dc2626', backgroundColor3: '#fef3c7' },
     { id: 'dive-ball', name: 'Dive Ball', themeColor: '#22d3ee', backgroundColor: '#031826', uiStyle: 'glass', backgroundStyle: 'aurora', backgroundColor2: '#0ea5e9', backgroundColor3: '#ecfeff' },
     { id: 'safari-ball', name: 'Safari Ball', themeColor: '#84cc16', backgroundColor: '#17210b', uiStyle: 'soft', backgroundStyle: 'mesh', backgroundColor2: '#ca8a04', backgroundColor3: '#65a30d' },
-    { id: 'premier-ball', name: 'Premier Ball', themeColor: '#dc2626', backgroundColor: '#f8fafc', uiStyle: 'flat', backgroundStyle: 'plain', backgroundColor2: '#f8fafc', backgroundColor3: '#ef4444' },
+    { id: 'premier-ball', name: 'Premier Ball', themeColor: '#dc2626', backgroundColor: '#eef2f7', uiStyle: 'flat', backgroundStyle: 'plain', backgroundColor2: '#dbe4ef', backgroundColor3: '#ef4444' },
     { id: 'moon-ball', name: 'Moon Ball', themeColor: '#f4d35e', backgroundColor: '#111827', uiStyle: 'glass', backgroundStyle: 'diamond', backgroundColor2: '#60a5fa', backgroundColor3: '#d8b4fe' },
     { id: 'dream-ball', name: 'Dream Ball', themeColor: '#f0abfc', backgroundColor: '#21102b', uiStyle: 'glass', backgroundStyle: 'aurora', backgroundColor2: '#fb7185', backgroundColor3: '#93c5fd' },
-    { id: 'nes-classic', name: 'NES Classic', themeColor: '#e60012', backgroundColor: '#d9d7cc', uiStyle: 'flat', backgroundStyle: 'pixel', backgroundColor2: '#4b5563', backgroundColor3: '#111827' },
+    { id: 'arcade-candy', name: 'Arcade Candy', themeColor: '#ff5d8f', backgroundColor: '#1b1234', uiStyle: 'neon', backgroundStyle: 'pixel', backgroundColor2: '#00f5d4', backgroundColor3: '#ffd166' },
+    { id: 'jungle-circuit', name: 'Jungle Circuit', themeColor: '#4ade80', backgroundColor: '#10251a', uiStyle: 'soft', backgroundStyle: 'mesh', backgroundColor2: '#facc15', backgroundColor3: '#06b6d4' },
+    { id: 'volcanic-glass', name: 'Volcanic Glass', themeColor: '#ff6b35', backgroundColor: '#24100b', uiStyle: 'glass', backgroundStyle: 'diagonal', backgroundColor2: '#f43f5e', backgroundColor3: '#fbbf24' },
+    { id: 'deep-sea-lumen', name: 'Deep Sea Lumen', themeColor: '#2dd4bf', backgroundColor: '#082f49', uiStyle: 'glass', backgroundStyle: 'aurora', backgroundColor2: '#38bdf8', backgroundColor3: '#a7f3d0' },
+    { id: 'matcha-sakura', name: 'Matcha Sakura', themeColor: '#ef7a9b', backgroundColor: '#203828', uiStyle: 'soft', backgroundStyle: 'aurora', backgroundColor2: '#86efac', backgroundColor3: '#f9a8d4' },
+    { id: 'citrus-storm', name: 'Citrus Storm', themeColor: '#f97316', backgroundColor: '#243016', uiStyle: 'soft', backgroundStyle: 'diagonal', backgroundColor2: '#facc15', backgroundColor3: '#22c55e' },
+    { id: 'nes-classic', name: 'NES Classic', themeColor: '#e60012', backgroundColor: '#d6d3c8', uiStyle: 'flat', backgroundStyle: 'pixel', backgroundColor2: '#5b5b63', backgroundColor3: '#2049c8' },
+    { id: 'candy-sky', name: 'Candy Sky', themeColor: '#00a6fb', backgroundColor: '#dff7ff', uiStyle: 'soft', backgroundStyle: 'aurora', backgroundColor2: '#ff5d8f', backgroundColor3: '#ffd166' },
+    { id: 'mint-orchid', name: 'Mint Orchid', themeColor: '#8b5cf6', backgroundColor: '#ddf8ec', uiStyle: 'glass', backgroundStyle: 'mesh', backgroundColor2: '#10b981', backgroundColor3: '#f472b6' },
+    { id: 'coral-breeze', name: 'Coral Breeze', themeColor: '#f97316', backgroundColor: '#ffe1dc', uiStyle: 'soft', backgroundStyle: 'diagonal', backgroundColor2: '#06b6d4', backgroundColor3: '#fb7185' },
+    { id: 'prism-garden', name: 'Prism Garden', themeColor: '#22c55e', backgroundColor: '#e9f7d8', uiStyle: 'glass', backgroundStyle: 'mesh', backgroundColor2: '#a855f7', backgroundColor3: '#f59e0b' },
+    { id: 'aurora-day', name: 'Aurora Day', themeColor: '#3b82f6', backgroundColor: '#e6f0ff', uiStyle: 'glass', backgroundStyle: 'aurora', backgroundColor2: '#14b8a6', backgroundColor3: '#c084fc' },
+    { id: 'berry-soda', name: 'Berry Soda', themeColor: '#d946ef', backgroundColor: '#f7e7ff', uiStyle: 'neon', backgroundStyle: 'pokemon', backgroundColor2: '#22d3ee', backgroundColor3: '#fb7185' },
+    { id: 'lime-pop', name: 'Lime Pop', themeColor: '#65a30d', backgroundColor: '#ecfccb', uiStyle: 'flat', backgroundStyle: 'pixel', backgroundColor2: '#0ea5e9', backgroundColor3: '#f97316' },
+    { id: 'sunset-parfait', name: 'Sunset Parfait', themeColor: '#f43f5e', backgroundColor: '#ffe8c7', uiStyle: 'soft', backgroundStyle: 'aurora', backgroundColor2: '#f59e0b', backgroundColor3: '#8b5cf6' },
+    { id: 'aqua-lagoon', name: 'Aqua Lagoon', themeColor: '#0891b2', backgroundColor: '#d7fbf4', uiStyle: 'glass', backgroundStyle: 'diamond', backgroundColor2: '#2563eb', backgroundColor3: '#84cc16' },
+    { id: 'lavender-tech', name: 'Lavender Tech', themeColor: '#7c3aed', backgroundColor: '#eee7ff', uiStyle: 'glass', backgroundStyle: 'mesh', backgroundColor2: '#06b6d4', backgroundColor3: '#f472b6' },
+    { id: 'peach-terminal', name: 'Peach Terminal', themeColor: '#ea580c', backgroundColor: '#ffead5', uiStyle: 'soft', backgroundStyle: 'noise', backgroundColor2: '#10b981', backgroundColor3: '#f43f5e' },
+    { id: 'pixel-meadow', name: 'Pixel Meadow', themeColor: '#16a34a', backgroundColor: '#dff7d9', uiStyle: 'flat', backgroundStyle: 'pixel', backgroundColor2: '#facc15', backgroundColor3: '#38bdf8' },
+    { id: 'bubblegum-map', name: 'Bubblegum Map', themeColor: '#ec4899', backgroundColor: '#ffe4f1', uiStyle: 'soft', backgroundStyle: 'pokemon', backgroundColor2: '#60a5fa', backgroundColor3: '#fbbf24' },
+    { id: 'stormglass-light', name: 'Stormglass Light', themeColor: '#0f766e', backgroundColor: '#dbeafe', uiStyle: 'glass', backgroundStyle: 'diagonal', backgroundColor2: '#38bdf8', backgroundColor3: '#94a3b8' },
+    { id: 'dragonfruit', name: 'Dragonfruit', themeColor: '#be185d', backgroundColor: '#fce7f3', uiStyle: 'glass', backgroundStyle: 'aurora', backgroundColor2: '#7c3aed', backgroundColor3: '#fb923c' },
+    { id: 'tropical-byte', name: 'Tropical Byte', themeColor: '#0d9488', backgroundColor: '#e0f2fe', uiStyle: 'neon', backgroundStyle: 'pixel', backgroundColor2: '#84cc16', backgroundColor3: '#f97316' },
+    { id: 'honeydew-drive', name: 'Honeydew Drive', themeColor: '#ca8a04', backgroundColor: '#f7fee7', uiStyle: 'flat', backgroundStyle: 'diamond', backgroundColor2: '#22c55e', backgroundColor3: '#0ea5e9' },
+    { id: 'opal-dream', name: 'Opal Dream', themeColor: '#0ea5e9', backgroundColor: '#ecfeff', uiStyle: 'glass', backgroundStyle: 'aurora', backgroundColor2: '#a78bfa', backgroundColor3: '#34d399' },
+    { id: 'rose-circuit', name: 'Rose Circuit', themeColor: '#e11d48', backgroundColor: '#ffe4e6', uiStyle: 'soft', backgroundStyle: 'mesh', backgroundColor2: '#2563eb', backgroundColor3: '#f59e0b' },
+    { id: 'kiwi-console', name: 'Kiwi Console', themeColor: '#4d7c0f', backgroundColor: '#eef9d2', uiStyle: 'flat', backgroundStyle: 'pixel', backgroundColor2: '#65a30d', backgroundColor3: '#7c3aed' },
+    { id: 'cloudberry', name: 'Cloudberry', themeColor: '#9333ea', backgroundColor: '#f0e7ff', uiStyle: 'glass', backgroundStyle: 'noise', backgroundColor2: '#38bdf8', backgroundColor3: '#fb7185' },
   ]), []);
+
+  const filteredThemePresets = useMemo(
+    () => themePresets.filter((preset) => getPresetTone(preset) === presetTone),
+    [themePresets, presetTone],
+  );
+
+  const lightPresetCount = useMemo(
+    () => themePresets.filter((preset) => getPresetTone(preset) === 'light').length,
+    [themePresets],
+  );
+
+  const darkPresetCount = themePresets.length - lightPresetCount;
 
   const backgroundStyleOptions = useMemo<Array<{ id: BackgroundStyle; label: string }>>(() => ([
     { id: 'plain', label: 'Plain' },
@@ -361,6 +426,30 @@ export function ThemeCustomizer() {
               <Sparkles className="h-4 w-4" />
               Temi rapidi
             </Label>
+            <div className="grid grid-cols-2 gap-1 rounded-lg border border-border bg-background p-1">
+              <button
+                type="button"
+                onClick={() => setPresetTone('light')}
+                className={`flex h-9 items-center justify-center gap-2 rounded-md px-3 text-sm font-medium transition-colors ${
+                  presetTone === 'light' ? 'bg-card text-card-foreground shadow-sm' : 'text-muted-foreground hover:bg-muted/60'
+                }`}
+              >
+                <Sun className="h-4 w-4" />
+                Light
+                <span className="rounded-full bg-muted px-1.5 py-0.5 text-[11px] leading-none text-muted-foreground">{lightPresetCount}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setPresetTone('dark')}
+                className={`flex h-9 items-center justify-center gap-2 rounded-md px-3 text-sm font-medium transition-colors ${
+                  presetTone === 'dark' ? 'bg-card text-card-foreground shadow-sm' : 'text-muted-foreground hover:bg-muted/60'
+                }`}
+              >
+                <Moon className="h-4 w-4" />
+                Dark
+                <span className="rounded-full bg-muted px-1.5 py-0.5 text-[11px] leading-none text-muted-foreground">{darkPresetCount}</span>
+              </button>
+            </div>
             <div className="grid max-h-56 grid-cols-1 gap-2 overflow-y-auto pr-1 sm:grid-cols-2 lg:grid-cols-3">
               <button
                 type="button"
@@ -380,7 +469,7 @@ export function ThemeCustomizer() {
                 {presetId === 'custom' && <Check className="h-4 w-4 text-primary" />}
               </button>
 
-              {themePresets.map((preset) => (
+              {filteredThemePresets.map((preset) => (
                 <button
                   key={preset.id}
                   type="button"
@@ -413,7 +502,10 @@ export function ThemeCustomizer() {
                 <Button
                   type="button"
                   variant="ghost"
-                  onClick={() => setColorScheme('light')}
+                  onClick={() => {
+                    setColorScheme('light');
+                    setPresetTone('light');
+                  }}
                   className={`h-11 rounded-lg ${
                     colorScheme === 'light' ? 'bg-card text-card-foreground shadow-sm hover:bg-card' : 'text-muted-foreground'
                   }`}
@@ -424,7 +516,10 @@ export function ThemeCustomizer() {
                 <Button
                   type="button"
                   variant="ghost"
-                  onClick={() => setColorScheme('dark')}
+                  onClick={() => {
+                    setColorScheme('dark');
+                    setPresetTone('dark');
+                  }}
                   className={`h-11 rounded-lg ${
                     colorScheme === 'dark' ? 'bg-card text-card-foreground shadow-sm hover:bg-card' : 'text-muted-foreground'
                   }`}
