@@ -406,7 +406,7 @@ export default function PokemonDetails() {
 
                 <div className="flex flex-col items-center text-center space-y-10">
                     {/* Centered Header */}
-                    <section className={cn("w-full max-w-3xl space-y-6 rounded-lg border p-6 sm:p-8", panelClass)}>
+                    <section className="w-full max-w-3xl space-y-6">
                         <div className="flex flex-col items-center gap-4">
                             <h1 className="text-7xl md:text-8xl font-black tracking-tighter capitalize text-foreground drop-shadow-sm py-2">
                                 {(overrides[`${details.id}-${details.name}`] as any)?.custom_display_name || details.displayName}
@@ -491,7 +491,7 @@ export default function PokemonDetails() {
 
                         {/* Generation Badge */}
                         <div className="flex justify-center flex-wrap gap-4">
-                            <div className="flex items-center rounded-lg border border-border/70 bg-background/80 px-6 py-2 text-xs font-bold uppercase tracking-widest text-muted-foreground shadow-sm dark:border-white/15 dark:bg-white/10">
+                            <div className="flex items-center px-6 py-1 text-xs font-bold uppercase tracking-widest text-muted-foreground">
                                 Gen {details.generation}
                             </div>
                         </div>
@@ -695,20 +695,20 @@ export default function PokemonDetails() {
                                         className={cn(
                                             "group relative flex flex-col items-center justify-center overflow-hidden rounded-xl border border-border/80 p-4 text-card-foreground shadow-md transition-all duration-500 transform active:scale-95",
                                             isCaught
-                                                ? "border-2 shadow-lg"
+                                                ? "border-2"
                                                 : "bg-gradient-to-b from-muted/85 to-card/95 hover:from-muted hover:to-background dark:from-muted/45 dark:to-card/95"
                                         )}
                                         style={{
                                             borderColor: isCaught ? accentColor : undefined,
-                                            backgroundImage: isCaught
-                                                ? `linear-gradient(180deg, color-mix(in srgb, ${accentColor} 22%, hsl(var(--card)) 78%), color-mix(in srgb, ${accentColor} 12%, hsl(var(--background)) 88%))`
-                                                : undefined,
-                                            boxShadow: isCaught
-                                                ? `inset 0 1px 0 rgba(255,255,255,0.18), 0 14px 30px ${accentColor}35`
-                                                : undefined
+                                            backgroundColor: isCaught ? `color-mix(in srgb, ${accentColor} 34%, hsl(var(--card)) 66%)` : undefined,
                                         }}
                                     >
-                                        <div className="relative w-full aspect-square mb-3 flex items-center justify-center">
+                                        <div
+                                            className="relative mb-3 flex aspect-square w-full items-center justify-center rounded-lg"
+                                            style={{
+                                                backgroundColor: isCaught ? `color-mix(in srgb, ${accentColor} 22%, transparent)` : undefined,
+                                            }}
+                                        >
                                             <img
                                                 src={variant.spriteUrl}
                                                 alt={variant.displayName}
