@@ -407,9 +407,9 @@ export function Navbar() {
 
   return (
     <nav
-      className="sticky top-0 z-50 border-b border-border/55 bg-card/78 shadow-[0_16px_42px_rgba(0,0,0,0.16)] outline outline-1 outline-black/10 backdrop-blur-2xl supports-[backdrop-filter]:bg-card/68 dark:border-white/10 dark:outline-white/15 dark:supports-[backdrop-filter]:bg-card/62"
+      className="sticky top-0 z-50 border-b border-white/15 bg-[#171717]/88 text-white shadow-[0_16px_42px_rgba(0,0,0,0.3)] outline outline-1 outline-white/10 backdrop-blur-2xl supports-[backdrop-filter]:bg-[#171717]/78"
       style={{
-        boxShadow: `0 16px 42px rgba(0,0,0,0.16), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 ${accentColor}30`,
+        boxShadow: `0 16px 42px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 ${accentColor}35`,
       }}
     >
       <div
@@ -442,7 +442,7 @@ export function Navbar() {
                   variant={isActive ? 'default' : 'ghost'}
                   size="sm"
                   className={cn(
-                    'h-9 px-2 sm:px-3 gap-1.5 sm:gap-2 outline outline-1 outline-black/5 dark:outline-white/10',
+                    'h-9 px-2 sm:px-3 gap-1.5 sm:gap-2 text-white outline outline-1 outline-white/10 hover:bg-white/10 hover:text-white',
                     isActive && 'bg-primary text-primary-foreground shadow-sm'
                   )}
                 >
@@ -463,14 +463,14 @@ export function Navbar() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-[3.25rem] w-[3.25rem] rounded-xl border-2 bg-muted p-0 outline outline-1 outline-black/10 transition-all duration-300 hover:bg-muted dark:outline-white/15"
+                  className="h-[3.25rem] w-[3.25rem] rounded-xl border-2 bg-white/10 p-0 outline outline-1 outline-white/15 transition-all duration-300 hover:bg-white/15"
                   style={{
                     borderColor: accentColor,
                     boxShadow: `inset 0 1px 0 rgba(255,255,255,0.18), 0 0 14px ${accentColor}40`,
                   }}
                 >
                   <span
-                    className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-[0.65rem] bg-muted text-card-foreground shadow-sm"
+                    className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-[0.65rem] bg-black/20 text-white shadow-sm"
                     style={{
                       boxShadow: `inset 0 1px 0 rgba(255,255,255,0.2)`,
                     }}

@@ -56,7 +56,7 @@ type PersistedPokemonSlot = {
 };
 
 const COUNTER_SLOTS_PREFIX = '__counter_slots_v1__:';
-const COUNTER_SPRITE_EDGE_SHADOW = 'drop-shadow(0 1px 0 rgba(0,0,0,0.88)) drop-shadow(1px 0 0 rgba(0,0,0,0.72)) drop-shadow(0 4px 8px rgba(0,0,0,0.85))';
+const COUNTER_SPRITE_EDGE_SHADOW = 'drop-shadow(0 1px 0 rgba(0,0,0,0.88)) drop-shadow(1px 0 0 rgba(0,0,0,0.72)) drop-shadow(0 3px 4px rgba(0,0,0,0.28))';
 
 const getFormOptions = (pokemonDetails: PokemonDetails) => {
   if (!pokemonDetails) return [];
@@ -760,12 +760,13 @@ export function ShinyCounter({
             <Button
               size="lg"
               onClick={decrement}
-              variant="outline"
-              className={cn("text-xl hover:bg-background", compact ? "h-11 min-w-20 px-6" : "h-12 px-6")}
+              variant={compact ? "default" : "outline"}
+              className={cn("text-xl", compact ? "h-11 min-w-20 px-6" : "h-12 px-6 hover:bg-background")}
               style={{
-                borderColor: accentColor,
-                color: accentColor,
-                backgroundColor: compact ? `color-mix(in srgb, ${accentColor} 12%, transparent)` : undefined,
+                borderColor: compact ? undefined : accentColor,
+                color: compact ? undefined : accentColor,
+                backgroundColor: compact ? accentColor : undefined,
+                boxShadow: compact ? `0 0 20px ${accentColor}40` : undefined,
               }}
             >
               <Minus className="h-5 w-5" />
@@ -796,7 +797,7 @@ export function ShinyCounter({
               onChange={(e) => setIncrementAmount(Math.max(1, parseInt(e.target.value) || 1))}
               className={cn(
                 "w-16 h-8 text-center bg-background text-foreground",
-                compact ? "border border-border/70" : "border-2 border-input"
+                compact ? "border border-white/15 bg-white/10 text-white shadow-none" : "border-2 border-input"
               )}
             />
           </div>
@@ -814,14 +815,17 @@ export function ShinyCounter({
               onKeyDown={handleHotkeyAssignment}
               className={cn(
                 "w-36 h-8 text-center bg-background text-foreground",
-                compact ? "border border-border/70" : "border-2 border-input"
+                compact ? "border border-white/15 bg-white/10 text-white shadow-none" : "border-2 border-input"
               )}
             />
             <Button
               type="button"
               variant="outline"
               size="sm"
-              className="h-8 px-3"
+              className={cn(
+                "h-8 px-3",
+                compact && "border-white/15 bg-white/10 text-white hover:bg-white/15 hover:text-white"
+              )}
               onClick={() => setIncrementHotkey('')}
             >
               Reset

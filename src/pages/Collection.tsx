@@ -72,7 +72,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
     return 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 xl:gap-5';
   }, []);
   const nativeSelectClassName =
-    'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2';
+    'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-inner ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 dark:border-white/15 dark:bg-[#181818]/95 dark:text-white';
 
   const isAbortLikeError = (err: unknown) => {
     if (!err || typeof err !== 'object') return false;

@@ -150,15 +150,15 @@ export default function Counter() {
 
         {/* View Switcher Header (only if logged in) */}
         {user && !isSingleView && (
-          <section className="rounded-lg border border-border/70 bg-card/80 p-4 shadow-sm backdrop-blur">
+          <section className="rounded-lg border border-white/15 bg-[#171717]/92 p-4 text-white shadow-[0_16px_38px_rgba(0,0,0,0.35)] backdrop-blur">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div className="min-w-0">
                 <div className="mb-2 flex flex-wrap items-center gap-2">
-                  <Badge variant="outline" className="gap-1">
+                  <Badge variant="outline" className="gap-1 border-white/15 bg-white/10 text-white">
                     <Activity className="h-3.5 w-3.5" />
                     {activeHunts.length}/{MAX_ACTIVE_COUNTERS} attive
                   </Badge>
-                  <Badge variant="secondary" className="gap-1">
+                  <Badge variant="secondary" className="gap-1 border border-white/15 bg-white/10 text-white hover:bg-white/10">
                     <Target className="h-3.5 w-3.5" />
                     {remainingSlots} libere
                   </Badge>
@@ -171,7 +171,7 @@ export default function Counter() {
                 >
                   Counter
                 </h1>
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p className="mt-1 text-sm text-white/70">
                   Tieni le cacce attive in vista e apri il focus quando devi configurare i dettagli.
                 </p>
               </div>
@@ -215,17 +215,17 @@ export default function Counter() {
                 {activeHunts.map((hunt) => (
                   <div
                     key={hunt.id}
-                    className="group/card relative overflow-hidden rounded-lg border border-border/70 bg-card/85 p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+                    className="group/card relative overflow-hidden rounded-lg border border-white/15 bg-[#171717]/95 p-4 text-white shadow-[0_18px_42px_rgba(0,0,0,0.42)] backdrop-blur transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_22px_54px_rgba(0,0,0,0.5)]"
                   >
                     <div
                       className="pointer-events-none absolute inset-x-0 top-0 h-1"
                       style={{ backgroundColor: accentColor }}
                     />
-                    <div className="absolute right-2 top-2 z-10 flex gap-1 rounded-md border border-border/70 bg-background/80 p-1 opacity-100 shadow-sm backdrop-blur sm:opacity-0 sm:transition-opacity sm:group-hover/card:opacity-100">
+                    <div className="absolute right-2 top-2 z-10 flex gap-1 opacity-100 sm:opacity-0 sm:transition-opacity sm:group-hover/card:opacity-100">
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                        className="h-8 w-8 text-white/65 hover:bg-white/10 hover:text-white"
                         onClick={(e) => {
                           e.stopPropagation();
                           navigate(`/counter/${hunt.id}`);
@@ -237,7 +237,7 @@ export default function Counter() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                        className="h-8 w-8 text-white/65 hover:bg-white/10 hover:text-destructive"
                         onClick={(e) => {
                           e.stopPropagation();
                           setHuntToHideId(hunt.id);
@@ -258,7 +258,7 @@ export default function Counter() {
                       <Button
                         type="button"
                         variant="outline"
-                        className="mt-3 w-full justify-center"
+                        className="mt-3 w-full justify-center border-white/15 bg-white/10 text-white shadow-sm hover:bg-white/15 hover:text-white"
                         onClick={() => navigate(`/counter/${hunt.id}`)}
                       >
                         <SlidersHorizontal className="mr-2 h-4 w-4" />
