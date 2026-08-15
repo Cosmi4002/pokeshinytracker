@@ -687,6 +687,7 @@ export default function PokemonDetails() {
                             {variants.map(variant => {
                                 const isCaught = caughtForms.has(variant.name);
                                 const isLoading = actionLoading === variant.name;
+                                const caughtCardColor = `color-mix(in srgb, ${accentColor} 52%, hsl(var(--card)) 48%)`;
 
                                 return (
                                     <button
@@ -700,21 +701,10 @@ export default function PokemonDetails() {
                                         )}
                                         style={{
                                             borderColor: isCaught ? accentColor : undefined,
-                                            backgroundColor: isCaught ? `color-mix(in srgb, ${accentColor} 48%, hsl(var(--card)) 52%)` : undefined,
+                                            background: isCaught ? caughtCardColor : undefined,
                                         }}
                                     >
-                                        {isCaught && (
-                                            <span
-                                                className="pointer-events-none absolute inset-0 z-0"
-                                                style={{ backgroundColor: `color-mix(in srgb, ${accentColor} 48%, hsl(var(--card)) 52%)` }}
-                                            />
-                                        )}
-                                        <div
-                                            className="relative z-10 mb-3 flex aspect-square w-full items-center justify-center rounded-lg"
-                                            style={{
-                                                backgroundColor: isCaught ? `color-mix(in srgb, ${accentColor} 28%, hsl(var(--background)) 72%)` : undefined,
-                                            }}
-                                        >
+                                        <div className="relative z-10 mb-3 flex aspect-square w-full items-center justify-center rounded-lg">
                                             <img
                                                 src={variant.spriteUrl}
                                                 alt={variant.displayName}

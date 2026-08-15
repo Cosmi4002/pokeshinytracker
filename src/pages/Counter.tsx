@@ -150,7 +150,7 @@ export default function Counter() {
 
         {/* View Switcher Header (only if logged in) */}
         {user && !isSingleView && (
-          <section className="rounded-lg border border-border/70 bg-card/90 p-4 text-card-foreground shadow-[0_16px_38px_rgba(0,0,0,0.14)] backdrop-blur dark:border-white/15 dark:bg-[#171717]/92 dark:text-white dark:shadow-[0_16px_38px_rgba(0,0,0,0.35)]">
+          <section className="rounded-lg border border-border/70 bg-card p-4 text-card-foreground shadow-sm dark:border-white/15 dark:bg-[#171717]/92 dark:text-white dark:shadow-[0_16px_38px_rgba(0,0,0,0.35)]">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div className="min-w-0">
                 <div className="mb-2 flex flex-wrap items-center gap-2">
@@ -215,7 +215,7 @@ export default function Counter() {
                 {activeHunts.map((hunt) => (
                   <div
                     key={hunt.id}
-                    className="group/card relative overflow-hidden rounded-lg border border-border/70 bg-card/95 p-4 text-card-foreground shadow-[0_18px_42px_rgba(0,0,0,0.16)] backdrop-blur transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_22px_54px_rgba(0,0,0,0.22)] dark:border-white/15 dark:bg-[#171717]/95 dark:text-white dark:shadow-[0_18px_42px_rgba(0,0,0,0.42)] dark:hover:shadow-[0_22px_54px_rgba(0,0,0,0.5)]"
+                    className="group/card relative overflow-hidden rounded-lg border border-border/70 bg-card p-4 text-card-foreground shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-white/15 dark:bg-[#171717]/95 dark:text-white dark:shadow-[0_18px_42px_rgba(0,0,0,0.42)] dark:hover:shadow-[0_22px_54px_rgba(0,0,0,0.5)]"
                   >
                     <div
                       className="pointer-events-none absolute inset-x-0 top-0 h-1"

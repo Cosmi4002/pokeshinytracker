@@ -257,6 +257,48 @@ export type Database = {
         }
         Relationships: []
       }
+      theme_preset_overrides: {
+        Row: {
+          background_color: string
+          background_color2: string
+          background_color3: string
+          background_style: string
+          created_at: string
+          name: string
+          preset_id: string
+          theme_color: string
+          ui_style: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          background_color: string
+          background_color2?: string
+          background_color3?: string
+          background_style: string
+          created_at?: string
+          name: string
+          preset_id: string
+          theme_color: string
+          ui_style: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          background_color?: string
+          background_color2?: string
+          background_color3?: string
+          background_style?: string
+          created_at?: string
+          name?: string
+          preset_id?: string
+          theme_color?: string
+          ui_style?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       user_preferences: {
         Row: {
           background_color: string | null

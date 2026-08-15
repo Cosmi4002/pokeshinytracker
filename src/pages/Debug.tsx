@@ -66,6 +66,7 @@ export default function Debug() {
     }, []);
 
     return (
+        <div className="min-h-screen bg-background text-foreground">
         <div className="container mx-auto py-8 space-y-4">
             <h1 className="text-2xl font-bold">Diagnostica Supabase</h1>
 
@@ -107,6 +108,7 @@ export default function Debug() {
                     <Button onClick={checkConnection} disabled={status.loading}>Riprova Test</Button>
                 </CardContent>
             </Card>
+        </div>
         </div>
     );
 }

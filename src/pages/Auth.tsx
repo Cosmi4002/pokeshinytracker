@@ -29,8 +29,8 @@ const FloatingInput = ({ label, icon: Icon, error, accentColor, className, value
       <div
         className={cn(
           "flex items-center border-2 rounded-2xl transition-all duration-300 bg-background/30 backdrop-blur-md overflow-hidden",
-          (isFocused || hasValue) ? "bg-background/80 shadow-lg border-opacity-100" : "border-transparent bg-white/5 hover:bg-white/10",
-          error ? "border-destructive/50" : (isFocused ? "" : "border-white/10"),
+          (isFocused || hasValue) ? "bg-background/80 shadow-lg border-opacity-100" : "border-transparent bg-muted/45 hover:bg-muted/65 dark:bg-white/5 dark:hover:bg-white/10",
+          error ? "border-destructive/50" : (isFocused ? "" : "border-border/70 dark:border-white/10"),
           className
         )}
         style={{
@@ -47,7 +47,7 @@ const FloatingInput = ({ label, icon: Icon, error, accentColor, className, value
           <Input
             {...props}
             value={value}
-            className="border-0 shadow-none focus-visible:ring-0 bg-transparent h-full pb-2 px-3 text-base text-white caret-white placeholder:opacity-0"
+            className="border-0 bg-transparent h-full pb-2 px-3 text-base text-foreground caret-foreground shadow-none placeholder:opacity-0 focus-visible:ring-0 dark:text-white dark:caret-white"
             onFocus={(e) => {
               setIsFocused(true);
               props.onFocus?.(e);
@@ -174,7 +174,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen w-full relative flex items-center justify-center p-2 sm:p-4 bg-[#0a0a0a] overflow-hidden">
+    <div className="min-h-screen w-full relative flex items-center justify-center p-2 sm:p-4 bg-background text-foreground overflow-hidden">
 
       {/* Immersive Animated Background */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -197,7 +197,7 @@ export default function Auth() {
       </div>
 
       {/* Back to Home Link */}
-      <Link to="/" className="absolute top-8 left-8 z-50 flex items-center gap-2 text-white/50 hover:text-white transition-colors group">
+      <Link to="/" className="absolute top-8 left-8 z-50 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors group dark:text-white/50 dark:hover:text-white">
         <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
         <span className="text-sm font-medium">Torna alla Home</span>
       </Link>
@@ -207,34 +207,34 @@ export default function Auth() {
 
         {/* Brand Header */}
         <div className="text-center mb-4 space-y-2">
-          <div className="inline-flex items-center justify-center p-4 rounded-[2rem] bg-white/5 backdrop-blur-2xl border border-white/10 shadow-2xl mb-1 relative group overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="inline-flex items-center justify-center p-4 rounded-[2rem] bg-card/80 backdrop-blur-2xl border border-border shadow-2xl mb-1 relative group overflow-hidden dark:bg-white/5 dark:border-white/10">
+            <div className="absolute inset-0 bg-gradient-to-br from-foreground/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity dark:from-white/10" />
             <Sparkles className="w-10 h-10 transition-all duration-700 group-hover:scale-110 group-hover:rotate-12" style={{ color: accentColor }} />
           </div>
           <div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tighter text-white drop-shadow-2xl">
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tighter text-foreground drop-shadow-2xl dark:text-white">
               PokeShiny<span style={{ color: accentColor }}>Tracker</span>
             </h1>
           </div>
         </div>
 
         {/* Main Glassmorphic Card */}
-        <div className="bg-white/[0.03] backdrop-blur-[40px] border border-white/10 rounded-[2rem] p-4 sm:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden">
+        <div className="bg-card/90 backdrop-blur-[40px] border border-border rounded-[2rem] p-4 sm:p-6 shadow-2xl relative overflow-hidden dark:bg-white/[0.03] dark:border-white/10 dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
 
           {/* Subtle reflection line */}
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-foreground/15 to-transparent dark:via-white/20" />
 
           <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6 bg-white/5 p-1 rounded-xl h-12">
+            <TabsList className="grid w-full grid-cols-2 mb-6 bg-background/70 p-1 rounded-xl h-12 dark:bg-white/5">
               <TabsTrigger
                 value="login"
-                className="rounded-xl py-2 font-bold text-sm uppercase tracking-widest data-[state=active]:bg-white/10 data-[state=active]:text-white data-[state=active]:shadow-xl transition-all"
+                className="rounded-xl py-2 font-bold text-sm uppercase tracking-widest data-[state=active]:bg-card data-[state=active]:text-card-foreground data-[state=active]:shadow-xl transition-all dark:data-[state=active]:bg-white/10 dark:data-[state=active]:text-white"
               >
                 Login
               </TabsTrigger>
               <TabsTrigger
                 value="register"
-                className="rounded-xl py-2 font-bold text-sm uppercase tracking-widest data-[state=active]:bg-white/10 data-[state=active]:text-white data-[state=active]:shadow-xl transition-all"
+                className="rounded-xl py-2 font-bold text-sm uppercase tracking-widest data-[state=active]:bg-card data-[state=active]:text-card-foreground data-[state=active]:shadow-xl transition-all dark:data-[state=active]:bg-white/10 dark:data-[state=active]:text-white"
               >
                 Registrati
               </TabsTrigger>
@@ -360,7 +360,7 @@ export default function Auth() {
           </Tabs>
 
           {/* Bottom security assurance */}
-          <div className="mt-8 pt-8 border-t border-white/5 flex items-center justify-center gap-3 text-white/30 text-xs font-semibold uppercase tracking-widest">
+          <div className="mt-8 pt-8 border-t border-border flex items-center justify-center gap-3 text-muted-foreground text-xs font-semibold uppercase tracking-widest dark:border-white/5 dark:text-white/30">
             <Lock className="w-3.5 h-3.5" />
             Cloud Sincronizzato & Sicuro
           </div>

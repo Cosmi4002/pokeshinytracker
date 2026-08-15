@@ -234,8 +234,8 @@ export default function PokedexManager() {
                 </div>
 
                 {isAdmin && (
-                    <Card className="mb-6 overflow-hidden border-white/10 bg-white/5 shadow-xl backdrop-blur-xl">
-                        <CardHeader className="border-b border-white/5 bg-white/[0.02]">
+                    <Card className="mb-6 overflow-hidden border-border bg-card text-card-foreground shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-white/5">
+                        <CardHeader className="border-b border-border bg-muted/25 dark:border-white/5 dark:bg-white/[0.02]">
                             <div className="mb-1 flex items-center gap-2 text-primary">
                                 <ShieldCheck className="h-4 w-4" />
                                 <span className="text-xs font-bold uppercase tracking-widest">Solo admin</span>
@@ -244,7 +244,7 @@ export default function PokedexManager() {
                             <CardDescription>Mostra i pulsanti di modifica nelle pagine dei Pokemon.</CardDescription>
                         </CardHeader>
                         <CardContent className="pt-5">
-                            <div className="flex items-center justify-between gap-4 rounded-lg border border-white/10 bg-white/[0.03] p-4">
+                            <div className="flex items-center justify-between gap-4 rounded-lg border border-border bg-background/60 p-4 dark:border-white/10 dark:bg-white/[0.03]">
                                 <div>
                                     <Label htmlFor="editor-mode" className="text-base font-bold">
                                         Modalita Editor
@@ -259,8 +259,8 @@ export default function PokedexManager() {
 
                 <div className="grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(20rem,0.9fr)]">
                     <div className="space-y-6">
-                        <Card className="overflow-hidden border-white/10 bg-white/5 shadow-xl backdrop-blur-xl">
-                            <CardHeader className="border-b border-white/5 bg-white/[0.02]">
+                        <Card className="overflow-hidden border-border bg-card text-card-foreground shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-white/5">
+                            <CardHeader className="border-b border-border bg-muted/25 dark:border-white/5 dark:bg-white/[0.02]">
                                 <div className="mb-1 flex items-center gap-2 text-primary">
                                     <Layers className="h-4 w-4" />
                                     <span className="text-xs font-bold uppercase tracking-widest">Filtri separati</span>
@@ -290,7 +290,7 @@ export default function PokedexManager() {
                                     ] as const).map((control) => {
                                         const selected = getCardFilterOption(control.value);
                                         return (
-                                            <div key={control.id} className="space-y-3 rounded-lg border border-white/10 bg-background/55 p-4">
+                                            <div key={control.id} className="space-y-3 rounded-lg border border-border bg-background/60 p-4 dark:border-white/10 dark:bg-background/55">
                                                 <div className="space-y-1">
                                                     <Label htmlFor={control.id} className="text-base font-bold">
                                                         {control.label}
@@ -325,8 +325,8 @@ export default function PokedexManager() {
                             </CardContent>
                         </Card>
 
-                        <Card className="overflow-hidden border-white/10 bg-white/5 shadow-xl backdrop-blur-xl">
-                            <CardHeader className="border-b border-white/5 bg-white/[0.02]">
+                        <Card className="overflow-hidden border-border bg-card text-card-foreground shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-white/5">
+                            <CardHeader className="border-b border-border bg-muted/25 dark:border-white/5 dark:bg-white/[0.02]">
                                 <div className="mb-1 flex items-center gap-2 text-primary">
                                     <Palette className="h-4 w-4" />
                                     <span className="text-xs font-bold uppercase tracking-widest">Colori Collezione</span>
@@ -351,13 +351,13 @@ export default function PokedexManager() {
                                             </SelectContent>
                                         </Select>
                                     </div>
-                                    <div className="grid grid-cols-3 gap-2 rounded-lg border border-white/10 bg-background/55 p-3">
+                                    <div className="grid grid-cols-3 gap-2 rounded-lg border border-border bg-background/60 p-3 dark:border-white/10 dark:bg-background/55">
                                         {(["primary", "secondary", "accent"] as const).map((key) => (
                                             <div key={key} className="min-w-0">
                                                 <span className="block truncate text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
                                                     {key}
                                                 </span>
-                                                <span className="mt-1 block h-8 rounded-md border border-white/10" style={{ backgroundColor: activeTheme[key] }} />
+                                                <span className="mt-1 block h-8 rounded-md border border-border dark:border-white/10" style={{ backgroundColor: activeTheme[key] }} />
                                             </div>
                                         ))}
                                     </div>
@@ -369,7 +369,7 @@ export default function PokedexManager() {
                                     <ColorPicker label="Accent" value={activeTheme.accent} onChange={(v) => updateThemeColor("accent", v)} hideDesktopAdvancedPicker />
                                 </div>
 
-                                <div className="space-y-3 rounded-lg border border-white/10 bg-background/55 p-4">
+                                <div className="space-y-3 rounded-lg border border-border bg-background/60 p-4 dark:border-white/10 dark:bg-background/55">
                                     <div className="flex items-center gap-2">
                                         <Sparkles className="h-4 w-4 text-primary" />
                                         <Label className="text-base font-bold">Preset giochi</Label>
@@ -380,9 +380,9 @@ export default function PokedexManager() {
                                                 key={game.id}
                                                 type="button"
                                                 onClick={() => applyPresetToSelectedGame(game.colors)}
-                                                className="flex min-h-14 items-center gap-3 rounded-lg border border-white/10 bg-white/[0.03] p-2.5 text-left transition hover:border-primary/50 hover:bg-primary/5"
+                                                className="flex min-h-14 items-center gap-3 rounded-lg border border-border bg-card p-2.5 text-left transition hover:border-primary/50 hover:bg-primary/5 dark:border-white/10 dark:bg-white/[0.03]"
                                             >
-                                                <span className="flex h-8 w-8 shrink-0 overflow-hidden rounded-full border border-white/10">
+                                                    <span className="flex h-8 w-8 shrink-0 overflow-hidden rounded-full border border-border dark:border-white/10">
                                                     <span className="flex-1" style={{ backgroundColor: game.colors.primary }} />
                                                     <span className="flex-1" style={{ backgroundColor: game.colors.secondary }} />
                                                     <span className="flex-1" style={{ backgroundColor: game.colors.accent }} />
@@ -400,8 +400,8 @@ export default function PokedexManager() {
                     </div>
 
                     <aside className="space-y-6">
-                        <Card className="overflow-hidden border-white/10 bg-white/5 shadow-xl backdrop-blur-xl lg:sticky lg:top-24">
-                            <CardHeader className="border-b border-white/5 bg-white/[0.02]">
+                        <Card className="overflow-hidden border-border bg-card text-card-foreground shadow-xl backdrop-blur-xl lg:sticky lg:top-24 dark:border-white/10 dark:bg-white/5">
+                            <CardHeader className="border-b border-border bg-muted/25 dark:border-white/5 dark:bg-white/[0.02]">
                                 <CardTitle>Anteprima rapida</CardTitle>
                                 <CardDescription>Card simulativa con colori e filtro Collezione attuali.</CardDescription>
                             </CardHeader>
@@ -450,7 +450,7 @@ export default function PokedexManager() {
                                     </div>
                                 </div>
 
-                                <div className="rounded-lg border border-white/10 bg-background/55 p-3">
+                                <div className="rounded-lg border border-border bg-background/60 p-3 dark:border-white/10 dark:bg-background/55">
                                     <p className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Filtro Collezione</p>
                                     <p className="mt-1 text-sm font-semibold">{selectedFilter.name}</p>
                                     <p className="mt-1 text-xs text-muted-foreground">{selectedFilter.description}</p>
