@@ -69,7 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, password: string, username: string) => {
     if (!isSupabaseConfigured) {
-      return { error: new Error(getSupabaseConfigErrorMessage() ?? 'Supabase non configurato') };
+      return { error: new Error(getSupabaseConfigErrorMessage() ?? 'Supabase not configured') };
     }
 
     // After email verification, bring the user back to the Auth page
@@ -92,7 +92,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     if (!isSupabaseConfigured) {
-      return { error: new Error(getSupabaseConfigErrorMessage() ?? 'Supabase non configurato') };
+      return { error: new Error(getSupabaseConfigErrorMessage() ?? 'Supabase not configured') };
     }
 
     const { error } = await supabase.auth.signInWithPassword({

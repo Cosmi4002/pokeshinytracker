@@ -292,8 +292,8 @@ export default function PokemonDetails() {
     const toggleCaught = async (variant: FormVariant) => {
         if (!user) {
             toast({
-                title: "Accesso richiesto",
-                description: "Effettua il login per salvare la tua collezione.",
+                title: "Sign-in required",
+                description: "Sign in to save your collection.",
                 variant: "destructive"
             });
             return;
@@ -343,7 +343,7 @@ export default function PokemonDetails() {
                 await fetchCaughtStatus();
             }
         } catch (err: any) {
-            toast({ title: "Errore", description: err.message, variant: "destructive" });
+            toast({ title: "Error", description: err.message, variant: "destructive" });
         } finally {
             setActionLoading(null);
         }
@@ -469,7 +469,7 @@ export default function PokemonDetails() {
                                                     <Edit3 className="h-5 w-5" />
                                                 </Button>
                                             </TooltipTrigger>
-                                            <TooltipContent>Rinomina Pokémon</TooltipContent>
+                                            <TooltipContent>Rename Pokémon</TooltipContent>
                                         </Tooltip>
 
                                         <Tooltip>
@@ -479,12 +479,12 @@ export default function PokemonDetails() {
                                                     size="icon"
                                                     className="h-10 w-10 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                                                     onClick={() => {
-                                                        if (confirm(`Sei sicuro di voler eliminare ${details.displayName} dal Pokédex?`)) {
+                                                        if (confirm(`Are you sure you want to remove ${details.displayName} from the Pokédex?`)) {
                                                             saveOverride(details.id, details.name, { is_excluded: true });
                                                             navigate('/pokedex');
                                                             toast({
-                                                                title: "Pokemon eliminato",
-                                                                description: `${details.displayName} è stato rimosso dalla visualizzazione.`
+                                                                title: "Pokémon deleted",
+                                                                description: `${details.displayName} has been removed from view.`
                                                             });
                                                         }
                                                     }}
@@ -492,7 +492,7 @@ export default function PokemonDetails() {
                                                     <EyeOff className="h-5 w-5" />
                                                 </Button>
                                             </TooltipTrigger>
-                                            <TooltipContent>Elimina dal Pokédex</TooltipContent>
+                                            <TooltipContent>Remove from Pokédex</TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
                                 </div>
@@ -559,7 +559,7 @@ export default function PokemonDetails() {
                             <div className="space-y-5">
                                 {availableGames.length === 0 && curatedGameIds && (
                                     <div className="rounded-lg border border-border/70 bg-background/80 p-4 text-sm font-bold text-muted-foreground dark:border-white/15 dark:bg-white/10">
-                                        Nessun gioco console valido per shiny origin.
+                                        No valid console game is available for the shiny origin.
                                     </div>
                                 )}
 

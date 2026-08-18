@@ -234,7 +234,7 @@ export default function Pokedex() {
                             <div className="relative w-full sm:w-72">
                                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground/75" />
                                 <Input
-                                    placeholder="Cerca Pokémon..."
+                                    placeholder="Search Pokémon..."
                                     value={search}
                                     onChange={e => setSearch(e.target.value)}
                                     className="h-11 border-border/80 bg-gradient-to-b from-muted/90 to-background/95 pl-10 text-[0.95rem] font-bold text-foreground shadow-inner transition-all placeholder:font-semibold placeholder:text-foreground/70 hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-white/15 dark:from-[#242424]/95 dark:to-[#171717]/95 dark:text-white dark:placeholder:text-white/55"
@@ -261,7 +261,7 @@ export default function Pokedex() {
                     {/* Errors */}
                     {pokemonError && (
                         <div className="bg-destructive/10 border border-destructive/20 p-4 rounded-xl text-destructive text-center">
-                            Errore: {pokemonError}
+                            Error: {pokemonError}
                         </div>
                     )}
 
@@ -274,7 +274,7 @@ export default function Pokedex() {
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3">
                             {filteredGroups.length === 0 && !pokemonError && (
                                 <div className="col-span-full py-20 text-center text-muted-foreground">
-                                    Nessun Pokémon trovato.
+                                    No Pokémon found.
                                 </div>
                             )}
                             {filteredGroups.map(group => {

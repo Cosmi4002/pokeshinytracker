@@ -254,7 +254,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                 size="icon"
                 onClick={onEdit}
                 className="h-7 w-7 rounded-full border border-white/10 bg-black/55 text-white shadow-lg backdrop-blur-md hover:bg-white hover:text-black"
-                title="Modifica"
+                title="Edit"
               >
                 <Pencil className="h-3.5 w-3.5" />
               </Button>
@@ -266,7 +266,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                   "h-7 w-7 rounded-full border text-white shadow-[0_3px_12px_rgba(0,0,0,0.55)] ring-1 ring-black/35 backdrop-blur-md",
                   isEvolved ? "border-white/45 bg-emerald-700 hover:bg-emerald-800" : "border-white/25 bg-black/70 hover:bg-emerald-700"
                 )}
-                title={isEvolved ? 'Segna come non evoluto' : 'Segna come evoluto'}
+                title={isEvolved ? 'Mark as not evolved' : 'Mark as evolved'}
               >
                 <ArrowUpCircle className="h-3.5 w-3.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]" />
               </Button>
@@ -276,7 +276,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                     variant="secondary"
                     size="icon"
                     className="h-7 w-7 rounded-full border border-white/10 bg-black/55 text-white shadow-lg backdrop-blur-md hover:bg-destructive"
-                    title="Elimina"
+                    title="Delete"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>
@@ -285,16 +285,12 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                   <AlertDialogHeader>
                     <AlertDialogTitle className="text-xl font-bold">Delete {displayName}?</AlertDialogTitle>
                     <AlertDialogDescription className="text-white/60">
-                      Sei sicuro di voler eliminare questo Pokemon dalla tua collezione? Questa azione non puo essere annullata.
+                      Are you sure you want to delete this Pokémon from your collection? This action cannot be undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel className="bg-white/5 hover:bg-white/10 border-white/10 text-white">
-                      Annulla
-                    </AlertDialogCancel>
-                    <AlertDialogAction onClick={onDelete} className="bg-destructive hover:bg-destructive/90 text-white">
-                      Elimina
-                    </AlertDialogAction>
+                    <AlertDialogCancel className="bg-white/5 hover:bg-white/10 border-white/10 text-white">Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={onDelete} className="bg-destructive hover:bg-destructive/90 text-white">Delete</AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>

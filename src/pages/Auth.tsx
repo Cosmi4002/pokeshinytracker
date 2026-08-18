@@ -76,7 +76,7 @@ const FloatingInput = ({ label, icon: Icon, error, accentColor, className, value
 };
 
 const authSchema = z.object({
-  email: z.string().email('Inserisci un email valida'),
+  email: z.string().email('Enter a valid email address'),
   password: z.string().min(6, 'Minimo 6 caratteri'),
 });
 const signUpSchema = authSchema.extend({
@@ -141,7 +141,7 @@ export default function Auth() {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isSupabaseConfigured) {
-      toast({ variant: 'destructive', title: 'Supabase non configurato', description: supabaseConfigError ?? 'Configura Supabase.' });
+      toast({ variant: 'destructive', title: 'Supabase not configured', description: supabaseConfigError ?? 'Configure Supabase.' });
       return;
     }
     if (!validateForm()) return;
@@ -149,9 +149,9 @@ export default function Auth() {
     const { error } = await signIn(email, password);
     setLoading(false);
     if (error) {
-      toast({ variant: 'destructive', title: 'Accesso fallito', description: error.message === 'Invalid login credentials' ? 'Credenziali non valide.' : error.message });
+      toast({ variant: 'destructive', title: 'Sign-in failed', description: error.message === 'Invalid login credentials' ? 'Invalid credentials.' : error.message });
     } else {
-      toast({ title: 'Bentornato!', description: 'Accesso effettuato con successo.' });
+      toast({ title: 'Welcome back!', description: 'You have signed in successfully.' });
       navigate('/counter');
     }
   };
@@ -159,7 +159,7 @@ export default function Auth() {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isSupabaseConfigured) {
-      toast({ variant: 'destructive', title: 'Supabase non configurato', description: supabaseConfigError ?? 'Configura Supabase.' });
+      toast({ variant: 'destructive', title: 'Supabase not configured', description: supabaseConfigError ?? 'Configure Supabase.' });
       return;
     }
     if (!validateSignUpForm()) return;
@@ -167,9 +167,9 @@ export default function Auth() {
     const { error } = await signUp(email, password, username.trim());
     setLoading(false);
     if (error) {
-      toast({ variant: 'destructive', title: 'Errore registrazione', description: error.message });
+      toast({ variant: 'destructive', title: 'Sign-up error', description: error.message });
     } else {
-      toast({ title: 'Account creato!', description: 'Controlla la tua email per verificare l\'account.' });
+      toast({ title: 'Account created!', description: 'Controlla la tua email per verificare l\'account.' });
     }
   };
 
@@ -235,9 +235,7 @@ export default function Auth() {
               <TabsTrigger
                 value="register"
                 className="rounded-xl py-2 font-bold text-sm uppercase tracking-widest data-[state=active]:bg-card data-[state=active]:text-card-foreground data-[state=active]:shadow-xl transition-all dark:data-[state=active]:bg-white/10 dark:data-[state=active]:text-white"
-              >
-                Registrati
-              </TabsTrigger>
+              >Sign Up</TabsTrigger>
             </TabsList>
 
             <div className="relative min-h-[300px]">
@@ -255,7 +253,7 @@ export default function Auth() {
                       error={errors.email}
                     />
                     <FloatingInput
-                      label="Tua Password"
+                      label="Your Password"
                       type="password"
                       icon={Lock}
                       value={password}
@@ -281,11 +279,11 @@ export default function Auth() {
                       {loading ? (
                         <>
                           <Loader2 className="mr-3 h-6 w-6 animate-spin" />
-                          <span>Caricamento...</span>
+                          <span>Loading...</span>
                         </>
                       ) : (
                         <div className="flex items-center justify-center gap-3">
-                          <span>Accedi</span>
+                          <span>Sign In</span>
                           <ArrowRight className="w-6 h-6 group-hover:translate-x-1.5 transition-transform duration-500" />
                         </div>
                       )}
@@ -318,7 +316,7 @@ export default function Auth() {
                       error={errors.email}
                     />
                     <FloatingInput
-                      label="Scegli Password"
+                      label="Choose a Password"
                       type="password"
                       icon={Lock}
                       value={password}
@@ -348,7 +346,7 @@ export default function Auth() {
                         </>
                       ) : (
                         <div className="flex items-center justify-center gap-3">
-                          <span>Registrati</span>
+                          <span>Sign Up</span>
                           <ArrowRight className="w-6 h-6 group-hover:translate-x-1.5 transition-transform duration-500" />
                         </div>
                       )}

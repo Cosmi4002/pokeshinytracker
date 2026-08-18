@@ -182,7 +182,7 @@ export default function Counter() {
                 style={{ backgroundColor: accentColor }}
               >
                 <Plus className="mr-2 h-4 w-4" />
-                Nuova caccia
+                New hunt
               </Button>
             </div>
           </section>
@@ -207,7 +207,7 @@ export default function Counter() {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             {loading ? (
               <div className="col-span-full rounded-lg border border-border/70 bg-card/70 py-12 text-center text-sm text-muted-foreground">
-                Caricamento counter...
+                Loading counters...
               </div>
             ) : (
               <>
@@ -242,7 +242,7 @@ export default function Counter() {
                           e.stopPropagation();
                           setHuntToHideId(hunt.id);
                         }}
-                        title="Chiudi (Nascondi)"
+                        title="Close (Hide)"
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -273,13 +273,13 @@ export default function Counter() {
                     <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-md border border-border bg-background">
                       <Plus className="h-6 w-6 text-muted-foreground" />
                     </div>
-                    <h2 className="text-lg font-bold">Nessuna caccia attiva</h2>
+                    <h2 className="text-lg font-bold">No active hunts</h2>
                     <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
-                      Crea un counter e poi usa Configura per scegliere Pokemon, metodo e dettagli.
+                      Create a counter, then use Configure to choose the Pokémon, method, and details.
                     </p>
                     <Button className="mt-4" onClick={handleCreateNew} style={{ backgroundColor: accentColor }}>
                       <Plus className="mr-2 h-4 w-4" />
-                      Nuova caccia
+                      New hunt
                     </Button>
                   </div>
                 )}
@@ -295,7 +295,7 @@ export default function Counter() {
                         <Plus className="h-5 w-5 text-muted-foreground" />
                       </div>
                       <div>
-                        <div className="font-bold">Aggiungi counter</div>
+                        <div className="font-bold">Add counter</div>
                         <div className="mt-1 text-sm text-muted-foreground">{remainingSlots} slot disponibili</div>
                       </div>
                     </div>
@@ -310,21 +310,19 @@ export default function Counter() {
       <AlertDialog open={!!huntToHideId} onOpenChange={(open) => !open && setHuntToHideId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Conferma eliminazione counter</AlertDialogTitle>
+            <AlertDialogTitle>Confirm counter deletion</AlertDialogTitle>
             <AlertDialogDescription>
-              Vuoi davvero rimuovere questo counter dalla vista multipla? Potrai riaggiungerlo in seguito.
+              Do you really want to remove this counter from the multi-counter view? You can add it again later.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setHuntToHideId(null)}>Annulla</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setHuntToHideId(null)}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 if (huntToHideId) void handleHideHunt(huntToHideId);
                 setHuntToHideId(null);
               }}
-            >
-              Elimina
-            </AlertDialogAction>
+            >Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

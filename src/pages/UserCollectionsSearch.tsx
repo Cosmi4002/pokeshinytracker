@@ -150,7 +150,7 @@ export default function UserCollectionsSearch() {
       setDiscoverableProfiles(onlyNamedProfiles(data || []));
     } catch (err: any) {
       if (!silent) {
-        setDiscoverableProfilesError(err?.message || 'Impossibile caricare gli utenti.');
+        setDiscoverableProfilesError(err?.message || 'Unable to load users.');
       }
     } finally {
       if (!silent) setDiscoverableProfilesLoading(false);
@@ -184,7 +184,7 @@ export default function UserCollectionsSearch() {
         setProfiles(onlyNamedProfiles(data || []));
       } catch (err: any) {
         if (!active) return;
-        setProfilesError(err?.message || 'Errore durante la ricerca username');
+        setProfilesError(err?.message || 'Error while searching for a username');
       } finally {
         if (active) setProfilesLoading(false);
       }
@@ -214,7 +214,7 @@ export default function UserCollectionsSearch() {
       setEntries(data || []);
     } catch (err: any) {
       if (!silent) {
-        setEntriesError(err?.message || 'Impossibile caricare la collezione.');
+        setEntriesError(err?.message || 'Unable to load the collection.');
       }
     } finally {
       if (!silent) setEntriesLoading(false);
@@ -259,7 +259,7 @@ export default function UserCollectionsSearch() {
       setGlobalRecentEntries(enriched);
     } catch (err: any) {
       if (!silent) {
-        setGlobalRecentError(err?.message || 'Impossibile caricare anteprima utenti.');
+        setGlobalRecentError(err?.message || 'Unable to load the user preview.');
       }
     } finally {
       if (!silent) setGlobalRecentLoading(false);
@@ -494,7 +494,7 @@ export default function UserCollectionsSearch() {
                 )}
                 {options.showUsername && (
                   <span className="max-w-full truncate rounded-full bg-muted px-2 py-0.5 normal-case tracking-normal">
-                    @{username || 'utente'}
+                    @{username || 'user'}
                   </span>
                 )}
               </div>
@@ -504,13 +504,13 @@ export default function UserCollectionsSearch() {
               {gameLogo ? (
                 <img
                   src={gameLogo}
-                  alt={entry.game || 'Gioco'}
+                  alt={entry.game || 'Game'}
                   className="h-9 w-auto max-w-[96px] object-contain brightness-110 drop-shadow"
                   loading="lazy"
                 />
               ) : (
                 <span className="rounded-full border border-border bg-muted px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-muted-foreground">
-                  {entry.game || 'Gioco non indicato'}
+                  {entry.game || 'Game not specified'}
                 </span>
               )}
             </div>
@@ -631,11 +631,11 @@ export default function UserCollectionsSearch() {
             <div className="mt-1 truncate text-lg font-black leading-tight">{entry.pokemon_name}</div>
             <div className="mt-3 grid gap-x-4 gap-y-2 text-xs sm:grid-cols-2">
               <div className="min-w-0">
-                <div className="font-black uppercase tracking-[0.12em] text-muted-foreground">Gioco</div>
+                <div className="font-black uppercase tracking-[0.12em] text-muted-foreground">Game</div>
                 <div className="mt-0.5 truncate font-semibold">{getGameLabel(entry.game)}</div>
               </div>
               <div className="min-w-0">
-                <div className="font-black uppercase tracking-[0.12em] text-muted-foreground">Metodo</div>
+                <div className="font-black uppercase tracking-[0.12em] text-muted-foreground">Method</div>
                 <div className="mt-0.5 truncate font-semibold">{formatMethodLabel(entry.method)}</div>
               </div>
               <div className="min-w-0">
@@ -661,10 +661,10 @@ export default function UserCollectionsSearch() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5" />
-              Cerca Username
+              Search Usernames
             </CardTitle>
             <CardDescription>
-              Esplora le collezioni pubbliche degli utenti in tempo reale.
+              Explore public user collections in real time.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -689,13 +689,13 @@ export default function UserCollectionsSearch() {
               </div>
               {profileSuggestionsLoading && (
                 <p className="text-sm text-muted-foreground">
-                  {searchTerm ? 'Ricerca in corso...' : 'Caricamento utenti...'}
+                  {searchTerm ? 'Searching...' : 'Loading users...'}
                 </p>
               )}
               {profileSuggestionsError && <p className="text-sm text-destructive">{profileSuggestionsError}</p>}
               {!profileSuggestionsLoading && !profileSuggestionsError && profileSuggestions.length === 0 && (
                 <p className="text-sm text-muted-foreground">
-                  {searchTerm ? 'Nessun username trovato.' : 'Nessun utente pubblico disponibile.'}
+                  {searchTerm ? 'No username found.' : 'No public users available.'}
                 </p>
               )}
               {profileSuggestions.length > 0 && (
@@ -715,11 +715,11 @@ export default function UserCollectionsSearch() {
 
             {!selectedProfile && (
             <div className="space-y-2 pt-2 border-t">
-              <h3 className="font-semibold">Anteprima tutti gli utenti (ultimi 4 giorni)</h3>
-              {globalRecentLoading && <p className="text-sm text-muted-foreground">Caricamento anteprima globale...</p>}
+              <h3 className="font-semibold">All-user preview (last 4 days)</h3>
+              {globalRecentLoading && <p className="text-sm text-muted-foreground">Loading global preview...</p>}
               {globalRecentError && <p className="text-sm text-destructive">{globalRecentError}</p>}
               {!globalRecentLoading && !globalRecentError && globalRecentEntries.length === 0 && (
-                <p className="text-sm text-muted-foreground">Nessuna cattura pubblica negli ultimi 4 giorni.</p>
+                <p className="text-sm text-muted-foreground">No public catches in the last 4 days.</p>
               )}
               {!globalRecentLoading && globalRecentEntries.length > 0 && (
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -736,32 +736,32 @@ export default function UserCollectionsSearch() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 Collezione di @{selectedProfile.username}
-                <span className="text-sm font-normal text-muted-foreground">({entries.length} catture)</span>
+                <span className="text-sm font-normal text-muted-foreground">({entries.length} catches)</span>
               </CardTitle>
               <CardDescription className="flex items-center gap-2">
                 <Radio className={`h-4 w-4 ${isRealtimeActive ? 'text-green-500' : 'text-muted-foreground'}`} />
-                {isRealtimeActive ? 'Aggiornamento realtime attivo' : 'Realtime non connesso'}
+                {isRealtimeActive ? 'Real-time updates active' : 'Real-time updates disconnected'}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {entriesLoading && <p className="text-sm text-muted-foreground">Caricamento collezione...</p>}
+              {entriesLoading && <p className="text-sm text-muted-foreground">Loading collection...</p>}
               {entriesError && <p className="text-sm text-destructive">{entriesError}</p>}
 
               {!entriesLoading && !entriesError && entries.length === 0 && (
-                <p className="text-sm text-muted-foreground">Nessuna cattura trovata per questo username.</p>
+                <p className="text-sm text-muted-foreground">No catches found for this username.</p>
               )}
 
               {!entriesLoading && entries.length > 0 && (
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
                     <BarChart3 className="h-4 w-4 text-muted-foreground" />
-                    <h3 className="font-semibold">Statistiche utente</h3>
+                    <h3 className="font-semibold">User statistics</h3>
                   </div>
 
                   <Card className="overflow-hidden border-border/70">
                     <CardContent className="grid gap-4 p-5 sm:grid-cols-[1fr_auto] sm:items-center">
                       <div className="space-y-2">
-                        <div className="text-sm font-medium text-muted-foreground">Panoramica collezione</div>
+                        <div className="text-sm font-medium text-muted-foreground">Collection overview</div>
                         <div className="flex flex-wrap items-end gap-x-4 gap-y-2">
                           <div className="text-5xl font-black tabular-nums tracking-tight">
                             {numberFormatter.format(userStats.obtainedCount)}
@@ -785,10 +785,10 @@ export default function UserCollectionsSearch() {
                   </Card>
 
                   <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                    <StatTile label="Media" value={userStats.averageAttempts ? numberFormatter.format(userStats.averageAttempts) : '-'} note={`${numberFormatter.format(userStats.trackedRows)} con encounters`} icon={TrendingUp} />
-                    <StatTile label="Charm" value={`${userStats.charmPercent}%`} note="Catture con cromamuleto" icon={Crown} />
-                    <StatTile label="Gioco top" value={userStats.topGame?.label || '-'} note={userStats.topGame ? `${userStats.topGame.count} catture` : 'Nessun dato'} icon={Gamepad2} />
-                    <StatTile label="Metodo top" value={userStats.topMethod?.label || '-'} note={userStats.topMethod ? `${userStats.topMethod.count} catture` : 'Nessun dato'} icon={Target} />
+                    <StatTile label="Average" value={userStats.averageAttempts ? numberFormatter.format(userStats.averageAttempts) : '-'} note={`${numberFormatter.format(userStats.trackedRows)} with encounters`} icon={TrendingUp} />
+                    <StatTile label="Charm" value={`${userStats.charmPercent}%`} note="Catches with the Shiny Charm" icon={Crown} />
+                    <StatTile label="Top game" value={userStats.topGame?.label || '-'} note={userStats.topGame ? `${userStats.topGame.count} catches` : 'No data'} icon={Gamepad2} />
+                    <StatTile label="Top method" value={userStats.topMethod?.label || '-'} note={userStats.topMethod ? `${userStats.topMethod.count} catches` : 'No data'} icon={Target} />
                   </div>
 
                   <Card className="border-border/70 bg-muted/30 shadow-sm">
@@ -796,8 +796,8 @@ export default function UserCollectionsSearch() {
                       <CardTitle className="text-base">Record</CardTitle>
                     </CardHeader>
                     <CardContent className="grid gap-3 lg:grid-cols-2">
-                      {renderRecordHuntCard('Caccia più lunga', userStats.longestHunt)}
-                      {renderRecordHuntCard('Caccia più fortunata', userStats.luckiestHunt)}
+                      {renderRecordHuntCard('Longest hunt', userStats.longestHunt)}
+                      {renderRecordHuntCard('Luckiest hunt', userStats.luckiestHunt)}
                     </CardContent>
                   </Card>
                 </div>
@@ -805,7 +805,7 @@ export default function UserCollectionsSearch() {
 
               {!entriesLoading && entries.length > 0 && (
                 <div className="space-y-2">
-                  <h3 className="font-semibold">Ultime catture</h3>
+                  <h3 className="font-semibold">Latest catches</h3>
                   <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {entries.map((entry) => renderPublicShinyCard(entry, 'collection', { large: true }))}
                   </div>

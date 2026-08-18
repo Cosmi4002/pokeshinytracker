@@ -186,13 +186,13 @@ export default function PokedexManager() {
             });
             toast({
                 title: "Gestione card salvata",
-                description: "Le preferenze sono state salvate su questo dispositivo.",
+                description: "Preferences were saved on this device.",
             });
         } catch (error: any) {
             toast({
                 variant: "destructive",
-                title: "Errore salvataggio",
-                description: error?.message || "Impossibile salvare le preferenze card.",
+                title: "Save error",
+                description: error?.message || "Unable to save preferences card.",
             });
         } finally {
             setIsSavingThemes(false);
@@ -241,7 +241,7 @@ export default function PokedexManager() {
                                 <span className="text-xs font-bold uppercase tracking-widest">Solo admin</span>
                             </div>
                             <CardTitle>Editor Pokedex</CardTitle>
-                            <CardDescription>Mostra i pulsanti di modifica nelle pagine dei Pokemon.</CardDescription>
+                            <CardDescription>Show edit buttons on Pokémon pages.</CardDescription>
                         </CardHeader>
                         <CardContent className="pt-5">
                             <div className="flex items-center justify-between gap-4 rounded-lg border border-border bg-background/60 p-4 dark:border-white/10 dark:bg-white/[0.03]">
@@ -266,7 +266,7 @@ export default function PokedexManager() {
                                     <span className="text-xs font-bold uppercase tracking-widest">Filtri separati</span>
                                 </div>
                                 <CardTitle>Filtri card</CardTitle>
-                                <CardDescription>Scegli effetti indipendenti per Pokedex e Collezione.</CardDescription>
+                                <CardDescription>Choose separate effects for the Pokédex and Collection.</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4 pt-5">
                                 <div className="grid gap-4 md:grid-cols-2">
@@ -332,12 +332,12 @@ export default function PokedexManager() {
                                     <span className="text-xs font-bold uppercase tracking-widest">Colori Collezione</span>
                                 </div>
                                 <CardTitle>Colori card Collezione</CardTitle>
-                                <CardDescription>Modifica i colori del gioco selezionato senza cambiare gli altri giochi.</CardDescription>
+                                <CardDescription>Edit the selected game colors without changing the other games.</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-5 pt-5">
                                 <div className="grid gap-4 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
                                     <div className="space-y-2">
-                                        <Label>Gioco da modificare</Label>
+                                        <Label>Game to edit</Label>
                                         <Select value={selectedGame} onValueChange={setSelectedGame}>
                                             <SelectTrigger>
                                                 <SelectValue />
@@ -389,7 +389,7 @@ export default function PokedexManager() {
                                                 </span>
                                                 <span className="min-w-0">
                                                     <span className="block truncate text-sm font-semibold">{game.name}</span>
-                                                    <span className="block truncate text-xs text-muted-foreground">Applica al gioco selezionato</span>
+                                                    <span className="block truncate text-xs text-muted-foreground">Apply to the selected game</span>
                                                 </span>
                                             </button>
                                         ))}
@@ -403,7 +403,7 @@ export default function PokedexManager() {
                         <Card className="overflow-hidden border-border bg-card text-card-foreground shadow-xl backdrop-blur-xl lg:sticky lg:top-24 dark:border-white/10 dark:bg-white/5">
                             <CardHeader className="border-b border-border bg-muted/25 dark:border-white/5 dark:bg-white/[0.02]">
                                 <CardTitle>Anteprima rapida</CardTitle>
-                                <CardDescription>Card simulativa con colori e filtro Collezione attuali.</CardDescription>
+                                <CardDescription>Preview card using the current Collection colors and filter.</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4 pt-5">
                                 <div
@@ -435,7 +435,7 @@ export default function PokedexManager() {
                                         </div>
                                         <div className="mt-auto grid grid-cols-3 gap-2 text-center">
                                             <div className="rounded-lg border border-white/10 bg-black/35 px-2 py-2">
-                                                <p className="text-[10px] font-bold uppercase text-white/50">Metodo</p>
+                                                <p className="text-[10px] font-bold uppercase text-white/50">Method</p>
                                                 <p className="truncate text-xs font-black text-white">Random</p>
                                             </div>
                                             <div className="rounded-lg border border-white/10 bg-black/35 px-2 py-2">
@@ -443,7 +443,7 @@ export default function PokedexManager() {
                                                 <p className="text-xs font-black text-white">4096</p>
                                             </div>
                                             <div className="rounded-lg border border-white/10 bg-black/35 px-2 py-2">
-                                                <p className="text-[10px] font-bold uppercase text-white/50">Data</p>
+                                                <p className="text-[10px] font-bold uppercase text-white/50">Date</p>
                                                 <p className="truncate text-xs font-black text-white">10 Ago</p>
                                             </div>
                                         </div>
@@ -459,13 +459,11 @@ export default function PokedexManager() {
                                 <div className="grid gap-2">
                                     <Button type="button" onClick={handleSaveCardSettings} disabled={themesLoading || isSavingThemes}>
                                         <Save className="mr-2 h-4 w-4" />
-                                        {isSavingThemes ? "Salvataggio..." : "Salva gestione card"}
+                                        {isSavingThemes ? "Saving..." : "Save card settings"}
                                     </Button>
                                     <div className="grid grid-cols-2 gap-2">
                                         <Button type="button" variant="outline" onClick={handleDiscardDraft}>
-                                            <RotateCcw className="mr-2 h-4 w-4" />
-                                            Annulla
-                                        </Button>
+                                            <RotateCcw className="mr-2 h-4 w-4" />Cancel</Button>
                                         <Button type="button" variant="outline" onClick={handleResetSelectedGame}>
                                             Default gioco
                                         </Button>

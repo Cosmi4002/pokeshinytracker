@@ -97,7 +97,7 @@ export default function Debug() {
                     <div className="flex items-center justify-between p-2 border rounded">
                         <div className="flex flex-col">
                             <span>Colonne 'form' e 'gender'</span>
-                            <span className="text-xs text-muted-foreground">Necessarie per la nuova feature</span>
+                            <span className="text-xs text-muted-foreground">Required for the new feature</span>
                         </div>
 
                         {status.loading ? <Loader2 className="animate-spin" /> :
@@ -105,7 +105,7 @@ export default function Debug() {
                                 <div className="flex items-center gap-2 text-red-500"><XCircle /> <span>{status.columnError}</span></div>}
                     </div>
 
-                    <Button onClick={checkConnection} disabled={status.loading}>Riprova Test</Button>
+                    <Button onClick={checkConnection} disabled={status.loading}>Retry Test</Button>
                 </CardContent>
             </Card>
         </div>

@@ -192,14 +192,14 @@ export function Navbar() {
   const handleSetUsername = async () => {
     if (!user) return;
     const current = displayUsername || '';
-    const next = window.prompt('Inserisci username (3-24 caratteri):', current);
+    const next = window.prompt('Enter a username (3–24 characters):', current);
     if (next === null) return;
 
     const username = next.trim();
     if (username.length < 3 || username.length > 24) {
       toast({
         variant: 'destructive',
-        title: 'Username non valido',
+        title: 'Invalid username',
         description: 'Deve avere tra 3 e 24 caratteri.',
       });
       return;
@@ -228,14 +228,14 @@ export function Navbar() {
 
       setProfileUsername(username);
       toast({
-        title: 'Username aggiornato',
+        title: 'Username updated',
         description: `Nuovo username: @${username}`,
       });
     } catch (err: any) {
       toast({
         variant: 'destructive',
-        title: 'Errore aggiornamento username',
-        description: err?.message || 'Impossibile aggiornare username.',
+        title: 'Username update error',
+        description: err?.message || 'Unable to update the username.',
       });
     }
   };
@@ -517,7 +517,7 @@ export function Navbar() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="text-muted-foreground text-xs flex flex-col items-start gap-1">
                   <span className="font-semibold text-foreground">
-                    {displayUsername ? `@${displayUsername}` : 'Username non impostato'}
+                    {displayUsername ? `@${displayUsername}` : 'Username not set'}
                   </span>
                   <span className="font-semibold text-foreground">{user.email}</span>
                   <span>ID: {user.id.slice(0, 8)}...</span>
@@ -534,7 +534,7 @@ export function Navbar() {
                 <DialogHeader className="border-b border-border bg-card p-4 pr-10 text-left">
                   <DialogTitle>Avatar</DialogTitle>
                   <DialogDescription>
-                    Scegli il trainer oppure usa Sposta per riordinare con un tap.
+                    Choose the trainer, or use Move to reorder with one tap.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="border-b border-border bg-card p-3">
@@ -549,9 +549,7 @@ export function Navbar() {
                         setMovingAvatarId(null);
                       }}
                     >
-                      <Check className="h-4 w-4" />
-                      Scegli
-                    </Button>
+                      <Check className="h-4 w-4" />Choose</Button>
                     <Button
                       type="button"
                       variant={avatarPickerMode === 'move' ? 'default' : 'ghost'}
@@ -569,7 +567,7 @@ export function Navbar() {
                   {avatarPickerMode === 'move' && (
                     <div className="mt-2 rounded-md border border-primary/25 bg-primary/10 px-3 py-2 text-xs text-muted-foreground">
                       {movingAvatarId
-                        ? 'Ora tocca la posizione dove vuoi inserirlo.'
+                        ? 'Now tap the position where you want to place it.'
                         : 'Tocca un avatar da spostare.'}
                     </div>
                   )}

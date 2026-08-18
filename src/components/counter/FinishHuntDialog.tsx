@@ -190,8 +190,8 @@ export function FinishHuntDialog({
     if (!game) {
       toast({
         variant: 'destructive',
-        title: 'Gioco richiesto',
-        description: 'Seleziona il gioco in cui hai catturato questo shiny',
+        title: 'Game required',
+        description: 'Select the game in which you caught this shiny Pokémon',
       });
       return;
     }
@@ -254,7 +254,7 @@ export function FinishHuntDialog({
 
       toast({
         title: '🎉 Caccia completata!',
-        description: `${finalDisplayName} shiny è stato aggiunto alla tua collezione!`,
+        description: `Shiny ${finalDisplayName} was added to your collection!`,
       });
 
       onOpenChange(false);
@@ -262,7 +262,7 @@ export function FinishHuntDialog({
     } catch (error: any) {
       toast({
         variant: 'destructive',
-        title: 'Errore nel salvare',
+        title: 'Save error',
         description: error.message,
       });
     } finally {
@@ -274,9 +274,9 @@ export function FinishHuntDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Completa la caccia</DialogTitle>
+          <DialogTitle>Complete the hunt</DialogTitle>
           <DialogDescription>
-            Inserisci i dettagli finali per salvare questo shiny nella collezione
+            Enter the final details to save this shiny Pokémon to your collection
           </DialogDescription>
         </DialogHeader>
 
@@ -364,7 +364,7 @@ export function FinishHuntDialog({
           </div>
 
           <div className="space-y-2">
-            <Label>Gioco *</Label>
+            <Label>Game *</Label>
             <Select value={game} onValueChange={setGame}>
               <SelectTrigger>
                 <SelectValue placeholder="Seleziona il gioco" />
@@ -390,7 +390,7 @@ export function FinishHuntDialog({
           )}
 
           <div className="space-y-2">
-            <Label>Metodo *</Label>
+            <Label>Method *</Label>
             <MethodSelector value={method.id} onChange={setMethod} />
           </div>
 
@@ -402,7 +402,7 @@ export function FinishHuntDialog({
                 onCheckedChange={(v) => setHideCounterEncounters(v === true)}
               />
               <Label htmlFor="finish-hide-counter-encounters" className="cursor-pointer select-none">
-                Nascondi counter encounters in collezione
+                Hide counter encounters in collection
               </Label>
             </div>
           )}
@@ -414,7 +414,7 @@ export function FinishHuntDialog({
               onCheckedChange={(v) => setShowEncounters(v === true)}
             />
             <Label htmlFor="finish-show-encounters" className="cursor-pointer select-none">
-              Mostra encounters in collezione
+              Show encounters in collection
             </Label>
           </div>
 
@@ -467,7 +467,7 @@ export function FinishHuntDialog({
                 }}
               />
               <Label htmlFor="show-total" className="cursor-pointer select-none">
-                Mostra “Total” in collezione
+                Show “Total” in collection
               </Label>
             </div>
             <div className="space-y-2">
@@ -500,7 +500,7 @@ export function FinishHuntDialog({
                 }}
               />
               <Label htmlFor="show-seen" className="cursor-pointer select-none">
-                Mostra “Seen” in collezione
+                Show “Seen” in collection
               </Label>
             </div>
             <div className="space-y-2">
@@ -557,17 +557,17 @@ export function FinishHuntDialog({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Data inizio</Label>
+              <Label>Start date</Label>
               <Input type="date" value={huntStartDate} onChange={(e) => setHuntStartDate(e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label>Data cattura *</Label>
+              <Label>Catch date *</Label>
               <Input type="date" value={caughtDate} onChange={(e) => setCaughtDate(e.target.value)} />
             </div>
           </div>
 
           <div className="flex items-center justify-between p-3 rounded-lg border border-destructive/30 bg-destructive/5">
-            <Label>FAIL (caccia fallita)</Label>
+            <Label>FAIL (failed hunt)</Label>
             <Switch checked={isFail} onCheckedChange={setIsFail} />
           </div>
 
@@ -611,12 +611,10 @@ export function FinishHuntDialog({
               className="flex-1"
               onClick={() => onOpenChange(false)}
               disabled={loading}
-            >
-              Annulla
-            </Button>
+            >Cancel</Button>
             <Button type="submit" className="flex-1 shiny-glow" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Salva
+              Save
             </Button>
           </div>
         </form>

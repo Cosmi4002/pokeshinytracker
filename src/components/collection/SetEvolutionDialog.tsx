@@ -38,7 +38,7 @@ export function SetEvolutionDialog({ open, onOpenChange, entry, onSuccess }: Set
       toast({
         variant: 'destructive',
         title: 'Selezione mancante',
-        description: 'Seleziona il Pokémon di origine in "Evoluto da".',
+        description: 'Select the original Pokémon under “Evolved from”.',
       });
       return;
     }
@@ -66,8 +66,8 @@ export function SetEvolutionDialog({ open, onOpenChange, entry, onSuccess }: Set
     } catch (err: any) {
       toast({
         variant: 'destructive',
-        title: 'Errore',
-        description: err?.message || 'Impossibile salvare evoluzione.',
+        title: 'Error',
+        description: err?.message || 'Unable to save the evolution.',
       });
     } finally {
       setLoading(false);
@@ -95,8 +95,8 @@ export function SetEvolutionDialog({ open, onOpenChange, entry, onSuccess }: Set
     } catch (err: any) {
       toast({
         variant: 'destructive',
-        title: 'Errore',
-        description: err?.message || 'Impossibile rimuovere evoluzione.',
+        title: 'Error',
+        description: err?.message || 'Unable to remove the evolution.',
       });
     } finally {
       setLoading(false);
@@ -107,7 +107,7 @@ export function SetEvolutionDialog({ open, onOpenChange, entry, onSuccess }: Set
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Imposta evoluzione</DialogTitle>
+          <DialogTitle>Set Evolution</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -124,18 +124,16 @@ export function SetEvolutionDialog({ open, onOpenChange, entry, onSuccess }: Set
           </div>
 
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)} className="flex-1" disabled={loading}>
-              Annulla
-            </Button>
+            <Button variant="outline" onClick={() => onOpenChange(false)} className="flex-1" disabled={loading}>Cancel</Button>
             {entry?.is_evolved && (
               <Button variant="secondary" onClick={handleUnset} className="flex-1" disabled={loading}>
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Rimuovi
+                Remove
               </Button>
             )}
             <Button onClick={handleSave} className="flex-1" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Salva
+              Save
             </Button>
           </div>
         </div>

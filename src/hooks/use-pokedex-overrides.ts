@@ -94,16 +94,16 @@ export function usePokedexOverrides() {
 
                 if (error) {
                     console.error("Supabase sync failed:", error);
-                    toast.error(`Errore sincronizzazione: ${error.message}`);
+                    toast.error(`Sync error: ${error.message}`);
                 } else {
-                    toast.success("Modifica salvata globalmente!");
+                    toast.success("Changes saved globally!");
                 }
             } catch (e) {
                 console.warn("Supabase table might not exist yet", e);
-                toast.error("Errore: Tabella database mancante.");
+                toast.error("Error: database table is missing.");
             }
         } else {
-            toast.info("Modifica salvata solo in locale (non sei loggato).");
+            toast.info("Changes saved locally only (you are not signed in).");
         }
     };
 
