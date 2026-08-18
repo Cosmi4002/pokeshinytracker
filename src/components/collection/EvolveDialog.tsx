@@ -147,7 +147,7 @@ export function EvolveDialog({ open, onOpenChange, entry, onSuccess }: EvolveDia
 
       toast({
         title: 'Evoluzione completata! 🎉',
-        description: `${entry.pokemon_name} si è evoluto in ${evolutionPokemon.displayName}!`,
+        description: `${entry.pokemon_name} evolved into ${evolutionPokemon.displayName}!`,
       });
       
       onOpenChange(false);
@@ -158,8 +158,8 @@ export function EvolveDialog({ open, onOpenChange, entry, onSuccess }: EvolveDia
     } catch (error: any) {
       toast({
         variant: 'destructive',
-        title: 'Errore',
-        description: error.message || 'Impossibile completare l\'evoluzione.',
+        title: 'Error',
+        description: error.message || 'Unable to complete the evolution.',
       });
     } finally {
       setLoading(false);
@@ -187,7 +187,7 @@ export function EvolveDialog({ open, onOpenChange, entry, onSuccess }: EvolveDia
             Gestisci Evoluzione
           </DialogTitle>
           <DialogDescription>
-            Seleziona l'evoluzione per {currentPokemon?.displayName || entry.pokemon_name}
+            Select the evolution for {currentPokemon?.displayName || entry.pokemon_name}
           </DialogDescription>
         </DialogHeader>
 
@@ -218,18 +218,18 @@ export function EvolveDialog({ open, onOpenChange, entry, onSuccess }: EvolveDia
           {!canEvolveThis ? (
             <div className="text-center p-4 bg-muted/50 rounded-lg">
               <p className="text-muted-foreground">
-                Questo Pokémon non può evolversi ulteriormente.
+                This Pokémon cannot evolve any further.
               </p>
             </div>
           ) : availableEvolutions.length === 0 ? (
             <div className="text-center p-4 bg-muted/50 rounded-lg">
               <p className="text-muted-foreground">
-                Nessuna evoluzione disponibile per questo Pokémon.
+                No evolution is available for this Pokémon.
               </p>
             </div>
           ) : (
             <div className="space-y-3">
-              <p className="text-sm font-medium text-white/80">Seleziona l'evoluzione:</p>
+              <p className="text-sm font-medium text-white/80">Select the evolution:</p>
               <div className="grid grid-cols-1 gap-2">
                 {availableEvolutions.map((evolution) => (
                   <button
@@ -269,9 +269,7 @@ export function EvolveDialog({ open, onOpenChange, entry, onSuccess }: EvolveDia
               variant="outline"
               onClick={handleClose}
               className="flex-1"
-            >
-              Annulla
-            </Button>
+            >Cancel</Button>
             <Button
               onClick={handleEvolve}
               disabled={!selectedEvolution || loading || !canEvolveThis}
@@ -281,7 +279,7 @@ export function EvolveDialog({ open, onOpenChange, entry, onSuccess }: EvolveDia
               )}
             >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {loading ? 'Evolvo...' : 'Conferma Evoluzione'}
+              {loading ? 'Evolving...' : 'Confirm Evolution'}
             </Button>
           </div>
         </div>

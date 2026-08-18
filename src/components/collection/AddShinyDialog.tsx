@@ -173,7 +173,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!pokemonId || !pokemonName) {
-      toast({ variant: 'destructive', title: 'Seleziona un Pokémon' });
+      toast({ variant: 'destructive', title: 'Select a Pokémon' });
       return;
     }
     if (!user) {
@@ -228,7 +228,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
 
       toast({
         title: 'Shiny aggiunto!',
-        description: `${formatPokemonName(pokemonName, pokemonId)} è stato aggiunto alla collezione.`,
+        description: `${formatPokemonName(pokemonName, pokemonId)} was added to the collection.`,
       });
       resetFormState();
       onOpenChange(false);
@@ -236,8 +236,8 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
     } catch (error: any) {
       toast({
         variant: 'destructive',
-        title: 'Errore',
-        description: error.message || 'Impossibile aggiungere lo shiny.',
+        title: 'Error',
+        description: error.message || 'Unable to add the shiny Pokémon.',
       });
     } finally {
       setLoading(false);
@@ -248,7 +248,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
     <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Aggiungi Shiny alla collezione</DialogTitle>
+          <DialogTitle>Add Shiny Pokémon to Collection</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -358,7 +358,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
 
           {/* 5. Gioco */}
           <div className="space-y-2">
-            <Label>Gioco</Label>
+            <Label>Game</Label>
             <Select value={game} onValueChange={setGame}>
               <SelectTrigger>
                 <SelectValue />
@@ -417,7 +417,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
 
           {/* 6. Metodo */}
           <div className="space-y-2">
-            <Label>Metodo *</Label>
+            <Label>Method *</Label>
             <MethodSelector value={method.id} onChange={setMethod} />
           </div>
 
@@ -429,7 +429,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
                 onCheckedChange={(v) => setHideCounterEncounters(v === true)}
               />
               <Label htmlFor="hide-counter-encounters" className="cursor-pointer select-none">
-                Nascondi counter encounters in collezione
+                Hide counter encounters in collection
               </Label>
             </div>
           )}
@@ -441,7 +441,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
               onCheckedChange={(v) => setShowEncounters(v === true)}
             />
             <Label htmlFor="show-encounters" className="cursor-pointer select-none">
-              Mostra encounters in collezione
+              Show encounters in collection
             </Label>
           </div>
 
@@ -492,7 +492,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
                 }}
               />
               <Label htmlFor="show-total" className="cursor-pointer select-none">
-                Mostra “Total” in collezione
+                Show “Total” in collection
               </Label>
             </div>
                         <div className="space-y-2">
@@ -525,7 +525,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
                 }}
               />
               <Label htmlFor="show-seen" className="cursor-pointer select-none">
-                Mostra “Seen” in collezione
+                Show “Seen” in collection
               </Label>
             </div>
             <div className="space-y-2">
@@ -580,10 +580,10 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
             </div>
           </div>
 
-          {/* 8. Data inizio e fine */}
+          {/* 8. Start and end dates */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Data inizio caccia</Label>
+              <Label>Hunt start date</Label>
               <Input
                 type="date"
                 value={huntStartDate}
@@ -591,14 +591,14 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
               />
             </div>
             <div className="space-y-2">
-              <Label>Data cattura *</Label>
+              <Label>Catch date *</Label>
               <Input type="date" value={caughtDate} onChange={(e) => setCaughtDate(e.target.value)} />
             </div>
           </div>
 
           {/* 9. FAIL - Separated from Phase */}
           <div className="flex items-center justify-between p-3 rounded-lg border border-destructive/30 bg-destructive/5">
-            <Label>FAIL (caccia fallita)</Label>
+            <Label>FAIL (failed hunt)</Label>
             <Switch checked={isFail} onCheckedChange={setIsFail} />
           </div>
 
@@ -610,7 +610,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
           {/* 10. Playlist */}
           {playlists.length > 0 && (
             <div className="space-y-2">
-              <Label>Playlist (opzionale)</Label>
+              <Label>Playlist (optional)</Label>
               <Select value={playlistId || 'none'} onValueChange={(val) => setPlaylistId(val === 'none' ? '' : val)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Nessuna playlist" />
@@ -639,7 +639,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
 
           <Button type="submit" className="w-full" disabled={loading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Aggiungi Shiny
+            Add Shiny
           </Button>
         </form>
       </DialogContent>

@@ -38,7 +38,7 @@ export default function Index() {
     },
     {
       icon: BarChart3,
-      title: 'Statistiche',
+      title: 'Statistics',
       description: 'Precise collection totals.',
       link: '/stats',
     },

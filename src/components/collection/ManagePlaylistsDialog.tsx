@@ -85,8 +85,8 @@ export function ManagePlaylistsDialog({ open, onOpenChange, onSuccess }: ManageP
         } catch (err: any) {
             toast({
                 variant: 'destructive',
-                title: 'Errore',
-                description: err.message || 'Impossibile caricare le playlist',
+                title: 'Error',
+                description: err.message || 'Unable to load playlists',
             });
             setPlaylists([]);
         } finally {
@@ -129,8 +129,8 @@ export function ManagePlaylistsDialog({ open, onOpenChange, onSuccess }: ManageP
             if (deleteError) throw deleteError;
 
             toast({
-                title: 'Playlist eliminata',
-                description: `"${playlistToDelete.name}" è stata eliminata con successo.`,
+                title: 'Playlist deleted',
+                description: `"${playlistToDelete.name}" was deleted successfully.`,
             });
 
             // Refresh the list
@@ -139,8 +139,8 @@ export function ManagePlaylistsDialog({ open, onOpenChange, onSuccess }: ManageP
         } catch (err: any) {
             toast({
                 variant: 'destructive',
-                title: 'Errore nell\'eliminazione',
-                description: err.message || 'Impossibile eliminare la playlist. Riprova.',
+                title: 'Deletion error',
+                description: err.message || 'Unable to delete the playlist. Try again.',
             });
         } finally {
             setDeleteLoading(null);
@@ -162,8 +162,8 @@ export function ManagePlaylistsDialog({ open, onOpenChange, onSuccess }: ManageP
         const labels: Record<string, string> = {
             custom: 'Personalizzata',
             generation: 'Generazione',
-            game: 'Gioco',
-            method: 'Metodo',
+            game: 'Game',
+            method: 'Method',
             type: 'Tipo',
         };
         return labels[categoryType] || categoryType;
@@ -176,18 +176,16 @@ export function ManagePlaylistsDialog({ open, onOpenChange, onSuccess }: ManageP
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <List className="h-5 w-5" />
-                            Gestisci Playlist
+                            Manage Playlists
                         </DialogTitle>
                     </DialogHeader>
 
                     {loading ? (
                         <div className="py-12 text-center text-muted-foreground">
-                            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
-                            Caricamento...
-                        </div>
+                            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />Loading...</div>
                     ) : playlists.length === 0 ? (
                         <div className="py-12 text-center text-muted-foreground">
-                            Nessuna playlist ancora. Crea la tua prima playlist!
+                            No playlists yet. Create your first playlist!
                         </div>
                     ) : (
                         <div className="space-y-3">
@@ -254,28 +252,26 @@ export function ManagePlaylistsDialog({ open, onOpenChange, onSuccess }: ManageP
                     <AlertDialogHeader>
                         <AlertDialogTitle>Sei sicuro?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Stai per eliminare la playlist <strong>"{playlistToDelete?.name}"</strong>.
+                            You are about to delete the playlist <strong>"{playlistToDelete?.name}"</strong>.
                             {playlistToDelete && playlistToDelete.shinyCount! > 0 && (
                                 <>
                                     <br />
                                     <br />
                                     Questa playlist contiene <strong>{playlistToDelete.shinyCount} shiny</strong>.
-                                    Gli shiny non verranno eliminati, ma non saranno più assegnati a questa playlist.
+                                    The shiny Pokémon will not be deleted, but they will no longer be assigned to this playlist.
                                 </>
                             )}
                             <br />
                             <br />
-                            Questa azione non può essere annullata.
+                            This action cannot be undone.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Annulla</AlertDialogCancel>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleDeleteConfirm}
                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                        >
-                            Elimina
-                        </AlertDialogAction>
+                        >Delete</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

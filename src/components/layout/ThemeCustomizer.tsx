@@ -435,13 +435,13 @@ export function ThemeCustomizer() {
     if (!isSupabaseConfigured) {
       toast({
         variant: 'destructive',
-        title: 'Supabase non configurato',
+        title: 'Supabase not configured',
         description: 'Non posso salvare i temi globali senza Supabase.',
       });
       return;
     }
 
-    const rawName = window.prompt('Nome preset personale:', 'Mio tema');
+    const rawName = window.prompt('Custom preset name:', 'My theme');
     const name = rawName?.trim();
     if (!name) return;
 
@@ -463,7 +463,7 @@ export function ThemeCustomizer() {
     if (error) {
       toast({
         variant: 'destructive',
-        title: 'Tema non salvato',
+        title: 'Theme not saved',
         description: error.message,
       });
       return;
@@ -477,7 +477,7 @@ export function ThemeCustomizer() {
     setPresetTone(getPresetTone(nextPreset));
     toast({
       title: 'Tema aggiunto',
-      description: `${name} salvato e sincronizzato per tutti.`,
+      description: `${name} was saved and synced for everyone.`,
     });
   };
 
@@ -486,7 +486,7 @@ export function ThemeCustomizer() {
     if (!isSupabaseConfigured) {
       toast({
         variant: 'destructive',
-        title: 'Supabase non configurato',
+        title: 'Supabase not configured',
         description: 'Non posso sincronizzare i temi globali senza Supabase.',
       });
       return;
@@ -515,7 +515,7 @@ export function ThemeCustomizer() {
     if (error) {
       toast({
         variant: 'destructive',
-        title: 'Tema non aggiornato',
+        title: 'Theme not updated',
         description: error.message,
       });
       return;
@@ -527,8 +527,8 @@ export function ThemeCustomizer() {
     ]);
     setPresetTone(getPresetTone(nextPreset));
     toast({
-      title: 'Tema aggiornato',
-      description: `${nextPreset.name} salvato e sincronizzato per tutti.`,
+      title: 'Theme updated',
+      description: `${nextPreset.name} was saved and synced for everyone.`,
     });
   };
 
@@ -537,7 +537,7 @@ export function ThemeCustomizer() {
     if (!isSupabaseConfigured) {
       toast({
         variant: 'destructive',
-        title: 'Supabase non configurato',
+        title: 'Supabase not configured',
         description: 'Non posso modificare i temi globali senza Supabase.',
       });
       return;
@@ -558,7 +558,7 @@ export function ThemeCustomizer() {
       if (error) {
         toast({
           variant: 'destructive',
-          title: 'Tema non eliminato',
+          title: 'Theme not deleted',
           description: error.message,
         });
         return;
@@ -568,8 +568,8 @@ export function ThemeCustomizer() {
       setManagedThemePresets((currentPresets) => currentPresets.filter((preset) => preset.id !== id));
       if (presetId === id) setPresetId('custom');
       toast({
-        title: 'Tema eliminato',
-        description: `${selectedPreset.name} nascosto e sincronizzato per tutti.`,
+        title: 'Theme deleted',
+        description: `${selectedPreset.name} was hidden and synced for everyone.`,
       });
       return;
     }
@@ -582,7 +582,7 @@ export function ThemeCustomizer() {
     if (error) {
       toast({
         variant: 'destructive',
-        title: 'Tema non eliminato',
+        title: 'Theme not deleted',
         description: error.message,
       });
       return;
@@ -591,8 +591,8 @@ export function ThemeCustomizer() {
     setManagedThemePresets((currentPresets) => currentPresets.filter((preset) => preset.id !== id));
     if (presetId === id) setPresetId('custom');
     toast({
-      title: 'Tema eliminato',
-      description: `${selectedPreset.name} rimosso e sincronizzato per tutti.`,
+      title: 'Theme deleted',
+      description: `${selectedPreset.name} was removed and synced for everyone.`,
     });
   };
 
@@ -614,15 +614,15 @@ export function ThemeCustomizer() {
       setSaving(false);
       toast({
         title: 'Preferenze salvate',
-        description: 'Colori e sfondo aggiornati correttamente',
+        description: 'Colors and background updated successfully',
       });
       setOpen(false);
     } else {
       setSaving(false);
       toast({
         variant: 'destructive',
-        title: 'Errore',
-        description: result?.error || 'Impossibile salvare le preferenze',
+        title: 'Error',
+        description: result?.error || 'Unable to save preferences',
       });
     }
   };
@@ -641,7 +641,7 @@ export function ThemeCustomizer() {
 
     toast({
       title: 'Modalita random attiva',
-      description: 'I colori seguiranno il tema della Home',
+      description: 'Colors will follow the Home theme',
     });
     setOpen(false);
   };
@@ -650,8 +650,8 @@ export function ThemeCustomizer() {
     if (!window.EyeDropper) {
       toast({
         variant: 'destructive',
-        title: 'Pipetta non disponibile',
-        description: 'Il browser non supporta la selezione colore dallo schermo.',
+        title: 'Eyedropper unavailable',
+        description: 'This browser does not support picking a color from the screen.',
       });
       return;
     }
@@ -677,7 +677,7 @@ export function ThemeCustomizer() {
       skipNextOpenSyncRef.current = true;
       setOpen(true);
       toast({
-        title: 'Colore sfondo applicato',
+        title: 'Background color applied',
         description: result.sRGBHex,
       });
     } catch (err: any) {
@@ -686,8 +686,8 @@ export function ThemeCustomizer() {
       if (err?.name === 'AbortError') return;
       toast({
         variant: 'destructive',
-        title: 'Errore pipetta',
-        description: 'Non sono riuscito a leggere il colore selezionato.',
+        title: 'Eyedropper error',
+        description: 'Unable to read the selected color.',
       });
     }
   };
@@ -710,7 +710,7 @@ export function ThemeCustomizer() {
           {colorScheme === 'dark'
             ? <Moon className="h-6 w-6 text-white drop-shadow-[0_0_6px_rgba(255,255,255,0.85)]" />
             : <Sun className="h-6 w-6 text-amber-600 drop-shadow-[0_0_6px_rgba(251,191,36,0.75)]" />}
-          <span className="sr-only">Impostazioni colori</span>
+          <span className="sr-only">Color settings</span>
         </Button>
       </DialogTrigger>
 
@@ -722,7 +722,7 @@ export function ThemeCustomizer() {
             </span>
             Tema app
           </DialogTitle>
-          <DialogDescription>Personalizza tema, sfondo e modalita dell'app.</DialogDescription>
+          <DialogDescription>Customize the app's theme, background, and mode.</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 bg-muted/25 p-4 sm:p-5">
@@ -740,7 +740,7 @@ export function ThemeCustomizer() {
                   className="h-10 justify-center gap-2"
                 >
                   <Save className="h-4 w-4" />
-                  Aggiorna tema selezionato
+                  Update selected theme
                 </Button>
                 <Button
                   type="button"
@@ -749,7 +749,7 @@ export function ThemeCustomizer() {
                   className="h-10 justify-center gap-2 border-dashed"
                 >
                   <Sparkles className="h-4 w-4" />
-                  Aggiungi nuovo tema
+                  Add new theme
                 </Button>
               </div>
             )}
@@ -829,7 +829,7 @@ export function ThemeCustomizer() {
                         type="button"
                         onClick={() => void deleteCustomPreset(preset.id)}
                         className="mr-2 flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                        title={isAddedPreset ? 'Elimina tema aggiunto' : 'Elimina tema dalla lista'}
+                        title={isAddedPreset ? 'Delete added theme' : 'Remove theme from list'}
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -901,7 +901,7 @@ export function ThemeCustomizer() {
                   className="h-10 justify-center gap-2"
                 >
                   <Pipette className="h-4 w-4" />
-                  Pipetta sfondo
+                  Background eyedropper
                 </Button>
               </div>
               <div className="grid gap-3 md:grid-cols-2">
@@ -929,7 +929,7 @@ export function ThemeCustomizer() {
                 </div>
 
                 <ColorPicker
-                  label="Colore sfondo"
+                  label="Background color"
                   value={backgroundColor}
                   hideDesktopAdvancedPicker
                   onChange={(color) => {
@@ -984,7 +984,7 @@ export function ThemeCustomizer() {
             {backgroundStyle !== 'plain' && (
               <div className="grid gap-3 pt-1 md:grid-cols-2">
                 <ColorPicker
-                  label="Accento sfondo 2"
+                  label="Background accent 2"
                   value={previewAccent2}
                   hideDesktopAdvancedPicker
                   onChange={(color) => {
@@ -993,7 +993,7 @@ export function ThemeCustomizer() {
                   }}
                 />
                 <ColorPicker
-                  label="Accento sfondo 3"
+                  label="Background accent 3"
                   value={previewAccent3}
                   hideDesktopAdvancedPicker
                   onChange={(color) => {
@@ -1013,7 +1013,7 @@ export function ThemeCustomizer() {
               style={{ backgroundColor: accentColor }}
             >
               <Save className="mr-2 h-4 w-4" />
-              {saving ? 'Salvataggio...' : 'Salva preferenze'}
+              {saving ? 'Saving...' : 'Save preferences'}
             </Button>
           </div>
         </div>

@@ -109,8 +109,8 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
       }
       toast({
         variant: 'destructive',
-        title: 'Errore',
-        description: err.message || 'Impossibile caricare i dati',
+        title: 'Error',
+        description: err.message || 'Unable to load data',
       });
       setEntries([]);
       setPlaylists([]);
@@ -131,14 +131,14 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
 
       setEntries((prev) => prev.filter((e) => e.id !== id));
       toast({
-        title: 'Eliminato',
-        description: 'Pokémon rimosso dalla collezione',
+        title: 'Deleted',
+        description: 'Pokémon removed from the collection',
       });
     } catch (err: any) {
       toast({
         variant: 'destructive',
-        title: 'Errore',
-        description: err.message || 'Impossibile eliminare',
+        title: 'Error',
+        description: err.message || 'Unable to delete',
       });
     }
   };
@@ -381,7 +381,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
       <div className="min-h-screen bg-background">
         <Navbar />
         <main className="container mx-auto py-8 px-4 flex justify-center items-center">
-          <p className="text-muted-foreground">Caricamento...</p>
+          <p className="text-muted-foreground">Loading...</p>
         </main>
       </div>
     );
@@ -415,15 +415,15 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
                 <div className="flex items-center gap-3">
                   <LogIn className="h-10 w-10 text-muted-foreground" />
                   <div>
-                    <h3 className="font-semibold">Accedi per salvare la tua collezione</h3>
+                    <h3 className="font-semibold">Sign in to save your collection</h3>
                     <p className="text-sm text-muted-foreground">
-                      Registrati o effettua il login per salvare i tuoi shiny nel cloud e averli su tutti i dispositivi.
+                      Sign up or sign in to save your shiny Pokémon to the cloud and access them on every device.
                     </p>
                   </div>
                 </div>
                 <Link to="/auth">
                   <Button className="shadow-lg hover:shadow-xl transition-all duration-300">
-                    Accedi / Registrati
+                    Sign In / Sign Up
                   </Button>
                 </Link>
               </CardContent>
@@ -435,7 +435,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,hsl(var(--muted)/0.45),transparent_34%),radial-gradient(circle_at_bottom_right,hsl(var(--muted)/0.28),transparent_30%)] pointer-events-none" />
             <div>
               <h1 className="text-3xl sm:text-4xl font-bold text-foreground">
-                La mia collezione Shiny
+                My Shiny Collection
               </h1>
               <div className="mt-3 flex flex-wrap justify-center md:justify-start gap-2">
                 <Button variant="outline" size="sm" className={cn(mode === 'obtained' && 'bg-muted text-foreground')} asChild>
@@ -461,17 +461,15 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
                 {playlists.length > 0 && (
                   <Button variant="outline" size="sm" onClick={() => setIsManagePlaylistsDialogOpen(true)} className="flex-1 sm:flex-none">
                     <List className="mr-2 h-4 w-4" />
-                    Gestisci Playlist
+                    Manage Playlists
                   </Button>
                 )}
                 <Button variant="outline" size="sm" onClick={() => setIsNewPlaylistDialogOpen(true)} className="flex-1 sm:flex-none">
                   <Plus className="mr-2 h-4 w-4" />
-                  Nuova Playlist
+                  New Playlist
                 </Button>
                 <Button className="shiny-glow w-full sm:w-auto" onClick={() => setIsAddDialogOpen(true)}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Aggiungi Shiny
-                </Button>
+                  <Plus className="mr-2 h-4 w-4" />Add Shiny</Button>
               </div>
             )}
             {/* Dialoghi sempre montati per evitare problemi di scope con il bundler */}
@@ -523,9 +521,9 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
                 <div>
-                  <Label>Cerca</Label>
+                  <Label>Search</Label>
                   <Input
-                    placeholder="Cerca Pokémon..."
+                    placeholder="Search Pokémon..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
@@ -546,7 +544,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
                   </select>
                 </div>
                 <div>
-                  <Label>Gioco</Label>
+                  <Label>Game</Label>
                   <select
                     value={filterGame}
                     onChange={(e) => setFilterGame(e.target.value)}
@@ -561,7 +559,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
                   </select>
                 </div>
                 <div>
-                  <Label>Metodo</Label>
+                  <Label>Method</Label>
                   <select
                     value={filterMethod}
                     onChange={(e) => setFilterMethod(e.target.value)}
@@ -582,8 +580,8 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
                     onChange={(e) => setSortBy(e.target.value as CollectionSort)}
                     className={nativeSelectClassName}
                   >
-                    <option value="date_desc">Data: recenti -&gt; vecchi</option>
-                    <option value="date_asc">Data: vecchi -&gt; recenti</option>
+                    <option value="date_desc">Date: newest to oldest</option>
+                    <option value="date_asc">Date: oldest to newest</option>
                   </select>
                 </div>
                 <div>
@@ -624,11 +622,11 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
             <Card>
               <CardContent className="py-12 text-center text-muted-foreground">
                 {!user
-                  ? 'Accedi per vedere e salvare la tua collezione.'
+                  ? 'Sign in to view and save your collection.'
                   : scopedEntries.length === 0
                     ? mode === 'distribution_event'
-                      ? 'Nessun shiny Distribution / Event ancora! Aggiungi una cattura con metodo “Distribution / Event”.'
-                      : 'Nessuno shiny ancora! Inizia a cacciare e aggiungi le tue catture.'
+                      ? 'No Distribution / Event shiny Pokémon yet! Add a catch using the “Distribution / Event” method.'
+                      : 'No shiny Pokémon yet! Start hunting and add your catches.'
                     : 'Nessuno shiny corrisponde ai filtri.'}
               </CardContent>
             </Card>

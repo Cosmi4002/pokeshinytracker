@@ -42,7 +42,7 @@ const getGameLabel = (gameId?: string | null) =>
   'Sconosciuto';
 
 const getMethodLabel = (method?: string | null) =>
-  findHuntingMethod(method)?.name || method || 'Metodo sconosciuto';
+  findHuntingMethod(method)?.name || method || 'Unknown method';
 
 const getCaughtDate = (entry: CaughtShinyRow) => {
   const rawDate = entry.caught_date || entry.created_at;
@@ -187,11 +187,11 @@ function RecordHunt({
           <div className="mt-1 truncate text-lg font-black leading-tight">{entry.pokemon_name}</div>
           <div className="mt-3 grid gap-x-4 gap-y-2 text-xs sm:grid-cols-2">
             <div className="min-w-0">
-              <div className="font-black uppercase tracking-[0.12em] text-muted-foreground">Gioco</div>
+              <div className="font-black uppercase tracking-[0.12em] text-muted-foreground">Game</div>
               <div className="mt-0.5 truncate font-semibold">{getGameLabel(entry.game)}</div>
             </div>
             <div className="min-w-0">
-              <div className="font-black uppercase tracking-[0.12em] text-muted-foreground">Metodo</div>
+              <div className="font-black uppercase tracking-[0.12em] text-muted-foreground">Method</div>
               <div className="mt-0.5 truncate font-semibold">{getMethodLabel(entry.method)}</div>
             </div>
             <div className="min-w-0">
@@ -272,8 +272,8 @@ export default function Stats() {
       if (error) {
         toast({
           variant: 'destructive',
-          title: 'Errore',
-          description: error.message || 'Impossibile caricare le statistiche',
+          title: 'Error',
+          description: error.message || 'Unable to load statistics',
         });
         setEntries([]);
       } else {
@@ -395,15 +395,13 @@ export default function Stats() {
         <main className="container mx-auto flex min-h-[70vh] items-center justify-center px-4 py-8">
           <Card className="max-w-md">
             <CardHeader>
-              <CardTitle>Statistiche</CardTitle>
+              <CardTitle>Statistics</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">Accedi per vedere le statistiche precise della tua collezione.</p>
+              <p className="text-sm text-muted-foreground">Sign in to view detailed statistics for your collection.</p>
               <Link to="/auth">
                 <Button className="w-full" style={{ backgroundColor: accentColor }}>
-                  <LogIn className="mr-2 h-4 w-4" />
-                  Accedi
-                </Button>
+                  <LogIn className="mr-2 h-4 w-4" />Sign In</Button>
               </Link>
             </CardContent>
           </Card>
@@ -422,17 +420,17 @@ export default function Stats() {
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
             <BarChart3 className="h-6 w-6" style={{ color: accentColor }} />
-            <h1 className="text-2xl font-bold sm:text-3xl">Statistiche</h1>
+            <h1 className="text-2xl font-bold sm:text-3xl">Statistics</h1>
           </div>
           <p className="text-sm text-muted-foreground">
-            Calcolate dalla tua collezione salvata.
+            Calculated from your saved collection.
           </p>
         </div>
 
         <Card className="overflow-hidden border-border/70">
           <CardContent className="grid gap-4 p-5 sm:grid-cols-[1fr_auto] sm:items-center">
             <div className="space-y-2">
-              <div className="text-sm font-medium text-muted-foreground">Panoramica collezione</div>
+              <div className="text-sm font-medium text-muted-foreground">Collection overview</div>
               <div className="flex flex-wrap items-end gap-x-4 gap-y-2">
                 <div className="text-5xl font-black tabular-nums tracking-tight" style={{ color: accentColor }}>
                   {numberFormatter.format(obtainedTotal)}
@@ -456,22 +454,22 @@ export default function Stats() {
         </Card>
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          <StatCard title="Media encounters" value={stats.averageAttempts ? numberFormatter.format(stats.averageAttempts) : '-'} note={`${numberFormatter.format(stats.totalAttempts)} encounters con counter`} accentColor={accentColor} />
-          <StatCard title="Con cromamuleto" value={`${percentage(stats.shinyCharmCount, obtainedTotal)}%`} note={`${numberFormatter.format(stats.shinyCharmCount)} shiny segnati con charm`} accentColor={accentColor} />
-          <StatCard title="Evoluti" value={numberFormatter.format(stats.evolvedCount)} note="Pokemon con evoluzione registrata" accentColor={accentColor} />
+          <StatCard title="Average encounters" value={stats.averageAttempts ? numberFormatter.format(stats.averageAttempts) : '-'} note={`${numberFormatter.format(stats.totalAttempts)} counter encounters`} accentColor={accentColor} />
+          <StatCard title="With Shiny Charm" value={`${percentage(stats.shinyCharmCount, obtainedTotal)}%`} note={`${numberFormatter.format(stats.shinyCharmCount)} shiny Pokémon marked with the Charm`} accentColor={accentColor} />
+          <StatCard title="Evolved" value={numberFormatter.format(stats.evolvedCount)} note="Pokémon with a recorded evolution" accentColor={accentColor} />
         </div>
 
         <div className="grid gap-4 lg:grid-cols-2">
-          <RankedList title="Metodi più usati" items={stats.methodTop} total={obtainedTotal} empty="Nessun metodo registrato." accentColor={accentColor} />
-          <RankedList title="Giochi più usati" items={stats.gameTop} total={obtainedTotal} empty="Nessun gioco registrato." accentColor={accentColor} />
-          <RankedList title="Distribuzione per generazione" items={stats.generationTop} total={obtainedTotal} empty="Nessuna generazione calcolabile." accentColor={accentColor} />
+          <RankedList title="Most-used methods" items={stats.methodTop} total={obtainedTotal} empty="No methods recorded." accentColor={accentColor} />
+          <RankedList title="Most-used games" items={stats.gameTop} total={obtainedTotal} empty="No games recorded." accentColor={accentColor} />
+          <RankedList title="Distribution by generation" items={stats.generationTop} total={obtainedTotal} empty="No generation data available." accentColor={accentColor} />
           <Card className={`border ${statsPanelClass}`}>
             <CardHeader>
               <CardTitle className="text-base">Record</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-3 lg:grid-cols-2">
-              <RecordHunt label="Caccia più lunga" entry={stats.longestHunt} accentColor={accentColor} />
-              <RecordHunt label="Caccia più fortunata" entry={stats.luckiestHunt} accentColor={accentColor} />
+              <RecordHunt label="Longest hunt" entry={stats.longestHunt} accentColor={accentColor} />
+              <RecordHunt label="Luckiest hunt" entry={stats.luckiestHunt} accentColor={accentColor} />
             </CardContent>
           </Card>
         </div>
@@ -479,7 +477,7 @@ export default function Stats() {
         <div className="grid gap-4">
           <Card className={`order-2 border ${statsPanelClass}`}>
             <CardHeader>
-              <CardTitle className="text-base">Andamento ultimi mesi</CardTitle>
+              <CardTitle className="text-base">Trend over recent months</CardTitle>
             </CardHeader>
             <CardContent>
               {stats.monthly.length === 0 ? (

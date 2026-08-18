@@ -513,7 +513,7 @@ export default function Bingo() {
           <div className="order-2 lg:order-1">
             {loading ? (
               <div className="rounded-lg border border-border bg-card p-8 text-center text-muted-foreground">
-                Caricamento Pokemon...
+                Loading Pokémon...
               </div>
             ) : pendingGenerations.size === 0 ? (
               <div className="rounded-lg border border-border bg-card p-8 text-center text-muted-foreground">
@@ -623,7 +623,7 @@ export default function Bingo() {
                               openPickerForCell(index);
                             }}
                             className="absolute right-1 top-1 flex h-7 w-7 items-center justify-center rounded-full border border-border bg-card/95 text-card-foreground shadow-sm opacity-100 transition hover:bg-accent sm:opacity-0 sm:group-hover:opacity-100"
-                            title="Scegli contenuto"
+                            title="Choose content"
                           >
                             <Pencil className="h-3.5 w-3.5" />
                           </button>
@@ -731,8 +731,8 @@ export default function Bingo() {
       <Dialog open={pickerOpen} onOpenChange={setPickerOpen}>
         <DialogContent className="w-[calc(100vw-1rem)] max-w-xl max-h-[85dvh] overflow-hidden p-0">
           <DialogHeader className="border-b border-border p-4 pr-10 text-left">
-            <DialogTitle>Scegli contenuto</DialogTitle>
-            <DialogDescription>Puoi inserire un Pokémon o un logo gioco nella casella.</DialogDescription>
+            <DialogTitle>Choose content</DialogTitle>
+            <DialogDescription>You can place a Pokémon or a game logo in the square.</DialogDescription>
           </DialogHeader>
           <div className="flex items-center gap-2 px-4 pt-4">
             <Button
@@ -767,7 +767,7 @@ export default function Bingo() {
                 }}
               />
               <p className="text-xs text-muted-foreground">
-                Nota: i Pokémon “Shiny Locked” e “No Own OT” non sono disponibili nel Bingo.
+                Note: “Shiny Locked” and “No Own OT” Pokémon are not available in Bingo.
               </p>
             </div>
           ) : (
@@ -802,7 +802,7 @@ export default function Bingo() {
         <DialogContent className="w-[calc(100vw-1rem)] max-w-xl max-h-[85dvh] overflow-hidden p-0">
           <DialogHeader className="border-b border-border p-4 pr-10 text-left">
             <DialogTitle>Seleziona Loghi</DialogTitle>
-            <DialogDescription>Scegli quali giochi possono comparire nel bingo.</DialogDescription>
+            <DialogDescription>Choose which games can appear in Bingo.</DialogDescription>
           </DialogHeader>
 
           <div className="flex items-center gap-2 px-4 pt-4">
@@ -866,7 +866,7 @@ export default function Bingo() {
           </div>
 
           <div className="border-t border-border p-4 flex justify-end">
-            <Button onClick={() => setGamePickerOpen(false)}>Chiudi</Button>
+            <Button onClick={() => setGamePickerOpen(false)}>Close</Button>
           </div>
         </DialogContent>
       </Dialog>

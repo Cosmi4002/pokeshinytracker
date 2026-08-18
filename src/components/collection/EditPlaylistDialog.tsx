@@ -63,8 +63,8 @@ export function EditPlaylistDialog({ open, onOpenChange, onSuccess, playlist }: 
         if (!trimmedName) {
             toast({
                 variant: 'destructive',
-                title: 'Nome richiesto',
-                description: 'Inserisci un nome per la playlist',
+                title: 'Name required',
+                description: 'Enter a name for the playlist',
             });
             return;
         }
@@ -86,8 +86,8 @@ export function EditPlaylistDialog({ open, onOpenChange, onSuccess, playlist }: 
             if (error) throw error;
 
             toast({
-                title: 'Playlist aggiornata!',
-                description: `"${trimmedName}" è stata aggiornata con successo.`,
+                title: 'Playlist updated!',
+                description: `"${trimmedName}" was updated successfully.`,
             });
 
             onOpenChange(false);
@@ -95,8 +95,8 @@ export function EditPlaylistDialog({ open, onOpenChange, onSuccess, playlist }: 
         } catch (error: any) {
             toast({
                 variant: 'destructive',
-                title: 'Errore nell\'aggiornamento',
-                description: error.message || 'Impossibile aggiornare la playlist. Riprova.',
+                title: 'Update error',
+                description: error.message || 'Unable to update the playlist. Try again.',
             });
         } finally {
             setLoading(false);
@@ -107,12 +107,12 @@ export function EditPlaylistDialog({ open, onOpenChange, onSuccess, playlist }: 
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-md">
                 <DialogHeader>
-                    <DialogTitle>Modifica Playlist</DialogTitle>
+                    <DialogTitle>Edit Playlist</DialogTitle>
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="space-y-2">
-                        <Label>Nome *</Label>
+                        <Label>Name *</Label>
                         <Input
                             value={name}
                             onChange={(e) => setName(e.target.value)}
@@ -141,13 +141,13 @@ export function EditPlaylistDialog({ open, onOpenChange, onSuccess, playlist }: 
                         <Textarea
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
-                            placeholder="Descrivi questa playlist..."
+                            placeholder="Describe this playlist..."
                         />
                     </div>
 
                     <Button type="submit" className="w-full" disabled={loading}>
                         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Salva Modifiche
+                        Save Changes
                     </Button>
                 </form>
             </DialogContent>

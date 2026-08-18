@@ -839,7 +839,7 @@ export function ShinyCounter({
               {saveStatus === 'saving' ? (
                 <>
                   <Loader2 className="h-3 w-3 animate-spin" />
-                  <span>Salvataggio...</span>
+                  <span>Saving...</span>
                 </>
               ) : saveStatus === 'saved' ? (
                 <>
@@ -849,7 +849,7 @@ export function ShinyCounter({
               ) : (
                 <>
                   <CloudOff className="h-3 w-3 text-destructive" />
-                  <span className="text-destructive">Errore</span>
+                  <span className="text-destructive">Error</span>
                 </>
               )}
             </div>
@@ -1018,7 +1018,7 @@ export function ShinyCounter({
                           slot.setForm('');
                           slot.setGender('');
                         }}
-                        title={`Rimuovi ${slot.label}`}
+                        title={`Remove ${slot.label}`}
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -1081,7 +1081,7 @@ export function ShinyCounter({
                 className="w-full shiny-glow"
               >
                 <Check className="mr-2 h-4 w-4" />
-                Termina caccia e salva
+                Finish hunt and save
               </Button>
             )}
 
@@ -1107,15 +1107,15 @@ export function ShinyCounter({
             <AlertDialogHeader>
               <AlertDialogTitle>Sei sicuro?</AlertDialogTitle>
               <AlertDialogDescription>
-                Questa azione riporterà il counter a 0. I dati salvati verranno aggiornati.
+                This action will reset the counter to 0. Saved data will be updated.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Annulla</AlertDialogCancel>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction onClick={() => {
                 reset();
                 setIsResetDialogOpen(false);
-              }}>Conferma</AlertDialogAction>
+              }}>Confirm</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
@@ -1139,7 +1139,7 @@ export function ShinyCounter({
   } catch (err: any) {
     return (
       <div className="p-4 border-2 border-destructive bg-destructive/10 rounded-lg text-destructive">
-        <h3 className="font-bold mb-2">Errore di rendering</h3>
+        <h3 className="font-bold mb-2">Rendering error</h3>
         <pre className="text-xs overflow-auto max-h-40">{err.message}</pre>
         <pre className="text-[10px] mt-2 opacity-50 overflow-auto">{err.stack}</pre>
       </div>

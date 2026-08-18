@@ -22,15 +22,15 @@ export class ErrorBoundary extends Component<Props, State> {
         <div className="min-h-screen bg-background flex items-center justify-center p-4">
           <div className="text-center space-y-4 max-w-2xl">
             <p className="text-2xl">🚨</p>
-            <h1 className="text-xl font-bold text-destructive">Errore Applicazione</h1>
+            <h1 className="text-xl font-bold text-destructive">Application Error</h1>
 
             <div className="text-left bg-muted/50 p-4 rounded-lg overflow-auto max-h-[60vh] text-xs font-mono border border-border">
-              <p className="font-bold mb-2 text-foreground">{this.state.error?.message || 'Errore sconosciuto'}</p>
+              <p className="font-bold mb-2 text-foreground">{this.state.error?.message || 'Unknown error'}</p>
               <pre className="opacity-70 whitespace-pre-wrap">{this.state.error?.stack}</pre>
             </div>
 
             <p className="text-muted-foreground text-sm">
-              Prova a ricaricare la pagina. Se l&apos;errore persiste, copia questo messaggio e invialo allo sviluppatore.
+              Try reloading the page. If the error persists, copy this message and send it to the developer.
             </p>
 
             <button

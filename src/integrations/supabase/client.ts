@@ -19,7 +19,7 @@ export function getSupabaseConfigErrorMessage() {
     isSupabaseConfigured,
   });
   return [
-    "Supabase non è configurato.",
+    "Supabase is not configured.",
     "Imposta le variabili d'ambiente:",
     "- VITE_SUPABASE_URL",
     "- VITE_SUPABASE_PUBLISHABLE_KEY (oppure VITE_SUPABASE_ANON_KEY)",

@@ -225,7 +225,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
     e.preventDefault();
     if (!entry || !user) return;
     if (!pokemonId || !pokemonName) {
-      toast({ variant: 'destructive', title: 'Seleziona un Pokémon' });
+      toast({ variant: 'destructive', title: 'Select a Pokémon' });
       return;
     }
     if (!game) {
@@ -283,15 +283,15 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
 
       toast({
         title: 'Modifiche salvate',
-        description: `${formatPokemonName(pokemonName, pokemonId)} è stato aggiornato nella collezione.`,
+        description: `${formatPokemonName(pokemonName, pokemonId)} was updated in the collection.`,
       });
       onOpenChange(false);
       onSuccess();
     } catch (error: any) {
       toast({
         variant: 'destructive',
-        title: 'Errore',
-        description: error.message || 'Impossibile salvare le modifiche.',
+        title: 'Error',
+        description: error.message || 'Unable to save changes.',
       });
     } finally {
       setLoading(false);
@@ -304,7 +304,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Modifica shiny in collezione</DialogTitle>
+          <DialogTitle>Edit shiny Pokémon in collection</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -414,7 +414,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
 
           {/* 7. Gioco */}
           <div className="space-y-2">
-            <Label>Gioco *</Label>
+            <Label>Game *</Label>
             <Select value={game} onValueChange={setGame}>
               <SelectTrigger>
                 <SelectValue placeholder="Seleziona gioco" />
@@ -473,7 +473,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
 
           {/* 8. Metodo */}
           <div className="space-y-2">
-            <Label>Metodo *</Label>
+            <Label>Method *</Label>
             <MethodSelector value={method.id} onChange={setMethod} />
           </div>
 
@@ -485,7 +485,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
                 onCheckedChange={(v) => setHideCounterEncounters(v === true)}
               />
               <Label htmlFor="edit-hide-counter-encounters" className="cursor-pointer select-none">
-                Nascondi counter encounters in collezione
+                Hide counter encounters in collection
               </Label>
             </div>
           )}
@@ -497,7 +497,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
               onCheckedChange={(v) => setShowEncounters(v === true)}
             />
             <Label htmlFor="edit-show-encounters" className="cursor-pointer select-none">
-              Mostra encounters in collezione
+              Show encounters in collection
             </Label>
           </div>
 
@@ -548,7 +548,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
                 }}
               />
               <Label htmlFor="show-total" className="cursor-pointer select-none">
-                Mostra “Total” in collezione
+                Show “Total” in collection
               </Label>
             </div>
                         <div className="space-y-2">
@@ -581,7 +581,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
                 }}
               />
               <Label htmlFor="show-seen" className="cursor-pointer select-none">
-                Mostra “Seen” in collezione
+                Show “Seen” in collection
               </Label>
             </div>
             <div className="space-y-2">
@@ -639,18 +639,18 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
           {/* 10. Date */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Data inizio caccia</Label>
+              <Label>Hunt start date</Label>
               <Input type="date" value={huntStartDate} onChange={(e) => setHuntStartDate(e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label>Data cattura *</Label>
+              <Label>Catch date *</Label>
               <Input type="date" value={caughtDate} onChange={(e) => setCaughtDate(e.target.value)} />
             </div>
           </div>
 
           {/* 11. FAIL - Separated from Phase */}
           <div className="flex items-center justify-between p-3 rounded-lg border border-destructive/30 bg-destructive/5">
-            <Label>FAIL (caccia fallita)</Label>
+            <Label>FAIL (failed hunt)</Label>
             <Switch checked={isFail} onCheckedChange={setIsFail} />
           </div>
 
@@ -662,7 +662,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
           {/* 12. Playlist */}
           {playlists.length > 0 && (
             <div className="space-y-2">
-              <Label>Playlist (opzionale)</Label>
+              <Label>Playlist (optional)</Label>
               <Select value={playlistId || 'none'} onValueChange={(val) => setPlaylistId(val === 'none' ? '' : val)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Nessuna playlist" />
@@ -687,7 +687,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
 
           <Button type="submit" className="w-full" disabled={loading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Salva modifiche
+            Save changes
           </Button>
         </form>
       </DialogContent>

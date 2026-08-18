@@ -256,7 +256,7 @@ export function ColorPicker({ label, value, onChange, presets = DEFAULT_PRESETS,
                             value={pickerColor}
                             onChange={handleColorInputChange}
                             className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                            aria-label={`Scegli ${label}`}
+                            aria-label={`Choose ${label}`}
                         />
                     </label>
                     <Input
