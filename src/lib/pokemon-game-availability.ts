@@ -690,7 +690,7 @@ const CURATED_SHINY_ORIGIN_BY_ID: AvailabilityById = {
   643: ["omegaruby","ultrasun","sword"],
   644: ["alphasapphire","ultramoon","shield"],
   645: ["black","white","omegaruby","alphasapphire","ultrasun","ultramoon","sword","shield","pla"],
-  646: ["omegaruby","alphasapphire","ultrasun","ultramoon","sword","shield"],
+  646: ["black2","white2","omegaruby","alphasapphire","ultrasun","ultramoon","sword","shield"],
   647: [],
   648: [],
   649: [],

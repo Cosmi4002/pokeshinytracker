@@ -935,6 +935,30 @@ export function _getPokemonSpriteUrlRaw(pokemonId: number, options: { shiny?: bo
   // If HOME doesn't have female sprites, we might have an issue.
   // Assumption: HOME folder has forms indexed by ID.
 
+  // Some form IDs collide with unrelated entries in the site's flat catalogue,
+  // so usePokemonList assigns them safe internal IDs. Sprite files still use the
+  // original PokeAPI IDs and must be resolved from the form slug.
+  const canonicalFormSpriteIds: Record<string, number> = {
+    'rotom-heat': 10008,
+    'rotom-wash': 10009,
+    'rotom-frost': 10010,
+    'rotom-fan': 10011,
+    'rotom-mow': 10012,
+    'shaymin-sky': 10006,
+    'basculin-blue-striped': 10016,
+    'tornadus-therian': 10019,
+    'thundurus-therian': 10020,
+    'landorus-therian': 10021,
+    'kyurem-black': 10022,
+    'kyurem-white': 10023,
+    'keldeo-resolute': 10024,
+    'meloetta-pirouette': 10025,
+  };
+  const canonicalFormSpriteId = name ? canonicalFormSpriteIds[name.toLowerCase()] : undefined;
+  if (canonicalFormSpriteId) {
+    return `${baseUrl}${shinyPath}${genderPath}/${canonicalFormSpriteId}.png`;
+  }
+
   return `${baseUrl}${shinyPath}${genderPath}/${pokemonId}.png`;
 }
 
@@ -972,7 +996,7 @@ export const POKEMON_FORM_COUNTS: Record<number, number> = {
   492: 2, // Shaymin
   493: 18, // Arceus
   // Gen 5
-  550: 2, // Basculin
+  550: 3, // Basculin
   555: 2, // Darmanitan
   585: 4, // Deerling
   586: 4, // Sawsbuck
@@ -997,7 +1021,7 @@ export const POKEMON_FORM_COUNTS: Record<number, number> = {
   720: 2, // Hoopa
   // Gen 7
   741: 4, // Oricorio
-  745: 2, // Lycanroc (Midday, Midnight, Dusk - wait 3?) Dusk is form.
+  745: 3, // Lycanroc (Midday, Midnight, Dusk)
   746: 2, // Wishiwashi
   773: 18, // Silvally
   774: 2, // Minior (Meteor/Core) - different colors are forms? Yes. ~7 colors + meteor. Minior is complex.
@@ -1030,4 +1054,3 @@ export const POKEMON_FORM_COUNTS: Record<number, number> = {
   1011: 4, // Dipplin/Hydra - Ogerpon (4 masks)
   1024: 3, // Terapagos
 };
-

@@ -70,7 +70,7 @@ export const POKEMON_WITH_GENDER_DIFF = [
 ];
 
 // Manual Varieties to force inclusion for specific species that aren't fully listed in pokedex.json
-export const MANUAL_VARIETIES: Record<number, { id: number, name: string }[]> = {
+const RAW_MANUAL_VARIETIES: Record<number, { id: number, name: string, generation?: number }[]> = {
   201: [ // Unown
     { id: 10001, name: 'unown-b' }, { id: 10002, name: 'unown-c' }, { id: 10003, name: 'unown-d' },
     { id: 10004, name: 'unown-e' }, { id: 10005, name: 'unown-f' }, { id: 10006, name: 'unown-g' },
@@ -88,12 +88,12 @@ export const MANUAL_VARIETIES: Record<number, { id: number, name: string }[]> = 
     { id: 10003, name: 'deoxys-speed' },
   ],
   412: [ // Burmy
-    { id: 10004, name: 'burmy-sandy' },
-    { id: 10005, name: 'burmy-trash' }
+    { id: 1041201, name: 'burmy-sandy' },
+    { id: 1041202, name: 'burmy-trash' }
   ],
   413: [ // Wormadam
-    { id: 10014, name: 'wormadam-sandy' },
-    { id: 10015, name: 'wormadam-trash' }
+    { id: 1041301, name: 'wormadam-sandy' },
+    { id: 1041302, name: 'wormadam-trash' }
   ],
   422: [ // Shellos
     { id: 10026, name: 'shellos-east' }
@@ -133,17 +133,19 @@ export const MANUAL_VARIETIES: Record<number, { id: number, name: string }[]> = 
   ],
   550: [ // Basculin
     { id: 10016, name: 'basculin-blue-striped' },
-    { id: 10247, name: 'basculin-white-striped' }
+    { id: 10247, name: 'basculin-white-striped', generation: 8 }
   ],
   585: [ // Deerling
-    { id: 10051, name: 'deerling-summer' },
-    { id: 10052, name: 'deerling-autumn' },
-    { id: 10053, name: 'deerling-winter' }
+    // Synthetic IDs are intentional: seasonal forms do not have distinct Pokémon IDs
+    // in PokeAPI, and the old 10051-10053 values collided with Arceus forms.
+    { id: 1058501, name: 'deerling-summer' },
+    { id: 1058502, name: 'deerling-autumn' },
+    { id: 1058503, name: 'deerling-winter' }
   ],
   586: [ // Sawsbuck
-    { id: 10054, name: 'sawsbuck-summer' },
-    { id: 10055, name: 'sawsbuck-autumn' },
-    { id: 10056, name: 'sawsbuck-winter' }
+    { id: 1058601, name: 'sawsbuck-summer' },
+    { id: 1058602, name: 'sawsbuck-autumn' },
+    { id: 1058603, name: 'sawsbuck-winter' }
   ],
   641: [ // Tornadus
     { id: 10019, name: 'tornadus-therian' }
@@ -265,6 +267,33 @@ export const MANUAL_VARIETIES: Record<number, { id: number, name: string }[]> = 
     { id: 10277, name: 'terapagos-stellar' }
   ],
 };
+
+// PokeAPI form IDs are only unique inside their original endpoint and several of
+// the historical manual entries overlap other Pokémon in our single flat list
+// (for example Giratina Origin and Vivillon Garden both used 10007). Preserve a
+// canonical ID when it is free; otherwise assign a stable species-scoped ID.
+export const MANUAL_VARIETIES: Record<number, { id: number, name: string, generation?: number }[]> = (() => {
+  const reservedIds = new Map<number, string>(
+    (pokedexData as Array<{ id: number, name: string }>).map((entry) => [entry.id, entry.name])
+  );
+  const normalized: Record<number, { id: number, name: string, generation?: number }[]> = {};
+
+  Object.entries(RAW_MANUAL_VARIETIES).forEach(([baseIdText, varieties]) => {
+    const baseId = Number(baseIdText);
+    normalized[baseId] = varieties.map((variety, index) => {
+      let id = variety.id;
+      const existingName = reservedIds.get(id);
+      // Keep an ID already present for this exact form: usePokemonList will skip
+      // the redundant manual entry. Only remap genuine cross-species collisions.
+      if (existingName && existingName !== variety.name) id = baseId * 10000 + index + 1;
+      while (reservedIds.has(id) && reservedIds.get(id) !== variety.name) id += 1;
+      reservedIds.set(id, variety.name);
+      return { ...variety, id };
+    });
+  });
+
+  return normalized;
+})();
 
 // Generation ranges
 export const GENERATION_RANGES: Record<number, [number, number]> = {
@@ -641,7 +670,7 @@ export function usePokemonList() {
               id: v.id,
               baseId,
               name: v.name,
-              generation: baseEntry?.generation || getGeneration(v.id, v.name, baseId),
+              generation: v.generation || baseEntry?.generation || getGeneration(v.id, v.name, baseId),
               displayName: override?.custom_display_name || formatPokemonName(v.name, v.id, baseId),
               hideFromPokedex: isExcluded,
               shinyAvailability: getShinyAvailability({ baseId, name: v.name }),
@@ -687,11 +716,13 @@ export function usePokemonDetails(pokemonId: number | null) {
         if (!entry) {
           let manualBaseId: number | null = null;
           let manualName: string | null = null;
+          let manualGeneration: number | undefined;
           for (const [baseIdStr, varieties] of Object.entries(MANUAL_VARIETIES)) {
             const found = varieties.find((v) => v.id === pokemonId);
             if (found) {
               manualBaseId = parseInt(baseIdStr, 10);
               manualName = found.name;
+              manualGeneration = found.generation;
               break;
             }
           }
@@ -704,7 +735,7 @@ export function usePokemonDetails(pokemonId: number | null) {
                 id: pokemonId,
                 baseId: manualBaseId,
                 name: manualName,
-                generation: baseEntry.generation,
+                generation: manualGeneration || baseEntry.generation,
               };
             }
           }
@@ -730,7 +761,7 @@ export function usePokemonDetails(pokemonId: number | null) {
               id: m.id,
               baseId: baseId,
               name: m.name,
-              generation: entry.generation
+              generation: m.generation || entry.generation
             });
           }
         });

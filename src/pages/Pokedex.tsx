@@ -124,12 +124,36 @@ export default function Pokedex() {
         // Some species are easier to track as separate entries (each form as its own "base" card).
         // Keep them as individual Pokédex cards instead of a single % card.
         const splitIntoSeparateCardsBaseIds = new Set([
+            412, // Burmy cloaks
+            413, // Wormadam cloaks
+            422, // Shellos seas
+            423, // Gastrodon seas
+            479, // Rotom appliances
+            483, // Dialga forms
+            484, // Palkia forms
+            487, // Giratina Altered and Origin
+            492, // Shaymin Land and Sky
+            550, // Basculin (Red-Striped, Blue-Striped and White-Striped)
+            585, // Deerling seasonal forms
+            586, // Sawsbuck seasonal forms
+            641, // Tornadus forms
+            642, // Thundurus forms
+            645, // Landorus forms
+            646, // Kyurem forms
+            710, // Pumpkaboo sizes
+            711, // Gourgeist sizes
+            745, // Lycanroc forms
             849, // Toxtricity
+            854, // Sinistea authenticity
+            855, // Polteageist authenticity
             892, // Urshifu
+            905, // Enamorus forms
             925, // Maushold
             931, // Squawkabilly
             978, // Tatsugiri (Curly/Droopy/Stretchy)
             982, // Dudunsparce
+            1012, // Poltchageist authenticity
+            1013, // Sinistcha authenticity
         ]);
         pokemon.forEach(p => {
             const isCanonicalBase = p.id === p.baseId;

@@ -102,6 +102,8 @@ type PersistedState = {
   selectedGameIds?: number[];
   randomPokemonId?: number | null;
   randomPokemonName?: string | null;
+  randomGenerationFilters?: number[];
+  /** Legacy single-generation value, kept for existing saved data. */
   randomGenerationFilter?: number | 'all' | null;
 };
 
@@ -133,7 +135,7 @@ export default function Games() {
   const [pickerValueName, setPickerValueName] = useState<string | undefined>(undefined);
   const [pickerMode, setPickerMode] = useState<'pokemon' | 'logo'>('pokemon');
   const [randomPokemon, setRandomPokemon] = useState<PokemonBasic | null>(null);
-  const [randomGenerationFilter, setRandomGenerationFilter] = useState<'all' | number>('all');
+  const [randomGenerationFilters, setRandomGenerationFilters] = useState<Set<number>>(new Set());
 
   const saveTimerRef = useRef<number | null>(null);
   const didInitRef = useRef(false);
@@ -172,9 +174,9 @@ export default function Games() {
   }, [allRandomPokemon]);
 
   const randomPokemonPool = useMemo(() => {
-    if (randomGenerationFilter === 'all') return allRandomPokemon;
-    return allRandomPokemon.filter((p) => p.generation === randomGenerationFilter);
-  }, [allRandomPokemon, randomGenerationFilter]);
+    if (randomGenerationFilters.size === 0) return allRandomPokemon;
+    return allRandomPokemon.filter((p) => randomGenerationFilters.has(p.generation));
+  }, [allRandomPokemon, randomGenerationFilters]);
 
   const availableGenerations = useMemo(() => {
     const gens = new Set<number>();
@@ -211,7 +213,8 @@ export default function Games() {
           generations: state.generations ?? [],
           random_pokemon_id: state.randomPokemonId ?? null,
           random_pokemon_name: state.randomPokemonName ?? null,
-          random_generation_filter: state.randomGenerationFilter === 'all' ? null : state.randomGenerationFilter ?? null,
+          random_generation_filter: state.randomGenerationFilters?.length === 1 ? state.randomGenerationFilters[0] : null,
+          random_generation_filters: state.randomGenerationFilters ?? [],
         },
         { onConflict: 'user_id' }
       );
@@ -253,8 +256,10 @@ export default function Games() {
       }
     }
 
-    if (parsed.randomGenerationFilter === 'all' || typeof parsed.randomGenerationFilter === 'number') {
-      setRandomGenerationFilter(parsed.randomGenerationFilter);
+    if (Array.isArray(parsed.randomGenerationFilters)) {
+      setRandomGenerationFilters(new Set(parsed.randomGenerationFilters));
+    } else if (typeof parsed.randomGenerationFilter === 'number') {
+      setRandomGenerationFilters(new Set([parsed.randomGenerationFilter]));
     }
 
     if (typeof parsed.randomPokemonId === 'number') {
@@ -275,9 +280,9 @@ export default function Games() {
     selectedGameIds: Array.from(selectedGameIds),
     randomPokemonId: randomPokemon?.id ?? null,
     randomPokemonName: randomPokemon?.name ?? null,
-    randomGenerationFilter,
+    randomGenerationFilters: Array.from(randomGenerationFilters),
     ...overrides,
-  }), [gameRatio, gridIds, gridSize, includeGames, includedGenerations, marked, randomGenerationFilter, randomPokemon, selectedGameIds]);
+  }), [gameRatio, gridIds, gridSize, includeGames, includedGenerations, marked, randomGenerationFilters, randomPokemon, selectedGameIds]);
 
   const pickRandomPokemon = useCallback(() => {
     if (randomPokemonPool.length === 0) return;
@@ -289,20 +294,28 @@ export default function Games() {
     void persist(makePersistedState({
       randomPokemonId: next.id,
       randomPokemonName: next.name,
-      randomGenerationFilter,
+      randomGenerationFilters: Array.from(randomGenerationFilters),
     }));
-  }, [makePersistedState, persist, randomGenerationFilter, randomPokemon, randomPokemonPool]);
+  }, [makePersistedState, persist, randomGenerationFilters, randomPokemon, randomPokemonPool]);
 
-  const setRandomGeneration = useCallback((nextFilter: 'all' | number) => {
-    const shouldClear = randomPokemon && nextFilter !== 'all' && randomPokemon.generation !== nextFilter;
-    setRandomGenerationFilter(nextFilter);
+  const toggleRandomGeneration = useCallback((generation: number | 'all') => {
+    const nextFilters = generation === 'all'
+      ? new Set<number>()
+      : (() => {
+          const next = new Set(randomGenerationFilters);
+          if (next.has(generation)) next.delete(generation);
+          else next.add(generation);
+          return next;
+        })();
+    const shouldClear = randomPokemon && nextFilters.size > 0 && !nextFilters.has(randomPokemon.generation);
+    setRandomGenerationFilters(nextFilters);
     if (shouldClear) setRandomPokemon(null);
     void persist(makePersistedState({
       randomPokemonId: shouldClear ? null : randomPokemon?.id ?? null,
       randomPokemonName: shouldClear ? null : randomPokemon?.name ?? null,
-      randomGenerationFilter: nextFilter,
+      randomGenerationFilters: Array.from(nextFilters),
     }));
-  }, [makePersistedState, persist, randomPokemon]);
+  }, [makePersistedState, persist, randomGenerationFilters, randomPokemon]);
 
   const buildPools = useCallback((gens: Set<number>) => {
     const matchesGen = (p: { generation?: number } | Pick<GameCell, 'generation'>) =>
@@ -492,7 +505,7 @@ export default function Games() {
     void (async () => {
       const { data, error } = await supabase
         .from('bingo_boards')
-        .select('grid_size, grid_ids, marked_ids, generations, random_pokemon_id, random_pokemon_name, random_generation_filter')
+        .select('grid_size, grid_ids, marked_ids, generations, random_pokemon_id, random_pokemon_name, random_generation_filter, random_generation_filters')
         .eq('user_id', user.id)
         .maybeSingle();
 
@@ -508,6 +521,7 @@ export default function Games() {
         generations: data.generations ?? [],
         randomPokemonId: data.random_pokemon_id ?? null,
         randomPokemonName: data.random_pokemon_name ?? null,
+        randomGenerationFilters: data.random_generation_filters ?? undefined,
         randomGenerationFilter: data.random_generation_filter ?? 'all',
       });
     })();
@@ -574,28 +588,28 @@ export default function Games() {
 
               <div className="space-y-2">
                 <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  Generation
+                  Generations
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <Button
                     type="button"
-                    variant={randomGenerationFilter === 'all' ? 'default' : 'outline'}
+                    variant={randomGenerationFilters.size === 0 ? 'default' : 'outline'}
                     size="sm"
-                    onClick={() => setRandomGeneration('all')}
+                    onClick={() => toggleRandomGeneration('all')}
                     className="h-8 px-3"
-                    style={randomGenerationFilter === 'all' ? { backgroundColor: accentColor } : undefined}
+                    style={randomGenerationFilters.size === 0 ? { backgroundColor: accentColor } : undefined}
                   >
                     All
                   </Button>
                   {randomAvailableGenerations.map((gen) => {
-                    const isActive = randomGenerationFilter === gen;
+                    const isActive = randomGenerationFilters.has(gen);
                     return (
                       <Button
                         key={gen}
                         type="button"
                         variant={isActive ? 'default' : 'outline'}
                         size="sm"
-                        onClick={() => setRandomGeneration(gen)}
+                        onClick={() => toggleRandomGeneration(gen)}
                         className="h-8 px-3"
                         style={isActive ? { backgroundColor: accentColor } : undefined}
                       >
@@ -624,7 +638,7 @@ export default function Games() {
 
               {!loading && randomPokemonPool.length === 0 && (
                 <p className="text-xs text-muted-foreground">
-                  No Pokémon available for this generation.
+                  No Pokémon available for the selected generations.
                 </p>
               )}
             </div>
@@ -650,7 +664,7 @@ export default function Games() {
                     className="h-40 w-40 object-contain"
                     style={{
                       imageRendering: 'auto',
-                      filter: `url(#${randomSpriteOutlineId}) drop-shadow(0 8px 16px rgba(0,0,0,0.75))`,
+                      filter: `url(#${randomSpriteOutlineId}) drop-shadow(0 2px 3px rgba(0,0,0,0.08))`,
                     }}
                     decoding="async"
                     onError={(event) => {

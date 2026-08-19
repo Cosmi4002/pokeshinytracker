@@ -23,6 +23,7 @@ export type Database = {
           grid_size: number
           marked_ids: number[]
           random_generation_filter: number | null
+          random_generation_filters: number[]
           random_pokemon_id: number | null
           random_pokemon_name: string | null
           updated_at: string
@@ -35,6 +36,7 @@ export type Database = {
           grid_size?: number
           marked_ids?: number[]
           random_generation_filter?: number | null
+          random_generation_filters?: number[]
           random_pokemon_id?: number | null
           random_pokemon_name?: string | null
           updated_at?: string
@@ -47,6 +49,7 @@ export type Database = {
           grid_size?: number
           marked_ids?: number[]
           random_generation_filter?: number | null
+          random_generation_filters?: number[]
           random_pokemon_id?: number | null
           random_pokemon_name?: string | null
           updated_at?: string
