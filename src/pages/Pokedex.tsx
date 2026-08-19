@@ -120,7 +120,7 @@ export default function Pokedex() {
         };
         // Always show these full species lines even if some forms were hidden via overrides.
         const forceVisibleBaseIds = new Set([351, 386, 666]);
-        const forceSingleCardBaseIds = new Set([201, 493, 669, 670, 671, 676, 773, 741, 774, 849, 869, 925, 931, 1017, 1024]);
+        const forceSingleCardBaseIds = new Set([201, 493, 646, 647, 669, 670, 671, 676, 773, 741, 774, 800, 849, 869, 925, 931, 1017, 1024]);
         // Some species are easier to track as separate entries (each form as its own "base" card).
         // Keep them as individual Pokédex cards instead of a single % card.
         const splitIntoSeparateCardsBaseIds = new Set([
@@ -139,7 +139,6 @@ export default function Pokedex() {
             641, // Tornadus forms
             642, // Thundurus forms
             645, // Landorus forms
-            646, // Kyurem forms
             710, // Pumpkaboo sizes
             711, // Gourgeist sizes
             745, // Lycanroc forms

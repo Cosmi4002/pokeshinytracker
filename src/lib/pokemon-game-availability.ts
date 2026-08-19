@@ -1554,7 +1554,7 @@ const CURATED_SHINY_ORIGIN_BY_NAME: AvailabilityByName = {
   'krookodile': ["black","white","black2","white2","x","y","omegaruby","alphasapphire","sun","moon","ultrasun","ultramoon","sword","shield","scarlet","violet","za"],
   'kubfu': [],
   'kyogre': ["sapphire","emerald","heartgold","ultramoon","sword","shield","brilliantdiamond","shiningpearl"],
-  'kyurem': ["omegaruby","alphasapphire","ultrasun","ultramoon","sword","shield"],
+  'kyurem': ["black2","white2","omegaruby","alphasapphire","ultrasun","ultramoon","sword","shield"],
   'lairon': ["ruby","sapphire","firered","leafgreen","emerald","diamond","pearl","platinum","heartgold","soulsilver","black","white","black2","white2","x","y","omegaruby","alphasapphire","sun","moon","ultrasun","ultramoon","sword","shield","brilliantdiamond","shiningpearl","za"],
   'lampent': ["black","white","black2","white2","x","y","omegaruby","alphasapphire","sun","moon","ultrasun","ultramoon","sword","shield","scarlet","violet","za"],
   'lanturn': ["gold","silver","crystal","ruby","sapphire","firered","leafgreen","emerald","diamond","pearl","platinum","heartgold","soulsilver","black","white","black2","white2","x","y","omegaruby","alphasapphire","sun","moon","ultrasun","ultramoon","sword","shield","brilliantdiamond","shiningpearl","scarlet","violet"],

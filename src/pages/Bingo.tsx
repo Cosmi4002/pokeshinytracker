@@ -17,6 +17,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 const SIZE_OPTIONS = [5] as const;
 const STORAGE_KEY = 'bingo-shiny-state';
@@ -128,6 +138,7 @@ export default function Games() {
   const [replaceMode, setReplaceMode] = useState(false);
   const [selectedGameIds, setSelectedGameIds] = useState<Set<number>>(() => new Set(GAMES.map((g) => g.id)));
   const [gamePickerOpen, setGamePickerOpen] = useState(false);
+  const [regenerateConfirmOpen, setRegenerateConfirmOpen] = useState(false);
 
   const [includedGenerations, setIncludedGenerations] = useState<Set<number>>(new Set());
   const [pendingGenerations, setPendingGenerations] = useState<Set<number>>(new Set());
@@ -739,7 +750,13 @@ export default function Games() {
                 <Shuffle className="h-4 w-4" />
                 {replaceMode ? 'Swap ON' : 'Swap OFF'}
               </Button>
-              <Button onClick={generateGrid} className="h-10 justify-center gap-2">
+              <Button
+                onClick={() => {
+                  if (gridIds.length > 0) setRegenerateConfirmOpen(true);
+                  else generateGrid();
+                }}
+                className="h-10 justify-center gap-2"
+              >
                 <RefreshCcw className="h-4 w-4" />
                 Regenerate
               </Button>
@@ -1108,6 +1125,21 @@ export default function Games() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={regenerateConfirmOpen} onOpenChange={setRegenerateConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Regenerate this Bingo board?</AlertDialogTitle>
+            <AlertDialogDescription>
+              The current board and its marked squares will be replaced with a new random board.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={generateGrid}>Regenerate</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
