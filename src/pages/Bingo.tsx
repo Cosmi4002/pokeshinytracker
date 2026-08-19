@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { CheckCircle2, Dice5, Gamepad2, Grid3X3, Pencil, RefreshCcw, Shuffle, Sparkles } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
@@ -100,12 +100,16 @@ type PersistedState = {
   includeGames?: boolean;
   gameRatio?: number;
   selectedGameIds?: number[];
+  randomPokemonId?: number | null;
+  randomPokemonName?: string | null;
+  randomGenerationFilter?: number | 'all' | null;
 };
 
 export default function Games() {
   const { pokemon, loading } = usePokemonList();
   const { accentColor } = useRandomColor();
   const { user } = useAuth();
+  const randomSpriteOutlineId = `random-sprite-outline-${useId().replace(/:/g, '')}`;
 
   const [gridSize, setGridSize] = useState<(typeof SIZE_OPTIONS)[number]>(5);
   const [pendingGridSize, setPendingGridSize] = useState<(typeof SIZE_OPTIONS)[number]>(5);
@@ -129,6 +133,7 @@ export default function Games() {
   const [pickerValueName, setPickerValueName] = useState<string | undefined>(undefined);
   const [pickerMode, setPickerMode] = useState<'pokemon' | 'logo'>('pokemon');
   const [randomPokemon, setRandomPokemon] = useState<PokemonBasic | null>(null);
+  const [randomGenerationFilter, setRandomGenerationFilter] = useState<'all' | number>('all');
 
   const saveTimerRef = useRef<number | null>(null);
   const didInitRef = useRef(false);
@@ -146,7 +151,7 @@ export default function Games() {
     return Array.from(byBase.values());
   }, [pokemon]);
 
-  const randomPokemonPool = useMemo(() => {
+  const allRandomPokemon = useMemo(() => {
     const byName = new Map<string, PokemonBasic>();
     pokemon.forEach((p) => {
       if (p.hideFromPokedex) return;
@@ -158,15 +163,18 @@ export default function Games() {
     return Array.from(byName.values());
   }, [pokemon]);
 
-  const pickRandomPokemon = useCallback(() => {
-    if (randomPokemonPool.length === 0) return;
-    setRandomPokemon((current) => {
-      const candidates = current && randomPokemonPool.length > 1
-        ? randomPokemonPool.filter((p) => p.name !== current.name)
-        : randomPokemonPool;
-      return candidates[Math.floor(Math.random() * candidates.length)];
+  const randomAvailableGenerations = useMemo(() => {
+    const gens = new Set<number>();
+    allRandomPokemon.forEach((p) => {
+      if (typeof p.generation === 'number') gens.add(p.generation);
     });
-  }, [randomPokemonPool]);
+    return Array.from(gens).sort((a, b) => a - b);
+  }, [allRandomPokemon]);
+
+  const randomPokemonPool = useMemo(() => {
+    if (randomGenerationFilter === 'all') return allRandomPokemon;
+    return allRandomPokemon.filter((p) => p.generation === randomGenerationFilter);
+  }, [allRandomPokemon, randomGenerationFilter]);
 
   const availableGenerations = useMemo(() => {
     const gens = new Set<number>();
@@ -201,6 +209,9 @@ export default function Games() {
           grid_ids: state.gridIds ?? [],
           marked_ids: state.markedIds ?? [],
           generations: state.generations ?? [],
+          random_pokemon_id: state.randomPokemonId ?? null,
+          random_pokemon_name: state.randomPokemonName ?? null,
+          random_generation_filter: state.randomGenerationFilter === 'all' ? null : state.randomGenerationFilter ?? null,
         },
         { onConflict: 'user_id' }
       );
@@ -241,7 +252,57 @@ export default function Games() {
         setMarked(new Set(nextMarked));
       }
     }
-  }, [idToCell]);
+
+    if (parsed.randomGenerationFilter === 'all' || typeof parsed.randomGenerationFilter === 'number') {
+      setRandomGenerationFilter(parsed.randomGenerationFilter);
+    }
+
+    if (typeof parsed.randomPokemonId === 'number') {
+      const restored =
+        allRandomPokemon.find((p) => p.id === parsed.randomPokemonId && p.name === parsed.randomPokemonName) ??
+        allRandomPokemon.find((p) => p.id === parsed.randomPokemonId);
+      if (restored) setRandomPokemon(restored);
+    }
+  }, [allRandomPokemon, idToCell]);
+
+  const makePersistedState = useCallback((overrides: PersistedState = {}): PersistedState => ({
+    gridSize,
+    gridIds,
+    markedIds: Array.from(marked),
+    generations: Array.from(includedGenerations),
+    includeGames,
+    gameRatio,
+    selectedGameIds: Array.from(selectedGameIds),
+    randomPokemonId: randomPokemon?.id ?? null,
+    randomPokemonName: randomPokemon?.name ?? null,
+    randomGenerationFilter,
+    ...overrides,
+  }), [gameRatio, gridIds, gridSize, includeGames, includedGenerations, marked, randomGenerationFilter, randomPokemon, selectedGameIds]);
+
+  const pickRandomPokemon = useCallback(() => {
+    if (randomPokemonPool.length === 0) return;
+    const candidates = randomPokemon && randomPokemonPool.length > 1
+      ? randomPokemonPool.filter((p) => p.name !== randomPokemon.name)
+      : randomPokemonPool;
+    const next = candidates[Math.floor(Math.random() * candidates.length)];
+    setRandomPokemon(next);
+    void persist(makePersistedState({
+      randomPokemonId: next.id,
+      randomPokemonName: next.name,
+      randomGenerationFilter,
+    }));
+  }, [makePersistedState, persist, randomGenerationFilter, randomPokemon, randomPokemonPool]);
+
+  const setRandomGeneration = useCallback((nextFilter: 'all' | number) => {
+    const shouldClear = randomPokemon && nextFilter !== 'all' && randomPokemon.generation !== nextFilter;
+    setRandomGenerationFilter(nextFilter);
+    if (shouldClear) setRandomPokemon(null);
+    void persist(makePersistedState({
+      randomPokemonId: shouldClear ? null : randomPokemon?.id ?? null,
+      randomPokemonName: shouldClear ? null : randomPokemon?.name ?? null,
+      randomGenerationFilter: nextFilter,
+    }));
+  }, [makePersistedState, persist, randomPokemon]);
 
   const buildPools = useCallback((gens: Set<number>) => {
     const matchesGen = (p: { generation?: number } | Pick<GameCell, 'generation'>) =>
@@ -282,7 +343,7 @@ export default function Games() {
     setGridIds(ids);
     setMarked(new Set());
 
-    void persist({
+    void persist(makePersistedState({
       gridSize: pendingGridSize,
       gridIds: ids,
       markedIds: [],
@@ -290,8 +351,8 @@ export default function Games() {
       includeGames,
       gameRatio,
       selectedGameIds: Array.from(selectedGameIds),
-    });
-  }, [pendingGenerations, pendingGridSize, includeGames, gameRatio, persist, buildPools, selectedGameIds]);
+    }));
+  }, [pendingGenerations, pendingGridSize, includeGames, gameRatio, persist, buildPools, selectedGameIds, makePersistedState]);
 
   const toggleMark = useCallback((index: number) => {
     setMarked((prev) => {
@@ -431,7 +492,7 @@ export default function Games() {
     void (async () => {
       const { data, error } = await supabase
         .from('bingo_boards')
-        .select('grid_size, grid_ids, marked_ids, generations')
+        .select('grid_size, grid_ids, marked_ids, generations, random_pokemon_id, random_pokemon_name, random_generation_filter')
         .eq('user_id', user.id)
         .maybeSingle();
 
@@ -445,6 +506,9 @@ export default function Games() {
         gridIds: data.grid_ids ?? [],
         markedIds: data.marked_ids ?? [],
         generations: data.generations ?? [],
+        randomPokemonId: data.random_pokemon_id ?? null,
+        randomPokemonName: data.random_pokemon_name ?? null,
+        randomGenerationFilter: data.random_generation_filter ?? 'all',
       });
     })();
   }, [loading, user, applyPersisted]);
@@ -457,15 +521,7 @@ export default function Games() {
 
     if (saveTimerRef.current) window.clearTimeout(saveTimerRef.current);
     saveTimerRef.current = window.setTimeout(() => {
-      void persist({
-        gridSize,
-        gridIds,
-        markedIds: Array.from(marked),
-        generations: Array.from(includedGenerations),
-        includeGames,
-        gameRatio,
-        selectedGameIds: Array.from(selectedGameIds),
-      });
+      void persist(makePersistedState());
     }, 250);
 
     return () => {
@@ -474,7 +530,7 @@ export default function Games() {
         saveTimerRef.current = null;
       }
     };
-  }, [loading, gridSize, gridIds, marked, includedGenerations, includeGames, gameRatio, persist, selectedGameIds]);
+  }, [loading, gridIds, persist, makePersistedState]);
 
   const totalCells = grid.length || gridSize * gridSize;
   const markedCount = marked.size;
@@ -516,29 +572,86 @@ export default function Games() {
                 </div>
               </div>
 
-              <Button
-                type="button"
-                onClick={pickRandomPokemon}
-                disabled={loading || randomPokemonPool.length === 0}
-                className="gap-2"
-              >
-                <Dice5 className="h-4 w-4" />
-                {randomPokemon ? 'Pick another' : 'Pick a random Pokémon'}
-              </Button>
+              <div className="space-y-2">
+                <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Generation
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    type="button"
+                    variant={randomGenerationFilter === 'all' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setRandomGeneration('all')}
+                    className="h-8 px-3"
+                    style={randomGenerationFilter === 'all' ? { backgroundColor: accentColor } : undefined}
+                  >
+                    All
+                  </Button>
+                  {randomAvailableGenerations.map((gen) => {
+                    const isActive = randomGenerationFilter === gen;
+                    return (
+                      <Button
+                        key={gen}
+                        type="button"
+                        variant={isActive ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setRandomGeneration(gen)}
+                        className="h-8 px-3"
+                        style={isActive ? { backgroundColor: accentColor } : undefined}
+                      >
+                        Gen {gen}
+                      </Button>
+                    );
+                  })}
+                </div>
+              </div>
 
-              <p className="text-xs text-muted-foreground">
-                {loading ? 'Loading Pokémon...' : `${randomPokemonPool.length} available choices`}
-              </p>
+              <div className="flex flex-wrap items-center gap-3">
+                <Button
+                  type="button"
+                  onClick={pickRandomPokemon}
+                  disabled={loading || randomPokemonPool.length === 0}
+                  className="gap-2"
+                >
+                  <Dice5 className="h-4 w-4" />
+                  {randomPokemon ? 'Pick another' : 'Pick a random Pokémon'}
+                </Button>
+
+                <span className="text-xs text-muted-foreground">
+                  {loading ? 'Loading Pokémon...' : `${randomPokemonPool.length} available choices`}
+                </span>
+              </div>
+
+              {!loading && randomPokemonPool.length === 0 && (
+                <p className="text-xs text-muted-foreground">
+                  No Pokémon available for this generation.
+                </p>
+              )}
             </div>
 
             <div className="flex min-h-64 items-center justify-center rounded-lg border border-border bg-background/70 p-4">
               {randomPokemon ? (
                 <div className="flex w-full flex-col items-center text-center">
+                  <svg className="absolute h-0 w-0" aria-hidden="true" focusable="false">
+                    <filter id={randomSpriteOutlineId} x="-32%" y="-32%" width="164%" height="164%" colorInterpolationFilters="sRGB">
+                      <feMorphology in="SourceAlpha" operator="dilate" radius="0.5" result="outline" />
+                      <feFlood floodColor="#050505" result="outlineColor" />
+                      <feComposite in="outlineColor" in2="outline" operator="in" result="outlineShape" />
+                      <feMerge>
+                        <feMergeNode in="outlineShape" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+                  </svg>
                   <img
                     key={`${randomPokemon.id}-${randomPokemon.name}`}
                     src={getPokemonSpriteUrl(randomPokemon.id, { shiny: true, name: randomPokemon.name })}
                     alt={randomPokemon.displayName}
-                    className="h-40 w-40 object-contain drop-shadow-xl"
+                    className="h-40 w-40 object-contain"
+                    style={{
+                      imageRendering: 'auto',
+                      filter: `url(#${randomSpriteOutlineId}) drop-shadow(0 8px 16px rgba(0,0,0,0.75))`,
+                    }}
                     decoding="async"
                     onError={(event) => {
                       event.currentTarget.src = '/placeholder.svg';
