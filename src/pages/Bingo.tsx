@@ -23,6 +23,13 @@ const STORAGE_KEY = 'bingo-shiny-state';
 const MARK_COLOR = '#22c55e';
 const GAME_ID_BASE = 20000;
 
+const getRandomIndex = (length: number): number => {
+  const randomValue = typeof crypto !== 'undefined' && crypto.getRandomValues
+    ? crypto.getRandomValues(new Uint32Array(1))[0] / 0x100000000
+    : Math.random();
+  return Math.floor(randomValue * length);
+};
+
 interface GameCell {
   readonly type: 'game';
   readonly id: number;
@@ -286,17 +293,16 @@ export default function Games() {
 
   const pickRandomPokemon = useCallback(() => {
     if (randomPokemonPool.length === 0) return;
-    const candidates = randomPokemon && randomPokemonPool.length > 1
-      ? randomPokemonPool.filter((p) => p.name !== randomPokemon.name)
-      : randomPokemonPool;
-    const next = candidates[Math.floor(Math.random() * candidates.length)];
+    // Uniform independent draw: every eligible Pokémon has exactly 1 / pool size
+    // probability on every click, including Pokémon selected in previous draws.
+    const next = randomPokemonPool[getRandomIndex(randomPokemonPool.length)];
     setRandomPokemon(next);
     void persist(makePersistedState({
       randomPokemonId: next.id,
       randomPokemonName: next.name,
       randomGenerationFilters: Array.from(randomGenerationFilters),
     }));
-  }, [makePersistedState, persist, randomGenerationFilters, randomPokemon, randomPokemonPool]);
+  }, [makePersistedState, persist, randomGenerationFilters, randomPokemonPool]);
 
   const toggleRandomGeneration = useCallback((generation: number | 'all') => {
     const nextFilters = generation === 'all'
