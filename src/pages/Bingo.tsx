@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { CheckCircle2, Gamepad2, Grid3X3, Pencil, RefreshCcw, Shuffle, Sparkles } from 'lucide-react';
+import { CheckCircle2, Dice5, Gamepad2, Grid3X3, Pencil, RefreshCcw, Shuffle, Sparkles } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -102,7 +102,7 @@ type PersistedState = {
   selectedGameIds?: number[];
 };
 
-export default function Bingo() {
+export default function Games() {
   const { pokemon, loading } = usePokemonList();
   const { accentColor } = useRandomColor();
   const { user } = useAuth();
@@ -128,6 +128,7 @@ export default function Bingo() {
   const [pickerValue, setPickerValue] = useState<number | null>(null);
   const [pickerValueName, setPickerValueName] = useState<string | undefined>(undefined);
   const [pickerMode, setPickerMode] = useState<'pokemon' | 'logo'>('pokemon');
+  const [randomPokemon, setRandomPokemon] = useState<PokemonBasic | null>(null);
 
   const saveTimerRef = useRef<number | null>(null);
   const didInitRef = useRef(false);
@@ -144,6 +145,28 @@ export default function Bingo() {
     });
     return Array.from(byBase.values());
   }, [pokemon]);
+
+  const randomPokemonPool = useMemo(() => {
+    const byName = new Map<string, PokemonBasic>();
+    pokemon.forEach((p) => {
+      if (p.hideFromPokedex) return;
+      // Event / No Own OT Pokémon are obtainable and remain eligible.
+      // Only genuinely shiny-locked Pokémon are excluded.
+      if (p.shinyAvailability === 'unobtainable') return;
+      if (!byName.has(p.name)) byName.set(p.name, p);
+    });
+    return Array.from(byName.values());
+  }, [pokemon]);
+
+  const pickRandomPokemon = useCallback(() => {
+    if (randomPokemonPool.length === 0) return;
+    setRandomPokemon((current) => {
+      const candidates = current && randomPokemonPool.length > 1
+        ? randomPokemonPool.filter((p) => p.name !== current.name)
+        : randomPokemonPool;
+      return candidates[Math.floor(Math.random() * candidates.length)];
+    });
+  }, [randomPokemonPool]);
 
   const availableGenerations = useMemo(() => {
     const gens = new Set<number>();
@@ -464,6 +487,88 @@ export default function Bingo() {
     >
       <Navbar />
       <main className="mx-auto flex w-full max-w-7xl flex-col gap-5 px-3 py-5 sm:px-4 lg:px-6">
+        <header className="rounded-lg border border-border bg-card p-5 shadow-sm">
+          <div className="flex items-center gap-3">
+            <span className="flex h-11 w-11 items-center justify-center rounded-lg border border-border bg-background">
+              <Gamepad2 className="h-5 w-5" style={{ color: accentColor }} />
+            </span>
+            <div>
+              <h1 className="text-3xl font-black leading-tight">Games</h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Pick a random shiny target or play Shiny Bingo.
+              </p>
+            </div>
+          </div>
+        </header>
+
+        <section className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
+          <div className="grid gap-5 p-5 md:grid-cols-[minmax(0,1fr)_280px] md:items-center">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                  <Dice5 className="h-5 w-5" style={{ color: accentColor }} />
+                </span>
+                <div>
+                  <h2 className="text-xl font-black">Random Pokémon</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Choose a random Pokémon from every available species and form. Shiny-locked Pokémon are excluded.
+                  </p>
+                </div>
+              </div>
+
+              <Button
+                type="button"
+                onClick={pickRandomPokemon}
+                disabled={loading || randomPokemonPool.length === 0}
+                className="gap-2"
+              >
+                <Dice5 className="h-4 w-4" />
+                {randomPokemon ? 'Pick another' : 'Pick a random Pokémon'}
+              </Button>
+
+              <p className="text-xs text-muted-foreground">
+                {loading ? 'Loading Pokémon...' : `${randomPokemonPool.length} available choices`}
+              </p>
+            </div>
+
+            <div className="flex min-h-64 items-center justify-center rounded-lg border border-border bg-background/70 p-4">
+              {randomPokemon ? (
+                <div className="flex w-full flex-col items-center text-center">
+                  <img
+                    key={`${randomPokemon.id}-${randomPokemon.name}`}
+                    src={getPokemonSpriteUrl(randomPokemon.id, { shiny: true, name: randomPokemon.name })}
+                    alt={randomPokemon.displayName}
+                    className="h-40 w-40 object-contain drop-shadow-xl"
+                    decoding="async"
+                    onError={(event) => {
+                      event.currentTarget.src = '/placeholder.svg';
+                    }}
+                  />
+                  <div className="mt-2 text-xl font-black">{randomPokemon.displayName}</div>
+                  <div className="mt-1 flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
+                    <span className="rounded-md border border-border bg-card px-2 py-1">
+                      #{randomPokemon.baseId.toString().padStart(4, '0')}
+                    </span>
+                    <span className="rounded-md border border-border bg-card px-2 py-1">
+                      Gen {randomPokemon.generation}
+                    </span>
+                    {randomPokemon.shinyAvailability === 'not_own_ot' && (
+                      <span className="rounded-md border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-amber-600 dark:text-amber-300">
+                        Event / No Own OT
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center text-sm text-muted-foreground">
+                  <Dice5 className="mx-auto mb-3 h-10 w-10 opacity-40" />
+                  Press the button to reveal a Pokémon.
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
         <header className="rounded-lg border border-border bg-card p-4 shadow-sm">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="min-w-0">
@@ -873,4 +978,3 @@ export default function Bingo() {
     </div>
   );
 }
-

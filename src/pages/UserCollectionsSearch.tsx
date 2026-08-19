@@ -4,6 +4,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import type { Tables } from '@/integrations/supabase/types';
 import { getPokemonSpriteUrl } from '@/hooks/use-pokemon';
@@ -60,6 +61,11 @@ export default function UserCollectionsSearch() {
   const [entries, setEntries] = useState<PublicCaughtRow[]>([]);
   const [entriesLoading, setEntriesLoading] = useState(false);
   const [entriesError, setEntriesError] = useState<string | null>(null);
+  const [pokemonQuery, setPokemonQuery] = useState('');
+  const [gameFilter, setGameFilter] = useState('all');
+  const [methodFilter, setMethodFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [collectionSort, setCollectionSort] = useState('newest');
   const [isRealtimeActive, setIsRealtimeActive] = useState(false);
   const [globalRecentEntries, setGlobalRecentEntries] = useState<PublicRecentRow[]>([]);
   const [globalRecentLoading, setGlobalRecentLoading] = useState(true);
@@ -294,6 +300,11 @@ export default function UserCollectionsSearch() {
 
   useEffect(() => {
     if (!selectedProfile) return;
+    setPokemonQuery('');
+    setGameFilter('all');
+    setMethodFilter('all');
+    setStatusFilter('all');
+    setCollectionSort('newest');
     void loadCollection(selectedProfile);
   }, [selectedProfile?.user_id]);
 
@@ -403,6 +414,57 @@ export default function UserCollectionsSearch() {
       luckiestHunt,
     };
   }, [entries]);
+
+  const collectionGameOptions = useMemo(() => {
+    const ids = Array.from(new Set(entries.map((entry) => entry.game).filter(Boolean) as string[]));
+    return ids.sort((a, b) => getGameLabel(a).localeCompare(getGameLabel(b)));
+  }, [entries]);
+
+  const collectionMethodOptions = useMemo(() => {
+    const methods = Array.from(new Set(entries.map((entry) => entry.method).filter(Boolean) as string[]));
+    return methods.sort((a, b) => formatMethodLabel(a).localeCompare(formatMethodLabel(b)));
+  }, [entries]);
+
+  const filteredCollectionEntries = useMemo(() => {
+    const term = pokemonQuery.trim().toLowerCase();
+    const matchesStatus = (entry: PublicCaughtRow) => {
+      if (statusFilter === 'obtained') return !entry.is_fail && !entry.is_unobtainable;
+      if (statusFilter === 'fail') return entry.is_fail === true;
+      if (statusFilter === 'uncatchable') return entry.is_unobtainable === true;
+      return true;
+    };
+
+    return entries
+      .filter((entry) => {
+        if (term) {
+          const searchable = `${entry.pokemon_name || ''} ${entry.form || ''} ${entry.pokemon_id}`.toLowerCase();
+          if (!searchable.includes(term)) return false;
+        }
+        if (gameFilter !== 'all' && entry.game !== gameFilter) return false;
+        if (methodFilter !== 'all' && entry.method !== methodFilter) return false;
+        return matchesStatus(entry);
+      })
+      .sort((a, b) => {
+        if (collectionSort === 'oldest') {
+          return (a.caught_date || a.created_at || '').localeCompare(b.caught_date || b.created_at || '');
+        }
+        if (collectionSort === 'name-asc') return (a.pokemon_name || '').localeCompare(b.pokemon_name || '');
+        if (collectionSort === 'name-desc') return (b.pokemon_name || '').localeCompare(a.pokemon_name || '');
+        return (b.caught_date || b.created_at || '').localeCompare(a.caught_date || a.created_at || '');
+      });
+  }, [entries, pokemonQuery, gameFilter, methodFilter, statusFilter, collectionSort]);
+
+  const hasActiveCollectionFilters = Boolean(
+    pokemonQuery.trim() || gameFilter !== 'all' || methodFilter !== 'all' || statusFilter !== 'all' || collectionSort !== 'newest'
+  );
+
+  const clearCollectionFilters = () => {
+    setPokemonQuery('');
+    setGameFilter('all');
+    setMethodFilter('all');
+    setStatusFilter('all');
+    setCollectionSort('newest');
+  };
 
   const renderGenderIcon = (gender: string | null) => {
     if (gender === 'male') return <span className="text-blue-500">{'\u2642'}</span>;
@@ -804,10 +866,81 @@ export default function UserCollectionsSearch() {
               )}
 
               {!entriesLoading && entries.length > 0 && (
-                <div className="space-y-2">
-                  <h3 className="font-semibold">Latest catches</h3>
+                <div className="space-y-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <h3 className="font-semibold">Collection entries</h3>
+                    <span className="text-xs font-semibold text-muted-foreground">
+                      {filteredCollectionEntries.length} of {entries.length}
+                    </span>
+                  </div>
+
+                  <div className="grid gap-3 rounded-lg border border-border/70 bg-muted/20 p-4 sm:grid-cols-2 xl:grid-cols-5">
+                    <div className="relative sm:col-span-2 xl:col-span-1">
+                      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        value={pokemonQuery}
+                        onChange={(event) => setPokemonQuery(event.target.value)}
+                        placeholder="Search Pokémon or form..."
+                        className="pl-10"
+                      />
+                    </div>
+
+                    <Select value={gameFilter} onValueChange={setGameFilter}>
+                      <SelectTrigger><SelectValue placeholder="Game" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All games</SelectItem>
+                        {collectionGameOptions.map((game) => (
+                          <SelectItem key={game} value={game}>{getGameLabel(game)}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <Select value={methodFilter} onValueChange={setMethodFilter}>
+                      <SelectTrigger><SelectValue placeholder="Method" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All methods</SelectItem>
+                        {collectionMethodOptions.map((method) => (
+                          <SelectItem key={method} value={method}>{formatMethodLabel(method)}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                      <SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All statuses</SelectItem>
+                        <SelectItem value="obtained">Obtained</SelectItem>
+                        <SelectItem value="fail">Fail</SelectItem>
+                        <SelectItem value="uncatchable">Uncatchable</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    <Select value={collectionSort} onValueChange={setCollectionSort}>
+                      <SelectTrigger><SelectValue placeholder="Sort" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="newest">Newest first</SelectItem>
+                        <SelectItem value="oldest">Oldest first</SelectItem>
+                        <SelectItem value="name-asc">Name A–Z</SelectItem>
+                        <SelectItem value="name-desc">Name Z–A</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    {hasActiveCollectionFilters && (
+                      <div className="sm:col-span-2 xl:col-span-5">
+                        <Button type="button" variant="ghost" size="sm" onClick={clearCollectionFilters}>
+                          Clear filters
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+
+                  {filteredCollectionEntries.length === 0 && (
+                    <div className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+                      No Pokémon match these filters.
+                    </div>
+                  )}
                   <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {entries.map((entry) => renderPublicShinyCard(entry, 'collection', { large: true }))}
+                    {filteredCollectionEntries.map((entry) => renderPublicShinyCard(entry, 'collection', { large: true }))}
                   </div>
                 </div>
               )}

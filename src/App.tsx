@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/lib/auth-context";
 import { RandomColorProvider } from "@/lib/random-color-context";
 import Index from "./pages/Index";
@@ -16,7 +16,7 @@ import CollectionEvents from "./pages/CollectionEvents";
 import CollectionSpecial from "./pages/CollectionSpecial";
 import CollectionFailUncatchable from "./pages/CollectionFailUncatchable";
 import UserCollectionsSearch from "./pages/UserCollectionsSearch";
-import Bingo from "./pages/Bingo";
+import Games from "./pages/Bingo";
 import Stats from "./pages/Stats";
 import { ScrollRestoration } from "@/components/layout/ScrollRestoration";
 import { ApplyAppearance } from "@/components/layout/ApplyAppearance";
@@ -51,7 +51,8 @@ function AppContent() {
           <Route path="/collection/events" element={<CollectionEvents />} />
           <Route path="/collection/fail-uncatchable" element={<CollectionFailUncatchable />} />
           <Route path="/users" element={<UserCollectionsSearch />} />
-          <Route path="/bingo" element={<Bingo />} />
+          <Route path="/games" element={<Games />} />
+          <Route path="/bingo" element={<Navigate to="/games" replace />} />
           <Route path="/stats" element={<Stats />} />
           <Route path="/debug" element={<Debug />} />
 

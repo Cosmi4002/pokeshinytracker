@@ -115,6 +115,12 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
     });
   }, [entry.pokemon_id, entry.pokemon_name, entry.form, entry.gender, spriteName]);
 
+  const mainSpriteFilter = isFail
+    ? 'brightness(0) contrast(1.3) drop-shadow(0 0 12px rgba(255,255,255,0.25))'
+    : entry.is_unobtainable
+      ? 'grayscale(1) brightness(1.05) contrast(0.95) drop-shadow(0 8px 16px rgba(0,0,0,0.75))'
+      : `url(#${mainSpriteOutlineId}) drop-shadow(0 8px 16px rgba(0,0,0,0.75))`;
+
   const displayName = entry.pokemon_name;
   const hasDualGameTheme = Boolean(secondaryTheme);
   const dualThemeRootBackground = hasDualGameTheme
@@ -358,15 +364,10 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                   decoding="async"
                   referrerPolicy="no-referrer"
                   alt={entry.pokemon_name}
-                  className={cn(
-                    "relative z-10 h-full w-full object-contain pokemon-sprite transition-all duration-300",
-                    entry.is_unobtainable ? "grayscale brightness-105" : ""
-                  )}
+                  className="relative z-10 h-full w-full object-contain pokemon-sprite transition-all duration-300"
                   style={{
                     imageRendering: 'auto',
-                    filter: `url(#${mainSpriteOutlineId}) ${isFail
-                      ? 'drop-shadow(0 0 12px rgba(255,255,255,0.25))'
-                      : 'drop-shadow(0 8px 16px rgba(0,0,0,0.75))'}`,
+                    filter: mainSpriteFilter,
                   }}
                   onError={(e) => {
                     handlePokemonSpriteError(e.currentTarget);
