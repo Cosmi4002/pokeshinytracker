@@ -424,7 +424,7 @@ export function ShinyCounter({
   }, []);
 
   const formatHotkeyLabel = useCallback((hotkey: string) => {
-    if (!hotkey) return 'Nessuno';
+    if (!hotkey) return 'None';
     if (hotkey === 'space') return 'Space';
     if (hotkey.length === 1) return hotkey.toUpperCase();
     return hotkey.charAt(0).toUpperCase() + hotkey.slice(1);
@@ -684,7 +684,7 @@ export function ShinyCounter({
                                   ].join(' ')}
                                   onClick={() => setSlotGender('')}
                                   aria-pressed={slot.gender !== 'female'}
-                                  title="Maschio"
+                                  title="Male"
                                 >
                                   <span className="text-base leading-none" aria-hidden="true">♂</span>
                                 </Button>
@@ -700,7 +700,7 @@ export function ShinyCounter({
                                   ].join(' ')}
                                   onClick={() => setSlotGender('female')}
                                   aria-pressed={slot.gender === 'female'}
-                                  title="Femmina"
+                                  title="Female"
                                 >
                                   <span className="text-base leading-none" aria-hidden="true">♀</span>
                                 </Button>
@@ -810,7 +810,7 @@ export function ShinyCounter({
             </Label>
             <Input
               id="increment-hotkey"
-              value={isAssigningHotkey ? 'Premi un tasto...' : formatHotkeyLabel(incrementHotkey)}
+              value={isAssigningHotkey ? 'Press a key...' : formatHotkeyLabel(incrementHotkey)}
               readOnly
               onFocus={() => setIsAssigningHotkey(true)}
               onBlur={() => setIsAssigningHotkey(false)}
@@ -844,7 +844,7 @@ export function ShinyCounter({
               ) : saveStatus === 'saved' ? (
                 <>
                   <Cloud className="h-3 w-3" />
-                  <span>Salvato</span>
+                  <span>Saved</span>
                 </>
               ) : (
                 <>

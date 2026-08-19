@@ -160,11 +160,11 @@ export function ManagePlaylistsDialog({ open, onOpenChange, onSuccess }: ManageP
 
     const getCategoryLabel = (categoryType: string) => {
         const labels: Record<string, string> = {
-            custom: 'Personalizzata',
-            generation: 'Generazione',
+            custom: 'Custom',
+            generation: 'Generation',
             game: 'Game',
             method: 'Method',
-            type: 'Tipo',
+            type: 'Type',
         };
         return labels[categoryType] || categoryType;
     };

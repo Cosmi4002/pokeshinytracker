@@ -472,7 +472,7 @@ export default function Bingo() {
                   <Sparkles className="h-5 w-5" style={{ color: accentColor }} />
                 </span>
                 <div>
-                  <h1 className="text-2xl font-bold leading-tight">Bingo Shiny</h1>
+                  <h1 className="text-2xl font-bold leading-tight">Shiny Bingo</h1>
                   <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                     <span className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-2 py-1">
                       <Grid3X3 className="h-3.5 w-3.5" />
@@ -484,7 +484,7 @@ export default function Bingo() {
                     </span>
                     <span className="inline-flex items-center gap-1 rounded-md border border-border bg-background px-2 py-1">
                       <Gamepad2 className="h-3.5 w-3.5" />
-                      {selectedGameIds.size} loghi
+                      {selectedGameIds.size} logos
                     </span>
                   </div>
                 </div>
@@ -496,14 +496,14 @@ export default function Bingo() {
                 variant={replaceMode ? 'default' : 'outline'}
                 onClick={() => setReplaceMode((prev) => !prev)}
                 className="h-10 justify-center gap-2"
-                title="Cambia una casella alla volta"
+                title="Change one square at a time"
               >
                 <Shuffle className="h-4 w-4" />
-                {replaceMode ? 'Cambio ON' : 'Cambio OFF'}
+                {replaceMode ? 'Swap ON' : 'Swap OFF'}
               </Button>
               <Button onClick={generateGrid} className="h-10 justify-center gap-2">
                 <RefreshCcw className="h-4 w-4" />
-                Rigenera
+                Regenerate
               </Button>
             </div>
           </div>
@@ -517,16 +517,16 @@ export default function Bingo() {
               </div>
             ) : pendingGenerations.size === 0 ? (
               <div className="rounded-lg border border-border bg-card p-8 text-center text-muted-foreground">
-                Seleziona almeno una generazione.
+                Select at least one generation.
               </div>
             ) : grid.length === 0 ? (
               <div className="rounded-lg border border-border bg-card p-8 text-center text-muted-foreground">
-                Premi Rigenera.
+                Press Regenerate.
               </div>
             ) : (
               <div className="mx-auto w-full max-w-[680px]">
                 <div className="mb-3 flex items-center justify-between gap-3">
-                  <div className="text-sm font-medium text-muted-foreground">{progress}% completato</div>
+                  <div className="text-sm font-medium text-muted-foreground">{progress}% complete</div>
                   <div className="h-2 w-36 overflow-hidden rounded-full bg-muted">
                     <div
                       className="h-full rounded-full transition-all"
@@ -640,9 +640,9 @@ export default function Bingo() {
             <div className="rounded-lg border border-border bg-card p-3 shadow-sm">
               <div className="mb-3 flex items-center justify-between gap-3">
                 <div>
-                  <div className="text-sm font-semibold">Generazioni</div>
+                  <div className="text-sm font-semibold">Generations</div>
                   <div className="text-xs text-muted-foreground">
-                    {pendingGenerations.size} di {availableGenerations.length} attive
+                    {pendingGenerations.size} of {availableGenerations.length} active
                   </div>
                 </div>
                 <div className="flex overflow-hidden rounded-md border border-border">
@@ -652,7 +652,7 @@ export default function Bingo() {
                     onClick={selectAllGenerations}
                     className="h-8 rounded-none px-2.5 text-xs"
                   >
-                    Tutte
+                    All
                   </Button>
                   <Button
                     variant="ghost"
@@ -660,7 +660,7 @@ export default function Bingo() {
                     onClick={clearGenerations}
                     className="h-8 rounded-none border-l border-border px-2.5 text-xs"
                   >
-                    Nessuna
+                    None
                   </Button>
                 </div>
               </div>
@@ -695,13 +695,13 @@ export default function Bingo() {
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2 text-sm font-semibold">
                   <Gamepad2 className="h-4 w-4" />
-                  Loghi gioco
+                  Game logos
                 </div>
                 <Switch checked={includeGames} onCheckedChange={setIncludeGames} />
               </div>
               <div className={cn('mt-4 space-y-3', !includeGames && 'opacity-50')}>
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>Quota caselle</span>
+                  <span>Square ratio</span>
                   <span>{Math.round(gameRatio * 100)}%</span>
                 </div>
                 <Slider
@@ -720,7 +720,7 @@ export default function Bingo() {
                   disabled={!includeGames}
                 >
                   <Gamepad2 className="h-4 w-4" />
-                  {selectedGameIds.size} selezionati
+                  {selectedGameIds.size} selected
                 </Button>
               </div>
             </div>
@@ -801,7 +801,7 @@ export default function Bingo() {
       <Dialog open={gamePickerOpen} onOpenChange={setGamePickerOpen}>
         <DialogContent className="w-[calc(100vw-1rem)] max-w-xl max-h-[85dvh] overflow-hidden p-0">
           <DialogHeader className="border-b border-border p-4 pr-10 text-left">
-            <DialogTitle>Seleziona Loghi</DialogTitle>
+            <DialogTitle>Select Logos</DialogTitle>
             <DialogDescription>Choose which games can appear in Bingo.</DialogDescription>
           </DialogHeader>
 
@@ -812,7 +812,7 @@ export default function Bingo() {
               onClick={() => setSelectedGameIds(new Set(GAMES.map((g) => g.id)))}
               className="h-9 flex-1"
             >
-              Tutti
+              All
             </Button>
             <Button
               variant="outline"
@@ -820,10 +820,10 @@ export default function Bingo() {
               onClick={() => setSelectedGameIds(new Set())}
               className="h-9 flex-1"
             >
-              Nessuno
+              None
             </Button>
             <div className="text-xs text-muted-foreground">
-              Selezionati: {selectedGameIds.size}
+              Selected: {selectedGameIds.size}
             </div>
           </div>
 

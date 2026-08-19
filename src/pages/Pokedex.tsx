@@ -226,7 +226,7 @@ export default function Pokedex() {
                                 Shiny Pokédex
                             </h1>
                             <p className="text-muted-foreground mt-1 font-medium">
-                                {totalCaughtCount} Pokémon catturati
+                                {totalCaughtCount} Pokémon caught
                             </p>
                         </div>
 
@@ -242,10 +242,10 @@ export default function Pokedex() {
                             </div>
                             <Select value={generationFilter} onValueChange={setGenerationFilter}>
                                 <SelectTrigger className="h-11 w-full border-border/80 bg-gradient-to-b from-muted/90 to-background/95 text-[0.95rem] font-bold text-foreground shadow-inner transition-all hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 sm:w-[160px] dark:border-white/15 dark:from-[#242424]/95 dark:to-[#171717]/95 dark:text-white">
-                                    <SelectValue placeholder="Generazione" />
+                                    <SelectValue placeholder="Generation" />
                                 </SelectTrigger>
                                 <SelectContent className="border-border bg-gradient-to-b from-muted to-popover text-popover-foreground shadow-lg dark:border-white/15 dark:from-[#202020] dark:to-[#141414] dark:text-white">
-                                    <SelectItem value="all" className="font-bold text-foreground">Tutti</SelectItem>
+                                    <SelectItem value="all" className="font-bold text-foreground">All</SelectItem>
                                     {Object.keys(GENERATION_RANGES).map(g => (
                                         <SelectItem key={g} value={g} className="font-bold text-foreground">Gen {g}</SelectItem>
                                     ))}

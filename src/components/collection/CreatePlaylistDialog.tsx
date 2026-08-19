@@ -95,7 +95,7 @@ export function CreatePlaylistDialog({ open, onOpenChange, onSuccess }: CreatePl
       if (error) {
         // Handle specific Supabase errors
         if (error.message.includes('JWT')) {
-          throw new Error('Sessione scaduta. Effettua nuovamente il login.');
+          throw new Error('Session expired. Please sign in again.');
         } else if (error.message.includes('unique')) {
           throw new Error('You already have a playlist with this name.');
         } else if (error.message.includes('network') || error.message.includes('fetch')) {

@@ -436,14 +436,14 @@ export default function Stats() {
                   {numberFormatter.format(obtainedTotal)}
                 </div>
                 <div className="pb-1 text-sm text-muted-foreground">
-                  shiny principali, {numberFormatter.format(stats.uniqueSpecies)} specie uniche
+                  main shinies, {numberFormatter.format(stats.uniqueSpecies)} unique species
                 </div>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2 text-sm sm:min-w-64">
               <div className={`rounded-md p-3 ${statsInnerPanelClass}`}>
                 <div className="font-mono text-lg font-bold">{numberFormatter.format(stats.uniqueForms)}</div>
-                <div className="text-xs text-muted-foreground">forme</div>
+                <div className="text-xs text-muted-foreground">forms</div>
               </div>
               <div className={`rounded-md p-3 ${statsInnerPanelClass}`}>
                 <div className="font-mono text-lg font-bold">{numberFormatter.format(stats.fail.length)}</div>
@@ -481,7 +481,7 @@ export default function Stats() {
             </CardHeader>
             <CardContent>
               {stats.monthly.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Nessuna data valida registrata.</p>
+                <p className="text-sm text-muted-foreground">No valid dates recorded.</p>
               ) : (
                 <div className="flex h-56 items-end gap-2">
                   {stats.monthly.map((item) => (

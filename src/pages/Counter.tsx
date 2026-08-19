@@ -156,11 +156,11 @@ export default function Counter() {
                 <div className="mb-2 flex flex-wrap items-center gap-2">
                   <Badge variant="outline" className="gap-1 border-border/70 bg-background/70 text-foreground dark:border-white/15 dark:bg-white/10 dark:text-white">
                     <Activity className="h-3.5 w-3.5" />
-                    {activeHunts.length}/{MAX_ACTIVE_COUNTERS} attive
+                    {activeHunts.length}/{MAX_ACTIVE_COUNTERS} active
                   </Badge>
                   <Badge variant="secondary" className="gap-1 border border-border/70 bg-muted/70 text-foreground hover:bg-muted/70 dark:border-white/15 dark:bg-white/10 dark:text-white dark:hover:bg-white/10">
                     <Target className="h-3.5 w-3.5" />
-                    {remainingSlots} libere
+                    {remainingSlots} free
                   </Badge>
                 </div>
                 <h1
@@ -172,7 +172,7 @@ export default function Counter() {
                   Counter
                 </h1>
                 <p className="mt-1 text-sm text-muted-foreground dark:text-white/70">
-                  Tieni le cacce attive in vista e apri il focus quando devi configurare i dettagli.
+                  Keep active hunts in view and open focus mode when you need to configure details.
                 </p>
               </div>
               <Button
@@ -194,7 +194,7 @@ export default function Counter() {
           <div className="mx-auto max-w-3xl space-y-4">
             <div>
               <Button variant="ghost" onClick={() => navigate('/counter')}>
-                <LayoutGrid className="mr-2 h-4 w-4" /> Torna alla vista Multipla
+                <LayoutGrid className="mr-2 h-4 w-4" /> Back to multi view
               </Button>
             </div>
             <ShinyCounter huntId={huntId} enableKeyboardShortcuts />
@@ -262,7 +262,7 @@ export default function Counter() {
                         onClick={() => navigate(`/counter/${hunt.id}`)}
                       >
                         <SlidersHorizontal className="mr-2 h-4 w-4" />
-                        Configura Pokemon e metodo
+                        Configure Pokémon and method
                       </Button>
                     </div>
                   </div>

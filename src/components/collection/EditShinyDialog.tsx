@@ -229,7 +229,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
       return;
     }
     if (!game) {
-      toast({ variant: 'destructive', title: 'Seleziona il gioco' });
+      toast({ variant: 'destructive', title: 'Select a game' });
       return;
     }
 
@@ -417,7 +417,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
             <Label>Game *</Label>
             <Select value={game} onValueChange={setGame}>
               <SelectTrigger>
-                <SelectValue placeholder="Seleziona gioco" />
+                <SelectValue placeholder="Select game" />
               </SelectTrigger>
               <SelectContent>
                 {GAMES.map((g) => (
@@ -429,15 +429,15 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
             </Select>
           </div>
 
-          {/* 7b. Secondo gioco (opzionale) */}
+          {/* 7b. Second game (optional) */}
           <div className="space-y-2">
-            <Label>Secondo gioco (opzionale)</Label>
+            <Label>Second game (optional)</Label>
             <Select value={secondaryGame || 'none'} onValueChange={(v) => setSecondaryGame(v === 'none' ? '' : v)}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">Nessuno</SelectItem>
+                <SelectItem value="none">None</SelectItem>
                 {GAMES.filter((g) => g.id !== game).map((g) => (
                   <SelectItem key={g.id} value={g.id}>
                     {g.name}
@@ -620,7 +620,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
                 }}
               />
               <Label htmlFor="edit-show-total-seen" className="cursor-pointer select-none">
-                Mostra "Total Seen"
+                Show "Total Seen"
               </Label>
             </div>
             <div className="space-y-2">
@@ -665,10 +665,10 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
               <Label>Playlist (optional)</Label>
               <Select value={playlistId || 'none'} onValueChange={(val) => setPlaylistId(val === 'none' ? '' : val)}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Nessuna playlist" />
+                  <SelectValue placeholder="No playlist" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">Nessuna playlist</SelectItem>
+                  <SelectItem value="none">No playlist</SelectItem>
                   {playlists.map((playlist) => (
                     <SelectItem key={playlist.id} value={playlist.id}>
                       {playlist.name}

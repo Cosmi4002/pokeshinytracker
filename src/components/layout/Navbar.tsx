@@ -494,7 +494,7 @@ export function Navbar() {
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={() => navigate('/pokedex/manage')}>
                   <Settings2 className="mr-2 h-4 w-4" />
-                  Gestione card
+                  Card settings
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleSetUsername}>
                   <Pencil className="mr-2 h-4 w-4" />
@@ -600,7 +600,7 @@ export function Navbar() {
                           }}
                           onDragEnd={() => setDraggedAvatarId(null)}
                           className="focus:outline-none focus:ring-2 focus:ring-ring rounded-lg"
-                          aria-label={avatarPickerMode === 'move' ? `Sposta ${avatar.label}` : `Seleziona ${avatar.label}`}
+                          aria-label={avatarPickerMode === 'move' ? `Move ${avatar.label}` : `Select ${avatar.label}`}
                         >
                           <span
                             className={cn(

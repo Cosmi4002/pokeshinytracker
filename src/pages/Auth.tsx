@@ -199,7 +199,7 @@ export default function Auth() {
       {/* Back to Home Link */}
       <Link to="/" className="absolute top-8 left-8 z-50 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors group dark:text-white/50 dark:hover:text-white">
         <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-        <span className="text-sm font-medium">Torna alla Home</span>
+        <span className="text-sm font-medium">Back to Home</span>
       </Link>
 
       {/* Auth Card Container */}

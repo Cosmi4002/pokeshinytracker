@@ -327,8 +327,8 @@ export function FinishHuntDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="male">Maschio</SelectItem>
-                  <SelectItem value="female">Femmina</SelectItem>
+                  <SelectItem value="male">Male</SelectItem>
+                  <SelectItem value="female">Female</SelectItem>
                 </SelectContent>
               </Select>
             ) : (
@@ -367,7 +367,7 @@ export function FinishHuntDialog({
             <Label>Game *</Label>
             <Select value={game} onValueChange={setGame}>
               <SelectTrigger>
-                <SelectValue placeholder="Seleziona il gioco" />
+                <SelectValue placeholder="Select game" />
               </SelectTrigger>
                 <SelectContent className="max-h-72 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-muted [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-muted-foreground">
                 {GAMES.map((g) => (
@@ -539,7 +539,7 @@ export function FinishHuntDialog({
                 }}
               />
               <Label htmlFor="finish-show-total-seen" className="cursor-pointer select-none">
-                Mostra "Total Seen"
+                Show "Total Seen"
               </Label>
             </div>
             <div className="space-y-2">
@@ -581,10 +581,10 @@ export function FinishHuntDialog({
               <Label>Playlist</Label>
               <Select value={playlistId || 'none'} onValueChange={(val) => setPlaylistId(val === 'none' ? '' : val)}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Nessuna playlist" />
+                  <SelectValue placeholder="No playlist" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">Nessuna playlist</SelectItem>
+                  <SelectItem value="none">No playlist</SelectItem>
                   {playlists.map((playlist) => (
                     <SelectItem key={playlist.id} value={playlist.id}>
                       {playlist.name}

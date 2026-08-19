@@ -7,8 +7,8 @@ interface GenderSelectorProps {
 }
 
 const genderOptions = [
-    { value: 'male', icon: '♂', label: 'Maschio', color: 'text-blue-500 hover:bg-blue-500/20 border-blue-500/50' },
-    { value: 'female', icon: '♀', label: 'Femmina', color: 'text-pink-500 hover:bg-pink-500/20 border-pink-500/50' },
+    { value: 'male', icon: '♂', label: 'Male', color: 'text-blue-500 hover:bg-blue-500/20 border-blue-500/50' },
+    { value: 'female', icon: '♀', label: 'Female', color: 'text-pink-500 hover:bg-pink-500/20 border-pink-500/50' },
     { value: 'genderless', icon: '⚪', label: 'Senza genere', color: 'text-gray-400 hover:bg-gray-400/20 border-gray-400/50' },
 ];
 

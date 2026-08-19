@@ -192,7 +192,7 @@ export default function PokemonDetails() {
         const baseVariant: FormVariant = {
             id: details.id,
             name: details.name,
-            displayName: details.hasGenderDifference ? 'Maschio' : details.displayName,
+            displayName: details.hasGenderDifference ? 'Male' : details.displayName,
             category: 'base',
             gender: details.hasGenderDifference ? 'male' : 'genderless',
             spriteUrl: details.sprites.shiny
@@ -203,7 +203,7 @@ export default function PokemonDetails() {
             items.push({
                 id: details.id,
                 name: `${details.name}-female`,
-                displayName: 'Femmina',
+                displayName: 'Female',
                 category: 'gender',
                 gender: 'female',
                 spriteUrl: details.sprites.femaleShiny
@@ -647,7 +647,7 @@ export default function PokemonDetails() {
                                                                         ? "text-blue-200 drop-shadow-[0_0_5px_rgba(147,197,253,0.95)]"
                                                                         : "text-white/25"
                                                                 )}
-                                                                title="Maschio"
+                                                                title="Male"
                                                             >
                                                                 ♂
                                                             </span>
@@ -658,7 +658,7 @@ export default function PokemonDetails() {
                                                                         ? "text-pink-200 drop-shadow-[0_0_5px_rgba(251,207,232,0.95)]"
                                                                         : "text-white/25"
                                                                 )}
-                                                                title="Femmina"
+                                                                title="Female"
                                                             >
                                                                 ♀
                                                             </span>
@@ -680,16 +680,16 @@ export default function PokemonDetails() {
                             <div className="text-left">
                                 <h2 className="text-3xl font-black tracking-tight flex items-center gap-3">
                                     <span className="w-2 h-8 bg-primary rounded-full shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
-                                    Collezione Forme
+                                    Form Collection
                                 </h2>
-                                <p className="text-muted-foreground mt-1 font-medium">Visualizza e segna le varianti cromatiche catturate.</p>
+                                <p className="text-muted-foreground mt-1 font-medium">View and mark the shiny variants you have caught.</p>
                             </div>
                             <div className="flex items-center gap-3 rounded-lg border border-border/70 bg-background/80 px-5 py-2.5 text-card-foreground shadow-inner dark:border-white/15 dark:bg-white/10">
                                 <Sparkles className="h-4 w-4 text-primary" />
                                 <span className="text-sm font-bold text-foreground">
                                     {caughtForms.size} <span className="text-muted-foreground mx-1">/</span> {variants.length}
                                 </span>
-                                <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest ml-2">completato</span>
+                                <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest ml-2">complete</span>
                             </div>
                         </div>
 
@@ -764,7 +764,7 @@ export default function PokemonDetails() {
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         const currentName = (overrides[`${variant.id}-${variant.name}`] as any)?.custom_display_name || variant.displayName;
-                                                        const newName = prompt(`Rinomina forma "${variant.displayName}":`, currentName);
+                                                        const newName = prompt(`Rename form "${variant.displayName}":`, currentName);
                                                         if (newName !== null) {
                                                             saveOverride(variant.id, variant.name, { custom_display_name: newName });
                                                         }
@@ -779,9 +779,9 @@ export default function PokemonDetails() {
                                                     className="h-8 w-8 rounded-lg border border-border bg-card/90 text-muted-foreground shadow-sm hover:bg-muted hover:text-destructive"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        if (confirm(`Eliminare la forma ${variant.displayName}?`)) {
+                                                        if (confirm(`Remove the ${variant.displayName} form?`)) {
                                                             saveOverride(variant.id, variant.name, { is_excluded: true });
-                                                            toast({ title: "Forma eliminata", description: `${variant.displayName} rimossa.` });
+                                                            toast({ title: "Form removed", description: `${variant.displayName} was removed.` });
                                                         }
                                                     }}
                                                 >

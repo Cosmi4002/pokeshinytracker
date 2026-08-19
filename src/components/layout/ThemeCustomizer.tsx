@@ -436,7 +436,7 @@ export function ThemeCustomizer() {
       toast({
         variant: 'destructive',
         title: 'Supabase not configured',
-        description: 'Non posso salvare i temi globali senza Supabase.',
+        description: 'Global themes cannot be saved without Supabase.',
       });
       return;
     }
@@ -476,7 +476,7 @@ export function ThemeCustomizer() {
     setPresetId(nextPreset.id);
     setPresetTone(getPresetTone(nextPreset));
     toast({
-      title: 'Tema aggiunto',
+      title: 'Theme added',
       description: `${name} was saved and synced for everyone.`,
     });
   };
@@ -487,7 +487,7 @@ export function ThemeCustomizer() {
       toast({
         variant: 'destructive',
         title: 'Supabase not configured',
-        description: 'Non posso sincronizzare i temi globali senza Supabase.',
+        description: 'Global themes cannot be synced without Supabase.',
       });
       return;
     }
@@ -538,7 +538,7 @@ export function ThemeCustomizer() {
       toast({
         variant: 'destructive',
         title: 'Supabase not configured',
-        description: 'Non posso modificare i temi globali senza Supabase.',
+        description: 'Global themes cannot be changed without Supabase.',
       });
       return;
     }
@@ -613,7 +613,7 @@ export function ThemeCustomizer() {
       setStoredBackgroundAccent3(backgroundColor3);
       setSaving(false);
       toast({
-        title: 'Preferenze salvate',
+        title: 'Preferences saved',
         description: 'Colors and background updated successfully',
       });
       setOpen(false);
@@ -640,7 +640,7 @@ export function ThemeCustomizer() {
     });
 
     toast({
-      title: 'Modalita random attiva',
+      title: 'Random mode active',
       description: 'Colors will follow the Home theme',
     });
     setOpen(false);
@@ -667,7 +667,7 @@ export function ThemeCustomizer() {
         skipNextOpenSyncRef.current = true;
         setOpen(true);
         toast({
-          title: 'Colore pulsante applicato',
+          title: 'Button color applied',
           description: result.sRGBHex,
         });
         return;
@@ -720,7 +720,7 @@ export function ThemeCustomizer() {
             <span className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card">
               <Paintbrush className="h-4 w-4" />
             </span>
-            Tema app
+            App Theme
           </DialogTitle>
           <DialogDescription>Customize the app's theme, background, and mode.</DialogDescription>
         </DialogHeader>
@@ -729,7 +729,7 @@ export function ThemeCustomizer() {
           <section className="space-y-3 rounded-lg border border-border bg-card p-3 shadow-sm sm:p-4">
             <Label className="flex items-center gap-2 text-sm font-semibold">
               <Sparkles className="h-4 w-4" />
-              Temi rapidi
+              Quick Themes
             </Label>
             {canManageThemePresets && (
               <div className="grid gap-2 rounded-lg border border-border bg-background p-2 sm:grid-cols-2">
@@ -790,8 +790,8 @@ export function ThemeCustomizer() {
                   <span className="h-full flex-1 rounded-r-full" style={{ backgroundColor }} />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-medium">Personalizzato</span>
-                  <span className="block truncate text-xs text-muted-foreground">Colori attuali</span>
+                  <span className="block truncate text-sm font-medium">Custom</span>
+                  <span className="block truncate text-xs text-muted-foreground">Current colors</span>
                 </span>
                 {presetId === 'custom' && <Check className="h-4 w-4 text-primary" />}
               </button>
@@ -819,7 +819,7 @@ export function ThemeCustomizer() {
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-sm font-medium">{preset.name}</span>
                         <span className="block truncate text-xs capitalize text-muted-foreground">
-                          {isAddedPreset ? 'Aggiunto' : isManagedPreset ? 'Modificato' : preset.backgroundStyle}
+                          {isAddedPreset ? 'Added' : isManagedPreset ? 'Modified' : preset.backgroundStyle}
                         </span>
                       </span>
                       {presetId === preset.id && <Check className="h-4 w-4 text-primary" />}
@@ -844,7 +844,7 @@ export function ThemeCustomizer() {
             <section className="space-y-3 rounded-lg border border-border bg-card p-3 shadow-sm sm:p-4">
               <Label className="flex items-center gap-2 text-sm font-semibold">
                 <Sun className="h-4 w-4" />
-                Modalita
+                Mode
               </Label>
               <div className="grid grid-cols-2 gap-1 rounded-lg border border-border bg-background p-1 lg:grid-cols-1">
                 <Button
@@ -892,7 +892,7 @@ export function ThemeCustomizer() {
                   style={{ borderColor: `${accentColor}80`, color: accentColor }}
                 >
                   <Pipette className="h-4 w-4" />
-                  Pipetta pulsante
+                  Button eyedropper
                 </Button>
                 <Button
                   type="button"
@@ -914,11 +914,11 @@ export function ThemeCustomizer() {
                     style={isRandom ? { backgroundColor: accentColor } : { borderColor: `${accentColor}80`, color: accentColor }}
                   >
                     <Sparkles className="mr-2 h-4 w-4" />
-                    Usa colore Home
+                    Use Home color
                   </Button>
 
                   <ColorPicker
-                    label="Colore principale"
+                    label="Primary color"
                     value={themeColor}
                     hideDesktopAdvancedPicker
                     onChange={(color) => {
@@ -945,7 +945,7 @@ export function ThemeCustomizer() {
           <section className="space-y-3 rounded-lg border border-border bg-card p-3 shadow-sm sm:p-4">
             <Label className="flex items-center gap-2 text-sm font-semibold">
               <Image className="h-4 w-4" />
-              Sfondo pagina
+              Page Background
             </Label>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
               {backgroundStyleOptions.map((option) => (

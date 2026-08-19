@@ -515,7 +515,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Filter className="h-5 w-5" />
-                Filtri
+                Filters
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -529,13 +529,13 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
                   />
                 </div>
                 <div>
-                  <Label>Generazione</Label>
+                  <Label>Generation</Label>
                   <select
                     value={filterGen}
                     onChange={(e) => setFilterGen(e.target.value)}
                     className={nativeSelectClassName}
                   >
-                    <option value="all">Tutte</option>
+                    <option value="all">All</option>
                       {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((gen) => (
                         <option key={gen} value={gen.toString()}>
                           Gen {gen}
@@ -550,7 +550,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
                     onChange={(e) => setFilterGame(e.target.value)}
                     className={nativeSelectClassName}
                   >
-                      <option value="all">Tutti</option>
+                      <option value="all">All</option>
                       {GAMES.map((game) => (
                         <option key={game.id} value={game.id}>
                           {game.name}
@@ -565,7 +565,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
                     onChange={(e) => setFilterMethod(e.target.value)}
                     className={nativeSelectClassName}
                   >
-                    <option value="all">Tutti</option>
+                    <option value="all">All</option>
                       {methodOptions.map((method) => (
                         <option key={method.value} value={method.value}>
                           {method.label}
@@ -574,7 +574,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
                   </select>
                 </div>
                 <div>
-                  <Label>Ordina</Label>
+                  <Label>Sort</Label>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as CollectionSort)}
@@ -592,8 +592,8 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
                     className={nativeSelectClassName}
                   >
                     <option value="none">—</option>
-                    <option value="dex_asc">Crescente</option>
-                    <option value="dex_desc">Decrescente</option>
+                    <option value="dex_asc">Ascending</option>
+                    <option value="dex_desc">Descending</option>
                   </select>
                 </div>
                 {playlists.length > 0 && (
@@ -604,7 +604,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
                       onChange={(e) => setFilterPlaylist(e.target.value)}
                       className={nativeSelectClassName}
                     >
-                        <option value="all">Tutte</option>
+                        <option value="all">All</option>
                         {playlists.map((pl) => (
                           <option key={pl.id} value={pl.name}>
                             {pl.name}
@@ -627,7 +627,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
                     ? mode === 'distribution_event'
                       ? 'No Distribution / Event shiny Pokémon yet! Add a catch using the “Distribution / Event” method.'
                       : 'No shiny Pokémon yet! Start hunting and add your catches.'
-                    : 'Nessuno shiny corrisponde ai filtri.'}
+                    : 'No shiny matches the filters.'}
               </CardContent>
             </Card>
           ) : (

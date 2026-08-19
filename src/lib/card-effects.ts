@@ -9,10 +9,10 @@ export type CardFilterOption = {
 export const CARD_FILTER_OPTIONS: CardFilterOption[] = [
   { id: 'none', name: 'No filter', description: 'Card pulita, senza overlay.' },
   { id: 'holo', name: 'Holo', description: 'Riflessi cromati senza stelline.' },
-  { id: 'cosmic', name: 'Diamond', description: 'Brillanti di luce tagliati, effetto gioiello.' },
+  { id: 'cosmic', name: 'Diamond', description: 'Cut light highlights with a jewel-like effect.' },
   { id: 'pixel', name: 'Pixel Pop', description: 'Pochi micro pixel luminosi, molto discreti.' },
   { id: 'neon', name: 'Neon Edge', description: 'Accenti neon sui bordi, senza griglia sul contenuto.' },
-  { id: 'prism', name: 'Prism', description: 'Lame di luce colorata stile cristallo.' },
+  { id: 'prism', name: 'Prism', description: 'Crystal-style blades of colored light.' },
   { id: 'ember', name: 'Ember', description: 'Fiamma calda piu intensa e visibile.' },
   { id: 'shadow', name: 'Shadow', description: 'Contrasto scuro e vignettatura.' },
 ];

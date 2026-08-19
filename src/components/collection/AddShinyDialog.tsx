@@ -373,15 +373,15 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
             </Select>
           </div>
 
-          {/* 5b. Secondo gioco (opzionale) */}
+          {/* 5b. Second game (optional) */}
           <div className="space-y-2">
-            <Label>Secondo gioco (opzionale)</Label>
+            <Label>Second game (optional)</Label>
             <Select value={secondaryGame || 'none'} onValueChange={(v) => setSecondaryGame(v === 'none' ? '' : v)}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
                 <SelectContent className="max-h-72 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-muted [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-muted-foreground">
-                <SelectItem value="none">Nessuno</SelectItem>
+                <SelectItem value="none">None</SelectItem>
                 {GAMES.filter((g) => g.id !== game).map((g) => (
                   <SelectItem key={g.id} value={g.id}>
                     {g.name}
@@ -564,7 +564,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
                 }}
               />
               <Label htmlFor="show-total-seen" className="cursor-pointer select-none">
-                Mostra "Total Seen"
+                Show "Total Seen"
               </Label>
             </div>
             <div className="space-y-2">
@@ -613,10 +613,10 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
               <Label>Playlist (optional)</Label>
               <Select value={playlistId || 'none'} onValueChange={(val) => setPlaylistId(val === 'none' ? '' : val)}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Nessuna playlist" />
+                  <SelectValue placeholder="No playlist" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">Nessuna playlist</SelectItem>
+                  <SelectItem value="none">No playlist</SelectItem>
                   {playlists.map((playlist) => (
                     <SelectItem key={playlist.id} value={playlist.id}>
                       {playlist.name}

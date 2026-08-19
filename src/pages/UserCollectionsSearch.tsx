@@ -735,7 +735,7 @@ export default function UserCollectionsSearch() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                Collezione di @{selectedProfile.username}
+                @{selectedProfile.username}'s Collection
                 <span className="text-sm font-normal text-muted-foreground">({entries.length} catches)</span>
               </CardTitle>
               <CardDescription className="flex items-center gap-2">
@@ -767,14 +767,14 @@ export default function UserCollectionsSearch() {
                             {numberFormatter.format(userStats.obtainedCount)}
                           </div>
                           <div className="pb-1 text-sm text-muted-foreground">
-                            shiny principali, {numberFormatter.format(userStats.speciesCount)} specie uniche
+                            main shinies, {numberFormatter.format(userStats.speciesCount)} unique species
                           </div>
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-2 text-sm sm:min-w-64">
                         <div className="rounded-md border bg-muted/30 p-3">
                           <div className="font-mono text-lg font-bold">{numberFormatter.format(userStats.formsCount)}</div>
-                          <div className="text-xs text-muted-foreground">forme</div>
+                          <div className="text-xs text-muted-foreground">forms</div>
                         </div>
                         <div className="rounded-md border bg-muted/30 p-3">
                           <div className="font-mono text-lg font-bold">{numberFormatter.format(userStats.failCount)}</div>

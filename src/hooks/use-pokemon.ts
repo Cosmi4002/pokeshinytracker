@@ -329,15 +329,15 @@ export function formatPokemonName(name: string, id: number, baseId?: number): st
 
   // Meowstic name overrides
   if (name.toLowerCase().includes('meowstic-male')) return 'Meowstic';
-  if (name.toLowerCase().includes('meowstic-female')) return 'Meowstic Femmina';
+  if (name.toLowerCase().includes('meowstic-female')) return 'Meowstic Female';
 
   // Oinkologne name overrides
   if (name.toLowerCase().includes('oinkologne-male')) return 'Oinkologne';
-  if (name.toLowerCase().includes('oinkologne-female')) return 'Oinkologne Femmina';
+  if (name.toLowerCase().includes('oinkologne-female')) return 'Oinkologne Female';
 
   // Indeedee name overrides
   if (name.toLowerCase().includes('indeedee-male')) return 'Indeedee';
-  if (name.toLowerCase().includes('indeedee-female')) return 'Indeedee Femmina';
+  if (name.toLowerCase().includes('indeedee-female')) return 'Indeedee Female';
 
   // Urshifu name overrides
   if (name.toLowerCase().includes('urshifu-single-strike')) return 'Urshifu (Single Strike)';
