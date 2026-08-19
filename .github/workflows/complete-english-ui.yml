@@ -1,0 +1,184 @@
+name: Complete English UI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/complete-english-ui.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Apply remaining English translations
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const replacements = [
+            ['src/components/collection/AddShinyDialog.tsx', 'Secondo gioco (opzionale)', 'Second game (optional)'],
+            ['src/components/collection/AddShinyDialog.tsx', '<SelectItem value="none">Nessuno</SelectItem>', '<SelectItem value="none">None</SelectItem>'],
+            ['src/components/collection/AddShinyDialog.tsx', 'Mostra "Total Seen"', 'Show "Total Seen"'],
+            ['src/components/collection/AddShinyDialog.tsx', 'placeholder="Nessuna playlist"', 'placeholder="No playlist"'],
+            ['src/components/collection/AddShinyDialog.tsx', '<SelectItem value="none">Nessuna playlist</SelectItem>', '<SelectItem value="none">No playlist</SelectItem>'],
+            ['src/components/collection/CreatePlaylistDialog.tsx', 'Sessione scaduta. Effettua nuovamente il login.', 'Session expired. Please sign in again.'],
+            ['src/components/collection/EditShinyDialog.tsx', "title: 'Seleziona il gioco'", "title: 'Select a game'"],
+            ['src/components/collection/EditShinyDialog.tsx', 'placeholder="Seleziona gioco"', 'placeholder="Select game"'],
+            ['src/components/collection/EditShinyDialog.tsx', 'Secondo gioco (opzionale)', 'Second game (optional)'],
+            ['src/components/collection/EditShinyDialog.tsx', '<SelectItem value="none">Nessuno</SelectItem>', '<SelectItem value="none">None</SelectItem>'],
+            ['src/components/collection/EditShinyDialog.tsx', 'Mostra "Total Seen"', 'Show "Total Seen"'],
+            ['src/components/collection/EditShinyDialog.tsx', 'placeholder="Nessuna playlist"', 'placeholder="No playlist"'],
+            ['src/components/collection/EditShinyDialog.tsx', '<SelectItem value="none">Nessuna playlist</SelectItem>', '<SelectItem value="none">No playlist</SelectItem>'],
+            ['src/components/collection/ManagePlaylistsDialog.tsx', "custom: 'Personalizzata'", "custom: 'Custom'"],
+            ['src/components/collection/ManagePlaylistsDialog.tsx', "generation: 'Generazione'", "generation: 'Generation'"],
+            ['src/components/collection/ManagePlaylistsDialog.tsx', "type: 'Tipo'", "type: 'Type'"],
+            ['src/components/counter/FinishHuntDialog.tsx', '<SelectItem value="male">Maschio</SelectItem>', '<SelectItem value="male">Male</SelectItem>'],
+            ['src/components/counter/FinishHuntDialog.tsx', '<SelectItem value="female">Femmina</SelectItem>', '<SelectItem value="female">Female</SelectItem>'],
+            ['src/components/counter/FinishHuntDialog.tsx', 'placeholder="Seleziona il gioco"', 'placeholder="Select game"'],
+            ['src/components/counter/FinishHuntDialog.tsx', 'Mostra "Total Seen"', 'Show "Total Seen"'],
+            ['src/components/counter/FinishHuntDialog.tsx', 'placeholder="Nessuna playlist"', 'placeholder="No playlist"'],
+            ['src/components/counter/FinishHuntDialog.tsx', '<SelectItem value="none">Nessuna playlist</SelectItem>', '<SelectItem value="none">No playlist</SelectItem>'],
+            ['src/components/counter/ShinyCounter.tsx', "if (!hotkey) return 'Nessuno';", "if (!hotkey) return 'None';"],
+            ['src/components/counter/ShinyCounter.tsx', 'title="Maschio"', 'title="Male"'],
+            ['src/components/counter/ShinyCounter.tsx', 'title="Femmina"', 'title="Female"'],
+            ['src/components/counter/ShinyCounter.tsx', "'Premi un tasto...'", "'Press a key...'"],
+            ['src/components/counter/ShinyCounter.tsx', '<span>Salvato</span>', '<span>Saved</span>'],
+            ['src/components/layout/Navbar.tsx', 'Gestione card', 'Card settings'],
+            ['src/components/layout/Navbar.tsx', '`Sposta ${avatar.label}`', '`Move ${avatar.label}`'],
+            ['src/components/layout/Navbar.tsx', '`Seleziona ${avatar.label}`', '`Select ${avatar.label}`'],
+            ['src/components/layout/ThemeCustomizer.tsx', 'Non posso salvare i temi globali senza Supabase.', 'Global themes cannot be saved without Supabase.'],
+            ['src/components/layout/ThemeCustomizer.tsx', "title: 'Tema aggiunto'", "title: 'Theme added'"],
+            ['src/components/layout/ThemeCustomizer.tsx', 'Non posso sincronizzare i temi globali senza Supabase.', 'Global themes cannot be synced without Supabase.'],
+            ['src/components/layout/ThemeCustomizer.tsx', 'Non posso modificare i temi globali senza Supabase.', 'Global themes cannot be changed without Supabase.'],
+            ['src/components/layout/ThemeCustomizer.tsx', "title: 'Preferenze salvate'", "title: 'Preferences saved'"],
+            ['src/components/layout/ThemeCustomizer.tsx', "title: 'Modalita random attiva'", "title: 'Random mode active'"],
+            ['src/components/layout/ThemeCustomizer.tsx', "title: 'Colore pulsante applicato'", "title: 'Button color applied'"],
+            ['src/components/layout/ThemeCustomizer.tsx', 'Tema app', 'App Theme'],
+            ['src/components/layout/ThemeCustomizer.tsx', 'Temi rapidi', 'Quick Themes'],
+            ['src/components/layout/ThemeCustomizer.tsx', 'Personalizzato', 'Custom'],
+            ['src/components/layout/ThemeCustomizer.tsx', 'Colori attuali', 'Current colors'],
+            ['src/components/layout/ThemeCustomizer.tsx', "'Aggiunto'", "'Added'"],
+            ['src/components/layout/ThemeCustomizer.tsx', "'Modificato'", "'Modified'"],
+            ['src/components/layout/ThemeCustomizer.tsx', 'Modalita', 'Mode'],
+            ['src/components/layout/ThemeCustomizer.tsx', 'Pipetta pulsante', 'Button eyedropper'],
+            ['src/components/layout/ThemeCustomizer.tsx', 'Usa colore Home', 'Use Home color'],
+            ['src/components/layout/ThemeCustomizer.tsx', 'label="Colore principale"', 'label="Primary color"'],
+            ['src/components/layout/ThemeCustomizer.tsx', 'Sfondo pagina', 'Page Background'],
+            ['src/components/ui/GenderSelector.tsx', "label: 'Maschio'", "label: 'Male'"],
+            ['src/components/ui/GenderSelector.tsx', "label: 'Femmina'", "label: 'Female'"],
+            ['src/hooks/use-pokemon.ts', 'Meowstic Femmina', 'Meowstic Female'],
+            ['src/hooks/use-pokemon.ts', 'Oinkologne Femmina', 'Oinkologne Female'],
+            ['src/hooks/use-pokemon.ts', 'Indeedee Femmina', 'Indeedee Female'],
+            ['src/lib/card-effects.ts', 'Brillanti di luce tagliati, effetto gioiello.', 'Cut light highlights with a jewel-like effect.'],
+            ['src/lib/card-effects.ts', 'Lame di luce colorata stile cristallo.', 'Crystal-style blades of colored light.'],
+            ['src/pages/Auth.tsx', 'Torna alla Home', 'Back to Home'],
+            ['src/pages/Bingo.tsx', 'Bingo Shiny', 'Shiny Bingo'],
+            ['src/pages/Bingo.tsx', '{selectedGameIds.size} loghi', '{selectedGameIds.size} logos'],
+            ['src/pages/Bingo.tsx', 'Cambia una casella alla volta', 'Change one square at a time'],
+            ['src/pages/Bingo.tsx', "'Cambio ON'", "'Swap ON'"],
+            ['src/pages/Bingo.tsx', "'Cambio OFF'", "'Swap OFF'"],
+            ['src/pages/Bingo.tsx', 'Rigenera', 'Regenerate'],
+            ['src/pages/Bingo.tsx', 'Seleziona almeno una generazione.', 'Select at least one generation.'],
+            ['src/pages/Bingo.tsx', 'Premi Regenerate.', 'Press Regenerate.'],
+            ['src/pages/Bingo.tsx', 'Premi Rigenera.', 'Press Regenerate.'],
+            ['src/pages/Bingo.tsx', '{progress}% completato', '{progress}% complete'],
+            ['src/pages/Bingo.tsx', 'Generazioni', 'Generations'],
+            ['src/pages/Bingo.tsx', '{pendingGenerations.size} di {availableGenerations.length} attive', '{pendingGenerations.size} of {availableGenerations.length} active'],
+            ['src/pages/Bingo.tsx', 'Tutte', 'All'],
+            ['src/pages/Bingo.tsx', 'Nessuna', 'None'],
+            ['src/pages/Bingo.tsx', 'Loghi gioco', 'Game logos'],
+            ['src/pages/Bingo.tsx', 'Quota caselle', 'Square ratio'],
+            ['src/pages/Bingo.tsx', '{selectedGameIds.size} selezionati', '{selectedGameIds.size} selected'],
+            ['src/pages/Bingo.tsx', 'Seleziona Loghi', 'Select Logos'],
+            ['src/pages/Bingo.tsx', 'Tutti', 'All'],
+            ['src/pages/Bingo.tsx', 'Nessuno', 'None'],
+            ['src/pages/Bingo.tsx', 'Selezionati: {selectedGameIds.size}', 'Selected: {selectedGameIds.size}'],
+            ['src/pages/Collection.tsx', 'Filtri', 'Filters'],
+            ['src/pages/Collection.tsx', '<Label>Generazione</Label>', '<Label>Generation</Label>'],
+            ['src/pages/Collection.tsx', '>Tutte<', '>All<'],
+            ['src/pages/Collection.tsx', '>Tutti<', '>All<'],
+            ['src/pages/Collection.tsx', '<Label>Ordina</Label>', '<Label>Sort</Label>'],
+            ['src/pages/Collection.tsx', '>Crescente<', '>Ascending<'],
+            ['src/pages/Collection.tsx', '>Decrescente<', '>Descending<'],
+            ['src/pages/Collection.tsx', 'Nessuno shiny corrisponde ai filtri.', 'No shiny matches the filters.'],
+            ['src/pages/Counter.tsx', '{activeHunts.length}/{MAX_ACTIVE_COUNTERS} attive', '{activeHunts.length}/{MAX_ACTIVE_COUNTERS} active'],
+            ['src/pages/Counter.tsx', '{remainingSlots} libere', '{remainingSlots} free'],
+            ['src/pages/Counter.tsx', 'Tieni le cacce attive in vista e apri il focus quando devi configurare i dettagli.', 'Keep active hunts in view and open focus mode when you need to configure details.'],
+            ['src/pages/Counter.tsx', 'Torna alla vista Multipla', 'Back to multi view'],
+            ['src/pages/Counter.tsx', 'Configura Pokemon e metodo', 'Configure Pokémon and method'],
+            ['src/pages/Pokedex.tsx', '{totalCaughtCount} Pokémon catturati', '{totalCaughtCount} Pokémon caught'],
+            ['src/pages/Pokedex.tsx', 'placeholder="Generazione"', 'placeholder="Generation"'],
+            ['src/pages/Pokedex.tsx', '>Tutti<', '>All<'],
+            ['src/pages/PokedexManager.tsx', 'Gestione card salvata', 'Card settings saved'],
+            ['src/pages/PokedexManager.tsx', 'Torna al Pokedex', 'Back to Pokedex'],
+            ['src/pages/PokedexManager.tsx', 'Gestione card', 'Card Settings'],
+            ['src/pages/PokedexManager.tsx', 'Colori e filtri delle card, salvati come preferenza personale.', 'Card colors and filters saved as your personal preference.'],
+            ['src/pages/PokedexManager.tsx', 'Solo admin', 'Admin only'],
+            ['src/pages/PokedexManager.tsx', 'Editor Pokedex', 'Pokedex Editor'],
+            ['src/pages/PokedexManager.tsx', 'Modalita Editor', 'Editor Mode'],
+            ['src/pages/PokedexManager.tsx', 'Rinomina o nasconde Pokemon e forme.', 'Rename or hide Pokémon and forms.'],
+            ['src/pages/PokedexManager.tsx', 'Filtri separati', 'Separate filters'],
+            ['src/pages/PokedexManager.tsx', 'Filtri card', 'Card Filters'],
+            ['src/pages/PokedexManager.tsx', 'Card Pokedex', 'Pokedex Card'],
+            ['src/pages/PokedexManager.tsx', 'Card Collezione', 'Collection Card'],
+            ['src/pages/PokedexManager.tsx', 'Colori Collezione', 'Collection Colors'],
+            ['src/pages/PokedexManager.tsx', 'Colori card Collezione', 'Collection Card Colors'],
+            ['src/pages/PokedexManager.tsx', 'Preset giochi', 'Game Presets'],
+            ['src/pages/PokedexManager.tsx', 'Anteprima rapida', 'Quick Preview'],
+            ['src/pages/PokedexManager.tsx', '10 Ago', 'Aug 10'],
+            ['src/pages/PokedexManager.tsx', 'Filtro Collezione', 'Collection Filter'],
+            ['src/pages/PokedexManager.tsx', 'Default gioco', 'Default game'],
+            ['src/pages/PokemonDetails.tsx', "details.hasGenderDifference ? 'Maschio'", "details.hasGenderDifference ? 'Male'"],
+            ['src/pages/PokemonDetails.tsx', "displayName: 'Femmina'", "displayName: 'Female'"],
+            ['src/pages/PokemonDetails.tsx', 'title="Maschio"', 'title="Male"'],
+            ['src/pages/PokemonDetails.tsx', 'title="Femmina"', 'title="Female"'],
+            ['src/pages/PokemonDetails.tsx', 'Collezione Forme', 'Form Collection'],
+            ['src/pages/PokemonDetails.tsx', 'Visualizza e segna le varianti cromatiche catturate.', 'View and mark the shiny variants you have caught.'],
+            ['src/pages/PokemonDetails.tsx', '>completato<', '>complete<'],
+            ['src/pages/PokemonDetails.tsx', 'Rinomina forma', 'Rename form'],
+            ['src/pages/PokemonDetails.tsx', 'Eliminare la forma ${variant.displayName}?', 'Remove the ${variant.displayName} form?'],
+            ['src/pages/PokemonDetails.tsx', 'toast({ title: "Forma eliminata", description: `${variant.displayName} rimossa.` });', 'toast({ title: "Form removed", description: `${variant.displayName} was removed.` });'],
+            ['src/pages/Stats.tsx', 'shiny principali, {numberFormatter.format(stats.uniqueSpecies)} specie uniche', 'main shinies, {numberFormatter.format(stats.uniqueSpecies)} unique species'],
+            ['src/pages/Stats.tsx', '>forme<', '>forms<'],
+            ['src/pages/Stats.tsx', 'Nessuna data valida registrata.', 'No valid dates recorded.'],
+            ['src/pages/UserCollectionsSearch.tsx', 'Collezione di @{selectedProfile.username}', "@{selectedProfile.username}'s Collection"],
+            ['src/pages/UserCollectionsSearch.tsx', 'shiny principali, {numberFormatter.format(userStats.speciesCount)} specie uniche', 'main shinies, {numberFormatter.format(userStats.speciesCount)} unique species'],
+            ['src/pages/UserCollectionsSearch.tsx', '>forme<', '>forms<'],
+          ];
+          const touched = new Set();
+          const missing = [];
+          for (const [file, from, to] of replacements) {
+            let text = fs.readFileSync(file, 'utf8');
+            if (text.includes(to) && !text.includes(from)) continue;
+            if (!text.includes(from)) { missing.push(`${file}: ${from}`); continue; }
+            text = text.split(from).join(to);
+            fs.writeFileSync(file, text);
+            touched.add(file);
+          }
+          if (missing.length) {
+            console.error('Missing expected strings:');
+            for (const item of missing) console.error(item);
+            process.exit(1);
+          }
+          console.log(`Updated ${touched.size} files.`);
+          NODE
+
+      - name: Commit final source changes and remove workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm --ignore-unmatch .github/workflows/complete-english-ui.yml
+          git add src
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git commit -m "Complete English UI translation"
+          git push
