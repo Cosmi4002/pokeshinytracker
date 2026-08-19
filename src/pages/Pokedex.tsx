@@ -14,7 +14,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useQuery } from '@tanstack/react-query';
 import { useGlobalCollectionThemes } from '@/hooks/use-global-collection-themes';
 
-type CaughtEntryStats = { count: number; genders: Set<string>; forms: Set<string> };
+type CaughtEntryStats = { count: number; legacyCount: number; genders: Set<string>; forms: Set<string> };
 type CaughtDataMap = Record<number, CaughtEntryStats>;
 
 const normalizePokedexForm = (value?: string | null) => (value || '').toString().trim().toLowerCase();
@@ -57,11 +57,12 @@ export default function Pokedex() {
             rows.forEach(row => {
                 const id = row.pokemon_id;
                 if (!caught[id]) {
-                    caught[id] = { count: 0, genders: new Set(), forms: new Set() };
+                    caught[id] = { count: 0, legacyCount: 0, genders: new Set(), forms: new Set() };
                 }
                 caught[id].count++;
                 if (row.gender) caught[id].genders.add(row.gender);
                 if (row.form) caught[id].forms.add(row.form);
+                else caught[id].legacyCount++;
             });
             return caught;
         },
@@ -72,6 +73,14 @@ export default function Pokedex() {
     useEffect(() => {
         setCaughtData(caughtDataFromQuery || {});
     }, [caughtDataFromQuery]);
+
+    const caughtFormNames = useMemo(() => {
+        const names = new Set<string>();
+        Object.values(caughtData).forEach(stats => {
+            stats.forms.forEach(form => names.add(normalizePokedexForm(form)));
+        });
+        return names;
+    }, [caughtData]);
 
     // Restore scroll position after data is loaded
     useEffect(() => {
@@ -300,11 +309,13 @@ export default function Pokedex() {
                                 // Granular caught status
                                 // 1. Primary sprite (Male or Single Strike)
                                 const statsForPrimary = caughtData[p.id];
-                                const formsForId = statsForPrimary?.forms;
                                 const isSpecialFormId = p.id > 10000 || p.id !== p.baseId;
-                                const hasFormMatch = hasCaughtForm(statsForPrimary, p.name);
+                                const hasFormMatch = caughtFormNames.has(normalizePokedexForm(p.name));
                                 const hasPrimaryCaughtRows = (statsForPrimary?.count || 0) > 0;
-                                const hasPrimaryLegacyRows = hasPrimaryCaughtRows && !formsForId?.size && !statsForPrimary?.genders.size;
+                                // Vivillon's historical synthetic IDs overlap other form IDs, so its
+                                // cards must rely on the explicit form slug instead of an ID-only fallback.
+                                const permitsLegacyFormFallback = p.baseId !== 666;
+                                const hasPrimaryLegacyRows = permitsLegacyFormFallback && (statsForPrimary?.legacyCount || 0) > 0;
                                 const isPrimaryCaught = Boolean(hasPrimaryCaughtRows &&
                                     (isSpecialFormId
                                         ? hasFormMatch || hasPrimaryLegacyRows
@@ -345,9 +356,12 @@ export default function Pokedex() {
                                     });
                                     if (caughtForms.size > 0) caughtCount = caughtForms.size;
                                 }
-                                const hasAnyCaughtRows = group.some(v => (caughtData[v.id]?.count || 0) > 0);
-                                if (caughtCount === 0 && hasAnyCaughtRows) caughtCount = 1;
-                                const isCaught = isPrimaryCaught || isSecondaryCaught || caughtCount > 0 || hasAnyCaughtRows;
+                                // Only use the ID fallback for legacy rows that do not identify a form.
+                                // A row with an explicit, different form must never mark this card as caught
+                                // (for example, Vivillon Fancy must not mark Vivillon Monsoon).
+                                const hasAnyLegacyRows = permitsLegacyFormFallback && group.some(v => (caughtData[v.id]?.legacyCount || 0) > 0);
+                                if (caughtCount === 0 && hasAnyLegacyRows) caughtCount = 1;
+                                const isCaught = isPrimaryCaught || isSecondaryCaught || caughtCount > 0 || hasAnyLegacyRows;
                                 const pct = Math.min(100, (caughtCount / totalVars) * 100);
 
                                 // Add a safeguard to prevent errors when clicking on non-evolving Pokémon icons

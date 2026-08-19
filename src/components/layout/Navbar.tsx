@@ -229,7 +229,7 @@ export function Navbar() {
       setProfileUsername(username);
       toast({
         title: 'Username updated',
-        description: `Nuovo username: @${username}`,
+        description: `New username: @${username}`,
       });
     } catch (err: any) {
       toast({
@@ -498,7 +498,7 @@ export function Navbar() {
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleSetUsername}>
                   <Pencil className="mr-2 h-4 w-4" />
-                  Imposta username
+                  Set username
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onSelect={(event) => {
@@ -561,14 +561,14 @@ export function Navbar() {
                       }}
                     >
                       <Move className="h-4 w-4" />
-                      Sposta
+                      Move
                     </Button>
                   </div>
                   {avatarPickerMode === 'move' && (
                     <div className="mt-2 rounded-md border border-primary/25 bg-primary/10 px-3 py-2 text-xs text-muted-foreground">
                       {movingAvatarId
                         ? 'Now tap the position where you want to place it.'
-                        : 'Tocca un avatar da spostare.'}
+                        : 'Tap an avatar to move it.'}
                     </div>
                   )}
                 </div>

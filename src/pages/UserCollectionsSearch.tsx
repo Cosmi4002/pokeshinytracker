@@ -583,7 +583,7 @@ export default function UserCollectionsSearch() {
   const profileSuggestions = searchTerm ? profiles : discoverableProfiles;
   const profileSuggestionsLoading = searchTerm ? profilesLoading : discoverableProfilesLoading;
   const profileSuggestionsError = searchTerm ? profilesError : discoverableProfilesError;
-  const profileSuggestionsTitle = searchTerm ? 'Risultati username' : 'Utenti disponibili';
+  const profileSuggestionsTitle = searchTerm ? 'Username results' : 'Available users';
 
   const renderRecordHuntCard = (label: string, entry: PublicCaughtRow | null) => {
     if (!entry) {
@@ -673,7 +673,7 @@ export default function UserCollectionsSearch() {
               <Input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Scrivi username..."
+                placeholder="Enter a username..."
                 className="pl-10"
               />
             </div>
@@ -818,4 +818,3 @@ export default function UserCollectionsSearch() {
     </div>
   );
 }
-

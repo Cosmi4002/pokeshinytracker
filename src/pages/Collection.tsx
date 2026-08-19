@@ -439,7 +439,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
               </h1>
               <div className="mt-3 flex flex-wrap justify-center md:justify-start gap-2">
                 <Button variant="outline" size="sm" className={cn(mode === 'obtained' && 'bg-muted text-foreground')} asChild>
-                  <Link to="/collection">Ottenuti</Link>
+                  <Link to="/collection">Obtained</Link>
                 </Button>
                 <Button variant="outline" size="sm" className={cn(mode === 'special' && 'bg-muted text-foreground')} asChild>
                   <Link to="/collection/special">Static Overworld / Game Gift</Link>
@@ -452,7 +452,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
                 </Button>
               </div>
               <p className="text-muted-foreground mt-1 font-medium">
-                {filteredEntries.length} mostrati su {scopedEntries.length} shiny Pokemon
+                {filteredEntries.length} shown out of {scopedEntries.length} shiny Pokémon
               </p>
             </div>
 

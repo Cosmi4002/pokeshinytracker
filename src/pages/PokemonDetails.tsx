@@ -527,11 +527,11 @@ export default function PokemonDetails() {
                                 <div>
                                     <h2 className="flex items-center gap-3 text-2xl font-black tracking-tight">
                                         <span className="h-7 w-2 rounded-full bg-primary shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
-                                        Ottenuto in
+                                        Obtained in
                                     </h2>
                                     {availabilitySourceLinks.length > 0 && (
                                         <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                                            <span>Info: varie fonti</span>
+                                            <span>Info: various sources</span>
                                             {availabilitySourceLinks.map(source => (
                                                 <a
                                                     key={source.url}
@@ -806,4 +806,3 @@ export default function PokemonDetails() {
         </div>
     );
 }
-

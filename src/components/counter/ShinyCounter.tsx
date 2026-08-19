@@ -657,11 +657,11 @@ export function ShinyCounter({
                                 >
                                   <div className="flex min-w-0 items-center gap-1.5 truncate">
                                     <Sparkles className="h-3 w-3 shrink-0" style={{ color: accentColor }} />
-                                    <SelectValue placeholder="Forma base" />
+                                    <SelectValue placeholder="Base form" />
                                   </div>
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="default">Forma base</SelectItem>
+                                  <SelectItem value="default">Base form</SelectItem>
                                   {slotFormOptions.map((f) => (
                                     <SelectItem key={f.name} value={f.name}>
                                       {f.displayName}
@@ -935,7 +935,7 @@ export function ShinyCounter({
                   className="h-9 w-9"
                   onClick={() => movePokemonSlot(0, 1)}
                   disabled={!selectedPokemonId}
-                  title="Sposta giu Pokemon 1"
+                  title="Move Pokémon 1 down"
                 >
                   <ArrowDown className="h-4 w-4" />
                 </Button>
@@ -991,7 +991,7 @@ export function ShinyCounter({
                       className="h-9 w-9"
                       onClick={() => movePokemonSlot(index + 1, index)}
                       disabled={!slot.value}
-                      title={`Sposta su ${slot.label}`}
+                      title={`Move ${slot.label} up`}
                     >
                       <ArrowUp className="h-4 w-4" />
                     </Button>
@@ -1002,7 +1002,7 @@ export function ShinyCounter({
                       className="h-9 w-9"
                       onClick={() => movePokemonSlot(index + 1, index + 2)}
                       disabled={!slot.value || index === 1}
-                      title={`Sposta giu ${slot.label}`}
+                      title={`Move ${slot.label} down`}
                     >
                       <ArrowDown className="h-4 w-4" />
                     </Button>

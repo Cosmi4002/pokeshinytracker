@@ -160,7 +160,7 @@ export default function Counter() {
                   </Badge>
                   <Badge variant="secondary" className="gap-1 border border-border/70 bg-muted/70 text-foreground hover:bg-muted/70 dark:border-white/15 dark:bg-white/10 dark:text-white dark:hover:bg-white/10">
                     <Target className="h-3.5 w-3.5" />
-                    {remainingSlots} free
+                    {remainingSlots} free {remainingSlots === 1 ? 'slot' : 'slots'}
                   </Badge>
                 </div>
                 <h1
@@ -296,7 +296,9 @@ export default function Counter() {
                       </div>
                       <div>
                         <div className="font-bold">Add counter</div>
-                        <div className="mt-1 text-sm text-muted-foreground">{remainingSlots} slot disponibili</div>
+                        <div className="mt-1 text-sm text-muted-foreground">
+                          {remainingSlots} free {remainingSlots === 1 ? 'slot' : 'slots'}
+                        </div>
                       </div>
                     </div>
                   </button>
