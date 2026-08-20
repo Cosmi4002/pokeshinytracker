@@ -1,45 +1,14 @@
-# ✨ PokeShinyTracker - Ultimate Shiny Pokémon Tracker
+# ✨ PokeShinyTracker
 
 ![Shiny Pokémon](https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/25.png)
 
-Un tracker professionale per la caccia ai Pokémon shiny, con statistiche accurate e collection completa.
+A tracker for hunting shiny Pokémon, with accurate statistics and complete collection.
 
 ## 🌟 Features
 
-- 🎯 **Shiny Counter** - Conta i tuoi incontri con statistiche precise
-- 📊 **Statistiche Corrette** - Formule identiche a ShinyTracker
-- 📚 **Pokédex Completo** - Tutti gli sprite shiny (Gen 1-9)
-- 💾 **Collection** - Salva i tuoi shiny catturati con dettagli completi
-- 📂 **Playlist** - Organizza la tua collection in categorie custom
-- 📱 **Responsive** - Perfetto su mobile e desktop
-
-## 🚀 Quick Start
-
-```bash
-# Installa dipendenze
-npm install
-
-# Avvia server di sviluppo
-npm run dev
-
-# Build locale veloce
-npm run build
-
-# Build completa per produzione
-npm run build:full
-```
-
-## 🛠️ Tecnologie
-
-- React + TypeScript
-- Vite
-- Tailwind CSS + shadcn/ui
-- PokeAPI per sprite
-
-## 📝 Licenza
-
-MIT License - Open Source
-
----
-
-**Buona caccia agli shiny!** ✨🎮
+- 🎯 **Shiny Counter** - Count your meetings with accurate statistics
+- 📊 **Correct Statistics** - Formulas identical to ShinyTracker
+- 📚 **Pokédex Complete** - All shiny sprites (Gen 1-9)
+- 💾 **Collection** - Save your captured shinys with full details
+- 📂 **Playlist** - Organize your collection into custom categories
+- 📱 **Responsive** - Perfect for mobile and desktop
