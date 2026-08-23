@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ComponentType } from 'react';
-import { BarChart3, Calendar, Crown, Dice5, Gamepad2, Hash, Radio, Search, Sparkles, Target, TrendingUp, UserRound, Users, ArrowUpCircle } from 'lucide-react';
+import { ArrowRight, ArrowUpCircle, BarChart3, Calendar, Crown, Dice5, Gamepad2, Hash, Radio, Search, Sparkles, Target, TrendingUp, UserRound, Users } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,7 +18,7 @@ import { resolvePokemonEntity } from '@/lib/pokemon-entity-resolver-v2';
 type ProfileRow = Pick<Tables<'profiles'>, 'user_id' | 'username'>;
 type PublicCaughtRow = Pick<
   Tables<'caught_shinies'>,
-  'id' | 'pokemon_id' | 'entity_key' | 'pokemon_name' | 'form' | 'gender' | 'caught_date' | 'created_at' | 'sprite_url' | 'game' | 'is_fail' | 'is_unobtainable' | 'hunt_start_date' | 'method' | 'attempts' | 'has_shiny_charm' | 'is_evolved' | 'show_encounters'
+  'id' | 'pokemon_id' | 'entity_key' | 'pokemon_name' | 'form' | 'gender' | 'caught_date' | 'created_at' | 'sprite_url' | 'game' | 'secondary_game' | 'is_fail' | 'is_unobtainable' | 'hunt_start_date' | 'method' | 'attempts' | 'has_shiny_charm' | 'is_evolved' | 'show_encounters'
 >;
 type PublicRecentRow = PublicCaughtRow & { user_id: string; username: string | null };
 
@@ -211,7 +211,7 @@ export default function UserCollectionsSearch() {
     try {
       const { data, error } = await supabase
         .from('caught_shinies')
-        .select('id, pokemon_id, entity_key, pokemon_name, form, gender, caught_date, created_at, sprite_url, game, is_fail, is_unobtainable, hunt_start_date, method, attempts, has_shiny_charm, is_evolved, show_encounters')
+        .select('id, pokemon_id, entity_key, pokemon_name, form, gender, caught_date, created_at, sprite_url, game, secondary_game, is_fail, is_unobtainable, hunt_start_date, method, attempts, has_shiny_charm, is_evolved, show_encounters')
         .eq('user_id', profile.user_id)
         .order('caught_date', { ascending: false })
         .order('created_at', { ascending: false })
@@ -238,7 +238,7 @@ export default function UserCollectionsSearch() {
       const cutoff = getFourDaysAgoDate();
       const { data, error } = await supabase
         .from('caught_shinies')
-        .select('id, user_id, pokemon_id, entity_key, pokemon_name, form, gender, caught_date, created_at, sprite_url, game, is_fail, is_unobtainable, hunt_start_date, method, attempts, has_shiny_charm, is_evolved, show_encounters')
+        .select('id, user_id, pokemon_id, entity_key, pokemon_name, form, gender, caught_date, created_at, sprite_url, game, secondary_game, is_fail, is_unobtainable, hunt_start_date, method, attempts, has_shiny_charm, is_evolved, show_encounters')
         .gte('caught_date', cutoff)
         .order('caught_date', { ascending: false })
         .order('created_at', { ascending: false })
@@ -423,7 +423,7 @@ export default function UserCollectionsSearch() {
   }, [entries]);
 
   const collectionGameOptions = useMemo(() => {
-    const ids = Array.from(new Set(entries.map((entry) => entry.game).filter(Boolean) as string[]));
+    const ids = Array.from(new Set(entries.flatMap((entry) => [entry.game, entry.secondary_game]).filter(Boolean) as string[]));
     return ids.sort((a, b) => getGameLabel(a).localeCompare(getGameLabel(b)));
   }, [entries]);
 
@@ -447,7 +447,7 @@ export default function UserCollectionsSearch() {
           const searchable = `${entry.pokemon_name || ''} ${entry.form || ''} ${entry.pokemon_id}`.toLowerCase();
           if (!searchable.includes(term)) return false;
         }
-        if (gameFilter !== 'all' && entry.game !== gameFilter) return false;
+        if (gameFilter !== 'all' && entry.game !== gameFilter && entry.secondary_game !== gameFilter) return false;
         if (methodFilter !== 'all' && entry.method !== methodFilter) return false;
         return matchesStatus(entry);
       })
@@ -519,6 +519,7 @@ export default function UserCollectionsSearch() {
     const showEntryEncounters = shouldShowEncounters(entry.method, entry.game, entry.attempts, entry.show_encounters ?? true);
     const username = 'username' in entry ? entry.username : null;
     const gameLogo = entry.game ? GAME_LOGOS[entry.game] : null;
+    const secondaryGameLogo = entry.secondary_game ? GAME_LOGOS[entry.secondary_game] : null;
 
     return (
       <div
@@ -570,16 +571,31 @@ export default function UserCollectionsSearch() {
             </div>
 
             <div className="flex min-h-[42px] items-center justify-center">
-              {gameLogo ? (
-                <img
-                  src={gameLogo}
-                  alt={entry.game || 'Game'}
-                  className="h-9 w-auto max-w-[96px] object-contain brightness-110 drop-shadow"
-                  loading="lazy"
-                />
+              {gameLogo || secondaryGameLogo ? (
+                <div className="flex min-w-0 items-center justify-center gap-2">
+                  {gameLogo && (
+                    <img
+                      src={gameLogo}
+                      alt={entry.game || 'Origin game'}
+                      className="h-9 w-auto max-w-[82px] object-contain brightness-110 drop-shadow"
+                      loading="lazy"
+                    />
+                  )}
+                  {gameLogo && secondaryGameLogo && (
+                    <ArrowRight className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+                  )}
+                  {secondaryGameLogo && (
+                    <img
+                      src={secondaryGameLogo}
+                      alt={entry.secondary_game || 'Transfer game'}
+                      className="h-9 w-auto max-w-[82px] object-contain brightness-110 drop-shadow"
+                      loading="lazy"
+                    />
+                  )}
+                </div>
               ) : (
                 <span className="rounded-full border border-border bg-muted px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-muted-foreground">
-                  {entry.game || 'Game not specified'}
+                  {[entry.game, entry.secondary_game].filter(Boolean).join(' → ') || 'Game not specified'}
                 </span>
               )}
             </div>
