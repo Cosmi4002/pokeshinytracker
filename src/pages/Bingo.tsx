@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
-import { CheckCircle2, Dice5, Gamepad2, Grid3X3, Info, Pencil, RefreshCcw, Shuffle, Sparkles } from 'lucide-react';
+import { CheckCircle2, Dice5, Gamepad2, Grid3X3, Info, Pencil, RefreshCcw, Shuffle, Sparkles, Volume2, VolumeX } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -42,6 +42,12 @@ const getRandomUnit = (): number => (
 );
 
 const getRandomIndex = (length: number): number => Math.floor(getRandomUnit() * length);
+
+const pickRandomFamilyPokemon = (families: PokemonBasic[][]): PokemonBasic | null => {
+  if (families.length === 0) return null;
+  const family = families[getRandomIndex(families.length)];
+  return family[getRandomIndex(family.length)] ?? null;
+};
 
 const getBulbapediaUrl = (pokemon: Pick<PokemonBasic, 'displayName' | 'name'>): string => {
   const query = pokemon.displayName || pokemon.name;
@@ -165,11 +171,11 @@ export default function Games() {
   const [randomPokemon, setRandomPokemon] = useState<PokemonBasic | null>(null);
   const [rollingPokemon, setRollingPokemon] = useState<PokemonBasic | null>(null);
   const [randomIsRolling, setRandomIsRolling] = useState(false);
+  const [randomSoundEnabled, setRandomSoundEnabled] = useState(false);
   const [randomGenerationFilters, setRandomGenerationFilters] = useState<Set<number>>(new Set());
 
   const saveTimerRef = useRef<number | null>(null);
   const didInitRef = useRef(false);
-  const randomRollIntervalRef = useRef<number | null>(null);
   const randomRollTimeoutRef = useRef<number | null>(null);
 
   const basePool = useMemo(() => {
@@ -363,41 +369,66 @@ export default function Games() {
     ...overrides,
   }), [gameRatio, getGridEntityKeys, gridIds, gridSize, includeGames, includedGenerations, marked, randomGenerationFilters, randomPokemon, selectedGameIds]);
 
+  const playRandomRollTick = useCallback((isFinal = false) => {
+    if (!randomSoundEnabled || typeof window === 'undefined') return;
+    const AudioContextCtor = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AudioContextCtor) return;
+    const audioContext = new AudioContextCtor();
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    oscillator.type = 'triangle';
+    oscillator.frequency.value = isFinal ? 740 : 420;
+    gain.gain.setValueAtTime(0.0001, audioContext.currentTime);
+    gain.gain.exponentialRampToValueAtTime(isFinal ? 0.06 : 0.035, audioContext.currentTime + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + (isFinal ? 0.14 : 0.055));
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+    oscillator.start();
+    oscillator.stop(audioContext.currentTime + (isFinal ? 0.16 : 0.07));
+    window.setTimeout(() => void audioContext.close(), isFinal ? 220 : 120);
+  }, [randomSoundEnabled]);
+
   const pickRandomPokemon = useCallback(() => {
     if (randomPokemonFamilies.length === 0 || randomIsRolling) return;
     // Families are drawn uniformly first, then a form inside that family.
     // This prevents Pokémon with many forms (Alcremie, Vivillon, etc.) from
     // dominating the random picker just because they have many variants.
-    const family = randomPokemonFamilies[getRandomIndex(randomPokemonFamilies.length)];
-    const next = family[getRandomIndex(family.length)];
-    const previewPool = randomPokemonPool.length > 0 ? randomPokemonPool : family;
+    const next = pickRandomFamilyPokemon(randomPokemonFamilies);
+    if (!next) return;
 
-    if (randomRollIntervalRef.current) window.clearInterval(randomRollIntervalRef.current);
     if (randomRollTimeoutRef.current) window.clearTimeout(randomRollTimeoutRef.current);
 
     setRandomIsRolling(true);
-    setRollingPokemon(previewPool[getRandomIndex(previewPool.length)]);
+    setRollingPokemon(pickRandomFamilyPokemon(randomPokemonFamilies));
 
-    randomRollIntervalRef.current = window.setInterval(() => {
-      setRollingPokemon(previewPool[getRandomIndex(previewPool.length)]);
-    }, 70);
+    const steps = [130, 150, 175, 205, 245, 295, 360, 440];
+    let stepIndex = 0;
 
-    randomRollTimeoutRef.current = window.setTimeout(() => {
-      if (randomRollIntervalRef.current) {
-        window.clearInterval(randomRollIntervalRef.current);
-        randomRollIntervalRef.current = null;
+    const runStep = () => {
+      if (stepIndex >= steps.length) {
+        randomRollTimeoutRef.current = null;
+        setRollingPokemon(null);
+        setRandomIsRolling(false);
+        setRandomPokemon(next);
+        playRandomRollTick(true);
+        void persist(makePersistedState({
+          randomPokemonId: next.id,
+          randomPokemonName: next.name,
+          randomGenerationFilters: Array.from(randomGenerationFilters),
+        }));
+        return;
       }
-      randomRollTimeoutRef.current = null;
-      setRollingPokemon(null);
-      setRandomIsRolling(false);
-      setRandomPokemon(next);
-      void persist(makePersistedState({
-        randomPokemonId: next.id,
-        randomPokemonName: next.name,
-        randomGenerationFilters: Array.from(randomGenerationFilters),
-      }));
-    }, 900);
-  }, [makePersistedState, persist, randomGenerationFilters, randomIsRolling, randomPokemonFamilies, randomPokemonPool]);
+
+      const preview = pickRandomFamilyPokemon(randomPokemonFamilies);
+      if (preview) setRollingPokemon(preview);
+      playRandomRollTick(false);
+      const delay = steps[stepIndex];
+      stepIndex += 1;
+      randomRollTimeoutRef.current = window.setTimeout(runStep, delay);
+    };
+
+    runStep();
+  }, [makePersistedState, persist, playRandomRollTick, randomGenerationFilters, randomIsRolling, randomPokemonFamilies]);
 
   const toggleRandomGeneration = useCallback((generation: number | 'all') => {
     const nextFilters = generation === 'all'
@@ -589,7 +620,6 @@ export default function Games() {
 
   useEffect(() => {
     return () => {
-      if (randomRollIntervalRef.current) window.clearInterval(randomRollIntervalRef.current);
       if (randomRollTimeoutRef.current) window.clearTimeout(randomRollTimeoutRef.current);
     };
   }, []);
@@ -742,6 +772,18 @@ export default function Games() {
                 >
                   <Dice5 className={cn('h-4 w-4', randomIsRolling && 'animate-spin')} />
                   {randomIsRolling ? 'Rolling...' : randomPokemon ? 'Pick another' : 'Pick a random Pokémon'}
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setRandomSoundEnabled((enabled) => !enabled)}
+                  className="h-10 w-10"
+                  title={randomSoundEnabled ? 'Disable roll sound' : 'Enable roll sound'}
+                  aria-label={randomSoundEnabled ? 'Disable roll sound' : 'Enable roll sound'}
+                >
+                  {randomSoundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
                 </Button>
 
                 <span className="text-xs text-muted-foreground">
