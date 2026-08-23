@@ -59,7 +59,12 @@ interface CaughtGameRow {
 
 type CaughtGender = 'male' | 'female';
 type CaughtGameGenderMap = Record<string, CaughtGender[]>;
-type AcquisitionInfo = { sourcePokemonName: string; originGameName: string };
+type AcquisitionInfo = {
+    sourcePokemonName: string;
+    originGameName: string;
+    originGameId: string;
+    transferGameId: string | null;
+};
 
 const isCaughtGender = (gender?: string | null): gender is CaughtGender => gender === 'male' || gender === 'female';
 
@@ -204,9 +209,14 @@ export default function PokemonDetails() {
                             ? (row.pokemon_name || details.name).replace(/\s*\(Origin(?: Forme)?\)\s*$/i, '')
                             : null
                     );
-                    const originGameName = GAMES.find((game) => game.id === row.game)?.name;
-                    if (!nextAcquisitionInfo && sourcePokemonName && originGameName) {
-                        nextAcquisitionInfo = { sourcePokemonName, originGameName };
+                    const originGame = GAMES.find((game) => game.id === row.game);
+                    if (!nextAcquisitionInfo && sourcePokemonName && originGame) {
+                        nextAcquisitionInfo = {
+                            sourcePokemonName,
+                            originGameName: originGame.name,
+                            originGameId: originGame.id,
+                            transferGameId: row.secondary_game,
+                        };
                     }
 
                     // For an evolved entry, the secondary game is the game where
@@ -600,39 +610,10 @@ export default function PokemonDetails() {
                         <section className={cn("w-full space-y-5 rounded-lg border p-6", panelClass)}>
                             <div className="flex flex-col gap-3 border-b border-border pb-5 text-left sm:flex-row sm:items-end sm:justify-between">
                                 <div>
-                                    <div className="flex items-center gap-2">
-                                        <h2 className="flex items-center gap-3 text-2xl font-black tracking-tight">
-                                            <span className="h-7 w-2 rounded-full bg-primary shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
-                                            Obtained in
-                                        </h2>
-                                        {acquisitionInfo && (
-                                            <Popover>
-                                                <PopoverTrigger asChild>
-                                                    <Button
-                                                        type="button"
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-7 w-7 rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
-                                                        aria-label="Acquisition information"
-                                                        title="Acquisition information"
-                                                    >
-                                                        <Info className="h-3.5 w-3.5" />
-                                                    </Button>
-                                                </PopoverTrigger>
-                                                <PopoverContent className="w-56 space-y-2 p-3 text-xs" align="start">
-                                                    <div className="font-black uppercase tracking-[0.12em] text-muted-foreground">Acquisition info</div>
-                                                    <div className="flex items-start justify-between gap-3">
-                                                        <span className="text-muted-foreground">Source Pokémon</span>
-                                                        <span className="text-right font-bold">{acquisitionInfo.sourcePokemonName}</span>
-                                                    </div>
-                                                    <div className="flex items-start justify-between gap-3">
-                                                        <span className="text-muted-foreground">Origin game</span>
-                                                        <span className="text-right font-bold">{acquisitionInfo.originGameName}</span>
-                                                    </div>
-                                                </PopoverContent>
-                                            </Popover>
-                                        )}
-                                    </div>
+                                    <h2 className="flex items-center gap-3 text-2xl font-black tracking-tight">
+                                        <span className="h-7 w-2 rounded-full bg-primary shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
+                                        Obtained in
+                                    </h2>
                                     {availabilitySourceLinks.length > 0 && (
                                         <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                                             <span>Info: various sources</span>
@@ -694,13 +675,42 @@ export default function PokemonDetails() {
                                                     style={{
                                                         borderColor: game.isCaught ? `color-mix(in srgb, ${game.theme.accent} 82%, white 18%)` : undefined,
                                                         background: game.isCaught
-                                                            ? `linear-gradient(160deg, color-mix(in srgb, ${game.theme.primary} 72%, black 28%) 0%, color-mix(in srgb, ${game.theme.secondary} 58%, black 42%) 62%, color-mix(in srgb, ${game.theme.accent} 42%, black 58%) 100%)`
+                                                            ? game.id === acquisitionInfo?.transferGameId && acquisitionInfo.originGameId !== game.id
+                                                                ? `linear-gradient(145deg, color-mix(in srgb, ${getGameTheme(acquisitionInfo.originGameId).primary} 62%, ${game.theme.primary} 38%) 0%, color-mix(in srgb, ${getGameTheme(acquisitionInfo.originGameId).secondary} 48%, ${game.theme.secondary} 52%) 52%, color-mix(in srgb, ${getGameTheme(acquisitionInfo.originGameId).accent} 36%, ${game.theme.accent} 64%) 100%)`
+                                                                : `linear-gradient(160deg, color-mix(in srgb, ${game.theme.primary} 72%, black 28%) 0%, color-mix(in srgb, ${game.theme.secondary} 58%, black 42%) 62%, color-mix(in srgb, ${game.theme.accent} 42%, black 58%) 100%)`
                                                             : undefined,
                                                         boxShadow: game.isCaught
                                                             ? `inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -18px 30px rgba(0,0,0,0.22), 0 14px 32px ${game.theme.primary}45`
                                                             : undefined
                                                     }}
                                                 >
+                                                    {game.isCaught && game.id === acquisitionInfo?.transferGameId && (
+                                                        <Popover>
+                                                            <PopoverTrigger asChild>
+                                                                <Button
+                                                                    type="button"
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="absolute left-2 top-2 z-10 h-6 w-6 rounded-full bg-black/20 text-white/75 hover:bg-black/35 hover:text-white"
+                                                                    aria-label="Acquisition information"
+                                                                    title="Acquisition information"
+                                                                >
+                                                                    <Info className="h-3.5 w-3.5" />
+                                                                </Button>
+                                                            </PopoverTrigger>
+                                                            <PopoverContent className="w-56 space-y-2 p-3 text-xs" align="start">
+                                                                <div className="font-black uppercase tracking-[0.12em] text-muted-foreground">Acquisition info</div>
+                                                                <div className="flex items-start justify-between gap-3">
+                                                                    <span className="text-muted-foreground">Source Pokémon</span>
+                                                                    <span className="text-right font-bold">{acquisitionInfo.sourcePokemonName}</span>
+                                                                </div>
+                                                                <div className="flex items-start justify-between gap-3">
+                                                                    <span className="text-muted-foreground">Origin game</span>
+                                                                    <span className="text-right font-bold">{acquisitionInfo.originGameName}</span>
+                                                                </div>
+                                                            </PopoverContent>
+                                                        </Popover>
+                                                    )}
                                                     {game.isCaught && (
                                                         <div
                                                             className="absolute inset-x-4 top-1 h-1 rounded-full opacity-95"
