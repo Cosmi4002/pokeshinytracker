@@ -1283,6 +1283,8 @@ const CURATED_SHINY_ORIGIN_BY_NAME: AvailabilityByName = {
   'dewpider': ["sun","moon","ultrasun","ultramoon","sword","shield","scarlet","violet"],
   'dhelmise': ["sun","moon","ultrasun","ultramoon","sword","shield"],
   'dialga': ["diamond","platinum","heartgold","soulsilver","alphasapphire","ultrasun","sword","shield","brilliantdiamond"],
+  // Origin Forme is not a separate shiny encounter: transform a legitimate shiny Dialga in PLA or SV.
+  'dialga-origin': ["pla","scarlet","violet"],
   'diancie': [],
   'diggersby': ["x","y","omegaruby","alphasapphire","sun","moon","ultrasun","ultramoon","sword","shield","za"],
   'diglett': ["gold","silver","crystal","ruby","sapphire","firered","leafgreen","emerald","diamond","pearl","platinum","heartgold","soulsilver","black","white","black2","white2","x","y","omegaruby","alphasapphire","sun","moon","ultrasun","ultramoon","lgp","lge","sword","shield","brilliantdiamond","shiningpearl","scarlet","violet"],
@@ -1713,6 +1715,8 @@ const CURATED_SHINY_ORIGIN_BY_NAME: AvailabilityByName = {
   'overqwil': ["pla","scarlet","violet","za"],
   'pachirisu': ["diamond","pearl","platinum","heartgold","soulsilver","black","white","black2","white2","x","y","omegaruby","alphasapphire","sun","moon","ultrasun","ultramoon","brilliantdiamond","shiningpearl","pla","scarlet","violet"],
   'palkia': ["pearl","platinum","heartgold","soulsilver","omegaruby","ultramoon","sword","shield","shiningpearl"],
+  // Origin Forme is not a separate shiny encounter: transform a legitimate shiny Palkia in PLA or SV.
+  'palkia-origin': ["pla","scarlet","violet"],
   'palossand': ["sun","moon","ultrasun","ultramoon","sword","shield","scarlet","violet","za"],
   'palpitoad': ["black","white","black2","white2","x","y","omegaruby","alphasapphire","sun","moon","ultrasun","ultramoon","sword","shield"],
   'pancham': ["x","y","omegaruby","alphasapphire","sun","moon","ultrasun","ultramoon","sword","shield","za"],

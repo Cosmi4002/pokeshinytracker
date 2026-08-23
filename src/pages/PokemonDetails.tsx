@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { usePokemonDetails, getPokemonSpriteUrl } from "@/hooks/use-pokemon";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
@@ -50,6 +50,7 @@ interface CaughtGameRow {
     form: string | null;
     game: string | null;
     secondary_game: string | null;
+    is_evolved: boolean | null;
 }
 
 type CaughtGender = 'male' | 'female';
@@ -72,6 +73,7 @@ const addCaughtGameGender = (
 export default function PokemonDetails() {
     const { pokemonId } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const { pokemon: details, loading } = usePokemonDetails(Number(pokemonId));
     const { overrides, saveOverride } = usePokedexOverrides();
     const { user } = useAuth();
@@ -116,7 +118,7 @@ export default function PokemonDetails() {
 
             const { data, error } = await supabase
                 .from('caught_shinies')
-                .select('pokemon_id, entity_key, gender, form, game, secondary_game')
+                .select('pokemon_id, entity_key, gender, form, game, secondary_game, is_evolved')
                 .eq('user_id', user.id)
                 .or('is_fail.is.false,is_fail.is.null')
                 .or('is_unobtainable.is.false,is_unobtainable.is.null')
@@ -189,7 +191,13 @@ export default function PokemonDetails() {
                 }
 
                 if (matchedThisPokemon) {
-                    [row.game, row.secondary_game].forEach(gameId => {
+                    // For an evolved entry, the secondary game is the game where
+                    // the current species/form was obtained. The primary game
+                    // remains provenance only and must not mark this form as caught.
+                    const gamesForCurrentPokemon = row.is_evolved && row.secondary_game
+                        ? [row.secondary_game]
+                        : [row.game, row.secondary_game];
+                    gamesForCurrentPokemon.forEach(gameId => {
                         if (gameId && gameId !== 'unknown' && GAME_LOGOS[gameId]) {
                             gameSet.add(gameId);
                             addCaughtGameGender(gameGenderMap, gameId, matchedGender);
@@ -310,6 +318,12 @@ export default function PokemonDetails() {
     }, [availableGames]);
 
     const caughtGameCount = availableGames.filter(game => game.isCaught).length;
+
+    const originFormNote = details?.name === 'dialga-origin'
+        ? 'Non è un incontro shiny separato: trasferisci un Dialga shiny legittimo in Leggende: Arceus o Pokémon Scarlatto/Violetto e usa l’Adamant Crystal. Il Dialga della storia in Leggende: Arceus è shiny-locked.'
+        : details?.name === 'palkia-origin'
+            ? 'Non è un incontro shiny separato: trasferisci un Palkia shiny legittimo in Leggende: Arceus o Pokémon Scarlatto/Violetto e usa il Lustrous Globe. Il Palkia della storia in Leggende: Arceus è shiny-locked.'
+            : null;
 
     const toggleCaught = async (variant: FormVariant) => {
         if (!user) {
@@ -439,7 +453,13 @@ export default function PokemonDetails() {
                     <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => navigate('/pokedex')}
+                        onClick={() => {
+                            if (location.state && typeof location.state === 'object' && 'fromPokedex' in location.state) {
+                                navigate(-1);
+                            } else {
+                                navigate('/pokedex');
+                            }
+                        }}
                         className="group rounded-lg border border-border/70 bg-card/95 px-4 font-medium text-muted-foreground shadow-sm backdrop-blur hover:bg-muted hover:text-foreground dark:border-white/15 dark:bg-[#171717]/95"
                     >
                         <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
@@ -593,6 +613,11 @@ export default function PokemonDetails() {
                             </div>
 
                             <div className="space-y-5">
+                                {originFormNote && (
+                                    <div className="rounded-lg border border-primary/30 bg-primary/5 p-4 text-left text-sm font-medium text-muted-foreground">
+                                        {originFormNote}
+                                    </div>
+                                )}
                                 {availableGames.length === 0 && curatedGameIds && (
                                     <div className="rounded-lg border border-border/70 bg-background/80 p-4 text-sm font-bold text-muted-foreground dark:border-white/15 dark:bg-white/10">
                                         No valid console game is available for the shiny origin.

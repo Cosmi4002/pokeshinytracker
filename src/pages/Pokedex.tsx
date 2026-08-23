@@ -17,6 +17,13 @@ import { resolvePokemonEntity } from '@/lib/pokemon-entity-resolver-v2';
 
 type CaughtEntryStats = { count: number; legacyCount: number; genders: Set<string>; forms: Set<string> };
 type CaughtDataMap = Record<number, CaughtEntryStats>;
+const POKEDEX_VIEW_STATE_KEY = 'pokedex-view-state';
+
+type PokedexViewState = {
+    scrollY: number;
+    search: string;
+    generationFilter: string;
+};
 
 const normalizePokedexForm = (value?: string | null) => (value || '').toString().trim().toLowerCase();
 
@@ -34,8 +41,22 @@ export default function Pokedex() {
     const navigate = useNavigate();
     const { pathname } = useLocation();
 
-    const [search, setSearch] = useState('');
-    const [generationFilter, setGenerationFilter] = useState('all');
+    const [search, setSearch] = useState(() => {
+        try {
+            const saved = sessionStorage.getItem(POKEDEX_VIEW_STATE_KEY);
+            return saved ? (JSON.parse(saved) as Partial<PokedexViewState>).search || '' : '';
+        } catch {
+            return '';
+        }
+    });
+    const [generationFilter, setGenerationFilter] = useState(() => {
+        try {
+            const saved = sessionStorage.getItem(POKEDEX_VIEW_STATE_KEY);
+            return saved ? (JSON.parse(saved) as Partial<PokedexViewState>).generationFilter || 'all' : 'all';
+        } catch {
+            return 'all';
+        }
+    });
 
     // Define setCaughtData to manage caught data state
     const [caughtData, setCaughtData] = useState<CaughtDataMap>({});
@@ -97,16 +118,28 @@ export default function Pokedex() {
         return names;
     }, [caughtData]);
 
-    // Restore scroll position after data is loaded
+    // Restore the exact view after returning from a Pokémon detail page.
     useEffect(() => {
         if (!pokemonLoading && !caughtLoading) {
-            const savedPosition = sessionStorage.getItem(`scroll-${pathname}`);
-            if (savedPosition) {
-                // Use a small timeout to ensure DOM is fully rendered
-                setTimeout(() => {
-                    window.scrollTo(0, parseInt(savedPosition));
-                }, 100);
+            let savedScroll = 0;
+            try {
+                const savedState = sessionStorage.getItem(POKEDEX_VIEW_STATE_KEY);
+                if (savedState) savedScroll = Number((JSON.parse(savedState) as Partial<PokedexViewState>).scrollY) || 0;
+            } catch {
+                savedScroll = 0;
             }
+
+            // The grid can gain height for a few frames while images settle. Retry
+            // briefly so mobile and desktop restore the same card reliably.
+            let frame = 0;
+            let frameId: number;
+            const restore = () => {
+                window.scrollTo(0, savedScroll);
+                frame += 1;
+                if (frame < 8) frameId = window.requestAnimationFrame(restore);
+            };
+            frameId = window.requestAnimationFrame(restore);
+            return () => window.cancelAnimationFrame(frameId);
         }
     }, [pokemonLoading, caughtLoading, pathname]);
 
@@ -135,10 +168,12 @@ export default function Pokedex() {
         };
         // Always show these full species lines even if some forms were hidden via overrides.
         const forceVisibleBaseIds = new Set([351, 386, 666]);
-        const forceSingleCardBaseIds = new Set([201, 493, 646, 647, 669, 670, 671, 676, 773, 741, 774, 800, 849, 869, 925, 931, 1017, 1024]);
+        const forceSingleCardBaseIds = new Set([646, 647, 800]);
         // Some species are easier to track as separate entries (each form as its own "base" card).
         // Keep them as individual Pokédex cards instead of a single % card.
         const splitIntoSeparateCardsBaseIds = new Set([
+            201, // Unown letters
+            493, // Arceus types
             412, // Burmy cloaks
             413, // Wormadam cloaks
             422, // Shellos seas
@@ -156,6 +191,13 @@ export default function Pokedex() {
             645, // Landorus forms
             710, // Pumpkaboo sizes
             711, // Gourgeist sizes
+            669, // Flabebe colors
+            670, // Floette colors
+            671, // Florges colors
+            676, // Furfrou trims
+            773, // Silvally types
+            741, // Oricorio forms
+            774, // Minior forms
             745, // Lycanroc forms
             849, // Toxtricity
             854, // Sinistea authenticity
@@ -168,6 +210,8 @@ export default function Pokedex() {
             982, // Dudunsparce
             1012, // Poltchageist authenticity
             1013, // Sinistcha authenticity
+            1017, // Ogerpon masks
+            1024, // Terapagos forms
         ]);
         pokemon.forEach(p => {
             const isCanonicalBase = p.id === p.baseId;
@@ -178,13 +222,16 @@ export default function Pokedex() {
             // Group by base ID AND name prefix (to group gender variants, but separate regional variants)
             // Clean name key: remove gender suffixes
             let nameKey = p.name.replace(/-male$|-female$/, '');
+            const alcremieSweet = p.baseId === 869
+                ? p.name.match(/-(strawberry|berry|love|star|clover|flower|ribbon)(?:-sweet)?$/)?.[1]
+                : null;
 
-            // Special grouping for species with major form differences we want on one card
-            // (intentionally left empty; some species are handled by splitIntoSeparateCardsBaseIds)
             if (forceSingleCardBaseIds.has(p.baseId)) nameKey = `base-${p.baseId}`;
 
             // Key includes baseId to sort by dex number, but nameKey to distinguish Alola/Galar etc.
-            const key = splitIntoSeparateCardsBaseIds.has(p.baseId)
+            const key = alcremieSweet
+                ? `${p.baseId}-sweet-${alcremieSweet}`
+                : splitIntoSeparateCardsBaseIds.has(p.baseId)
                 ? `${p.id}-${p.name}`
                 : `${p.baseId}-${nameKey}`;
 
@@ -200,34 +247,18 @@ export default function Pokedex() {
     const filteredGroups = useMemo(() => {
         const searchLower = search.toLowerCase();
 
-        // Lista di baseId che devono mostrare solo la forma base
-        const ONLY_BASE_FORM = [493, 669, 670, 671, 676, 773, 741, 774, 849, 869, 925, 931, 1017, 1024];
-        // Mappa baseId -> nome forma base
+        const ONLY_BASE_FORM = [646, 647, 800];
         const BASE_FORM_NAME: Record<number, string> = {
-            493: 'arceus',
-            669: 'flabebe',
-            670: 'floette',
-            671: 'florges',
-            676: 'furfrou',
-            773: 'silvally',
-            741: 'oricorio-baile',
-            774: 'minior-red-meteor',
-            849: 'toxtricity-amped',
-            869: 'alcremie-vanilla-cream-strawberry-sweet',
-            925: 'maushold-family-of-three',
-            931: 'squawkabilly-green-plumage',
-            1017: 'ogerpon',
-            1024: 'terapagos',
+            646: 'kyurem',
+            647: 'keldeo',
+            800: 'necrozma',
         };
 
         return speciesGroups.filter(group => {
             let p = group[0]; // Representative
 
-            // Filtro per mostrare solo la forma base per i baseId speciali
             if (ONLY_BASE_FORM.includes(p.baseId)) {
-                const baseForm = group.find(g => g.name === BASE_FORM_NAME[p.baseId]);
-                if (baseForm) p = baseForm;
-                else p = group[0];
+                p = group.find(g => g.name === BASE_FORM_NAME[p.baseId]) || p;
                 group = [p];
             }
 
@@ -376,7 +407,7 @@ export default function Pokedex() {
                                 // Do not show % completion for these (treat as single entry even if multiple "forms" exist).
                                 const noPercentBaseIds = new Set([964]); // Palafin (Zero/Hero) should not be a % tracker
                                 const formTotal = (!noPercentBaseIds.has(p.baseId) && group.length > 1)
-                                    ? (POKEMON_FORM_COUNTS[p.baseId] || POKEMON_FORM_COUNTS[p.id])
+                                    ? (p.baseId === 869 ? 9 : (POKEMON_FORM_COUNTS[p.baseId] || POKEMON_FORM_COUNTS[p.id]))
                                     : undefined;
                                 if (formTotal) totalVars = formTotal;
 
@@ -401,6 +432,12 @@ export default function Pokedex() {
                                 if (caughtCount === 0 && hasAnyLegacyRows) caughtCount = 1;
                                 const isCaught = isPrimaryCaught || isSecondaryCaught || caughtCount > 0 || hasAnyLegacyRows;
                                 const pct = Math.min(100, (caughtCount / totalVars) * 100);
+                                const alcremieSweet = p.baseId === 869
+                                    ? p.name.match(/-(strawberry|berry|love|star|clover|flower|ribbon)(?:-sweet)?$/)?.[1]
+                                    : null;
+                                const cardDisplayName = alcremieSweet
+                                    ? `Alcremie (${alcremieSweet.charAt(0).toUpperCase()}${alcremieSweet.slice(1)} Sweet)`
+                                    : p.displayName;
 
                                 // Add a safeguard to prevent errors when clicking on non-evolving Pokémon icons
                                 return (
@@ -408,7 +445,7 @@ export default function Pokedex() {
                                         key={p.id}
                                         pokemonId={p.id}
                                         baseId={p.baseId}
-                                        displayName={p.displayName}
+                                        displayName={cardDisplayName}
                                         shinyAvailability={p.shinyAvailability}
                                         spriteUrl={getPokemonSpriteUrl(p.id, { shiny: true, name: p.name })}
                                         secondarySprite={hasMultipleSprites
@@ -426,7 +463,16 @@ export default function Pokedex() {
                                         hasCaughtAny={isCaught}
                                         cardFilter={effects.pokedexCardFilter}
                                         onClick={() => {
-                                            navigate(`/pokedex/${p.id}`);
+                                            try {
+                                                sessionStorage.setItem(POKEDEX_VIEW_STATE_KEY, JSON.stringify({
+                                                    scrollY: window.scrollY,
+                                                    search,
+                                                    generationFilter,
+                                                } satisfies PokedexViewState));
+                                            } catch {
+                                                // Ignore storage failures in private browsing modes.
+                                            }
+                                            navigate(`/pokedex/${p.id}`, { state: { fromPokedex: true } });
                                         }}
                                     />
                                 );

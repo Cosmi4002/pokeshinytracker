@@ -470,7 +470,7 @@ export default function Stats() {
           <RankedList title="Most-used methods" items={stats.methodTop} total={obtainedTotal} empty="No methods recorded." accentColor={accentColor} />
           <RankedList title="Most-used games" items={stats.gameTop} total={obtainedTotal} empty="No games recorded." accentColor={accentColor} />
           <RankedList title="Distribution by generation" items={stats.generationTop} total={obtainedTotal} empty="No generation data available." accentColor={accentColor} />
-          <Card className={`border ${statsPanelClass}`}>
+          <Card className={`self-start border ${statsPanelClass}`}>
             <CardHeader>
               <CardTitle className="text-base">Record</CardTitle>
             </CardHeader>

@@ -754,7 +754,10 @@ export function usePokemonDetails(pokemonId: number | null) {
         let relatives = pokedexData.filter((p: any) => p.baseId === baseId);
 
         // Merge with manual varieties (discovery for purely local system)
-        const manuals = MANUAL_VARIETIES[baseId] || [];
+        // Alcremie already has all 63 official cream/sweet combinations in
+        // pokedex.json. The seven short sweet-only entries are legacy grouping
+        // aliases and have no independent sprite, so they must not be details cards.
+        const manuals = baseId === 869 ? [] : (MANUAL_VARIETIES[baseId] || []);
         manuals.forEach(m => {
           if (!relatives.some(r => r.id === m.id)) {
             relatives.push({
@@ -765,6 +768,12 @@ export function usePokemonDetails(pokemonId: number | null) {
             });
           }
         });
+
+        // These short sweet-only names are grouping aliases, not official
+        // Alcremie forms. Keep only the 63 full cream + sweet combinations.
+        if (baseId === 869) {
+          relatives = relatives.filter((r: any) => !/^alcremie-(strawberry|berry|love|star|clover|flower|ribbon)$/i.test(r.name));
+        }
 
         const isRegionalForm = name && (
           name.includes('-alola') || name.includes('-galar') ||
