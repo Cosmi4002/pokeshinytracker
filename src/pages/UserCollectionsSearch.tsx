@@ -13,11 +13,12 @@ import { GAME_LOGOS } from '@/lib/game-themes';
 import { toLocalISODate } from '@/lib/date';
 import { useRandomColor } from '@/lib/random-color-context';
 import { cn } from '@/lib/utils';
+import { resolvePokemonEntity } from '@/lib/pokemon-entity-resolver-v2';
 
 type ProfileRow = Pick<Tables<'profiles'>, 'user_id' | 'username'>;
 type PublicCaughtRow = Pick<
   Tables<'caught_shinies'>,
-  'id' | 'pokemon_id' | 'pokemon_name' | 'form' | 'gender' | 'caught_date' | 'created_at' | 'sprite_url' | 'game' | 'is_fail' | 'is_unobtainable' | 'hunt_start_date' | 'method' | 'attempts' | 'has_shiny_charm' | 'is_evolved' | 'show_encounters'
+  'id' | 'pokemon_id' | 'entity_key' | 'pokemon_name' | 'form' | 'gender' | 'caught_date' | 'created_at' | 'sprite_url' | 'game' | 'is_fail' | 'is_unobtainable' | 'hunt_start_date' | 'method' | 'attempts' | 'has_shiny_charm' | 'is_evolved' | 'show_encounters'
 >;
 type PublicRecentRow = PublicCaughtRow & { user_id: string; username: string | null };
 
@@ -210,7 +211,7 @@ export default function UserCollectionsSearch() {
     try {
       const { data, error } = await supabase
         .from('caught_shinies')
-        .select('id, pokemon_id, pokemon_name, form, gender, caught_date, created_at, sprite_url, game, is_fail, is_unobtainable, hunt_start_date, method, attempts, has_shiny_charm, is_evolved, show_encounters')
+        .select('id, pokemon_id, entity_key, pokemon_name, form, gender, caught_date, created_at, sprite_url, game, is_fail, is_unobtainable, hunt_start_date, method, attempts, has_shiny_charm, is_evolved, show_encounters')
         .eq('user_id', profile.user_id)
         .order('caught_date', { ascending: false })
         .order('created_at', { ascending: false })
@@ -237,7 +238,7 @@ export default function UserCollectionsSearch() {
       const cutoff = getFourDaysAgoDate();
       const { data, error } = await supabase
         .from('caught_shinies')
-        .select('id, user_id, pokemon_id, pokemon_name, form, gender, caught_date, created_at, sprite_url, game, is_fail, is_unobtainable, hunt_start_date, method, attempts, has_shiny_charm, is_evolved, show_encounters')
+        .select('id, user_id, pokemon_id, entity_key, pokemon_name, form, gender, caught_date, created_at, sprite_url, game, is_fail, is_unobtainable, hunt_start_date, method, attempts, has_shiny_charm, is_evolved, show_encounters')
         .gte('caught_date', cutoff)
         .order('caught_date', { ascending: false })
         .order('created_at', { ascending: false })
@@ -373,8 +374,14 @@ export default function UserCollectionsSearch() {
     let luckiestHunt: PublicCaughtRow | null = null;
 
     obtained.forEach((entry) => {
-      species.add(entry.pokemon_id);
-      forms.add(`${entry.pokemon_id}:${entry.form || 'base'}:${entry.gender || ''}`);
+      const entity = resolvePokemonEntity({
+        pokemonId: entry.pokemon_id,
+        pokemonName: entry.pokemon_name,
+        form: entry.form,
+        entityKey: entry.entity_key,
+      });
+      species.add(entity?.speciesId || entry.pokemon_id);
+      forms.add(`${entity?.key || entry.pokemon_id}:${entry.form || 'base'}:${entry.gender || ''}`);
       gameCounts.set(entry.game || 'unknown', (gameCounts.get(entry.game || 'unknown') || 0) + 1);
       methodCounts.set(entry.method || 'unknown', (methodCounts.get(entry.method || 'unknown') || 0) + 1);
       if (entry.has_shiny_charm) charmCount += 1;

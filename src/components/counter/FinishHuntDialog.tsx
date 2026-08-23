@@ -30,6 +30,7 @@ import { MethodSelector } from '@/components/counter/MethodSelector';
 import { Checkbox } from '@/components/ui/checkbox';
 import { getPokemonSpriteFallbackUrl } from '@/lib/pokemon-data';
 import { todayLocalISODate } from '@/lib/date';
+import { resolveEntityKeyForSelectedPokemon } from '@/lib/pokemon-entity-resolver-v2';
 
 interface FinishHuntDialogProps {
   open: boolean;
@@ -212,10 +213,18 @@ export function FinishHuntDialog({
       const finalDisplayName = form
         ? formOptions.find(f => f.name === form)?.displayName || formatPokemonName(pokemonName, pokemonId)
         : formatPokemonName(pokemonName, pokemonId);
+      const currentVariant = formOptions.find(f => f.name === form);
+      const displayId = currentVariant ? currentVariant.id : pokemonId;
+      const entityKey = resolveEntityKeyForSelectedPokemon({
+        pokemonId: displayId,
+        pokemonName: finalDisplayName,
+        form: form || pokemonName,
+      });
 
       const { error: insertError } = await supabase.from('caught_shinies').insert({
         user_id: user.id,
-        pokemon_id: pokemonId,
+        pokemon_id: displayId,
+        entity_key: entityKey,
         pokemon_name: finalDisplayName,
         sprite_url: spriteUrl,
         form: form || null,

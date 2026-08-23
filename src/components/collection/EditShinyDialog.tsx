@@ -31,6 +31,7 @@ import { Sparkles } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
 import { Checkbox } from '@/components/ui/checkbox';
 import { todayLocalISODate } from '@/lib/date';
+import { resolveEntityKeyForSelectedPokemon } from '@/lib/pokemon-entity-resolver-v2';
 
 type CaughtShinyRow = Tables<'caught_shinies'>;
 
@@ -244,11 +245,17 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
 
       const currentVariant = formOptions.find(f => f.name === form);
       const displayId = currentVariant ? currentVariant.id : pokemonId;
+      const entityKey = resolveEntityKeyForSelectedPokemon({
+        pokemonId: displayId,
+        pokemonName: finalDisplayName,
+        form: form || pokemonName,
+      });
 
       const { error } = await supabase
         .from('caught_shinies')
         .update({
           pokemon_id: displayId,
+          entity_key: entityKey,
           pokemon_name: finalDisplayName,
           sprite_url: finalSpriteUrl,
           form: form || null,
@@ -694,4 +701,3 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
     </Dialog>
   );
 }
-

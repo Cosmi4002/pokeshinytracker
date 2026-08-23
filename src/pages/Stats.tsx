@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { getPokemonSpriteUrl, usePokemonList } from '@/hooks/use-pokemon';
 import { findHuntingMethod, GAMES, getDynamicOdds } from '@/lib/pokemon-data';
 import type { Tables } from '@/integrations/supabase/types';
+import { resolvePokemonEntity } from '@/lib/pokemon-entity-resolver-v2';
 
 type CaughtShinyRow = Tables<'caught_shinies'>;
 
@@ -312,9 +313,15 @@ export default function Stats() {
     let luckiestHunt: CaughtShinyRow | null = null;
 
     obtained.forEach((entry) => {
+      const entity = resolvePokemonEntity({
+        pokemonId: entry.pokemon_id,
+        pokemonName: entry.pokemon_name,
+        form: entry.form,
+        entityKey: entry.entity_key,
+      });
       const pokemonInfo = pokemonById.get(entry.pokemon_id);
-      const baseId = pokemonInfo?.baseId || entry.pokemon_id;
-      const formKey = `${baseId}:${normalize(entry.form || entry.pokemon_name) || 'base'}:${normalize(entry.gender)}`;
+      const baseId = entity?.speciesId || pokemonInfo?.baseId || entry.pokemon_id;
+      const formKey = `${baseId}:${entity?.key || normalize(entry.form || entry.pokemon_name) || 'base'}:${normalize(entry.gender)}`;
       obtainedSpecies.add(baseId);
       obtainedForms.add(formKey);
 

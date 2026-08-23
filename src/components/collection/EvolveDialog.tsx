@@ -10,6 +10,7 @@ import { usePokemonList } from '@/hooks/use-pokemon';
 import { canEvolve, getNextEvolutions } from '@/lib/evolution-data';
 import type { Tables } from '@/integrations/supabase/types';
 import { cn } from '@/lib/utils';
+import { resolveEntityKeyForSelectedPokemon, resolvePokemonEntityKey } from '@/lib/pokemon-entity-resolver-v2';
 
 type CaughtShinyRow = Tables<'caught_shinies'>;
 
@@ -115,16 +116,30 @@ export function EvolveDialog({ open, onOpenChange, entry, onSuccess }: EvolveDia
         shiny: true,
         name: evolutionPokemon.name,
       });
+      const nextForm = evolutionPokemon.id !== evolutionPokemon.baseId ? evolutionPokemon.name : null;
+      const nextEntityKey = resolveEntityKeyForSelectedPokemon({
+        pokemonId: selectedEvolution,
+        pokemonName: evolutionPokemon.displayName,
+        form: nextForm || evolutionPokemon.name,
+      });
+      const previousEntityKey = resolvePokemonEntityKey({
+        pokemonId: entry.pokemon_id,
+        pokemonName: entry.pokemon_name,
+        form: entry.form,
+        entityKey: entry.entity_key,
+      });
 
       // Update the caught_shinies table
       let { error } = await supabase
         .from('caught_shinies')
         .update({
           pokemon_id: selectedEvolution,
+          entity_key: nextEntityKey,
           pokemon_name: evolutionPokemon.displayName,
           sprite_url: newSpriteUrl,
-          form: evolutionPokemon.id !== evolutionPokemon.baseId ? evolutionPokemon.name : null,
+          form: nextForm,
           is_evolved: true,
+          evolved_from_entity_key: previousEntityKey,
         })
         .eq('id', entry.id)
         .eq('user_id', user.id);
@@ -134,9 +149,11 @@ export function EvolveDialog({ open, onOpenChange, entry, onSuccess }: EvolveDia
           .from('caught_shinies')
           .update({
             pokemon_id: selectedEvolution,
+            entity_key: nextEntityKey,
             pokemon_name: evolutionPokemon.displayName,
             sprite_url: newSpriteUrl,
-            form: evolutionPokemon.id !== evolutionPokemon.baseId ? evolutionPokemon.name : null,
+            form: nextForm,
+            evolved_from_entity_key: previousEntityKey,
           })
           .eq('id', entry.id)
           .eq('user_id', user.id);

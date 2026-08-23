@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth-context';
 import { useQuery } from '@tanstack/react-query';
 import { useGlobalCollectionThemes } from '@/hooks/use-global-collection-themes';
+import { resolvePokemonEntity } from '@/lib/pokemon-entity-resolver-v2';
 
 type CaughtEntryStats = { count: number; legacyCount: number; genders: Set<string>; forms: Set<string> };
 type CaughtDataMap = Record<number, CaughtEntryStats>;
@@ -46,14 +47,14 @@ export default function Pokedex() {
             if (!user) return {} as CaughtDataMap;
             const { data, error } = await supabase
                 .from('caught_shinies')
-                .select('pokemon_id, gender, form')
+                .select('pokemon_id, entity_key, pokemon_name, gender, form')
                 .eq('user_id', user.id)
                 .or('is_fail.is.false,is_fail.is.null')
                 .or('is_unobtainable.is.false,is_unobtainable.is.null');
             if (error) throw error;
 
             const caught: CaughtDataMap = {};
-            const rows = (data || []) as Array<{ pokemon_id: number; gender: string | null; form: string | null }>;
+            const rows = (data || []) as Array<{ pokemon_id: number; entity_key: string | null; pokemon_name: string | null; gender: string | null; form: string | null }>;
             rows.forEach(row => {
                 const id = row.pokemon_id;
                 if (!caught[id]) {
@@ -63,6 +64,20 @@ export default function Pokedex() {
                 if (row.gender) caught[id].genders.add(row.gender);
                 if (row.form) caught[id].forms.add(row.form);
                 else caught[id].legacyCount++;
+
+                const entity = resolvePokemonEntity({
+                    pokemonId: row.pokemon_id,
+                    pokemonName: row.pokemon_name,
+                    form: row.form,
+                    entityKey: row.entity_key,
+                });
+                if (entity) {
+                    const entityStats = caught[entity.speciesId] || { count: 0, legacyCount: 0, genders: new Set(), forms: new Set() };
+                    entityStats.forms.add(entity.canonicalName);
+                    entity.legacy.formNames.forEach(formName => entityStats.forms.add(formName));
+                    if (row.gender) entityStats.genders.add(row.gender);
+                    caught[entity.speciesId] = entityStats;
+                }
             });
             return caught;
         },

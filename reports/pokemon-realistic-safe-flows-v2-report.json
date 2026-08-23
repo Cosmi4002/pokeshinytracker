@@ -1,0 +1,80 @@
+{
+  "version": 2,
+  "phase": "point-8-realistic-safe-environment",
+  "mode": "local-fixture-only",
+  "productionDataRead": false,
+  "productionDataModified": false,
+  "githubPublished": false,
+  "supabaseWritten": false,
+  "dependencyInstallAttempted": true,
+  "dependencyInstallResult": "failed-and-cleaned",
+  "dependencyInstallNotes": "npm ci --ignore-scripts failed because the container npm cache/registry state could not complete package extraction. The partial node_modules directory was moved out of the repository to /tmp/pokeshinytracker-node_modules-partial-1787315715.",
+  "scenarios": {
+    "collisionResolution": {
+      "covered": true,
+      "cases": [
+        "Giratina Origin vs Unown H legacy id 10007",
+        "ambiguous numeric ID alone blocked"
+      ]
+    },
+    "vivillonSeparation": {
+      "covered": true,
+      "cases": [
+        "Vivillon Monsoon remains distinct from Vivillon Fancy",
+        "caught stats do not mark a different Vivillon pattern"
+      ]
+    },
+    "alcremieCoverage": {
+      "covered": true,
+      "canonicalEntities": 63,
+      "shorthandAliases": 7
+    },
+    "collectionBackfill": {
+      "covered": true,
+      "cases": [
+        "existing entity_key preserved",
+        "invalid entity_key blocked",
+        "ambiguous legacy row blocked"
+      ]
+    },
+    "counterMultiSlot": {
+      "covered": true,
+      "cases": [
+        "three resolved slots produce aligned pokemon_entity_keys",
+        "one ambiguous slot blocks the whole key array"
+      ]
+    },
+    "bingo": {
+      "covered": true,
+      "cases": [
+        "Pokemon-only grids produce positional grid_entity_keys",
+        "ambiguous grids are withheld",
+        "game-logo grids do not pollute Pokemon entity keys",
+        "random Pokemon key resolves"
+      ]
+    },
+    "stats": {
+      "covered": true,
+      "cases": [
+        "species counted from canonical key",
+        "forms counted from canonical key",
+        "legacy duplicated IDs do not merge unrelated species"
+      ]
+    }
+  },
+  "results": {
+    "realisticSafeFlows": "7/7 pass",
+    "uiIntegrationAudit": "24/24 pass",
+    "catalogTests": "14/14 pass",
+    "legacyMapTests": "11/11 pass",
+    "catalogAudit": "pass",
+    "spriteAudit": "pass",
+    "legacyMapAudit": "pass",
+    "migrationDryRun": "pass"
+  },
+  "remainingForNextPhase": [
+    "full TypeScript typecheck once dependencies are installable",
+    "full Vite build once dependencies are installable",
+    "browser/manual preview in a compiled safe environment"
+  ]
+}

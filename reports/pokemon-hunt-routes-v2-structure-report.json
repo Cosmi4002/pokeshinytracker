@@ -1,0 +1,78 @@
+{
+  "generatedAt": "2026-08-23T13:25:23.657Z",
+  "routeCount": 52624,
+  "generation1Coverage": {
+    "species": 151,
+    "trackedGames": 35,
+    "remainingGeneratedDecisions": 4865
+  },
+  "generation2Coverage": {
+    "species": 100,
+    "trackedGames": 35,
+    "generatedDecisions": 3500
+  },
+  "generation3Coverage": {
+    "species": 135,
+    "trackedGames": 35,
+    "baseDecisions": 4725,
+    "separatelyClassifiedForms": 8,
+    "formDecisions": 280
+  },
+  "generation4Coverage": {
+    "species": 107,
+    "trackedGames": 35,
+    "catalogEntities": 139,
+    "generatedDecisions": 4865,
+    "separatelyClassifiedForms": 40
+  },
+  "unownFormCoverage": {
+    "forms": 28,
+    "trackedGames": 35,
+    "totalFormDecisions": 1022,
+    "additionalGeneratedDecisions": 945
+  },
+  "sourceHosts": [
+    "bulbapedia.bulbagarden.net",
+    "wiki.pokemoncentral.it",
+    "www.serebii.net"
+  ],
+  "checkedPilotCases": [
+    "Purugly Pearl native wild route",
+    "Glameow Diamond external-parent breeding",
+    "Purugly Diamond external-parent breeding then evolution",
+    "Turtwig Diamond starter soft reset",
+    "Grotle Diamond starter evolution",
+    "Suicune Crystal static Tin Tower encounter",
+    "National Dex #001-151 every tracked game has an explicit decision",
+    "National Dex #013-151 decisions agree with curated shiny-origin availability",
+    "Mew own-origin hunt limited to Japanese Emerald Faraway Island",
+    "National Dex #152-251 every tracked game has an explicit decision",
+    "National Dex #152-251 decisions agree with curated shiny-origin availability",
+    "Celebi own-origin hunt limited to Crystal Ilex Forest shrine",
+    "All 28 Unown forms tracked individually across every game",
+    "Generation II shiny Unown restricted to forms I and V by DVs",
+    "Unown ! and ? excluded from Generation II and enabled from Generation III",
+    "Legends: Arceus fixed Unown separated from repeatable shiny-capable spawns",
+    "National Dex #252-386 every tracked game has an explicit decision",
+    "Galarian Zigzagoon and Linoone tracked as separate regional forms",
+    "Castform weather forms retained as informational battle transformations",
+    "Spinda spot patterns not misclassified as separate forms",
+    "Deoxys Attack, Defense and Speed forms tied to their correct Birth Island games",
+    "Deoxys Normal Forme recorded as transfer-obtainable in Ruby/Sapphire without inventing a local shiny origin",
+    "Later Deoxys meteorite form changes recorded as transfer-only ownership for all four forms",
+    "ORAS story Eon Pokémon, super-ancient Pokémon and Deoxys shiny locks excluded",
+    "Limited-time shiny Rayquaza Tera Raid recorded but excluded from repeatable randomizer origins",
+    "Emerald fixed-seed encounters never recommend rapid Soft Reset",
+    "Emerald Rayquaza, Regis, weather trio, Navel Rock legends and Speed Deoxys use Runaway",
+    "Rayquaza cross-version, DLC and Ramanas Park prerequisites recorded",
+    "Legends: Z-A Hyperspace Sky Pillar Rayquaza recorded as shiny locked",
+    "National Dex #387-493 and every catalogued form have one decision per tracked game",
+    "Sinnoh starters distinguish Soft Reset gifts, PLA wild origins and Terarium encounters",
+    "Burmy, Wormadam, Shellos, Gastrodon and Rotom forms tracked individually",
+    "Dialga, Palkia, Giratina, Shaymin and Arceus form changes separated from shiny origins",
+    "Generation IV Ranger Manaphy Egg trade-and-hatch exception recorded",
+    "Darkrai, Shaymin and Arceus event/save-data prerequisites and shiny locks audited"
+  ],
+  "errors": [],
+  "warnings": []
+}

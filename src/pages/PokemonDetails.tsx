@@ -32,6 +32,7 @@ import {
     getAvailabilitySourceLinks,
     getCuratedShinyOriginGameIds
 } from "@/lib/pokemon-game-availability";
+import { resolveEntityKeyForSelectedPokemon, resolvePokemonEntityKey } from "@/lib/pokemon-entity-resolver-v2";
 
 interface FormVariant {
     id: number;
@@ -44,6 +45,7 @@ interface FormVariant {
 
 interface CaughtGameRow {
     pokemon_id: number;
+    entity_key: string | null;
     gender: string | null;
     form: string | null;
     game: string | null;
@@ -114,7 +116,7 @@ export default function PokemonDetails() {
 
             const { data, error } = await supabase
                 .from('caught_shinies')
-                .select('pokemon_id, gender, form, game, secondary_game')
+                .select('pokemon_id, entity_key, gender, form, game, secondary_game')
                 .eq('user_id', user.id)
                 .or('is_fail.is.false,is_fail.is.null')
                 .or('is_unobtainable.is.false,is_unobtainable.is.null')
@@ -130,16 +132,36 @@ export default function PokemonDetails() {
             rows.forEach(row => {
                 let matchedThisPokemon = false;
                 let matchedGender: CaughtGender | null = isCaughtGender(row.gender) ? row.gender : null;
+                const resolvedKey = resolvePokemonEntityKey({
+                    pokemonId: row.pokemon_id,
+                    form: row.form,
+                    entityKey: row.entity_key,
+                });
+                const matchedByEntity = resolvedKey
+                    ? variants.find(v => resolveEntityKeyForSelectedPokemon({
+                        pokemonId: v.id,
+                        pokemonName: v.displayName,
+                        form: v.name,
+                    }) === resolvedKey)
+                    : null;
+
+                if (matchedByEntity) {
+                    caughtSet.add(matchedByEntity.name);
+                    if (!matchedGender && isCaughtGender(matchedByEntity.gender)) {
+                        matchedGender = matchedByEntity.gender;
+                    }
+                    matchedThisPokemon = true;
+                }
 
                 // Priority 1: Exact form name match (new standard)
-                if (row.form) {
+                if (!matchedThisPokemon && row.form) {
                     caughtSet.add(row.form);
                     const matchedVariant = variants.find(v => v.name === row.form);
                     if (!matchedGender && isCaughtGender(matchedVariant?.gender)) {
                         matchedGender = matchedVariant.gender;
                     }
                     matchedThisPokemon = true;
-                } else {
+                } else if (!matchedThisPokemon) {
                     // Priority 2: Legacy fallback using ID and gender
                     const g = row.gender || 'genderless';
                     let matchedVariant = variants.find(v => v.id === row.pokemon_id && v.gender === g);
@@ -301,10 +323,23 @@ export default function PokemonDetails() {
 
         const key = variant.name;
         const isCaught = caughtForms.has(key);
+        const entityKey = resolveEntityKeyForSelectedPokemon({
+            pokemonId: variant.id,
+            pokemonName: variant.displayName,
+            form: variant.name,
+        });
         setActionLoading(key);
 
         try {
             if (isCaught) {
+                if (entityKey) {
+                    const { error } = await supabase
+                        .from('caught_shinies')
+                        .delete()
+                        .eq('user_id', user.id)
+                        .eq('entity_key', entityKey);
+                    if (error) throw error;
+                }
                 const { error } = await supabase
                     .from('caught_shinies')
                     .delete()
@@ -323,6 +358,7 @@ export default function PokemonDetails() {
                     .insert({
                         user_id: user.id,
                         pokemon_id: variant.id,
+                        entity_key: entityKey,
                         pokemon_name: variant.displayName,
                         gender: variant.gender,
                         form: variant.name,

@@ -22,6 +22,7 @@ import { useGlobalCollectionThemes } from '@/hooks/use-global-collection-themes'
 import { isFormEliminated } from '@/lib/form-filters';
 import { cn } from '@/lib/utils';
 import type { Tables } from '@/integrations/supabase/types';
+import { resolvePokemonBasicByEntity } from '@/lib/pokemon-entity-resolver-v2';
 
 type CaughtShinyRow = Tables<'caught_shinies'>;
 type PlaylistRow = Tables<'shiny_playlists'>;
@@ -186,6 +187,14 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
   }, [pokemon]);
 
   const resolveEntryPokemon = (entry: CaughtShinyRow) => {
+    const byEntity = resolvePokemonBasicByEntity(pokemon, {
+      pokemonId: entry.pokemon_id,
+      pokemonName: entry.pokemon_name,
+      form: entry.form,
+      entityKey: entry.entity_key,
+    });
+    if (byEntity) return byEntity;
+
     const formAliases: Record<string, string> = {
       // Gen 9 special forms: older saves / localized labels
       'maushold-famiglia-da-tre': 'maushold-family-of-three',

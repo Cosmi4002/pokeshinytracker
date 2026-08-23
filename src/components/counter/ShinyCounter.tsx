@@ -31,6 +31,7 @@ import { FinishHuntDialog } from './FinishHuntDialog';
 import { useRandomColor } from '@/lib/random-color-context';
 import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
 import { cn } from '@/lib/utils';
+import { resolveEntityKeysForCounterSlots } from '@/lib/pokemon-entity-resolver-v2';
 
 interface ShinyCounterProps {
   huntId?: string;
@@ -332,9 +333,11 @@ export function ShinyCounter({
           { id: selectedPokemon2Id, name: selectedPokemon2Name, form: selectedPokemon2Form, gender: selectedPokemon2Gender },
           { id: selectedPokemon3Id, name: selectedPokemon3Name, form: selectedPokemon3Form, gender: selectedPokemon3Gender },
         ];
+        const pokemonEntityKeys = resolveEntityKeysForCounterSlots(pokemonSlotsPayload);
         const payload = {
           user_id: user.id,
           pokemon_id: selectedPokemonId,
+          pokemon_entity_keys: pokemonEntityKeys,
           pokemon_name: encodePokemonSlots(pokemonSlotsPayload),
           method: selectedMethod.id,
           counter,
@@ -385,8 +388,10 @@ export function ShinyCounter({
           { id: selectedPokemon2Id, name: selectedPokemon2Name, form: selectedPokemon2Form, gender: selectedPokemon2Gender },
           { id: selectedPokemon3Id, name: selectedPokemon3Name, form: selectedPokemon3Form, gender: selectedPokemon3Gender },
         ];
+        const pokemonEntityKeys = resolveEntityKeysForCounterSlots(pokemonSlotsPayload);
         const payload = {
           pokemon_id: selectedPokemonId,
+          pokemon_entity_keys: pokemonEntityKeys,
           pokemon_name: encodePokemonSlots(pokemonSlotsPayload),
           form: selectedForm || null,
           gender: selectedGender || null,

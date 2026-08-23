@@ -106,6 +106,7 @@ export default function Counter() {
     const { data, error } = await supabase.from('active_hunts').insert({
       user_id: user.id,
       pokemon_id: null, // Initial empty state
+      pokemon_entity_keys: [],
       pokemon_name: null, // Initial empty state
       method: 'gen9-random', // Default method
       counter: 0,

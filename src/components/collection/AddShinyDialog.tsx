@@ -30,6 +30,7 @@ import { POKEBALLS, GAMES, GIGAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_C
 import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
 import { getPokemonSpriteUrl } from '@/lib/pokemon-data';
 import { todayLocalISODate } from '@/lib/date';
+import { resolveEntityKeyForSelectedPokemon } from '@/lib/pokemon-entity-resolver-v2';
 
 interface AddShinyDialogProps {
   open: boolean;
@@ -192,10 +193,16 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
 
       const currentVariant = formOptions.find(f => f.name === form);
       const displayId = currentVariant ? currentVariant.id : pokemonId;
+      const entityKey = resolveEntityKeyForSelectedPokemon({
+        pokemonId: displayId,
+        pokemonName: finalDisplayName,
+        form: form || pokemonName,
+      });
 
       const { error } = await supabase.from('caught_shinies').insert({
         user_id: user.id,
         pokemon_id: displayId,
+        entity_key: entityKey,
         pokemon_name: finalDisplayName,
         sprite_url: finalSpriteUrl,
         form: form || null,
@@ -646,4 +653,3 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
     </Dialog >
   );
 }
-

@@ -19,11 +19,13 @@ export type Database = {
         Row: {
           created_at: string
           generations: number[]
+          grid_entity_keys: string[]
           grid_ids: number[]
           grid_size: number
           marked_ids: number[]
           random_generation_filter: number | null
           random_generation_filters: number[]
+          random_entity_key: string | null
           random_pokemon_id: number | null
           random_pokemon_name: string | null
           updated_at: string
@@ -32,11 +34,13 @@ export type Database = {
         Insert: {
           created_at?: string
           generations?: number[]
+          grid_entity_keys?: string[]
           grid_ids?: number[]
           grid_size?: number
           marked_ids?: number[]
           random_generation_filter?: number | null
           random_generation_filters?: number[]
+          random_entity_key?: string | null
           random_pokemon_id?: number | null
           random_pokemon_name?: string | null
           updated_at?: string
@@ -45,11 +49,13 @@ export type Database = {
         Update: {
           created_at?: string
           generations?: number[]
+          grid_entity_keys?: string[]
           grid_ids?: number[]
           grid_size?: number
           marked_ids?: number[]
           random_generation_filter?: number | null
           random_generation_filters?: number[]
+          random_entity_key?: string | null
           random_pokemon_id?: number | null
           random_pokemon_name?: string | null
           updated_at?: string
@@ -68,6 +74,7 @@ export type Database = {
           is_visible_on_counter: boolean | null
           method: string
           pokemon_id: number | null
+          pokemon_entity_keys: string[]
           pokemon_name: string | null
           updated_at: string
           user_id: string
@@ -82,6 +89,7 @@ export type Database = {
           is_visible_on_counter?: boolean | null
           method: string
           pokemon_id?: number | null
+          pokemon_entity_keys?: string[]
           pokemon_name?: string | null
           updated_at?: string
           user_id: string
@@ -96,6 +104,7 @@ export type Database = {
           is_visible_on_counter?: boolean | null
           method?: string
           pokemon_id?: number | null
+          pokemon_entity_keys?: string[]
           pokemon_name?: string | null
           updated_at?: string
           user_id?: string
@@ -108,7 +117,9 @@ export type Database = {
           caught_date: string
           created_at: string
           evolved_from_id: number | null
+          evolved_from_entity_key: string | null
           evolved_from_name: string | null
+          entity_key: string | null
           form: string | null
           game: string
           secondary_game: string | null
@@ -156,7 +167,9 @@ export type Database = {
           method: string
           notes?: string | null
           evolved_from_id?: number | null
+          evolved_from_entity_key?: string | null
           evolved_from_name?: string | null
+          entity_key?: string | null
           phase_number?: number | null
           playlist_id?: string | null
           pokeball?: string
@@ -190,7 +203,9 @@ export type Database = {
           method?: string
           notes?: string | null
           evolved_from_id?: number | null
+          evolved_from_entity_key?: string | null
           evolved_from_name?: string | null
+          entity_key?: string | null
           phase_number?: number | null
           playlist_id?: string | null
           pokeball?: string
