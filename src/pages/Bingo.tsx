@@ -43,9 +43,14 @@ const getRandomUnit = (): number => (
 
 const getRandomIndex = (length: number): number => Math.floor(getRandomUnit() * length);
 
-const pickRandomFamilyPokemon = (families: PokemonBasic[][]): PokemonBasic | null => {
-  if (families.length === 0) return null;
-  const family = families[getRandomIndex(families.length)];
+const pickRandomFamilyPokemon = (families: PokemonBasic[][], excludedBaseIds: Set<number> = new Set()): PokemonBasic | null => {
+  const eligibleFamilies = families.filter((family) => {
+    const first = family[0];
+    return first && !excludedBaseIds.has(first.baseId ?? first.id);
+  });
+  const sourceFamilies = eligibleFamilies.length > 0 ? eligibleFamilies : families;
+  if (sourceFamilies.length === 0) return null;
+  const family = sourceFamilies[getRandomIndex(sourceFamilies.length)];
   return family[getRandomIndex(family.length)] ?? null;
 };
 
@@ -177,6 +182,7 @@ export default function Games() {
   const saveTimerRef = useRef<number | null>(null);
   const didInitRef = useRef(false);
   const randomRollTimeoutRef = useRef<number | null>(null);
+  const recentRandomFamilyIdsRef = useRef<number[]>([]);
 
   const basePool = useMemo(() => {
     const byBase = new Map<number, PokemonBasic>();
@@ -393,7 +399,8 @@ export default function Games() {
     // Families are drawn uniformly first, then a form inside that family.
     // This prevents Pokémon with many forms (Alcremie, Vivillon, etc.) from
     // dominating the random picker just because they have many variants.
-    const next = pickRandomFamilyPokemon(randomPokemonFamilies);
+    const recentFamilyIds = new Set(recentRandomFamilyIdsRef.current);
+    const next = pickRandomFamilyPokemon(randomPokemonFamilies, recentFamilyIds);
     if (!next) return;
 
     if (randomRollTimeoutRef.current) window.clearTimeout(randomRollTimeoutRef.current);
@@ -411,6 +418,8 @@ export default function Games() {
         setRandomIsRolling(false);
         setRandomPokemon(next);
         playRandomRollTick(true);
+        const nextFamilyId = next.baseId ?? next.id;
+        recentRandomFamilyIdsRef.current = [nextFamilyId, ...recentRandomFamilyIdsRef.current.filter((id) => id !== nextFamilyId)].slice(0, 12);
         void persist(makePersistedState({
           randomPokemonId: next.id,
           randomPokemonName: next.name,

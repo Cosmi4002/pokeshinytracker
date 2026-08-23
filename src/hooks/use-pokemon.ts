@@ -109,10 +109,10 @@ const RAW_MANUAL_VARIETIES: Record<number, { id: number, name: string, generatio
     { id: 10012, name: 'rotom-mow' },
   ],
   483: [ // Dialga
-    { id: 10243, name: 'dialga-origin' }
+    { id: 10243, name: 'dialga-origin', generation: 8 }
   ],
   484: [ // Palkia
-    { id: 10244, name: 'palkia-origin' }
+    { id: 10244, name: 'palkia-origin', generation: 8 }
   ],
   487: [ // Giratina
     { id: 10007, name: 'giratina-origin' },
