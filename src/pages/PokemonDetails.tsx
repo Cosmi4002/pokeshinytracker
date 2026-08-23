@@ -17,7 +17,8 @@ import {
     UserX,
     Edit3,
     EyeOff,
-    Trash2
+    Trash2,
+    Info
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -25,6 +26,7 @@ import { cn } from "@/lib/utils";
 import { isFormEliminated, POKEMON_DATA_OVERRIDES } from "@/lib/form-filters";
 import { usePokedexOverrides } from "@/hooks/use-pokedex-overrides";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { todayLocalISODate } from "@/lib/date";
 import { getGameTheme, GAME_LOGOS } from "@/lib/game-themes";
 import { GAMES } from "@/lib/pokemon-data";
@@ -51,10 +53,13 @@ interface CaughtGameRow {
     game: string | null;
     secondary_game: string | null;
     is_evolved: boolean | null;
+    pokemon_name: string | null;
+    evolved_from_name: string | null;
 }
 
 type CaughtGender = 'male' | 'female';
 type CaughtGameGenderMap = Record<string, CaughtGender[]>;
+type AcquisitionInfo = { sourcePokemonName: string; originGameName: string };
 
 const isCaughtGender = (gender?: string | null): gender is CaughtGender => gender === 'male' || gender === 'female';
 
@@ -97,6 +102,7 @@ export default function PokemonDetails() {
     const [caughtForms, setCaughtForms] = useState<Set<string>>(new Set());
     const [caughtGames, setCaughtGames] = useState<Set<string>>(new Set());
     const [caughtGameGenders, setCaughtGameGenders] = useState<CaughtGameGenderMap>({});
+    const [acquisitionInfo, setAcquisitionInfo] = useState<AcquisitionInfo | null>(null);
     const [actionLoading, setActionLoading] = useState<string | null>(null);
 
     // Fetch caught status
@@ -107,6 +113,7 @@ export default function PokemonDetails() {
             setCaughtForms(new Set());
             setCaughtGames(new Set());
             setCaughtGameGenders({});
+            setAcquisitionInfo(null);
         }
     }, [user, pokemonId, details]);
 
@@ -118,7 +125,7 @@ export default function PokemonDetails() {
 
             const { data, error } = await supabase
                 .from('caught_shinies')
-                .select('pokemon_id, entity_key, gender, form, game, secondary_game, is_evolved')
+                .select('pokemon_id, entity_key, gender, form, game, secondary_game, is_evolved, pokemon_name, evolved_from_name')
                 .eq('user_id', user.id)
                 .or('is_fail.is.false,is_fail.is.null')
                 .or('is_unobtainable.is.false,is_unobtainable.is.null')
@@ -129,6 +136,7 @@ export default function PokemonDetails() {
             const caughtSet = new Set<string>();
             const gameSet = new Set<string>();
             const gameGenderMap: CaughtGameGenderMap = {};
+            let nextAcquisitionInfo: AcquisitionInfo | null = null;
             const rows = (data || []) as CaughtGameRow[];
 
             rows.forEach(row => {
@@ -191,6 +199,16 @@ export default function PokemonDetails() {
                 }
 
                 if (matchedThisPokemon) {
+                    const sourcePokemonName = row.evolved_from_name || (
+                        /origin(?: forme)?\)?$/i.test(row.pokemon_name || details.name)
+                            ? (row.pokemon_name || details.name).replace(/\s*\(Origin(?: Forme)?\)\s*$/i, '')
+                            : null
+                    );
+                    const originGameName = GAMES.find((game) => game.id === row.game)?.name;
+                    if (!nextAcquisitionInfo && sourcePokemonName && originGameName) {
+                        nextAcquisitionInfo = { sourcePokemonName, originGameName };
+                    }
+
                     // For an evolved entry, the secondary game is the game where
                     // the current species/form was obtained. The primary game
                     // remains provenance only and must not mark this form as caught.
@@ -208,6 +226,7 @@ export default function PokemonDetails() {
             setCaughtForms(caughtSet);
             setCaughtGames(gameSet);
             setCaughtGameGenders(gameGenderMap);
+            setAcquisitionInfo(nextAcquisitionInfo);
         } catch (err) {
             console.error("Error fetching caught status:", err);
         }
@@ -581,10 +600,39 @@ export default function PokemonDetails() {
                         <section className={cn("w-full space-y-5 rounded-lg border p-6", panelClass)}>
                             <div className="flex flex-col gap-3 border-b border-border pb-5 text-left sm:flex-row sm:items-end sm:justify-between">
                                 <div>
-                                    <h2 className="flex items-center gap-3 text-2xl font-black tracking-tight">
-                                        <span className="h-7 w-2 rounded-full bg-primary shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
-                                        Obtained in
-                                    </h2>
+                                    <div className="flex items-center gap-2">
+                                        <h2 className="flex items-center gap-3 text-2xl font-black tracking-tight">
+                                            <span className="h-7 w-2 rounded-full bg-primary shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
+                                            Obtained in
+                                        </h2>
+                                        {acquisitionInfo && (
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-7 w-7 rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
+                                                        aria-label="Acquisition information"
+                                                        title="Acquisition information"
+                                                    >
+                                                        <Info className="h-3.5 w-3.5" />
+                                                    </Button>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-56 space-y-2 p-3 text-xs" align="start">
+                                                    <div className="font-black uppercase tracking-[0.12em] text-muted-foreground">Acquisition info</div>
+                                                    <div className="flex items-start justify-between gap-3">
+                                                        <span className="text-muted-foreground">Source Pokémon</span>
+                                                        <span className="text-right font-bold">{acquisitionInfo.sourcePokemonName}</span>
+                                                    </div>
+                                                    <div className="flex items-start justify-between gap-3">
+                                                        <span className="text-muted-foreground">Origin game</span>
+                                                        <span className="text-right font-bold">{acquisitionInfo.originGameName}</span>
+                                                    </div>
+                                                </PopoverContent>
+                                            </Popover>
+                                        )}
+                                    </div>
                                     {availabilitySourceLinks.length > 0 && (
                                         <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                                             <span>Info: various sources</span>

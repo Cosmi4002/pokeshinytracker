@@ -1,7 +1,7 @@
-import { Pencil, Trash2, Calendar, ArrowUpCircle, Crosshair, Sparkles, ArrowRight, Info } from 'lucide-react';
+import { Pencil, Trash2, Calendar, ArrowUpCircle, Crosshair, Sparkles, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getGameTheme, GAME_LOGOS, type GameTheme } from '@/lib/game-themes';
-import { GAMES, GIGAMAX_ICON, POKEBALLS, POKEMON_EGG_ICON, findHuntingMethod, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, handlePokemonSpriteError, isBreedingMethod, supportsGigamaxMark, toLocalPokemonSpriteUrl } from '@/lib/pokemon-data';
+import { GIGAMAX_ICON, POKEBALLS, POKEMON_EGG_ICON, findHuntingMethod, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, handlePokemonSpriteError, isBreedingMethod, supportsGigamaxMark, toLocalPokemonSpriteUrl } from '@/lib/pokemon-data';
 import type { Tables } from '@/integrations/supabase/types';
 import { useMemo, useCallback, useId } from 'react';
 import { cn } from '@/lib/utils';
@@ -17,7 +17,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 type CaughtShinyRow = Tables<'caught_shinies'>;
 
@@ -56,12 +55,6 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   const showEncountersPreference = (entry as any).show_encounters !== false;
   const evolvedFromId = (entry as any).evolved_from_id as number | null | undefined;
   const evolvedFromName = (entry as any).evolved_from_name as string | null | undefined;
-  const originGameName = GAMES.find((game) => game.id === entry.game)?.name || entry.game;
-  const sourcePokemonName = evolvedFromName || (
-    /origin(?: forme)?\)?$/i.test(entry.pokemon_name || '')
-      ? (entry.pokemon_name || '').replace(/\s*\(Origin(?: Forme)?\)\s*$/i, '')
-      : null
-  );
 
   const theme = useMemo(() => themeOverride || getGameTheme(entry.game), [entry.game, themeOverride]);
   const secondaryTheme = useMemo(() => {
@@ -477,33 +470,6 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                             className="h-10 w-auto max-w-[82px] object-contain brightness-110 drop-shadow-lg sm:h-11 sm:max-w-[92px]"
                           />
                         </>
-                      )}
-                      {sourcePokemonName && (
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              className="h-7 w-7 shrink-0 rounded-full text-white/65 hover:bg-white/10 hover:text-white"
-                              aria-label="Acquisition information"
-                              title="Acquisition information"
-                            >
-                              <Info className="h-3.5 w-3.5" />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-56 space-y-2 p-3 text-xs" align="end">
-                            <div className="font-black uppercase tracking-[0.12em] text-muted-foreground">Acquisition info</div>
-                            <div className="flex items-start justify-between gap-3">
-                              <span className="text-muted-foreground">Source Pokémon</span>
-                              <span className="text-right font-bold">{sourcePokemonName}</span>
-                            </div>
-                            <div className="flex items-start justify-between gap-3">
-                              <span className="text-muted-foreground">Origin game</span>
-                              <span className="text-right font-bold">{originGameName}</span>
-                            </div>
-                          </PopoverContent>
-                        </Popover>
                       )}
                     </>
                   )}
