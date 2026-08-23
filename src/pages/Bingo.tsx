@@ -43,9 +43,9 @@ const getRandomUnit = (): number => (
 
 const getRandomIndex = (length: number): number => Math.floor(getRandomUnit() * length);
 
-const getPokemonCentralWikiUrl = (pokemon: Pick<PokemonBasic, 'displayName' | 'name'>): string => {
+const getBulbapediaUrl = (pokemon: Pick<PokemonBasic, 'displayName' | 'name'>): string => {
   const query = pokemon.displayName || pokemon.name;
-  return `https://wiki.pokemoncentral.it/index.php?search=${encodeURIComponent(query)}`;
+  return `https://bulbapedia.bulbagarden.net/w/index.php?search=${encodeURIComponent(query)}`;
 };
 
 interface GameCell {
@@ -207,6 +207,17 @@ export default function Games() {
     ));
   }, [allRandomPokemon, randomGenerationFilters]);
 
+  const randomPokemonFamilies = useMemo(() => {
+    const families = new Map<number, PokemonBasic[]>();
+    randomPokemonPool.forEach((candidate) => {
+      const baseId = candidate.baseId ?? candidate.id;
+      const family = families.get(baseId);
+      if (family) family.push(candidate);
+      else families.set(baseId, [candidate]);
+    });
+    return Array.from(families.values());
+  }, [randomPokemonPool]);
+
   const availableGenerations = useMemo(() => {
     const gens = new Set<number>();
     basePool.forEach((p) => {
@@ -347,17 +358,19 @@ export default function Games() {
   }), [gameRatio, getGridEntityKeys, gridIds, gridSize, includeGames, includedGenerations, marked, randomGenerationFilters, randomPokemon, selectedGameIds]);
 
   const pickRandomPokemon = useCallback(() => {
-    if (randomPokemonPool.length === 0) return;
-    // Uniform independent draw: every eligible Pokémon has exactly 1 / pool size
-    // probability on every click, including Pokémon selected in previous draws.
-    const next = randomPokemonPool[getRandomIndex(randomPokemonPool.length)];
+    if (randomPokemonFamilies.length === 0) return;
+    // Families are drawn uniformly first, then a form inside that family.
+    // This prevents Pokémon with many forms (Alcremie, Vivillon, etc.) from
+    // dominating the random picker just because they have many variants.
+    const family = randomPokemonFamilies[getRandomIndex(randomPokemonFamilies.length)];
+    const next = family[getRandomIndex(family.length)];
     setRandomPokemon(next);
     void persist(makePersistedState({
       randomPokemonId: next.id,
       randomPokemonName: next.name,
       randomGenerationFilters: Array.from(randomGenerationFilters),
     }));
-  }, [makePersistedState, persist, randomGenerationFilters, randomPokemonPool]);
+  }, [makePersistedState, persist, randomGenerationFilters, randomPokemonFamilies]);
 
   const toggleRandomGeneration = useCallback((generation: number | 'all') => {
     const nextFilters = generation === 'all'
@@ -740,12 +753,12 @@ export default function Games() {
                   <div className="mt-2 flex items-center justify-center gap-2 text-xl font-black">
                     <span>{randomPokemon.displayName}</span>
                     <a
-                      href={getPokemonCentralWikiUrl(randomPokemon)}
+                      href={getBulbapediaUrl(randomPokemon)}
                       target="_blank"
                       rel="noreferrer"
                       className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-border bg-card text-muted-foreground transition-colors hover:border-primary/60 hover:text-primary"
-                      title={`Open ${randomPokemon.displayName} on Pokémon Central Wiki`}
-                      aria-label={`Open ${randomPokemon.displayName} on Pokémon Central Wiki`}
+                      title={`Open ${randomPokemon.displayName} on Bulbapedia`}
+                      aria-label={`Open ${randomPokemon.displayName} on Bulbapedia`}
                     >
                       <Info className="h-4 w-4" />
                     </a>
