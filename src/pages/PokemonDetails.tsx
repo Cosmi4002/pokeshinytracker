@@ -673,10 +673,14 @@ export default function PokemonDetails() {
                                                             : "border-border/80 bg-gradient-to-b from-muted/85 to-card/95 text-foreground opacity-95 hover:from-muted hover:to-background dark:from-muted/45 dark:to-card/95"
                                                     )}
                                                     style={{
-                                                        borderColor: game.isCaught ? `color-mix(in srgb, ${game.theme.accent} 82%, white 18%)` : undefined,
+                                                        borderColor: game.isCaught
+                                                            ? game.id === acquisitionInfo?.transferGameId && acquisitionInfo.originGameId !== game.id
+                                                                ? `color-mix(in srgb, ${getGameTheme(acquisitionInfo.originGameId).accent} 50%, ${game.theme.accent} 50%)`
+                                                                : `color-mix(in srgb, ${game.theme.accent} 82%, white 18%)`
+                                                            : undefined,
                                                         background: game.isCaught
                                                             ? game.id === acquisitionInfo?.transferGameId && acquisitionInfo.originGameId !== game.id
-                                                                ? `linear-gradient(145deg, color-mix(in srgb, ${getGameTheme(acquisitionInfo.originGameId).primary} 62%, ${game.theme.primary} 38%) 0%, color-mix(in srgb, ${getGameTheme(acquisitionInfo.originGameId).secondary} 48%, ${game.theme.secondary} 52%) 52%, color-mix(in srgb, ${getGameTheme(acquisitionInfo.originGameId).accent} 36%, ${game.theme.accent} 64%) 100%)`
+                                                                ? `radial-gradient(120% 140% at 14% 18%, color-mix(in srgb, ${getGameTheme(acquisitionInfo.originGameId).accent} 68%, transparent) 0%, transparent 44%), radial-gradient(120% 140% at 86% 22%, color-mix(in srgb, ${game.theme.accent} 68%, transparent) 0%, transparent 46%), radial-gradient(150% 120% at 18% 78%, color-mix(in srgb, ${getGameTheme(acquisitionInfo.originGameId).primary} 72%, #111) 0%, transparent 52%), radial-gradient(150% 120% at 82% 82%, color-mix(in srgb, ${game.theme.primary} 72%, #111) 0%, transparent 52%), linear-gradient(135deg, color-mix(in srgb, ${getGameTheme(acquisitionInfo.originGameId).secondary} 72%, #090909) 0%, color-mix(in srgb, #111 52%, ${getGameTheme(acquisitionInfo.originGameId).primary}) 38%, color-mix(in srgb, #111 48%, ${game.theme.primary}) 62%, color-mix(in srgb, ${game.theme.secondary} 72%, #090909) 100%)`
                                                                 : `linear-gradient(160deg, color-mix(in srgb, ${game.theme.primary} 72%, black 28%) 0%, color-mix(in srgb, ${game.theme.secondary} 58%, black 42%) 62%, color-mix(in srgb, ${game.theme.accent} 42%, black 58%) 100%)`
                                                             : undefined,
                                                         boxShadow: game.isCaught
@@ -691,11 +695,11 @@ export default function PokemonDetails() {
                                                                     type="button"
                                                                     variant="ghost"
                                                                     size="icon"
-                                                                    className="absolute left-2 top-2 z-10 h-6 w-6 rounded-full bg-black/20 text-white/75 hover:bg-black/35 hover:text-white"
+                                                                    className="absolute left-1.5 top-1.5 z-10 h-5 w-5 rounded-full bg-black/20 p-0 text-white/75 hover:bg-black/35 hover:text-white"
                                                                     aria-label="Acquisition information"
                                                                     title="Acquisition information"
                                                                 >
-                                                                    <Info className="h-3.5 w-3.5" />
+                                                                    <Info className="h-3 w-3" />
                                                                 </Button>
                                                             </PopoverTrigger>
                                                             <PopoverContent className="w-56 space-y-2 p-3 text-xs" align="start">
