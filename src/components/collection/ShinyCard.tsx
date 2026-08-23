@@ -146,13 +146,12 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
     : null;
   const dualThemeContentBackground = hasDualGameTheme
     ? `
-      radial-gradient(120% 140% at 12% 0%, color-mix(in srgb, ${theme.primary} 20%, transparent) 0%, transparent 48%),
-      radial-gradient(120% 140% at 88% 6%, color-mix(in srgb, ${secondaryTheme!.primary} 20%, transparent) 0%, transparent 48%),
-      linear-gradient(155deg, rgba(18,18,20,0.9) 0%, rgba(20,20,24,0.84) 48%, rgba(18,18,20,0.92) 100%)
+      linear-gradient(180deg, rgba(9,9,11,0.28) 0%, rgba(9,9,11,0.46) 100%),
+      ${dualThemeRootBackground}
     `
     : null;
   const spritePanelBackground = hasDualGameTheme
-    ? `linear-gradient(135deg, ${theme.secondary} 0%, color-mix(in srgb, ${theme.secondary} 50%, ${secondaryTheme!.secondary}) 50%, ${secondaryTheme!.secondary} 100%)`
+    ? dualThemeRootBackground!
     : entry.game === 'violet'
       ? `linear-gradient(135deg, ${theme.secondary} 0%, color-mix(in srgb, ${theme.secondary} 55%, ${theme.primary}) 52%, color-mix(in srgb, ${theme.primary} 86%, #111) 100%)`
       : `linear-gradient(135deg, ${theme.secondary} 0%, color-mix(in srgb, ${theme.secondary} 55%, ${theme.primary}) 52%, ${theme.primary} 100%)`;

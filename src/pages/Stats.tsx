@@ -474,9 +474,9 @@ export default function Stats() {
             <CardHeader>
               <CardTitle className="text-base">Record</CardTitle>
             </CardHeader>
-            <CardContent className="grid gap-3 lg:grid-cols-2">
-              <RecordHunt label="Longest hunt" entry={stats.longestHunt} accentColor={accentColor} />
+            <CardContent className="grid gap-3">
               <RecordHunt label="Luckiest hunt" entry={stats.luckiestHunt} accentColor={accentColor} />
+              <RecordHunt label="Longest hunt" entry={stats.longestHunt} accentColor={accentColor} />
             </CardContent>
           </Card>
         </div>

@@ -183,6 +183,8 @@ export default function Games() {
   const didInitRef = useRef(false);
   const randomRollTimeoutRef = useRef<number | null>(null);
   const recentRandomFamilyIdsRef = useRef<number[]>([]);
+  const randomAudioContextRef = useRef<AudioContext | null>(null);
+  const randomAudioOutputRef = useRef<AudioNode | null>(null);
 
   const basePool = useMemo(() => {
     const byBase = new Map<number, PokemonBasic>();
@@ -379,19 +381,36 @@ export default function Games() {
     if (!randomSoundEnabled || typeof window === 'undefined') return;
     const AudioContextCtor = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
     if (!AudioContextCtor) return;
-    const audioContext = new AudioContextCtor();
+
+    let audioContext = randomAudioContextRef.current;
+    if (!audioContext || audioContext.state === 'closed') {
+      audioContext = new AudioContextCtor();
+      const masterGain = audioContext.createGain();
+      const compressor = audioContext.createDynamicsCompressor();
+      masterGain.gain.value = 0.82;
+      compressor.threshold.value = -18;
+      compressor.knee.value = 12;
+      compressor.ratio.value = 6;
+      compressor.attack.value = 0.003;
+      compressor.release.value = 0.12;
+      masterGain.connect(compressor);
+      compressor.connect(audioContext.destination);
+      randomAudioContextRef.current = audioContext;
+      randomAudioOutputRef.current = masterGain;
+    }
+
+    if (audioContext.state === 'suspended') void audioContext.resume();
     const oscillator = audioContext.createOscillator();
     const gain = audioContext.createGain();
     oscillator.type = 'triangle';
     oscillator.frequency.value = isFinal ? 740 : 420;
     gain.gain.setValueAtTime(0.0001, audioContext.currentTime);
-    gain.gain.exponentialRampToValueAtTime(isFinal ? 0.06 : 0.035, audioContext.currentTime + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.18, audioContext.currentTime + 0.008);
     gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + (isFinal ? 0.14 : 0.055));
     oscillator.connect(gain);
-    gain.connect(audioContext.destination);
+    gain.connect(randomAudioOutputRef.current || audioContext.destination);
     oscillator.start();
     oscillator.stop(audioContext.currentTime + (isFinal ? 0.16 : 0.07));
-    window.setTimeout(() => void audioContext.close(), isFinal ? 220 : 120);
   }, [randomSoundEnabled]);
 
   const pickRandomPokemon = useCallback(() => {
@@ -630,6 +649,10 @@ export default function Games() {
   useEffect(() => {
     return () => {
       if (randomRollTimeoutRef.current) window.clearTimeout(randomRollTimeoutRef.current);
+      const audioContext = randomAudioContextRef.current;
+      randomAudioContextRef.current = null;
+      randomAudioOutputRef.current = null;
+      if (audioContext && audioContext.state !== 'closed') void audioContext.close();
     };
   }, []);
 
