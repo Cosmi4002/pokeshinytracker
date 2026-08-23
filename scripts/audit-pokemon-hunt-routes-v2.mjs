@@ -241,9 +241,9 @@ for (const route of masudaRoutes) {
 }
 
 if (HUNT_ROUTE_METHOD_WEIGHTS.standard !== 1
-  || HUNT_ROUTE_METHOD_WEIGHTS.masuda !== 0.25
-  || HUNT_ROUTE_METHOD_WEIGHTS.breeding !== 0.05) {
-  fail('Random hunt method weights must keep standard=1, Masuda=0.25 and Breeding=0.05');
+  || HUNT_ROUTE_METHOD_WEIGHTS.masuda !== 0.04
+  || HUNT_ROUTE_METHOD_WEIGHTS.breeding !== 0.01) {
+  fail('Random hunt method weights must keep standard=1, Masuda=0.04 and Breeding=0.01');
 }
 
 const weightedMethodFixtures = [
@@ -252,12 +252,12 @@ const weightedMethodFixtures = [
   { id: 'breeding', gameId: 'diamond', huntingMethodId: 'gen4-egg-hatching', method: 'breeding' },
 ];
 const masudaFixturePick = chooseRandomHuntRoute(weightedMethodFixtures, (() => {
-  const values = [0.8, 0, 0, 0];
+  const values = [0.97, 0, 0, 0];
   return () => values.shift() ?? 0;
 })());
 if (masudaFixturePick?.id !== 'masuda') fail('Weighted route selector did not preserve the reduced Masuda Method band');
 const breedingFixturePick = chooseRandomHuntRoute(weightedMethodFixtures, (() => {
-  const values = [0.99, 0, 0, 0];
+  const values = [0.998, 0, 0, 0];
   return () => values.shift() ?? 0;
 })());
 if (breedingFixturePick?.id !== 'breeding') fail('Weighted route selector did not preserve the strongly reduced Breeding band');
@@ -643,7 +643,7 @@ for (let index = 0; index < 10_000; index += 1) {
   else if (selected.method === 'breeding' || selected.method === 'breeding-and-evolution') silcoonDistribution.breeding += 1;
   else silcoonDistribution.standard += 1;
 }
-if (silcoonDistribution.standard < 7_000 || silcoonDistribution.masuda > 2_500 || silcoonDistribution.breeding > 700) {
+if (silcoonDistribution.standard < 9_300 || silcoonDistribution.masuda > 600 || silcoonDistribution.breeding > 200) {
   fail(`Silcoon Diamond weighted distribution is still breeding-heavy: ${JSON.stringify(silcoonDistribution)}`);
 }
 

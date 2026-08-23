@@ -2,14 +2,15 @@ import type { PokemonHuntRoute } from './pokemon-hunt-routes-v2';
 
 export const HUNT_ROUTE_METHOD_WEIGHTS = {
   standard: 1,
-  masuda: 0.25,
-  breeding: 0.05,
+  masuda: 0.04,
+  breeding: 0.01,
 } as const;
 
 type HuntRouteMethodClass = keyof typeof HUNT_ROUTE_METHOD_WEIGHTS;
 
 export function getHuntRouteMethodClass(route: PokemonHuntRoute): HuntRouteMethodClass {
   if (route.huntingMethodId.includes('masuda')) return 'masuda';
+  if (route.huntingMethodId.includes('egg-hatching') || route.huntingMethodId.includes('breeding')) return 'breeding';
   if (route.method === 'breeding' || route.method === 'breeding-and-evolution') {
     return 'breeding';
   }
