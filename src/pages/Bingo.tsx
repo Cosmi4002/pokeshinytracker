@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
-import { CheckCircle2, Dice5, Gamepad2, Grid3X3, ListFilter, Pencil, RefreshCcw, Shuffle, Sparkles } from 'lucide-react';
+import { CheckCircle2, Dice5, Gamepad2, Grid3X3, Info, Pencil, RefreshCcw, Shuffle, Sparkles } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -29,80 +29,11 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { resolveEntityKeyForSelectedPokemon } from '@/lib/pokemon-entity-resolver-v2';
-import { formatOdds, GAMES as HUNT_GAMES, getDynamicOdds, HUNTING_METHODS } from '@/lib/pokemon-data';
-import { getVerifiedHuntRoutesForEntity } from '@/lib/pokemon-hunt-routes-v2';
-import { chooseRandomHuntRoute } from '@/lib/pokemon-hunt-route-randomizer';
-import type { PokemonEntityKey } from '@/lib/pokemon-catalog-v2';
-import { TRACKED_GAME_IDS, type TrackedGameId } from '@/lib/pokemon-game-availability';
 
 const SIZE_OPTIONS = [5] as const;
 const STORAGE_KEY = 'bingo-shiny-state';
-const HUNT_GAME_FILTER_STORAGE_KEY = 'random-hunt-game-filters';
-const HUNT_METHOD_FILTER_STORAGE_KEY = 'random-hunt-method-filters';
 const MARK_COLOR = '#22c55e';
 const GAME_ID_BASE = 20000;
-
-const GAME_LABELS: Record<TrackedGameId, string> = {
-  gold: 'Gold',
-  silver: 'Silver',
-  crystal: 'Crystal',
-  ruby: 'Ruby',
-  sapphire: 'Sapphire',
-  firered: 'FireRed',
-  leafgreen: 'LeafGreen',
-  emerald: 'Emerald',
-  diamond: 'Diamond',
-  pearl: 'Pearl',
-  platinum: 'Platinum',
-  heartgold: 'HeartGold',
-  soulsilver: 'SoulSilver',
-  black: 'Black',
-  white: 'White',
-  black2: 'Black 2',
-  white2: 'White 2',
-  x: 'X',
-  y: 'Y',
-  omegaruby: 'Omega Ruby',
-  alphasapphire: 'Alpha Sapphire',
-  sun: 'Sun',
-  moon: 'Moon',
-  ultrasun: 'Ultra Sun',
-  ultramoon: 'Ultra Moon',
-  lgp: "Let's Go Pikachu",
-  lge: "Let's Go Eevee",
-  sword: 'Sword',
-  shield: 'Shield',
-  brilliantdiamond: 'Brilliant Diamond',
-  shiningpearl: 'Shining Pearl',
-  pla: 'Legends: Arceus',
-  scarlet: 'Scarlet',
-  violet: 'Violet',
-  za: 'Legends: Z-A',
-};
-
-const HUNT_GAME_OPTIONS = HUNT_GAMES
-  .filter((game): game is typeof game & { id: TrackedGameId } => TRACKED_GAME_IDS.includes(game.id as TrackedGameId))
-  .map((game) => ({ ...game, id: game.id as TrackedGameId }));
-
-const HUNT_GAME_GENERATIONS = Array.from(new Set(HUNT_GAME_OPTIONS.map((game) => game.generation)))
-  .sort((a, b) => a - b);
-
-function loadHuntGameFilters(): Set<TrackedGameId> {
-  if (typeof window === 'undefined') return new Set(TRACKED_GAME_IDS);
-  const saved = safeParseJson<string[]>(window.localStorage.getItem(HUNT_GAME_FILTER_STORAGE_KEY));
-  if (!saved) return new Set(TRACKED_GAME_IDS);
-  return new Set(saved.filter((gameId): gameId is TrackedGameId => TRACKED_GAME_IDS.includes(gameId as TrackedGameId)));
-}
-
-function loadHuntMethodFilters(): Set<string> {
-  if (typeof window === 'undefined') return new Set(HUNTING_METHODS.map((method) => method.id));
-  const saved = safeParseJson<string[]>(window.localStorage.getItem(HUNT_METHOD_FILTER_STORAGE_KEY));
-  if (!saved) return new Set(HUNTING_METHODS.map((method) => method.id));
-  return new Set(saved.filter((methodId) => HUNTING_METHODS.some((method) => method.id === methodId)));
-}
-
-const getMethodLabel = (methodId: string) =>
-  HUNTING_METHODS.find((method) => method.id === methodId)?.name ?? methodId;
 
 const getRandomUnit = (): number => (
   typeof crypto !== 'undefined' && crypto.getRandomValues
@@ -111,6 +42,11 @@ const getRandomUnit = (): number => (
 );
 
 const getRandomIndex = (length: number): number => Math.floor(getRandomUnit() * length);
+
+const getPokemonCentralWikiUrl = (pokemon: Pick<PokemonBasic, 'displayName' | 'name'>): string => {
+  const query = pokemon.displayName || pokemon.name;
+  return `https://wiki.pokemoncentral.it/index.php?search=${encodeURIComponent(query)}`;
+};
 
 interface GameCell {
   readonly type: 'game';
@@ -194,7 +130,6 @@ type PersistedState = {
   randomPokemonName?: string | null;
   randomEntityKey?: string | null;
   randomGenerationFilters?: number[];
-  randomMethodFilters?: string[];
   /** Legacy single-generation value, kept for existing saved data. */
   randomGenerationFilter?: number | 'all' | null;
 };
@@ -228,12 +163,7 @@ export default function Games() {
   const [pickerValueName, setPickerValueName] = useState<string | undefined>(undefined);
   const [pickerMode, setPickerMode] = useState<'pokemon' | 'logo'>('pokemon');
   const [randomPokemon, setRandomPokemon] = useState<PokemonBasic | null>(null);
-  const [randomHuntRouteId, setRandomHuntRouteId] = useState<string | null>(null);
   const [randomGenerationFilters, setRandomGenerationFilters] = useState<Set<number>>(new Set());
-  const [randomGameFilters, setRandomGameFilters] = useState<Set<TrackedGameId>>(loadHuntGameFilters);
-  const [randomMethodFilters, setRandomMethodFilters] = useState<Set<string>>(loadHuntMethodFilters);
-  const [randomGamePickerOpen, setRandomGamePickerOpen] = useState(false);
-  const [randomMethodPickerOpen, setRandomMethodPickerOpen] = useState(false);
 
   const saveTimerRef = useRef<number | null>(null);
   const didInitRef = useRef(false);
@@ -272,46 +202,10 @@ export default function Games() {
   }, [allRandomPokemon]);
 
   const randomPokemonPool = useMemo(() => {
-    if (randomGameFilters.size === 0) return [];
-    return allRandomPokemon.filter((candidate) => {
-      if (randomGenerationFilters.size > 0 && !randomGenerationFilters.has(candidate.generation)) return false;
-      const entityKey = resolveEntityKeyForSelectedPokemon({
-        pokemonId: candidate.id,
-        pokemonName: candidate.displayName || candidate.name,
-        form: candidate.name,
-      }) as PokemonEntityKey | null;
-      if (!entityKey) return false;
-      return getVerifiedHuntRoutesForEntity(entityKey, { includeExternalSetup: true })
-        .some((route) => randomGameFilters.has(route.gameId) && randomMethodFilters.has(route.huntingMethodId));
-    });
-  }, [allRandomPokemon, randomGameFilters, randomGenerationFilters, randomMethodFilters]);
-
-  const randomHuntRoutes = useMemo(() => {
-    if (!randomPokemon) return null;
-    const entityKey = resolveEntityKeyForSelectedPokemon({
-      pokemonId: randomPokemon.id,
-      pokemonName: randomPokemon.displayName || randomPokemon.name,
-      form: randomPokemon.name,
-    }) as PokemonEntityKey | null;
-    if (!entityKey) return [];
-
-    return getVerifiedHuntRoutesForEntity(entityKey, { includeExternalSetup: true })
-      .filter((route) => route.recommendation !== 'not-eligible' && randomGameFilters.has(route.gameId) && randomMethodFilters.has(route.huntingMethodId));
-  }, [randomGameFilters, randomMethodFilters, randomPokemon]);
-
-  const randomHuntRoute = useMemo(
-    () => randomHuntRoutes?.find((route) => route.id === randomHuntRouteId) ?? null,
-    [randomHuntRouteId, randomHuntRoutes],
-  );
-
-  useEffect(() => {
-    if (!randomPokemon || !randomHuntRoutes || randomHuntRoutes.length === 0) {
-      if (randomHuntRouteId !== null) setRandomHuntRouteId(null);
-      return;
-    }
-    if (randomHuntRoutes.some((route) => route.id === randomHuntRouteId)) return;
-    setRandomHuntRouteId(chooseRandomHuntRoute(randomHuntRoutes, getRandomUnit)?.id ?? null);
-  }, [randomHuntRouteId, randomHuntRoutes, randomPokemon]);
+    return allRandomPokemon.filter((candidate) => (
+      randomGenerationFilters.size === 0 || randomGenerationFilters.has(candidate.generation)
+    ));
+  }, [allRandomPokemon, randomGenerationFilters]);
 
   const availableGenerations = useMemo(() => {
     const gens = new Set<number>();
@@ -414,33 +308,23 @@ export default function Games() {
       }
     }
 
-    if (Array.isArray(parsed.randomGenerationFilters)) {
-      setRandomGenerationFilters(new Set(parsed.randomGenerationFilters));
-    } else if (typeof parsed.randomGenerationFilter === 'number') {
-      setRandomGenerationFilters(new Set([parsed.randomGenerationFilter]));
-    }
-    if (Array.isArray(parsed.randomMethodFilters)) {
-      setRandomMethodFilters(new Set(parsed.randomMethodFilters.filter((id) => HUNTING_METHODS.some((method) => method.id === id))));
-    }
+    const nextRandomGenerationFilters = Array.isArray(parsed.randomGenerationFilters)
+      ? new Set(parsed.randomGenerationFilters)
+      : typeof parsed.randomGenerationFilter === 'number'
+        ? new Set([parsed.randomGenerationFilter])
+        : new Set<number>();
+    setRandomGenerationFilters(nextRandomGenerationFilters);
 
     if (typeof parsed.randomPokemonId === 'number') {
       const restored =
         allRandomPokemon.find((p) => p.id === parsed.randomPokemonId && p.name === parsed.randomPokemonName) ??
         allRandomPokemon.find((p) => p.id === parsed.randomPokemonId);
       if (restored) {
-        const entityKey = resolveEntityKeyForSelectedPokemon({
-          pokemonId: restored.id,
-          pokemonName: restored.displayName || restored.name,
-          form: restored.name,
-        }) as PokemonEntityKey | null;
-        const isEligibleInSelectedGames = entityKey
-          ? getVerifiedHuntRoutesForEntity(entityKey, { includeExternalSetup: true })
-              .some((route) => randomGameFilters.has(route.gameId) && randomMethodFilters.has(route.huntingMethodId))
-          : false;
-        if (isEligibleInSelectedGames) setRandomPokemon(restored);
+        const isEligible = nextRandomGenerationFilters.size === 0 || nextRandomGenerationFilters.has(restored.generation);
+        if (isEligible) setRandomPokemon(restored);
       }
     }
-  }, [allRandomPokemon, idToCell, randomGameFilters, randomMethodFilters]);
+  }, [allRandomPokemon, idToCell]);
 
   const makePersistedState = useCallback((overrides: PersistedState = {}): PersistedState => ({
     gridSize,
@@ -459,33 +343,21 @@ export default function Games() {
       form: randomPokemon.name,
     }) : null,
     randomGenerationFilters: Array.from(randomGenerationFilters),
-    randomMethodFilters: Array.from(randomMethodFilters),
     ...overrides,
-  }), [gameRatio, getGridEntityKeys, gridIds, gridSize, includeGames, includedGenerations, marked, randomGenerationFilters, randomMethodFilters, randomPokemon, selectedGameIds]);
+  }), [gameRatio, getGridEntityKeys, gridIds, gridSize, includeGames, includedGenerations, marked, randomGenerationFilters, randomPokemon, selectedGameIds]);
 
   const pickRandomPokemon = useCallback(() => {
     if (randomPokemonPool.length === 0) return;
     // Uniform independent draw: every eligible Pokémon has exactly 1 / pool size
     // probability on every click, including Pokémon selected in previous draws.
     const next = randomPokemonPool[getRandomIndex(randomPokemonPool.length)];
-    const entityKey = resolveEntityKeyForSelectedPokemon({
-      pokemonId: next.id,
-      pokemonName: next.displayName || next.name,
-      form: next.name,
-    }) as PokemonEntityKey | null;
-    const eligibleRoutes = entityKey
-      ? getVerifiedHuntRoutesForEntity(entityKey, { includeExternalSetup: true })
-          .filter((route) => randomGameFilters.has(route.gameId) && randomMethodFilters.has(route.huntingMethodId))
-      : [];
-    const selectedRoute = chooseRandomHuntRoute(eligibleRoutes, getRandomUnit);
     setRandomPokemon(next);
-    setRandomHuntRouteId(selectedRoute?.id ?? null);
     void persist(makePersistedState({
       randomPokemonId: next.id,
       randomPokemonName: next.name,
       randomGenerationFilters: Array.from(randomGenerationFilters),
     }));
-  }, [makePersistedState, persist, randomGameFilters, randomMethodFilters, randomGenerationFilters, randomPokemonPool]);
+  }, [makePersistedState, persist, randomGenerationFilters, randomPokemonPool]);
 
   const toggleRandomGeneration = useCallback((generation: number | 'all') => {
     const nextFilters = generation === 'all'
@@ -505,56 +377,6 @@ export default function Games() {
       randomGenerationFilters: Array.from(nextFilters),
     }));
   }, [makePersistedState, persist, randomGenerationFilters, randomPokemon]);
-
-  const applyRandomGameFilters = useCallback((nextFilters: Set<TrackedGameId>) => {
-    setRandomGameFilters(nextFilters);
-    try {
-      window.localStorage.setItem(HUNT_GAME_FILTER_STORAGE_KEY, JSON.stringify(Array.from(nextFilters)));
-    } catch {
-      // Ignore storage restrictions; the active session still keeps the selection.
-    }
-
-    if (!randomPokemon) return;
-    const entityKey = resolveEntityKeyForSelectedPokemon({
-      pokemonId: randomPokemon.id,
-      pokemonName: randomPokemon.displayName || randomPokemon.name,
-      form: randomPokemon.name,
-    }) as PokemonEntityKey | null;
-    const remainsEligible = entityKey
-      ? getVerifiedHuntRoutesForEntity(entityKey, { includeExternalSetup: true })
-          .some((route) => nextFilters.has(route.gameId))
-      : false;
-    if (remainsEligible) return;
-
-    setRandomPokemon(null);
-    void persist(makePersistedState({
-      randomPokemonId: null,
-      randomPokemonName: null,
-      randomEntityKey: null,
-    }));
-  }, [makePersistedState, persist, randomPokemon]);
-
-  const applyRandomMethodFilters = useCallback((nextFilters: Set<string>) => {
-    setRandomMethodFilters(nextFilters);
-    try {
-      window.localStorage.setItem(HUNT_METHOD_FILTER_STORAGE_KEY, JSON.stringify(Array.from(nextFilters)));
-    } catch {
-      // Ignore storage restrictions; the active session still keeps the selection.
-    }
-    if (!randomPokemon) return;
-    const entityKey = resolveEntityKeyForSelectedPokemon({
-      pokemonId: randomPokemon.id,
-      pokemonName: randomPokemon.displayName || randomPokemon.name,
-      form: randomPokemon.name,
-    }) as PokemonEntityKey | null;
-    const remainsEligible = entityKey
-      ? getVerifiedHuntRoutesForEntity(entityKey, { includeExternalSetup: true })
-          .some((route) => randomGameFilters.has(route.gameId) && nextFilters.has(route.huntingMethodId))
-      : false;
-    if (remainsEligible) return;
-    setRandomPokemon(null);
-    setRandomHuntRouteId(null);
-  }, [randomGameFilters, randomPokemon]);
 
   const buildPools = useCallback((gens: Set<number>) => {
     const matchesGen = (p: { generation?: number } | Pick<GameCell, 'generation'>) =>
@@ -859,48 +681,9 @@ export default function Games() {
                     );
                   })}
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  Hunt games
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setRandomGamePickerOpen(true)}
-                    className={cn(
-                      'h-9 gap-2 px-3',
-                      randomGameFilters.size < TRACKED_GAME_IDS.length && 'border-primary/60 bg-primary/5'
-                    )}
-                  >
-                    <ListFilter className="h-4 w-4" />
-                    {randomGameFilters.size === TRACKED_GAME_IDS.length
-                      ? 'All games'
-                      : randomGameFilters.size === 0
-                        ? 'No games selected'
-                        : `${randomGameFilters.size} selected`}
-                  </Button>
-                  {randomGameFilters.size < TRACKED_GAME_IDS.length && randomGameFilters.size > 0 && (
-                    <span className="rounded-full bg-primary/10 px-2 py-1 text-[11px] font-semibold text-primary">
-                      Filter active
-                    </span>
-                  )}
-                </div>
                 <p className="text-xs text-muted-foreground">
-                  Only Pokémon with a verified hunt route in the selected games can be drawn.
+                  Only Pokémon from the selected generations can be drawn.
                 </p>
-              </div>
-
-              <div className="space-y-2">
-                <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Hunt methods</div>
-                <Button type="button" variant="outline" size="sm" onClick={() => setRandomMethodPickerOpen(true)} className="h-9 gap-2 px-3">
-                  <ListFilter className="h-4 w-4" />
-                  {randomMethodFilters.size === HUNTING_METHODS.length ? 'All methods' : `${randomMethodFilters.size} selected`}
-                </Button>
-                <p className="text-xs text-muted-foreground">Only Pokémon with a verified route using the selected methods can be drawn.</p>
               </div>
 
               <div className="flex flex-wrap items-center gap-3">
@@ -921,7 +704,7 @@ export default function Games() {
 
               {!loading && randomPokemonPool.length === 0 && (
                 <p className="text-xs text-muted-foreground">
-                  No Pokémon has a verified route for the selected generations and games.
+                  No Pokémon matches the selected generations.
                 </p>
               )}
             </div>
@@ -954,7 +737,19 @@ export default function Games() {
                       event.currentTarget.src = '/placeholder.svg';
                     }}
                   />
-                  <div className="mt-2 text-xl font-black">{randomPokemon.displayName}</div>
+                  <div className="mt-2 flex items-center justify-center gap-2 text-xl font-black">
+                    <span>{randomPokemon.displayName}</span>
+                    <a
+                      href={getPokemonCentralWikiUrl(randomPokemon)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-border bg-card text-muted-foreground transition-colors hover:border-primary/60 hover:text-primary"
+                      title={`Open ${randomPokemon.displayName} on Pokémon Central Wiki`}
+                      aria-label={`Open ${randomPokemon.displayName} on Pokémon Central Wiki`}
+                    >
+                      <Info className="h-4 w-4" />
+                    </a>
+                  </div>
                   <div className="mt-1 flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
                     <span className="rounded-md border border-border bg-card px-2 py-1">
                       #{randomPokemon.baseId.toString().padStart(4, '0')}
@@ -968,44 +763,6 @@ export default function Games() {
                       </span>
                     )}
                   </div>
-                  {randomHuntRoute ? (
-                    <div className="mt-4 w-full rounded-lg border border-primary/30 bg-primary/5 p-3 text-left">
-                      <div className="mb-2 flex items-center justify-between gap-2">
-                        <span className="text-xs font-black uppercase tracking-wide text-primary">
-                          Verified hunt
-                        </span>
-                        <span className="rounded-md border border-border bg-background px-2 py-1 text-xs font-semibold">
-                          {GAME_LABELS[randomHuntRoute.gameId]}
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div>
-                          <div className="font-semibold text-foreground">Method</div>
-                          <div className="text-muted-foreground">{getMethodLabel(randomHuntRoute.huntingMethodId)}</div>
-                        </div>
-                        <div>
-                          <div className="font-semibold text-foreground">Base odds</div>
-                          <div className="text-muted-foreground">
-                            1 / {formatOdds(getDynamicOdds(randomHuntRoute.huntingMethodId, 1, false))}
-                          </div>
-                        </div>
-                        <div className="col-span-2">
-                          <div className="font-semibold text-foreground">Location</div>
-                          <div className="text-muted-foreground">{randomHuntRoute.locations[0] ?? 'See route details'}</div>
-                        </div>
-                      </div>
-                      {randomHuntRoute.prerequisites.length > 0 && (
-                        <div className="mt-2 rounded-md border border-border bg-background/70 px-2 py-1.5 text-xs text-muted-foreground">
-                          <span className="font-semibold text-foreground">Setup: </span>
-                          {randomHuntRoute.prerequisites[0].note}
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="mt-4 w-full rounded-lg border border-dashed border-border bg-background/70 p-3 text-center text-xs text-muted-foreground">
-                      No verified route connected yet for this Pokémon.
-                    </div>
-                  )}
                 </div>
               ) : (
                 <div className="text-center text-sm text-muted-foreground">
@@ -1286,125 +1043,6 @@ export default function Games() {
           </aside>
         </section>
       </main>
-
-      <Dialog open={randomGamePickerOpen} onOpenChange={setRandomGamePickerOpen}>
-        <DialogContent className="w-[calc(100vw-1rem)] max-w-2xl max-h-[88dvh] overflow-hidden p-0">
-          <DialogHeader className="border-b border-border p-4 pr-10 text-left">
-            <DialogTitle>Choose hunt games</DialogTitle>
-            <DialogDescription>
-              Random Pokémon will only use verified routes in these games.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="flex items-center gap-2 border-b border-border px-4 py-3">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => applyRandomGameFilters(new Set(TRACKED_GAME_IDS))}
-              className="h-9 flex-1"
-            >
-              Select all
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => applyRandomGameFilters(new Set())}
-              className="h-9 flex-1"
-            >
-              Clear
-            </Button>
-            <span className="min-w-16 text-right text-xs text-muted-foreground">
-              {randomGameFilters.size}/{TRACKED_GAME_IDS.length}
-            </span>
-          </div>
-
-          <div className="max-h-[62dvh] space-y-5 overflow-y-auto p-4">
-            {HUNT_GAME_GENERATIONS.map((generation) => {
-              const games = HUNT_GAME_OPTIONS.filter((game) => game.generation === generation);
-              const selectedInGeneration = games.filter((game) => randomGameFilters.has(game.id)).length;
-              return (
-                <section key={generation} className="space-y-2">
-                  <div className="flex items-center justify-between gap-3">
-                    <h3 className="text-xs font-black uppercase tracking-wide text-muted-foreground">
-                      Generation {generation}
-                    </h3>
-                    <span className="text-[11px] text-muted-foreground">
-                      {selectedInGeneration}/{games.length}
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                    {games.map((game) => {
-                      const checked = randomGameFilters.has(game.id);
-                      return (
-                        <label
-                          key={game.id}
-                          className={cn(
-                            'flex cursor-pointer items-center gap-3 rounded-lg border bg-background px-3 py-3 transition-colors',
-                            checked ? 'border-primary/60 bg-primary/5 ring-1 ring-primary/15' : 'border-border hover:bg-accent/50'
-                          )}
-                        >
-                          <Checkbox
-                            checked={checked}
-                            onCheckedChange={(nextChecked) => {
-                              const next = new Set(randomGameFilters);
-                              if (nextChecked === true) next.add(game.id);
-                              else next.delete(game.id);
-                              applyRandomGameFilters(next);
-                            }}
-                          />
-                          <span className="text-sm font-semibold">{GAME_LABELS[game.id]}</span>
-                        </label>
-                      );
-                    })}
-                  </div>
-                </section>
-              );
-            })}
-          </div>
-
-          <div className="flex items-center justify-between gap-3 border-t border-border p-4">
-            <span className="text-xs text-muted-foreground">
-              {randomPokemonPool.length} Pokémon available
-            </span>
-            <Button type="button" onClick={() => setRandomGamePickerOpen(false)}>
-              Done
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={randomMethodPickerOpen} onOpenChange={setRandomMethodPickerOpen}>
-        <DialogContent className="w-[calc(100vw-1rem)] max-w-2xl max-h-[88dvh] overflow-hidden p-0">
-          <DialogHeader className="border-b border-border p-4 pr-10 text-left">
-            <DialogTitle>Choose hunt methods</DialogTitle>
-            <DialogDescription>Random Pokémon will only use verified routes using these methods.</DialogDescription>
-          </DialogHeader>
-          <div className="flex items-center gap-2 border-b border-border px-4 py-3">
-            <Button type="button" variant="outline" size="sm" onClick={() => applyRandomMethodFilters(new Set(HUNTING_METHODS.map((method) => method.id)))} className="h-9 flex-1">Select all</Button>
-            <Button type="button" variant="outline" size="sm" onClick={() => applyRandomMethodFilters(new Set())} className="h-9 flex-1">Clear</Button>
-            <span className="min-w-16 text-right text-xs text-muted-foreground">{randomMethodFilters.size}/{HUNTING_METHODS.length}</span>
-          </div>
-          <div className="max-h-[62dvh] space-y-5 overflow-y-auto p-4">
-            {Array.from(new Set(HUNTING_METHODS.map((method) => method.generation))).sort((a, b) => a - b).map((generation) => {
-              const methods = HUNTING_METHODS.filter((method) => method.generation === generation);
-              return (
-                <section key={generation} className="space-y-2">
-                  <div className="flex items-center justify-between"><h3 className="text-xs font-black uppercase tracking-wide text-muted-foreground">Generation {generation}</h3><span className="text-[11px] text-muted-foreground">{methods.filter((method) => randomMethodFilters.has(method.id)).length}/{methods.length}</span></div>
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                    {methods.map((method) => {
-                      const checked = randomMethodFilters.has(method.id);
-                      return <label key={method.id} className={cn('flex cursor-pointer items-center gap-3 rounded-lg border bg-background px-3 py-3 transition-colors', checked ? 'border-primary/60 bg-primary/5 ring-1 ring-primary/15' : 'border-border hover:bg-accent/50')}><Checkbox checked={checked} onCheckedChange={(value) => { const next = new Set(randomMethodFilters); if (value === true) next.add(method.id); else next.delete(method.id); applyRandomMethodFilters(next); }} /><span className="text-sm font-semibold">{method.name}</span></label>;
-                    })}
-                  </div>
-                </section>
-              );
-            })}
-          </div>
-          <div className="flex items-center justify-between border-t border-border p-4"><span className="text-xs text-muted-foreground">{randomPokemonPool.length} Pokémon available</span><Button type="button" onClick={() => setRandomMethodPickerOpen(false)}>Done</Button></div>
-        </DialogContent>
-      </Dialog>
 
       <Dialog open={pickerOpen} onOpenChange={setPickerOpen}>
         <DialogContent className="w-[calc(100vw-1rem)] max-w-xl max-h-[85dvh] overflow-hidden p-0">
