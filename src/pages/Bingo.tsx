@@ -163,10 +163,14 @@ export default function Games() {
   const [pickerValueName, setPickerValueName] = useState<string | undefined>(undefined);
   const [pickerMode, setPickerMode] = useState<'pokemon' | 'logo'>('pokemon');
   const [randomPokemon, setRandomPokemon] = useState<PokemonBasic | null>(null);
+  const [rollingPokemon, setRollingPokemon] = useState<PokemonBasic | null>(null);
+  const [randomIsRolling, setRandomIsRolling] = useState(false);
   const [randomGenerationFilters, setRandomGenerationFilters] = useState<Set<number>>(new Set());
 
   const saveTimerRef = useRef<number | null>(null);
   const didInitRef = useRef(false);
+  const randomRollIntervalRef = useRef<number | null>(null);
+  const randomRollTimeoutRef = useRef<number | null>(null);
 
   const basePool = useMemo(() => {
     const byBase = new Map<number, PokemonBasic>();
@@ -217,6 +221,8 @@ export default function Games() {
     });
     return Array.from(families.values());
   }, [randomPokemonPool]);
+
+  const displayedRandomPokemon = rollingPokemon ?? randomPokemon;
 
   const availableGenerations = useMemo(() => {
     const gens = new Set<number>();
@@ -358,19 +364,40 @@ export default function Games() {
   }), [gameRatio, getGridEntityKeys, gridIds, gridSize, includeGames, includedGenerations, marked, randomGenerationFilters, randomPokemon, selectedGameIds]);
 
   const pickRandomPokemon = useCallback(() => {
-    if (randomPokemonFamilies.length === 0) return;
+    if (randomPokemonFamilies.length === 0 || randomIsRolling) return;
     // Families are drawn uniformly first, then a form inside that family.
     // This prevents Pokémon with many forms (Alcremie, Vivillon, etc.) from
     // dominating the random picker just because they have many variants.
     const family = randomPokemonFamilies[getRandomIndex(randomPokemonFamilies.length)];
     const next = family[getRandomIndex(family.length)];
-    setRandomPokemon(next);
-    void persist(makePersistedState({
-      randomPokemonId: next.id,
-      randomPokemonName: next.name,
-      randomGenerationFilters: Array.from(randomGenerationFilters),
-    }));
-  }, [makePersistedState, persist, randomGenerationFilters, randomPokemonFamilies]);
+    const previewPool = randomPokemonPool.length > 0 ? randomPokemonPool : family;
+
+    if (randomRollIntervalRef.current) window.clearInterval(randomRollIntervalRef.current);
+    if (randomRollTimeoutRef.current) window.clearTimeout(randomRollTimeoutRef.current);
+
+    setRandomIsRolling(true);
+    setRollingPokemon(previewPool[getRandomIndex(previewPool.length)]);
+
+    randomRollIntervalRef.current = window.setInterval(() => {
+      setRollingPokemon(previewPool[getRandomIndex(previewPool.length)]);
+    }, 70);
+
+    randomRollTimeoutRef.current = window.setTimeout(() => {
+      if (randomRollIntervalRef.current) {
+        window.clearInterval(randomRollIntervalRef.current);
+        randomRollIntervalRef.current = null;
+      }
+      randomRollTimeoutRef.current = null;
+      setRollingPokemon(null);
+      setRandomIsRolling(false);
+      setRandomPokemon(next);
+      void persist(makePersistedState({
+        randomPokemonId: next.id,
+        randomPokemonName: next.name,
+        randomGenerationFilters: Array.from(randomGenerationFilters),
+      }));
+    }, 900);
+  }, [makePersistedState, persist, randomGenerationFilters, randomIsRolling, randomPokemonFamilies, randomPokemonPool]);
 
   const toggleRandomGeneration = useCallback((generation: number | 'all') => {
     const nextFilters = generation === 'all'
@@ -560,6 +587,13 @@ export default function Games() {
     setPendingGenerations(new Set(availableGenerations));
   }, [loading, gensTouched, availableGenerations, includedGenerations.size, pendingGenerations.size]);
 
+  useEffect(() => {
+    return () => {
+      if (randomRollIntervalRef.current) window.clearInterval(randomRollIntervalRef.current);
+      if (randomRollTimeoutRef.current) window.clearTimeout(randomRollTimeoutRef.current);
+    };
+  }, []);
+
   // Initial hydrate from remote (if logged in) or local storage.
   useEffect(() => {
     if (loading) return;
@@ -703,11 +737,11 @@ export default function Games() {
                 <Button
                   type="button"
                   onClick={pickRandomPokemon}
-                  disabled={loading || randomPokemonPool.length === 0}
+                  disabled={loading || randomIsRolling || randomPokemonPool.length === 0}
                   className="gap-2"
                 >
-                  <Dice5 className="h-4 w-4" />
-                  {randomPokemon ? 'Pick another' : 'Pick a random Pokémon'}
+                  <Dice5 className={cn('h-4 w-4', randomIsRolling && 'animate-spin')} />
+                  {randomIsRolling ? 'Rolling...' : randomPokemon ? 'Pick another' : 'Pick a random Pokémon'}
                 </Button>
 
                 <span className="text-xs text-muted-foreground">
@@ -722,9 +756,12 @@ export default function Games() {
               )}
             </div>
 
-            <div className="flex min-h-64 items-center justify-center rounded-lg border border-border bg-background/70 p-4">
-              {randomPokemon ? (
-                <div className="flex w-full flex-col items-center text-center">
+            <div className={cn(
+              'flex min-h-64 items-center justify-center rounded-lg border border-border bg-background/70 p-4 transition-all',
+              randomIsRolling && 'border-primary/50 bg-primary/5 shadow-[0_0_30px_rgba(59,130,246,0.12)]'
+            )}>
+              {displayedRandomPokemon ? (
+                <div className={cn('flex w-full flex-col items-center text-center transition-transform', randomIsRolling && 'scale-[1.02] animate-pulse')}>
                   <svg className="absolute h-0 w-0" aria-hidden="true" focusable="false">
                     <filter id={randomSpriteOutlineId} x="-32%" y="-32%" width="164%" height="164%" colorInterpolationFilters="sRGB">
                       <feMorphology in="SourceAlpha" operator="dilate" radius="0.5" result="outline" />
@@ -737,9 +774,9 @@ export default function Games() {
                     </filter>
                   </svg>
                   <img
-                    key={`${randomPokemon.id}-${randomPokemon.name}`}
-                    src={getPokemonSpriteUrl(randomPokemon.id, { shiny: true, name: randomPokemon.name })}
-                    alt={randomPokemon.displayName}
+                    key={`${displayedRandomPokemon.id}-${displayedRandomPokemon.name}`}
+                    src={getPokemonSpriteUrl(displayedRandomPokemon.id, { shiny: true, name: displayedRandomPokemon.name })}
+                    alt={displayedRandomPokemon.displayName}
                     className="h-40 w-40 object-contain"
                     style={{
                       imageRendering: 'auto',
@@ -751,26 +788,34 @@ export default function Games() {
                     }}
                   />
                   <div className="mt-2 flex items-center justify-center gap-2 text-xl font-black">
-                    <span>{randomPokemon.displayName}</span>
+                    <span>{displayedRandomPokemon.displayName}</span>
                     <a
-                      href={getBulbapediaUrl(randomPokemon)}
+                      href={getBulbapediaUrl(displayedRandomPokemon)}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-border bg-card text-muted-foreground transition-colors hover:border-primary/60 hover:text-primary"
-                      title={`Open ${randomPokemon.displayName} on Bulbapedia`}
-                      aria-label={`Open ${randomPokemon.displayName} on Bulbapedia`}
+                      className={cn(
+                        'inline-flex h-7 w-7 items-center justify-center rounded-full border border-border bg-card text-muted-foreground transition-colors hover:border-primary/60 hover:text-primary',
+                        randomIsRolling && 'pointer-events-none opacity-40'
+                      )}
+                      title={`Open ${displayedRandomPokemon.displayName} on Bulbapedia`}
+                      aria-label={`Open ${displayedRandomPokemon.displayName} on Bulbapedia`}
                     >
                       <Info className="h-4 w-4" />
                     </a>
                   </div>
                   <div className="mt-1 flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
                     <span className="rounded-md border border-border bg-card px-2 py-1">
-                      #{randomPokemon.baseId.toString().padStart(4, '0')}
+                      #{displayedRandomPokemon.baseId.toString().padStart(4, '0')}
                     </span>
                     <span className="rounded-md border border-border bg-card px-2 py-1">
-                      Gen {randomPokemon.generation}
+                      Gen {displayedRandomPokemon.generation}
                     </span>
-                    {randomPokemon.shinyAvailability === 'not_own_ot' && (
+                    {randomIsRolling && (
+                      <span className="rounded-md border border-primary/30 bg-primary/10 px-2 py-1 text-primary">
+                        Slot rolling
+                      </span>
+                    )}
+                    {displayedRandomPokemon.shinyAvailability === 'not_own_ot' && (
                       <span className="rounded-md border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-amber-600 dark:text-amber-300">
                         Event / No Own OT
                       </span>
