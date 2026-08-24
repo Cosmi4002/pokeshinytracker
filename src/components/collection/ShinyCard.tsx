@@ -652,9 +652,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                     </div>
                   </div>
                 </div>
-              ) : (
-                <div className="min-h-[184px] shrink-0" aria-hidden="true" />
-              )}
+              ) : null}
 
               <div
                 className="mt-auto rounded-2xl px-3 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
