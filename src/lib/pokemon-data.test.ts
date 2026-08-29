@@ -11,6 +11,12 @@ describe('pokemon sprite helpers', () => {
       'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/25.png'
     );
   });
+
+  it('uses Meloetta Pirouette shiny sprite instead of the colliding Meowstic sprite', () => {
+    expect(getPokemonSpriteUrl(10025, { shiny: true, name: 'meloetta-pirouette' })).toBe(
+      '/img/pokemon-sprites/remote/raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10018.png'
+    );
+  });
 });
 
 describe('shiny odds calculations', () => {
