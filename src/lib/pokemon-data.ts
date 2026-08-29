@@ -580,7 +580,8 @@ export function _getPokemonSpriteUrlRaw(pokemonId: number, options: { shiny?: bo
   if (!pokemonId) return '';
 
 
-  let { shiny = false, female = false, name, form } = options;
+  const { shiny = false, form } = options;
+  let { female = false, name } = options;
 
   const slugSource = (form || name || '').toLowerCase();
   const hasExplicitGenderForm = slugSource.includes('-female') || slugSource.includes('-male');
@@ -968,7 +969,9 @@ export function _getPokemonSpriteUrlRaw(pokemonId: number, options: { shiny?: bo
     'kyurem-black': 10022,
     'kyurem-white': 10023,
     'keldeo-resolute': 10024,
-    'meloetta-pirouette': 10025,
+    // The site keeps 10025 as a legacy internal ID, but PokeAPI's actual
+    // HOME sprite ID for Pirouette Forme is 10018 (10025 is Meowstic Female).
+    'meloetta-pirouette': 10018,
   };
   const canonicalFormSpriteId = name ? canonicalFormSpriteIds[name.toLowerCase()] : undefined;
   if (canonicalFormSpriteId) {
