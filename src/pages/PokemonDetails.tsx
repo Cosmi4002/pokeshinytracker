@@ -35,7 +35,7 @@ import {
     getCuratedShinyOriginGameIds
 } from "@/lib/pokemon-game-availability";
 import { resolveEntityKeyForSelectedPokemon, resolvePokemonEntityKey } from "@/lib/pokemon-entity-resolver-v2";
-import { getGameSpecificShinySpriteUrl } from "@/lib/game-sprites";
+import { getGameSpecificShinySpriteUrl, isGameSpecificShinySpriteUrl } from "@/lib/game-sprites";
 
 interface FormVariant {
     id: number;
@@ -875,7 +875,7 @@ export default function PokemonDetails() {
                                             loading="lazy"
                                             decoding="async"
                                             className={cn(
-                                                "mt-2 h-40 w-40 object-contain pokemon-sprite [image-rendering:pixelated]",
+                                                "mt-2 h-32 w-32 object-contain pokemon-sprite scale-[0.9] [image-rendering:pixelated]",
                                                 group.caughtGames.length === 0 && "opacity-35 grayscale"
                                             )}
                                         />
