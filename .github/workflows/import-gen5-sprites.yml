@@ -1,0 +1,29 @@
+name: Import Gen 5 game sprites
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import-sprites:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Download Black White sprite sets
+        run: node scripts/download-gen5-game-sprites.mjs
+      - name: Commit generated sprites and manifests
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/img/game-sprites/bw public/img/game-sprites/bw2 src/data/bw-shiny-sprite-manifest.ts src/data/bw2-shiny-sprite-manifest.ts
+          git diff --cached --quiet && exit 0
+          git commit -m "Import Black White shiny sprites"
+          git push origin HEAD:main
