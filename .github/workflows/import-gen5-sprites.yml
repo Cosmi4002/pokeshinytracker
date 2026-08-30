@@ -2,6 +2,11 @@ name: Import Gen 5 game sprites
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - scripts/download-gen5-game-sprites.mjs
+      - .github/workflows/import-gen5-sprites.yml
 
 permissions:
   contents: write
