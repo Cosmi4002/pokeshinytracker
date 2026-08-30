@@ -27,11 +27,24 @@ import { MethodSelector } from './MethodSelector';
 import { calculateShinyStats, findHuntingMethod, HUNTING_METHODS, HuntingMethod, POKEMON_EGG_ICON, SHINY_CHARM_ICON, getGameSpecificSpriteUrl, formatOdds, isBreedingMethod } from '@/lib/pokemon-data';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
+import type { Tables } from '@/integrations/supabase/types';
 import { FinishHuntDialog } from './FinishHuntDialog';
 import { useRandomColor } from '@/lib/random-color-context';
 import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
 import { cn } from '@/lib/utils';
 import { resolveEntityKeysForCounterSlots } from '@/lib/pokemon-entity-resolver-v2';
+import { useOnlineStatus } from '@/hooks/use-online-status';
+import {
+  migrateCounterSnapshot,
+  OFFLINE_HUNT_PREFIX,
+  OFFLINE_HUNT_SYNCED_EVENT,
+  patchCachedActiveHunt,
+  readCounterSnapshot,
+  replaceCachedActiveHunt,
+  writeCounterSnapshot,
+  type OfflineActiveHunt,
+  type OfflineCounterSnapshot,
+} from '@/lib/offline-counter-store';
 
 interface ShinyCounterProps {
   huntId?: string;
@@ -39,6 +52,8 @@ interface ShinyCounterProps {
   allowGlobalPlusMinusHotkeys?: boolean;
   compact?: boolean;
   showSetup?: boolean;
+  vibrationEnabled?: boolean;
+  huntLock?: boolean;
 }
 
 type PokemonSlot = {
@@ -49,6 +64,7 @@ type PokemonSlot = {
 };
 
 type PokemonDetails = ReturnType<typeof usePokemonDetails>['pokemon'];
+type ActiveHunt = Tables<'active_hunts'>;
 type PersistedPokemonSlot = {
   id: number | null;
   name: string;
@@ -130,9 +146,12 @@ export function ShinyCounter({
   allowGlobalPlusMinusHotkeys = true,
   compact = false,
   showSetup = true,
+  vibrationEnabled = false,
+  huntLock = false,
 }: ShinyCounterProps) {
   const { user } = useAuth();
   const { accentColor } = useRandomColor();
+  const isOnline = useOnlineStatus();
   const [counter, setCounter] = useState(0);
   const [incrementAmount, setIncrementAmount] = useState(1);
   const [incrementHotkey, setIncrementHotkey] = useState('');
@@ -153,7 +172,7 @@ export function ShinyCounter({
   const [customOdds, setCustomOdds] = useState(4096);
   const [loading, setLoading] = useState(!!user);
   const activeHuntIdRef = useRef<string | null>(null);
-  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'error'>('saved');
+  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'offline' | 'error'>('saved');
   const [isEditingCounter, setIsEditingCounter] = useState(false);
   const [tempCounterValue, setTempCounterValue] = useState('');
   const [isFinishDialogOpen, setIsFinishDialogOpen] = useState(false);
@@ -162,7 +181,10 @@ export function ShinyCounter({
   const [playlists, setPlaylists] = useState<{ id: string; name: string }[]>([]);
   const [huntCreatedAt, setHuntCreatedAt] = useState<string | null>(null);
   const isInitialLoadRef = useRef(true);
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const skipNextVariantResetRef = useRef(false);
+  const ownerId = user?.id || 'guest';
+  const storageHuntId = huntId || 'guest';
 
   const { pokemon: pokemonDetails } = usePokemonDetails(selectedPokemonId || 0);
   const { pokemon: pokemon2Details } = usePokemonDetails(selectedPokemon2Id || 0);
@@ -189,18 +211,116 @@ export function ShinyCounter({
     pokemon3Details,
   ]);
 
-  // Load active hunt and playlists from Supabase when user is logged in
+  const applyCounterSnapshot = useCallback((snapshot: OfflineCounterSnapshot) => {
+    const slots = [0, 1, 2].map((index) => normalizePersistedSlot(snapshot.pokemonSlots[index]));
+    setCounter(Math.max(0, snapshot.counter || 0));
+    setIncrementAmount(Math.max(1, snapshot.incrementAmount || 1));
+    setIncrementHotkey(snapshot.incrementHotkey || '');
+    setSelectedPokemonId(slots[0].id);
+    setSelectedPokemonName(slots[0].name);
+    setSelectedForm(slots[0].form);
+    setSelectedGender(slots[0].gender);
+    setSelectedPokemon2Id(slots[1].id);
+    setSelectedPokemon2Name(slots[1].name);
+    setSelectedPokemon2Form(slots[1].form);
+    setSelectedPokemon2Gender(slots[1].gender);
+    setSelectedPokemon3Id(slots[2].id);
+    setSelectedPokemon3Name(slots[2].name);
+    setSelectedPokemon3Form(slots[2].form);
+    setSelectedPokemon3Gender(slots[2].gender);
+    setSelectedMethod(findHuntingMethod(snapshot.methodId) ?? HUNTING_METHODS[0]);
+    setHasShinyCharm(snapshot.hasShinyCharm);
+    setCustomOdds(Math.max(1, snapshot.customOdds || 4096));
+    setHuntCreatedAt(snapshot.huntCreatedAt);
+  }, []);
+
+  const applyRemoteHunt = useCallback((data: ActiveHunt) => {
+    const slots = decodePokemonSlots(data.pokemon_name, data.pokemon_id, data.form, data.gender);
+    setCounter(data.counter ?? 0);
+    setIncrementAmount(data.increment_amount ?? 1);
+    setIncrementHotkey(data.increment_hotkey ?? '');
+    setSelectedPokemonId(slots[0].id);
+    setSelectedPokemonName(slots[0].name);
+    setSelectedForm(slots[0].form);
+    setSelectedGender(slots[0].gender);
+    setSelectedPokemon2Id(slots[1].id);
+    setSelectedPokemon2Name(slots[1].name);
+    setSelectedPokemon2Form(slots[1].form);
+    setSelectedPokemon2Gender(slots[1].gender);
+    setSelectedPokemon3Id(slots[2].id);
+    setSelectedPokemon3Name(slots[2].name);
+    setSelectedPokemon3Form(slots[2].form);
+    setSelectedPokemon3Gender(slots[2].gender);
+    setSelectedMethod(findHuntingMethod(data.method) ?? HUNTING_METHODS[0]);
+    setHasShinyCharm(data.has_shiny_charm ?? false);
+    setCustomOdds(4096);
+    setHuntCreatedAt(data.created_at);
+  }, []);
+
+  const applyEmptyHunt = useCallback(() => {
+    setCounter(0);
+    setIncrementAmount(1);
+    setIncrementHotkey('');
+    setSelectedPokemonId(null);
+    setSelectedPokemonName('');
+    setSelectedForm('');
+    setSelectedGender('');
+    setSelectedPokemon2Id(null);
+    setSelectedPokemon2Name('');
+    setSelectedPokemon2Form('');
+    setSelectedPokemon2Gender('');
+    setSelectedPokemon3Id(null);
+    setSelectedPokemon3Name('');
+    setSelectedPokemon3Form('');
+    setSelectedPokemon3Gender('');
+    setSelectedMethod(HUNTING_METHODS[0]);
+    setHasShinyCharm(false);
+    setCustomOdds(4096);
+    setHuntCreatedAt(null);
+  }, []);
+
+  // Load the device snapshot first, then reconcile it with Supabase when online.
   useEffect(() => {
+    isInitialLoadRef.current = true;
+    setInitialLoadComplete(false);
+    const localSnapshot = readCounterSnapshot(ownerId, storageHuntId);
+    if (localSnapshot) {
+      applyCounterSnapshot(localSnapshot);
+      setLoading(false);
+      setSaveStatus(localSnapshot.pendingSync ? (isOnline ? 'saving' : 'offline') : 'saved');
+    }
+
     if (!user) {
       setLoading(false);
+      isInitialLoadRef.current = false;
+      setInitialLoadComplete(true);
+      return;
+    }
+
+    if (huntId?.startsWith(OFFLINE_HUNT_PREFIX)) {
+      activeHuntIdRef.current = huntId;
+      setLoading(false);
+      setSaveStatus(isOnline ? 'saving' : 'offline');
+      isInitialLoadRef.current = false;
+      setInitialLoadComplete(true);
+      return;
+    }
+
+    if (!isOnline) {
+      activeHuntIdRef.current = huntId || null;
+      setLoading(false);
+      setSaveStatus('offline');
+      isInitialLoadRef.current = false;
+      setInitialLoadComplete(true);
       return;
     }
 
     const loadData = async () => {
       try {
-        const promises: any[] = [
-          supabase.from('shiny_playlists').select('id, name').eq('user_id', user.id)
-        ];
+        const playlistsRes = await supabase
+          .from('shiny_playlists')
+          .select('id, name')
+          .eq('user_id', user.id);
 
         let huntToLoadId = huntId;
         // If no specific huntId is provided in URL, try to load the most recent active hunt for the user.
@@ -212,73 +332,56 @@ export function ShinyCounter({
           }
         }
 
-        if (huntToLoadId) {
-          promises.push(supabase.from('active_hunts').select('*').eq('id', huntToLoadId).maybeSingle());
-        }
-
-        const [playlistsRes, huntRes] = await Promise.all(promises);
-
         if (playlistsRes.data) {
           setPlaylists(playlistsRes.data);
         }
 
-        if (huntRes && huntRes.data) {
+        const huntRes = huntToLoadId
+          ? await supabase.from('active_hunts').select('*').eq('id', huntToLoadId).maybeSingle()
+          : null;
+
+        if (huntRes?.data) {
           const data = huntRes.data;
           activeHuntIdRef.current = data.id;
-          setCounter(data.counter ?? 0);
-          setIncrementAmount(data.increment_amount ?? 1);
-          setIncrementHotkey(data.increment_hotkey ?? '');
-          const savedSlots = decodePokemonSlots(data.pokemon_name, data.pokemon_id, (data as any).form, (data as any).gender);
-          setSelectedPokemonId(savedSlots[0].id);
-          setSelectedPokemonName(savedSlots[0].name);
-          setSelectedForm(savedSlots[0].form);
-          setSelectedGender(savedSlots[0].gender);
-          setSelectedPokemon2Id(savedSlots[1].id);
-          setSelectedPokemon2Name(savedSlots[1].name);
-          setSelectedPokemon2Form(savedSlots[1].form);
-          setSelectedPokemon2Gender(savedSlots[1].gender);
-          setSelectedPokemon3Id(savedSlots[2].id);
-          setSelectedPokemon3Name(savedSlots[2].name);
-          setSelectedPokemon3Form(savedSlots[2].form);
-          setSelectedPokemon3Gender(savedSlots[2].gender);
-          setSelectedMethod(findHuntingMethod(data.method) ?? HUNTING_METHODS[0]);
-          setHasShinyCharm(data.has_shiny_charm ?? false);
-          setHuntCreatedAt(data.created_at);
+          const pendingSnapshot = readCounterSnapshot(user.id, data.id);
+          if (pendingSnapshot?.pendingSync) {
+            applyCounterSnapshot(pendingSnapshot);
+            setSaveStatus('saving');
+          } else {
+            applyRemoteHunt(data);
+            const remoteSlots = decodePokemonSlots(data.pokemon_name, data.pokemon_id, data.form, data.gender);
+            writeCounterSnapshot({
+              version: 1,
+              ownerId: user.id,
+              huntId: data.id,
+              updatedAt: data.updated_at || new Date().toISOString(),
+              pendingSync: false,
+              counter: data.counter ?? 0,
+              incrementAmount: data.increment_amount ?? 1,
+              incrementHotkey: data.increment_hotkey ?? '',
+              pokemonSlots: remoteSlots,
+              methodId: data.method,
+              hasShinyCharm: data.has_shiny_charm ?? false,
+              customOdds: 4096,
+              huntCreatedAt: data.created_at,
+            });
+            setSaveStatus('saved');
+          }
         } else {
-          // No hunt found for ID or no recent hunt. Reset to default new hunt state.
-          activeHuntIdRef.current = null;
-          setCounter(0);
-          setIncrementAmount(1);
-          setIncrementHotkey('');
-          setSelectedPokemonId(null);
-          setSelectedPokemonName('');
-          setSelectedPokemon2Id(null);
-          setSelectedPokemon2Name('');
-          setSelectedPokemon2Form('');
-          setSelectedPokemon2Gender('');
-          setSelectedPokemon3Id(null);
-          setSelectedPokemon3Name('');
-          setSelectedPokemon3Form('');
-          setSelectedPokemon3Gender('');
-          setSelectedMethod(HUNTING_METHODS[0]);
-          setHasShinyCharm(false);
-          setSelectedForm('');
-          setSelectedGender('');
-          setHuntCreatedAt(null);
+          activeHuntIdRef.current = localSnapshot ? huntId || null : null;
+          if (!localSnapshot) applyEmptyHunt();
         }
       } catch {
-        // Silently fail - use default state
+        if (localSnapshot) setSaveStatus('offline');
       } finally {
         setLoading(false);
-        // Mark initial load as complete after data is loaded
-        setTimeout(() => {
-          isInitialLoadRef.current = false;
-        }, 100);
+        isInitialLoadRef.current = false;
+        setInitialLoadComplete(true);
       }
     };
 
-    loadData();
-  }, [user?.id, huntId]);
+    void loadData();
+  }, [applyCounterSnapshot, applyEmptyHunt, applyRemoteHunt, huntId, isOnline, ownerId, storageHuntId, user]);
 
   // Sync state and clear variants when Pokémon changes
   useEffect(() => {
@@ -308,111 +411,140 @@ export function ShinyCounter({
     }
   }, []);
 
-  // Save to Supabase when state changes (debounced)
+  // Save locally immediately, then sync the same snapshot to Supabase when online.
   useEffect(() => {
-    if (!user) return;
+    if (!initialLoadComplete || isInitialLoadRef.current) return;
 
-    // Skip auto-save during initial load to prevent duplicates
-    if (isInitialLoadRef.current) return;
+    const pokemonSlotsPayload = [
+      { id: selectedPokemonId, name: selectedPokemonName, form: selectedForm, gender: selectedGender },
+      { id: selectedPokemon2Id, name: selectedPokemon2Name, form: selectedPokemon2Form, gender: selectedPokemon2Gender },
+      { id: selectedPokemon3Id, name: selectedPokemon3Name, form: selectedPokemon3Form, gender: selectedPokemon3Gender },
+    ];
+    const snapshotHuntId = activeHuntIdRef.current || storageHuntId;
+    const previousSnapshot = readCounterSnapshot(ownerId, snapshotHuntId);
+    const stateForComparison = {
+      counter,
+      incrementAmount,
+      incrementHotkey,
+      pokemonSlots: pokemonSlotsPayload,
+      methodId: selectedMethod.id,
+      hasShinyCharm,
+      customOdds,
+      huntCreatedAt,
+    };
+    const previousState = previousSnapshot ? {
+      counter: previousSnapshot.counter,
+      incrementAmount: previousSnapshot.incrementAmount,
+      incrementHotkey: previousSnapshot.incrementHotkey,
+      pokemonSlots: previousSnapshot.pokemonSlots,
+      methodId: previousSnapshot.methodId,
+      hasShinyCharm: previousSnapshot.hasShinyCharm,
+      customOdds: previousSnapshot.customOdds,
+      huntCreatedAt: previousSnapshot.huntCreatedAt,
+    } : null;
+    const stateChanged = JSON.stringify(stateForComparison) !== JSON.stringify(previousState);
+    const now = new Date().toISOString();
+    const pendingSync = Boolean(user && (stateChanged || previousSnapshot?.pendingSync));
+    const snapshot: OfflineCounterSnapshot = {
+      version: 1,
+      ownerId,
+      huntId: snapshotHuntId,
+      updatedAt: stateChanged ? now : previousSnapshot?.updatedAt || now,
+      pendingSync,
+      ...stateForComparison,
+    };
+    writeCounterSnapshot(snapshot);
 
+    if (!user) {
+      setSaveStatus('saved');
+      return;
+    }
+
+    const hasValidHunt = activeHuntIdRef.current !== null;
+    const hasUserData = selectedPokemonId !== null || counter > 0;
+    if (!hasValidHunt && !hasUserData) return;
+    if (!pendingSync) {
+      setSaveStatus('saved');
+      return;
+    }
+    if (!isOnline) {
+      setSaveStatus('offline');
+      return;
+    }
+
+    setSaveStatus('saving');
     const timer = setTimeout(async () => {
-      // Only save if we have an existing hunt ID OR if user has actually started hunting
-      // (selected a pokemon or has counter > 0)
-      const hasValidHunt = activeHuntIdRef.current !== null;
-      const hasUserData = selectedPokemonId !== null || counter > 0;
+      const pokemonEntityKeys = resolveEntityKeysForCounterSlots(pokemonSlotsPayload);
+      const payload = {
+        user_id: user.id,
+        pokemon_id: selectedPokemonId,
+        pokemon_entity_keys: pokemonEntityKeys,
+        pokemon_name: encodePokemonSlots(pokemonSlotsPayload),
+        method: selectedMethod.id,
+        counter,
+        has_shiny_charm: hasShinyCharm,
+        increment_amount: incrementAmount,
+        increment_hotkey: incrementHotkey || null,
+        form: selectedForm || null,
+        gender: selectedGender || null,
+        updated_at: snapshot.updatedAt,
+        is_visible_on_counter: true,
+      };
 
-      if (!hasValidHunt && !hasUserData) {
-        // Don't create a new hunt for default/empty state
-        return;
-      }
-
-      setSaveStatus('saving');
       try {
-        const pokemonSlotsPayload = [
-          { id: selectedPokemonId, name: selectedPokemonName, form: selectedForm, gender: selectedGender },
-          { id: selectedPokemon2Id, name: selectedPokemon2Name, form: selectedPokemon2Form, gender: selectedPokemon2Gender },
-          { id: selectedPokemon3Id, name: selectedPokemon3Name, form: selectedPokemon3Form, gender: selectedPokemon3Gender },
-        ];
-        const pokemonEntityKeys = resolveEntityKeysForCounterSlots(pokemonSlotsPayload);
-        const payload = {
-          user_id: user.id,
-          pokemon_id: selectedPokemonId,
-          pokemon_entity_keys: pokemonEntityKeys,
-          pokemon_name: encodePokemonSlots(pokemonSlotsPayload),
-          method: selectedMethod.id,
-          counter,
-          has_shiny_charm: hasShinyCharm,
-          increment_amount: incrementAmount,
-          increment_hotkey: incrementHotkey || null,
-          form: selectedForm || null,
-          gender: selectedGender || null,
-          updated_at: new Date().toISOString(),
-        };
+        const currentHuntId = activeHuntIdRef.current;
+        let remoteHunt: OfflineActiveHunt | null = null;
 
-        if (activeHuntIdRef.current) {
-          // Update existing hunt
-          const { error } = await supabase
+        if (currentHuntId && !currentHuntId.startsWith(OFFLINE_HUNT_PREFIX)) {
+          const { data, error } = await supabase
             .from('active_hunts')
             .update(payload)
-            .eq('id', activeHuntIdRef.current);
-          if (error) throw error;
+            .eq('id', currentHuntId)
+            .eq('user_id', user.id)
+            .select('*')
+            .maybeSingle();
+          if (error || !data) throw error || new Error('Active hunt was not found');
+          remoteHunt = data as OfflineActiveHunt;
         } else {
-          // Create new hunt only if we have user data
-          const insertPayload = { ...payload, created_at: new Date().toISOString() };
-          const { data, error } = await supabase.from('active_hunts').insert(insertPayload).select('id').single();
-          if (error) throw error;
-          if (data) {
-            activeHuntIdRef.current = data.id;
-            setHuntCreatedAt(insertPayload.created_at);
-          }
+          const createdAt = huntCreatedAt || new Date().toISOString();
+          const { data, error } = await supabase
+            .from('active_hunts')
+            .insert({ ...payload, created_at: createdAt })
+            .select('*')
+            .single();
+          if (error || !data) throw error || new Error('Active hunt could not be created');
+          remoteHunt = data as OfflineActiveHunt;
+          setHuntCreatedAt(createdAt);
         }
+
+        const previousHuntId = currentHuntId || snapshotHuntId;
+        activeHuntIdRef.current = remoteHunt.id;
+        const syncedSnapshot: OfflineCounterSnapshot = {
+          ...snapshot,
+          huntId: remoteHunt.id,
+          updatedAt: remoteHunt.updated_at || snapshot.updatedAt,
+          pendingSync: false,
+          huntCreatedAt: remoteHunt.created_at || snapshot.huntCreatedAt,
+        };
+        if (previousHuntId !== remoteHunt.id) {
+          migrateCounterSnapshot(user.id, previousHuntId, remoteHunt.id);
+          replaceCachedActiveHunt(user.id, previousHuntId, remoteHunt);
+          window.dispatchEvent(new CustomEvent(OFFLINE_HUNT_SYNCED_EVENT, {
+            detail: { temporaryId: previousHuntId, remoteHunt },
+          }));
+        } else {
+          patchCachedActiveHunt(user.id, remoteHunt.id, remoteHunt);
+        }
+        writeCounterSnapshot(syncedSnapshot);
         setSaveStatus('saved');
       } catch {
-        setSaveStatus('error');
+        writeCounterSnapshot({ ...snapshot, pendingSync: true });
+        setSaveStatus(navigator.onLine ? 'error' : 'offline');
       }
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [user?.id, loading, counter, incrementAmount, incrementHotkey, selectedPokemonId, selectedPokemonName, selectedPokemon2Id, selectedPokemon2Name, selectedPokemon2Form, selectedPokemon2Gender, selectedPokemon3Id, selectedPokemon3Name, selectedPokemon3Form, selectedPokemon3Gender, selectedMethod, hasShinyCharm, selectedForm, selectedGender]);
-
-  // Fast-sync variant/name changes so Hunts page reflects them immediately after navigation.
-  useEffect(() => {
-    if (!user || isInitialLoadRef.current) return;
-    if (!activeHuntIdRef.current) return;
-    const currentHuntId = activeHuntIdRef.current;
-
-    const syncVariantNow = async () => {
-      try {
-        const pokemonSlotsPayload = [
-          { id: selectedPokemonId, name: selectedPokemonName, form: selectedForm, gender: selectedGender },
-          { id: selectedPokemon2Id, name: selectedPokemon2Name, form: selectedPokemon2Form, gender: selectedPokemon2Gender },
-          { id: selectedPokemon3Id, name: selectedPokemon3Name, form: selectedPokemon3Form, gender: selectedPokemon3Gender },
-        ];
-        const pokemonEntityKeys = resolveEntityKeysForCounterSlots(pokemonSlotsPayload);
-        const payload = {
-          pokemon_id: selectedPokemonId,
-          pokemon_entity_keys: pokemonEntityKeys,
-          pokemon_name: encodePokemonSlots(pokemonSlotsPayload),
-          form: selectedForm || null,
-          gender: selectedGender || null,
-          method: selectedMethod.id,
-          updated_at: new Date().toISOString(),
-        };
-
-        const { error } = await supabase
-          .from('active_hunts')
-          .update(payload)
-          .eq('id', currentHuntId)
-          .eq('user_id', user.id);
-
-        if (error) throw error;
-      } catch {
-        // non-blocking best-effort sync
-      }
-    };
-
-    void syncVariantNow();
-  }, [user?.id, selectedPokemonId, selectedPokemonName, selectedPokemon2Id, selectedPokemon2Name, selectedPokemon2Form, selectedPokemon2Gender, selectedPokemon3Id, selectedPokemon3Name, selectedPokemon3Form, selectedPokemon3Gender, selectedForm, selectedGender, selectedMethod.id]);
+  }, [counter, customOdds, hasShinyCharm, huntCreatedAt, incrementAmount, incrementHotkey, initialLoadComplete, isOnline, ownerId, selectedForm, selectedGender, selectedMethod.id, selectedPokemon2Form, selectedPokemon2Gender, selectedPokemon2Id, selectedPokemon2Name, selectedPokemon3Form, selectedPokemon3Gender, selectedPokemon3Id, selectedPokemon3Name, selectedPokemonId, selectedPokemonName, storageHuntId, user]);
 
   // Calculate stats based on current counter and method
   const stats = useMemo(() => {
@@ -420,8 +552,20 @@ export function ShinyCounter({
     return calculateShinyStats(counter, selectedMethod.id, hasShinyCharm, selectedMethod.id === 'custom' ? customOdds : undefined);
   }, [counter, selectedMethod, hasShinyCharm, customOdds]);
 
-  const increment = () => setCounter((prev) => prev + incrementAmount);
-  const decrement = () => setCounter((prev) => Math.max(0, prev - incrementAmount));
+  const vibrate = useCallback((pattern: number | number[]) => {
+    if (vibrationEnabled && 'vibrate' in navigator) navigator.vibrate(pattern);
+  }, [vibrationEnabled]);
+
+  const increment = useCallback(() => {
+    setCounter((prev) => prev + incrementAmount);
+    vibrate(18);
+  }, [incrementAmount, vibrate]);
+
+  const decrement = useCallback(() => {
+    if (huntLock) return;
+    setCounter((prev) => Math.max(0, prev - incrementAmount));
+    vibrate([8, 24, 8]);
+  }, [huntLock, incrementAmount, vibrate]);
 
   const normalizeHotkey = useCallback((rawKey: string) => {
     if (rawKey === ' ') return 'space';
@@ -478,6 +622,7 @@ export function ShinyCounter({
   }, []);
 
   const movePokemonSlot = useCallback((fromIndex: number, toIndex: number) => {
+    if (huntLock) return;
     if (toIndex < 0 || toIndex > 2) return;
 
     const fromSlot = getPokemonSlot(fromIndex);
@@ -490,9 +635,10 @@ export function ShinyCounter({
     if (fromIndex === 0 || toIndex === 0) {
       skipNextVariantResetRef.current = true;
     }
-  }, [getPokemonSlot, setPokemonSlot]);
+  }, [getPokemonSlot, huntLock, setPokemonSlot]);
 
   const handleHotkeyAssignment = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (huntLock) return;
     if (e.key === 'Tab') {
       setIsAssigningHotkey(false);
       return;
@@ -516,17 +662,22 @@ export function ShinyCounter({
 
     setIncrementHotkey(normalizeHotkey(e.key));
     setIsAssigningHotkey(false);
-  }, [normalizeHotkey]);
+  }, [huntLock, normalizeHotkey]);
 
   // Ensure selectedMethod is never null in render
   const safeSelectedMethod = selectedMethod || HUNTING_METHODS[0];
 
   const handleCounterClick = () => {
+    if (huntLock) return;
     setTempCounterValue(counter.toString());
     setIsEditingCounter(true);
   };
 
   const handleCounterBlur = () => {
+    if (huntLock) {
+      setIsEditingCounter(false);
+      return;
+    }
     const newValue = parseInt(tempCounterValue);
     if (!isNaN(newValue) && newValue >= 0) {
       setCounter(newValue);
@@ -542,11 +693,10 @@ export function ShinyCounter({
     }
   };
 
-  const reset = async () => {
+  const reset = () => {
+    if (huntLock) return;
     setCounter(0);
-    if (user && activeHuntIdRef.current) {
-      await supabase.from('active_hunts').update({ counter: 0 }).eq('id', activeHuntIdRef.current);
-    }
+    vibrate([20, 40, 20]);
   };
 
   // Keyboard shortcuts
@@ -576,7 +726,7 @@ export function ShinyCounter({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [allowGlobalPlusMinusHotkeys, enableKeyboardShortcuts, incrementAmount, incrementHotkey, normalizeHotkey]);
+  }, [allowGlobalPlusMinusHotkeys, decrement, enableKeyboardShortcuts, increment, incrementHotkey, normalizeHotkey]);
 
   if (loading) {
     return (
@@ -598,6 +748,11 @@ export function ShinyCounter({
               : "space-y-4 rounded-lg border border-border/70 bg-card/70 p-4 text-card-foreground shadow-sm dark:border-white/15 dark:bg-[#171717]/95 dark:text-white dark:shadow-[0_18px_42px_rgba(0,0,0,0.42)]"
           )}
         >
+          {huntLock && (
+            <div className="mx-auto w-fit rounded-full border border-amber-500/35 bg-amber-500/10 px-3 py-1 text-xs font-bold text-amber-600 dark:text-amber-300">
+              Hunt Lock · increment only
+            </div>
+          )}
           {/* Pokemon Sprite */}
           {selectedPokemonSlots.length > 0 && (
             <div key={`sprite-container-${selectedPokemonSlots.map((slot) => slot.id).join('-')}`} className={cn("relative group/sprite flex justify-center", compact ? "mb-5" : "mb-4")}>
@@ -655,7 +810,7 @@ export function ShinyCounter({
                               }}
                             />
                             {slotFormOptions.length > 0 && (
-                              <Select value={slot.form || 'default'} onValueChange={(v) => setSlotForm(v === 'default' ? '' : v)}>
+                              <Select disabled={huntLock} value={slot.form || 'default'} onValueChange={(v) => setSlotForm(v === 'default' ? '' : v)}>
                                 <SelectTrigger
                                   className="h-8 w-full px-2 rounded-full text-xs"
                                   style={{ borderColor: accentColor }}
@@ -688,6 +843,7 @@ export function ShinyCounter({
                                       : "border-blue-500 text-blue-500 ring-2 ring-blue-500/30 scale-105",
                                   ].join(' ')}
                                   onClick={() => setSlotGender('')}
+                                  disabled={huntLock}
                                   aria-pressed={slot.gender !== 'female'}
                                   title="Male"
                                 >
@@ -704,6 +860,7 @@ export function ShinyCounter({
                                       : "border-border text-pink-500 opacity-70 hover:opacity-100",
                                   ].join(' ')}
                                   onClick={() => setSlotGender('female')}
+                                  disabled={huntLock}
                                   aria-pressed={slot.gender === 'female'}
                                   title="Female"
                                 >
@@ -745,10 +902,11 @@ export function ShinyCounter({
             <div
               onClick={handleCounterClick}
               className={cn(
-                "font-bold tabular-nums cursor-pointer hover:scale-105 transition-transform duration-200 text-center flex justify-center items-center",
+                "font-bold tabular-nums transition-transform duration-200 text-center flex justify-center items-center",
+                huntLock ? "cursor-default" : "cursor-pointer hover:scale-105",
                 compact ? "h-16 text-5xl" : "h-24 text-6xl"
               )}
-              title="Click to edit counter"
+              title={huntLock ? 'Unlock Hunt Lock to edit the counter' : 'Click to edit counter'}
             >
               <span
                 style={{
@@ -767,6 +925,7 @@ export function ShinyCounter({
             <Button
               size="lg"
               onClick={decrement}
+              disabled={huntLock}
               variant={compact ? "default" : "outline"}
               className={cn("text-xl", compact ? "h-11 min-w-20 px-6" : "h-12 px-6 hover:bg-background")}
               style={{
@@ -801,6 +960,7 @@ export function ShinyCounter({
               type="number"
               min={1}
               value={incrementAmount}
+              disabled={huntLock}
               onChange={(e) => setIncrementAmount(Math.max(1, parseInt(e.target.value) || 1))}
               className={cn(
                 "w-16 h-8 text-center bg-background text-foreground",
@@ -811,12 +971,13 @@ export function ShinyCounter({
 
           <div className="flex flex-wrap items-center justify-center gap-2">
             <Label htmlFor="increment-hotkey" className="text-xs text-muted-foreground">
-              Tasto +1:
+              Increment key:
             </Label>
             <Input
               id="increment-hotkey"
               value={isAssigningHotkey ? 'Press a key...' : formatHotkeyLabel(incrementHotkey)}
               readOnly
+              disabled={huntLock}
               onFocus={() => setIsAssigningHotkey(true)}
               onBlur={() => setIsAssigningHotkey(false)}
               onKeyDown={handleHotkeyAssignment}
@@ -834,12 +995,13 @@ export function ShinyCounter({
                 compact && "border-border/70 bg-background/80 text-foreground hover:bg-muted hover:text-foreground dark:border-white/15 dark:bg-white/10 dark:text-white dark:hover:bg-white/15 dark:hover:text-white"
               )}
               onClick={() => setIncrementHotkey('')}
+              disabled={huntLock}
             >
               Reset
             </Button>
           </div>
 
-          {user && !compact && (
+          {!compact && (
             <div className="flex justify-center items-center gap-2 text-sm text-muted-foreground h-6">
               {saveStatus === 'saving' ? (
                 <>
@@ -849,12 +1011,17 @@ export function ShinyCounter({
               ) : saveStatus === 'saved' ? (
                 <>
                   <Cloud className="h-3 w-3" />
-                  <span>Saved</span>
+                  <span>{user ? 'Saved and synced' : 'Saved on this device'}</span>
+                </>
+              ) : saveStatus === 'offline' ? (
+                <>
+                  <CloudOff className="h-3 w-3 text-amber-500" />
+                  <span className="text-amber-600 dark:text-amber-300">Saved on device · sync pending</span>
                 </>
               ) : (
                 <>
-                  <CloudOff className="h-3 w-3 text-destructive" />
-                  <span className="text-destructive">Error</span>
+                  <CloudOff className="h-3 w-3 text-amber-500" />
+                  <span className="text-amber-600 dark:text-amber-300">Saved on device · retry pending</span>
                 </>
               )}
             </div>
@@ -887,6 +1054,7 @@ export function ShinyCounter({
 
         {/* Setup Section */}
         {showSetup && (
+        <fieldset disabled={huntLock} className={cn("m-0 min-w-0 border-0 p-0", huntLock && "opacity-60")}>
         <Card className="border-border/70 bg-card/70 text-card-foreground shadow-sm dark:border-white/15 dark:bg-[#171717]/95 dark:text-white dark:shadow-[0_18px_42px_rgba(0,0,0,0.38)]">
           <CardContent className="pt-4 space-y-4">
             <h3 className="font-semibold text-lg">Setup</h3>
@@ -1083,6 +1251,8 @@ export function ShinyCounter({
               <Button
                 variant="default"
                 onClick={() => setIsFinishDialogOpen(true)}
+                disabled={!isOnline || huntLock || activeHuntIdRef.current?.startsWith(OFFLINE_HUNT_PREFIX)}
+                title={!isOnline ? 'Reconnect to finish and move this hunt to the collection' : undefined}
                 className="w-full shiny-glow"
               >
                 <Check className="mr-2 h-4 w-4" />
@@ -1094,6 +1264,7 @@ export function ShinyCounter({
             <Button
               variant="secondary"
               onClick={() => setIsResetDialogOpen(true)}
+              disabled={huntLock}
               className="w-full transition-all duration-300 hover:scale-[1.02]"
               style={{
                 boxShadow: `0 0 15px ${accentColor}40`,
@@ -1105,12 +1276,13 @@ export function ShinyCounter({
             </Button>
           </CardContent>
         </Card>
+        </fieldset>
         )}
 
         <AlertDialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Sei sicuro?</AlertDialogTitle>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
               <AlertDialogDescription>
                 This action will reset the counter to 0. Saved data will be updated.
               </AlertDialogDescription>
@@ -1141,12 +1313,13 @@ export function ShinyCounter({
         />
       </div>
     );
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const renderError = err instanceof Error ? err : new Error(String(err));
     return (
       <div className="p-4 border-2 border-destructive bg-destructive/10 rounded-lg text-destructive">
         <h3 className="font-bold mb-2">Rendering error</h3>
-        <pre className="text-xs overflow-auto max-h-40">{err.message}</pre>
-        <pre className="text-[10px] mt-2 opacity-50 overflow-auto">{err.stack}</pre>
+        <pre className="text-xs overflow-auto max-h-40">{renderError.message}</pre>
+        <pre className="text-[10px] mt-2 opacity-50 overflow-auto">{renderError.stack}</pre>
       </div>
     );
   }

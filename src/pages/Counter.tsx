@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Activity, LayoutGrid, Maximize2, Plus, SlidersHorizontal, Target, X } from 'lucide-react';
+import { Activity, Download, LayoutGrid, LockKeyhole, Maximize2, Plus, SlidersHorizontal, Sun, Target, UnlockKeyhole, Vibrate, Wifi, WifiOff, X } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { ShinyCounter } from '@/components/counter/ShinyCounter';
 import { Button } from '@/components/ui/button';
@@ -19,19 +19,71 @@ import { useAuth } from '@/lib/auth-context';
 import { useRandomColor } from '@/lib/random-color-context';
 import { supabase } from '@/integrations/supabase/client';
 import type { Tables } from '@/integrations/supabase/types';
+import { useOnlineStatus } from '@/hooks/use-online-status';
+import {
+  clearPendingHiddenHunt,
+  createOfflineActiveHunt,
+  OFFLINE_HUNT_PREFIX,
+  OFFLINE_HUNT_SYNCED_EVENT,
+  queueHiddenHunt,
+  readCachedActiveHunts,
+  readPendingHiddenHunts,
+  removeCachedActiveHunt,
+  replaceCachedActiveHunt,
+  writeCachedActiveHunts,
+  type OfflineActiveHunt,
+} from '@/lib/offline-counter-store';
 
 type ActiveHunt = Tables<'active_hunts'>;
 const MAX_ACTIVE_COUNTERS = 15;
+const COUNTER_PREFERENCES_KEY = 'pokeshiny:counter-preferences:v1';
+
+type BeforeInstallPromptEvent = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
+};
+
+type WakeLockSentinelLike = {
+  released: boolean;
+  release: () => Promise<void>;
+  addEventListener: (type: 'release', listener: () => void) => void;
+};
+
+type CounterPreferences = {
+  vibrationEnabled: boolean;
+  keepAwake: boolean;
+  huntLock: boolean;
+};
+
+const readCounterPreferences = (): CounterPreferences => {
+  try {
+    const saved = JSON.parse(localStorage.getItem(COUNTER_PREFERENCES_KEY) || '{}') as Partial<CounterPreferences>;
+    return {
+      vibrationEnabled: saved.vibrationEnabled === true,
+      keepAwake: saved.keepAwake === true,
+      huntLock: saved.huntLock === true,
+    };
+  } catch {
+    return { vibrationEnabled: false, keepAwake: false, huntLock: false };
+  }
+};
 
 export default function Counter() {
   const { huntId } = useParams<{ huntId?: string }>();
   const { user } = useAuth();
   const { accentColor } = useRandomColor();
   const navigate = useNavigate();
+  const isOnline = useOnlineStatus();
   const [activeHunts, setActiveHunts] = useState<ActiveHunt[]>([]);
   const [loading, setLoading] = useState(true);
   const [huntToHideId, setHuntToHideId] = useState<string | null>(null);
+  const [preferences, setPreferences] = useState<CounterPreferences>(readCounterPreferences);
+  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [isInstalled, setIsInstalled] = useState(() => window.matchMedia('(display-mode: standalone)').matches);
+  const [wakeLockActive, setWakeLockActive] = useState(false);
+  const wakeLockRef = useRef<WakeLockSentinelLike | null>(null);
   const remainingSlots = Math.max(0, MAX_ACTIVE_COUNTERS - activeHunts.length);
+  const wakeLockSupported = typeof navigator !== 'undefined' && 'wakeLock' in navigator;
   const isAbortLikeError = (err: unknown) => {
     if (!err || typeof err !== 'object') return false;
     const maybe = err as { name?: string; message?: string };
@@ -44,14 +96,96 @@ export default function Counter() {
   const isSingleView = !!huntId;
 
   useEffect(() => {
+    try {
+      localStorage.setItem(COUNTER_PREFERENCES_KEY, JSON.stringify(preferences));
+    } catch {
+      // Preferences remain active for the current session.
+    }
+  }, [preferences]);
+
+  useEffect(() => {
+    const handleInstallPrompt = (event: Event) => {
+      event.preventDefault();
+      setInstallPrompt(event as BeforeInstallPromptEvent);
+    };
+    const handleInstalled = () => {
+      setInstallPrompt(null);
+      setIsInstalled(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleInstallPrompt);
+    window.addEventListener('appinstalled', handleInstalled);
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleInstallPrompt);
+      window.removeEventListener('appinstalled', handleInstalled);
+    };
+  }, []);
+
+  const requestWakeLock = useCallback(async () => {
+    if (!preferences.keepAwake || !wakeLockSupported || document.visibilityState !== 'visible') return;
+    try {
+      const wakeLock = await (navigator as Navigator & {
+        wakeLock: { request: (type: 'screen') => Promise<WakeLockSentinelLike> };
+      }).wakeLock.request('screen');
+      wakeLockRef.current = wakeLock;
+      setWakeLockActive(true);
+      wakeLock.addEventListener('release', () => setWakeLockActive(false));
+    } catch {
+      setWakeLockActive(false);
+    }
+  }, [preferences.keepAwake, wakeLockSupported]);
+
+  useEffect(() => {
+    if (!preferences.keepAwake) {
+      void wakeLockRef.current?.release();
+      wakeLockRef.current = null;
+      setWakeLockActive(false);
+      return;
+    }
+
+    void requestWakeLock();
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') void requestWakeLock();
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility);
+      void wakeLockRef.current?.release();
+      wakeLockRef.current = null;
+    };
+  }, [preferences.keepAwake, requestWakeLock]);
+
+  useEffect(() => {
     if (!user) {
       setLoading(false);
       return;
     }
 
     const fetchHunts = async () => {
-      setLoading(true);
+      const cachedHunts = readCachedActiveHunts(user.id) as ActiveHunt[];
+      if (cachedHunts.length > 0) {
+        setActiveHunts(cachedHunts);
+        setLoading(false);
+      } else {
+        setLoading(true);
+      }
+
+      if (!isOnline) {
+        setLoading(false);
+        return;
+      }
+
       try {
+        const hiddenHuntIds = readPendingHiddenHunts(user.id);
+        await Promise.all(hiddenHuntIds.map(async (hiddenHuntId) => {
+          const { error } = await supabase
+            .from('active_hunts')
+            .update({ is_visible_on_counter: false })
+            .eq('id', hiddenHuntId)
+            .eq('user_id', user.id);
+          if (!error) clearPendingHiddenHunt(user.id, hiddenHuntId);
+        }));
+
         const { data, error } = await supabase
           .from('active_hunts')
           .select('*')
@@ -66,7 +200,11 @@ export default function Counter() {
         }
 
         if (data) {
-          setActiveHunts(data);
+          writeCachedActiveHunts(user.id, data as OfflineActiveHunt[]);
+          // Keep temporary hunts mounted so their counters can sync as soon as
+          // connectivity returns. The child counter replaces the temporary id
+          // with the Supabase id after a successful insert.
+          setActiveHunts(readCachedActiveHunts(user.id) as ActiveHunt[]);
         }
       } catch (err) {
         if (!isAbortLikeError(err)) {
@@ -78,11 +216,36 @@ export default function Counter() {
     };
 
     fetchHunts();
-  }, [user, huntId]); // Refetch when huntId changes (e.g. navigation)
+  }, [user, huntId, isOnline]); // Reconcile cached counters whenever connectivity returns.
+
+  useEffect(() => {
+    if (!user) return;
+    const handleOfflineHuntSynced = (event: Event) => {
+      const detail = (event as CustomEvent<{ temporaryId: string; remoteHunt: OfflineActiveHunt }>).detail;
+      if (!detail?.temporaryId || !detail.remoteHunt) return;
+      replaceCachedActiveHunt(user.id, detail.temporaryId, detail.remoteHunt);
+      setActiveHunts((current) => current.map((hunt) => hunt.id === detail.temporaryId
+        ? detail.remoteHunt as ActiveHunt
+        : hunt));
+      if (huntId === detail.temporaryId) {
+        navigate(`/counter/${detail.remoteHunt.id}`, { replace: true });
+      }
+    };
+
+    window.addEventListener(OFFLINE_HUNT_SYNCED_EVENT, handleOfflineHuntSynced);
+    return () => window.removeEventListener(OFFLINE_HUNT_SYNCED_EVENT, handleOfflineHuntSynced);
+  }, [huntId, navigate, user]);
 
   const handleHideHunt = async (huntId: string) => {
     // Optimistic update
     setActiveHunts(prev => prev.filter(h => h.id !== huntId));
+    if (user) removeCachedActiveHunt(user.id, huntId);
+
+    if (!user || huntId.startsWith(OFFLINE_HUNT_PREFIX)) return;
+    if (!isOnline) {
+      queueHiddenHunt(user.id, huntId);
+      return;
+    }
 
     const { error } = await supabase
       .from('active_hunts')
@@ -91,7 +254,7 @@ export default function Counter() {
 
     if (error) {
       console.error("Error hiding hunt:", error);
-      // Revert optimistic update if needed, or just let the next fetch handle it
+      queueHiddenHunt(user.id, huntId);
     }
   };
 
@@ -99,6 +262,14 @@ export default function Counter() {
     if (!user) {
       // For guests, we can navigate to a demo counter or prompt login
       navigate('/auth'); // Or some other handling
+      return;
+    }
+
+    if (!isOnline) {
+      const offlineHunt = createOfflineActiveHunt(user.id);
+      const nextHunts = [...activeHunts, offlineHunt as ActiveHunt].slice(0, MAX_ACTIVE_COUNTERS);
+      setActiveHunts(nextHunts);
+      writeCachedActiveHunts(user.id, nextHunts as OfflineActiveHunt[], false);
       return;
     }
 
@@ -135,8 +306,18 @@ export default function Counter() {
         .order('updated_at', { ascending: false })
         .limit(MAX_ACTIVE_COUNTERS);
 
-      if (newData) setActiveHunts(newData);
+      if (newData) {
+        writeCachedActiveHunts(user.id, newData as OfflineActiveHunt[]);
+        setActiveHunts(readCachedActiveHunts(user.id) as ActiveHunt[]);
+      }
     }
+  };
+
+  const handleInstallApp = async () => {
+    if (!installPrompt) return;
+    await installPrompt.prompt();
+    const choice = await installPrompt.userChoice;
+    if (choice.outcome === 'accepted') setInstallPrompt(null);
   };
 
   return (
@@ -189,6 +370,65 @@ export default function Counter() {
           </section>
         )}
 
+        <section className="rounded-lg border border-border/70 bg-card/85 p-3 text-card-foreground shadow-sm dark:border-white/15 dark:bg-[#171717]/92 dark:text-white">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex items-center gap-2 text-sm font-semibold">
+              {isOnline ? <Wifi className="h-4 w-4 text-emerald-500" /> : <WifiOff className="h-4 w-4 text-amber-500" />}
+              <span>{isOnline ? 'Online · cloud sync active' : 'Offline · counters saved on this device'}</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-end">
+              {installPrompt && !isInstalled && (
+                <Button type="button" variant="outline" size="sm" onClick={() => void handleInstallApp()}>
+                  <Download className="mr-2 h-4 w-4" />
+                  Install app
+                </Button>
+              )}
+              <Button
+                type="button"
+                variant={preferences.vibrationEnabled ? 'default' : 'outline'}
+                size="sm"
+                aria-pressed={preferences.vibrationEnabled}
+                onClick={() => setPreferences((current) => ({ ...current, vibrationEnabled: !current.vibrationEnabled }))}
+                style={preferences.vibrationEnabled ? { backgroundColor: accentColor } : undefined}
+              >
+                <Vibrate className="mr-2 h-4 w-4" />
+                Vibration
+              </Button>
+              <Button
+                type="button"
+                variant={preferences.keepAwake ? 'default' : 'outline'}
+                size="sm"
+                disabled={!wakeLockSupported}
+                aria-pressed={preferences.keepAwake}
+                title={wakeLockSupported ? 'Keep the screen awake while hunting' : 'Screen wake lock is not supported by this browser'}
+                onClick={() => setPreferences((current) => ({ ...current, keepAwake: !current.keepAwake }))}
+                style={preferences.keepAwake ? { backgroundColor: accentColor } : undefined}
+              >
+                <Sun className="mr-2 h-4 w-4" />
+                {preferences.keepAwake && wakeLockActive ? 'Screen awake' : 'Keep awake'}
+              </Button>
+              <Button
+                type="button"
+                variant={preferences.huntLock ? 'default' : 'outline'}
+                size="sm"
+                aria-pressed={preferences.huntLock}
+                onClick={() => setPreferences((current) => ({ ...current, huntLock: !current.huntLock }))}
+                style={preferences.huntLock ? { backgroundColor: accentColor } : undefined}
+              >
+                {preferences.huntLock
+                  ? <LockKeyhole className="mr-2 h-4 w-4" />
+                  : <UnlockKeyhole className="mr-2 h-4 w-4" />}
+                Hunt lock
+              </Button>
+            </div>
+          </div>
+          {preferences.huntLock && (
+            <p className="mt-2 text-xs text-muted-foreground">
+              Hunt Lock is active: incrementing remains available; editing, decrementing, setup, finish, and reset are protected.
+            </p>
+          )}
+        </section>
+
         {/* CONTENT */}
         {isSingleView ? (
           /* Single Counter View (Focused) */
@@ -198,11 +438,20 @@ export default function Counter() {
                 <LayoutGrid className="mr-2 h-4 w-4" /> Back to multi view
               </Button>
             </div>
-            <ShinyCounter huntId={huntId} enableKeyboardShortcuts />
+            <ShinyCounter
+              huntId={huntId}
+              enableKeyboardShortcuts
+              vibrationEnabled={preferences.vibrationEnabled}
+              huntLock={preferences.huntLock}
+            />
           </div>
         ) : !user ? (
           /* Guest View (Single Demo) */
-          <ShinyCounter enableKeyboardShortcuts />
+          <ShinyCounter
+            enableKeyboardShortcuts
+            vibrationEnabled={preferences.vibrationEnabled}
+            huntLock={preferences.huntLock}
+          />
         ) : (
           /* Multi Counter Grid */
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -255,6 +504,8 @@ export default function Counter() {
                         allowGlobalPlusMinusHotkeys={false}
                         compact
                         showSetup={false}
+                        vibrationEnabled={preferences.vibrationEnabled}
+                        huntLock={preferences.huntLock}
                       />
                       <Button
                         type="button"
