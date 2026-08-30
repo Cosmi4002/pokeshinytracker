@@ -28,10 +28,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { resolveEntityKeyForSelectedPokemon } from '@/lib/pokemon-entity-resolver-v2';
+import { resolveEntityKeyForSelectedPokemon, resolvePokemonEntityKey } from '@/lib/pokemon-entity-resolver-v2';
 
 const SIZE_OPTIONS = [5] as const;
 const STORAGE_KEY = 'bingo-shiny-state';
+const RANDOM_EXCLUDE_OBTAINED_KEY = 'pokeshiny:random-exclude-obtained:v1';
 const MARK_COLOR = '#22c55e';
 const GAME_ID_BASE = 20000;
 
@@ -42,6 +43,14 @@ const getRandomUnit = (): number => (
 );
 
 const getRandomIndex = (length: number): number => Math.floor(getRandomUnit() * length);
+
+const readExcludeObtainedPreference = () => {
+  try {
+    return window.localStorage.getItem(RANDOM_EXCLUDE_OBTAINED_KEY) === 'true';
+  } catch {
+    return false;
+  }
+};
 
 const pickRandomFamilyPokemon = (families: PokemonBasic[][], excludedBaseIds: Set<number> = new Set()): PokemonBasic | null => {
   const eligibleFamilies = families.filter((family) => {
@@ -178,6 +187,9 @@ export default function Games() {
   const [randomIsRolling, setRandomIsRolling] = useState(false);
   const [randomSoundEnabled, setRandomSoundEnabled] = useState(false);
   const [randomGenerationFilters, setRandomGenerationFilters] = useState<Set<number>>(new Set());
+  const [randomExcludeObtained, setRandomExcludeObtained] = useState(readExcludeObtainedPreference);
+  const [obtainedEntityKeys, setObtainedEntityKeys] = useState<Set<string>>(new Set());
+  const [obtainedPokemonLoading, setObtainedPokemonLoading] = useState(false);
 
   const saveTimerRef = useRef<number | null>(null);
   const didInitRef = useRef(false);
@@ -219,11 +231,21 @@ export default function Games() {
     return Array.from(gens).sort((a, b) => a - b);
   }, [allRandomPokemon]);
 
+  const isRandomPokemonObtained = useCallback((candidate: PokemonBasic) => {
+    const entityKey = resolveEntityKeyForSelectedPokemon({
+      pokemonId: candidate.id,
+      pokemonName: candidate.displayName || candidate.name,
+      form: candidate.name,
+    });
+    return Boolean(entityKey && obtainedEntityKeys.has(entityKey));
+  }, [obtainedEntityKeys]);
+
   const randomPokemonPool = useMemo(() => {
     return allRandomPokemon.filter((candidate) => (
-      randomGenerationFilters.size === 0 || randomGenerationFilters.has(candidate.generation)
+      (randomGenerationFilters.size === 0 || randomGenerationFilters.has(candidate.generation)) &&
+      (!randomExcludeObtained || !isRandomPokemonObtained(candidate))
     ));
-  }, [allRandomPokemon, randomGenerationFilters]);
+  }, [allRandomPokemon, isRandomPokemonObtained, randomExcludeObtained, randomGenerationFilters]);
 
   const randomPokemonFamilies = useMemo(() => {
     const families = new Map<number, PokemonBasic[]>();
@@ -647,6 +669,79 @@ export default function Games() {
   }, [loading, gensTouched, availableGenerations, includedGenerations.size, pendingGenerations.size]);
 
   useEffect(() => {
+    try {
+      window.localStorage.setItem(RANDOM_EXCLUDE_OBTAINED_KEY, String(randomExcludeObtained));
+    } catch {
+      // The filter remains active for the current session.
+    }
+  }, [randomExcludeObtained]);
+
+  useEffect(() => {
+    if (!user) {
+      setObtainedEntityKeys(new Set());
+      setObtainedPokemonLoading(false);
+      return;
+    }
+
+    let active = true;
+    const loadObtainedPokemon = async () => {
+      setObtainedPokemonLoading(true);
+      const { data, error } = await supabase
+        .from('caught_shinies')
+        .select('pokemon_id, entity_key, pokemon_name, form')
+        .eq('user_id', user.id)
+        .or('is_fail.is.false,is_fail.is.null')
+        .or('is_unobtainable.is.false,is_unobtainable.is.null');
+
+      if (!active) return;
+      if (error) {
+        console.error('Unable to load obtained Pokémon for the random filter:', error);
+        setObtainedPokemonLoading(false);
+        return;
+      }
+
+      const keys = new Set<string>();
+      (data || []).forEach((entry) => {
+        const key = resolvePokemonEntityKey({
+          pokemonId: entry.pokemon_id,
+          entityKey: entry.entity_key,
+          pokemonName: entry.pokemon_name,
+          form: entry.form,
+        });
+        if (key) keys.add(key);
+      });
+      setObtainedEntityKeys(keys);
+      setObtainedPokemonLoading(false);
+    };
+
+    void loadObtainedPokemon();
+    const channel = supabase
+      .channel(`games-obtained-filter-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'caught_shinies',
+          filter: `user_id=eq.${user.id}`,
+        },
+        () => void loadObtainedPokemon(),
+      )
+      .subscribe();
+
+    return () => {
+      active = false;
+      void supabase.removeChannel(channel);
+    };
+  }, [user]);
+
+  useEffect(() => {
+    if (randomExcludeObtained && randomPokemon && isRandomPokemonObtained(randomPokemon)) {
+      setRandomPokemon(null);
+    }
+  }, [isRandomPokemonObtained, randomExcludeObtained, randomPokemon]);
+
+  useEffect(() => {
     return () => {
       if (randomRollTimeoutRef.current) window.clearTimeout(randomRollTimeoutRef.current);
       const audioContext = randomAudioContextRef.current;
@@ -795,11 +890,37 @@ export default function Games() {
                 </p>
               </div>
 
+              <label
+                htmlFor="exclude-obtained-random"
+                className={cn(
+                  'flex items-start gap-3 rounded-lg border border-border bg-muted/25 p-3 transition-colors',
+                  user ? 'cursor-pointer hover:bg-muted/40' : 'cursor-not-allowed opacity-60',
+                )}
+              >
+                <Checkbox
+                  id="exclude-obtained-random"
+                  checked={randomExcludeObtained}
+                  disabled={!user || obtainedPokemonLoading || randomIsRolling}
+                  onCheckedChange={(checked) => setRandomExcludeObtained(checked === true)}
+                  className="mt-0.5"
+                />
+                <span className="space-y-0.5">
+                  <span className="block text-sm font-semibold">Exclude already obtained Pokémon</span>
+                  <span className="block text-xs text-muted-foreground">
+                    {user
+                      ? obtainedPokemonLoading
+                        ? 'Loading your Pokédex progress...'
+                        : 'Excludes the species and forms already illuminated in your Pokédex.'
+                      : 'Sign in to use your Pokédex progress.'}
+                  </span>
+                </span>
+              </label>
+
               <div className="flex flex-wrap items-center gap-3">
                 <Button
                   type="button"
                   onClick={pickRandomPokemon}
-                  disabled={loading || randomIsRolling || randomPokemonPool.length === 0}
+                  disabled={loading || randomIsRolling || (randomExcludeObtained && obtainedPokemonLoading) || randomPokemonPool.length === 0}
                   className="gap-2"
                 >
                   <Dice5 className={cn('h-4 w-4', randomIsRolling && 'animate-spin')} />
@@ -825,7 +946,9 @@ export default function Games() {
 
               {!loading && randomPokemonPool.length === 0 && (
                 <p className="text-xs text-muted-foreground">
-                  No Pokémon matches the selected generations.
+                  {randomExcludeObtained
+                    ? 'Every Pokémon matching these generations is already obtained.'
+                    : 'No Pokémon matches the selected generations.'}
                 </p>
               )}
             </div>

@@ -52,8 +52,6 @@ interface ShinyCounterProps {
   allowGlobalPlusMinusHotkeys?: boolean;
   compact?: boolean;
   showSetup?: boolean;
-  vibrationEnabled?: boolean;
-  huntLock?: boolean;
 }
 
 type PokemonSlot = {
@@ -65,6 +63,7 @@ type PokemonSlot = {
 
 type PokemonDetails = ReturnType<typeof usePokemonDetails>['pokemon'];
 type ActiveHunt = Tables<'active_hunts'>;
+type ActiveHuntWithVariant = ActiveHunt & { form?: string | null; gender?: string | null };
 type PersistedPokemonSlot = {
   id: number | null;
   name: string;
@@ -146,8 +145,6 @@ export function ShinyCounter({
   allowGlobalPlusMinusHotkeys = true,
   compact = false,
   showSetup = true,
-  vibrationEnabled = false,
-  huntLock = false,
 }: ShinyCounterProps) {
   const { user } = useAuth();
   const { accentColor } = useRandomColor();
@@ -234,7 +231,7 @@ export function ShinyCounter({
     setHuntCreatedAt(snapshot.huntCreatedAt);
   }, []);
 
-  const applyRemoteHunt = useCallback((data: ActiveHunt) => {
+  const applyRemoteHunt = useCallback((data: ActiveHuntWithVariant) => {
     const slots = decodePokemonSlots(data.pokemon_name, data.pokemon_id, data.form, data.gender);
     setCounter(data.counter ?? 0);
     setIncrementAmount(data.increment_amount ?? 1);
@@ -341,7 +338,7 @@ export function ShinyCounter({
           : null;
 
         if (huntRes?.data) {
-          const data = huntRes.data;
+          const data = huntRes.data as ActiveHuntWithVariant;
           activeHuntIdRef.current = data.id;
           const pendingSnapshot = readCounterSnapshot(user.id, data.id);
           if (pendingSnapshot?.pendingSync) {
@@ -552,20 +549,13 @@ export function ShinyCounter({
     return calculateShinyStats(counter, selectedMethod.id, hasShinyCharm, selectedMethod.id === 'custom' ? customOdds : undefined);
   }, [counter, selectedMethod, hasShinyCharm, customOdds]);
 
-  const vibrate = useCallback((pattern: number | number[]) => {
-    if (vibrationEnabled && 'vibrate' in navigator) navigator.vibrate(pattern);
-  }, [vibrationEnabled]);
-
   const increment = useCallback(() => {
     setCounter((prev) => prev + incrementAmount);
-    vibrate(18);
-  }, [incrementAmount, vibrate]);
+  }, [incrementAmount]);
 
   const decrement = useCallback(() => {
-    if (huntLock) return;
     setCounter((prev) => Math.max(0, prev - incrementAmount));
-    vibrate([8, 24, 8]);
-  }, [huntLock, incrementAmount, vibrate]);
+  }, [incrementAmount]);
 
   const normalizeHotkey = useCallback((rawKey: string) => {
     if (rawKey === ' ') return 'space';
@@ -622,7 +612,6 @@ export function ShinyCounter({
   }, []);
 
   const movePokemonSlot = useCallback((fromIndex: number, toIndex: number) => {
-    if (huntLock) return;
     if (toIndex < 0 || toIndex > 2) return;
 
     const fromSlot = getPokemonSlot(fromIndex);
@@ -635,10 +624,9 @@ export function ShinyCounter({
     if (fromIndex === 0 || toIndex === 0) {
       skipNextVariantResetRef.current = true;
     }
-  }, [getPokemonSlot, huntLock, setPokemonSlot]);
+  }, [getPokemonSlot, setPokemonSlot]);
 
   const handleHotkeyAssignment = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (huntLock) return;
     if (e.key === 'Tab') {
       setIsAssigningHotkey(false);
       return;
@@ -662,22 +650,17 @@ export function ShinyCounter({
 
     setIncrementHotkey(normalizeHotkey(e.key));
     setIsAssigningHotkey(false);
-  }, [huntLock, normalizeHotkey]);
+  }, [normalizeHotkey]);
 
   // Ensure selectedMethod is never null in render
   const safeSelectedMethod = selectedMethod || HUNTING_METHODS[0];
 
   const handleCounterClick = () => {
-    if (huntLock) return;
     setTempCounterValue(counter.toString());
     setIsEditingCounter(true);
   };
 
   const handleCounterBlur = () => {
-    if (huntLock) {
-      setIsEditingCounter(false);
-      return;
-    }
     const newValue = parseInt(tempCounterValue);
     if (!isNaN(newValue) && newValue >= 0) {
       setCounter(newValue);
@@ -694,9 +677,7 @@ export function ShinyCounter({
   };
 
   const reset = () => {
-    if (huntLock) return;
     setCounter(0);
-    vibrate([20, 40, 20]);
   };
 
   // Keyboard shortcuts
@@ -748,11 +729,6 @@ export function ShinyCounter({
               : "space-y-4 rounded-lg border border-border/70 bg-card/70 p-4 text-card-foreground shadow-sm dark:border-white/15 dark:bg-[#171717]/95 dark:text-white dark:shadow-[0_18px_42px_rgba(0,0,0,0.42)]"
           )}
         >
-          {huntLock && (
-            <div className="mx-auto w-fit rounded-full border border-amber-500/35 bg-amber-500/10 px-3 py-1 text-xs font-bold text-amber-600 dark:text-amber-300">
-              Hunt Lock · increment only
-            </div>
-          )}
           {/* Pokemon Sprite */}
           {selectedPokemonSlots.length > 0 && (
             <div key={`sprite-container-${selectedPokemonSlots.map((slot) => slot.id).join('-')}`} className={cn("relative group/sprite flex justify-center", compact ? "mb-5" : "mb-4")}>
@@ -810,7 +786,7 @@ export function ShinyCounter({
                               }}
                             />
                             {slotFormOptions.length > 0 && (
-                              <Select disabled={huntLock} value={slot.form || 'default'} onValueChange={(v) => setSlotForm(v === 'default' ? '' : v)}>
+                              <Select value={slot.form || 'default'} onValueChange={(v) => setSlotForm(v === 'default' ? '' : v)}>
                                 <SelectTrigger
                                   className="h-8 w-full px-2 rounded-full text-xs"
                                   style={{ borderColor: accentColor }}
@@ -843,7 +819,6 @@ export function ShinyCounter({
                                       : "border-blue-500 text-blue-500 ring-2 ring-blue-500/30 scale-105",
                                   ].join(' ')}
                                   onClick={() => setSlotGender('')}
-                                  disabled={huntLock}
                                   aria-pressed={slot.gender !== 'female'}
                                   title="Male"
                                 >
@@ -860,7 +835,6 @@ export function ShinyCounter({
                                       : "border-border text-pink-500 opacity-70 hover:opacity-100",
                                   ].join(' ')}
                                   onClick={() => setSlotGender('female')}
-                                  disabled={huntLock}
                                   aria-pressed={slot.gender === 'female'}
                                   title="Female"
                                 >
@@ -902,11 +876,10 @@ export function ShinyCounter({
             <div
               onClick={handleCounterClick}
               className={cn(
-                "font-bold tabular-nums transition-transform duration-200 text-center flex justify-center items-center",
-                huntLock ? "cursor-default" : "cursor-pointer hover:scale-105",
+                "cursor-pointer font-bold tabular-nums transition-transform duration-200 text-center flex justify-center items-center hover:scale-105",
                 compact ? "h-16 text-5xl" : "h-24 text-6xl"
               )}
-              title={huntLock ? 'Unlock Hunt Lock to edit the counter' : 'Click to edit counter'}
+              title="Click to edit counter"
             >
               <span
                 style={{
@@ -925,7 +898,6 @@ export function ShinyCounter({
             <Button
               size="lg"
               onClick={decrement}
-              disabled={huntLock}
               variant={compact ? "default" : "outline"}
               className={cn("text-xl", compact ? "h-11 min-w-20 px-6" : "h-12 px-6 hover:bg-background")}
               style={{
@@ -960,7 +932,6 @@ export function ShinyCounter({
               type="number"
               min={1}
               value={incrementAmount}
-              disabled={huntLock}
               onChange={(e) => setIncrementAmount(Math.max(1, parseInt(e.target.value) || 1))}
               className={cn(
                 "w-16 h-8 text-center bg-background text-foreground",
@@ -977,7 +948,6 @@ export function ShinyCounter({
               id="increment-hotkey"
               value={isAssigningHotkey ? 'Press a key...' : formatHotkeyLabel(incrementHotkey)}
               readOnly
-              disabled={huntLock}
               onFocus={() => setIsAssigningHotkey(true)}
               onBlur={() => setIsAssigningHotkey(false)}
               onKeyDown={handleHotkeyAssignment}
@@ -995,7 +965,6 @@ export function ShinyCounter({
                 compact && "border-border/70 bg-background/80 text-foreground hover:bg-muted hover:text-foreground dark:border-white/15 dark:bg-white/10 dark:text-white dark:hover:bg-white/15 dark:hover:text-white"
               )}
               onClick={() => setIncrementHotkey('')}
-              disabled={huntLock}
             >
               Reset
             </Button>
@@ -1054,7 +1023,6 @@ export function ShinyCounter({
 
         {/* Setup Section */}
         {showSetup && (
-        <fieldset disabled={huntLock} className={cn("m-0 min-w-0 border-0 p-0", huntLock && "opacity-60")}>
         <Card className="border-border/70 bg-card/70 text-card-foreground shadow-sm dark:border-white/15 dark:bg-[#171717]/95 dark:text-white dark:shadow-[0_18px_42px_rgba(0,0,0,0.38)]">
           <CardContent className="pt-4 space-y-4">
             <h3 className="font-semibold text-lg">Setup</h3>
@@ -1251,7 +1219,7 @@ export function ShinyCounter({
               <Button
                 variant="default"
                 onClick={() => setIsFinishDialogOpen(true)}
-                disabled={!isOnline || huntLock || activeHuntIdRef.current?.startsWith(OFFLINE_HUNT_PREFIX)}
+                disabled={!isOnline || activeHuntIdRef.current?.startsWith(OFFLINE_HUNT_PREFIX)}
                 title={!isOnline ? 'Reconnect to finish and move this hunt to the collection' : undefined}
                 className="w-full shiny-glow"
               >
@@ -1264,7 +1232,6 @@ export function ShinyCounter({
             <Button
               variant="secondary"
               onClick={() => setIsResetDialogOpen(true)}
-              disabled={huntLock}
               className="w-full transition-all duration-300 hover:scale-[1.02]"
               style={{
                 boxShadow: `0 0 15px ${accentColor}40`,
@@ -1276,7 +1243,6 @@ export function ShinyCounter({
             </Button>
           </CardContent>
         </Card>
-        </fieldset>
         )}
 
         <AlertDialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Activity, Download, LayoutGrid, LockKeyhole, Maximize2, Plus, SlidersHorizontal, Sun, Target, UnlockKeyhole, Vibrate, Wifi, WifiOff, X } from 'lucide-react';
+import { Activity, Download, LayoutGrid, Maximize2, Plus, SlidersHorizontal, Sun, Target, Users, Wifi, WifiOff, X } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { ShinyCounter } from '@/components/counter/ShinyCounter';
 import { Button } from '@/components/ui/button';
@@ -50,21 +50,17 @@ type WakeLockSentinelLike = {
 };
 
 type CounterPreferences = {
-  vibrationEnabled: boolean;
   keepAwake: boolean;
-  huntLock: boolean;
 };
 
 const readCounterPreferences = (): CounterPreferences => {
   try {
     const saved = JSON.parse(localStorage.getItem(COUNTER_PREFERENCES_KEY) || '{}') as Partial<CounterPreferences>;
     return {
-      vibrationEnabled: saved.vibrationEnabled === true,
       keepAwake: saved.keepAwake === true,
-      huntLock: saved.huntLock === true,
     };
   } catch {
-    return { vibrationEnabled: false, keepAwake: false, huntLock: false };
+    return { keepAwake: false };
   }
 };
 
@@ -357,15 +353,21 @@ export default function Counter() {
                   Keep active hunts in view and open focus mode when you need to configure details.
                 </p>
               </div>
-              <Button
-                onClick={handleCreateNew}
-                disabled={activeHunts.length >= MAX_ACTIVE_COUNTERS}
-                className="w-full md:w-auto"
-                style={{ backgroundColor: accentColor }}
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                New hunt
-              </Button>
+              <div className="flex w-full gap-2 md:w-auto">
+                <Button type="button" variant="outline" className="flex-1 md:flex-none" onClick={() => navigate('/rooms')}>
+                  <Users className="mr-2 h-4 w-4" />
+                  Hunt Rooms
+                </Button>
+                <Button
+                  onClick={handleCreateNew}
+                  disabled={activeHunts.length >= MAX_ACTIVE_COUNTERS}
+                  className="flex-1 md:flex-none"
+                  style={{ backgroundColor: accentColor }}
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  New hunt
+                </Button>
+              </div>
             </div>
           </section>
         )}
@@ -376,24 +378,13 @@ export default function Counter() {
               {isOnline ? <Wifi className="h-4 w-4 text-emerald-500" /> : <WifiOff className="h-4 w-4 text-amber-500" />}
               <span>{isOnline ? 'Online · cloud sync active' : 'Offline · counters saved on this device'}</span>
             </div>
-            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-end">
+            <div className="flex flex-wrap justify-end gap-2">
               {installPrompt && !isInstalled && (
                 <Button type="button" variant="outline" size="sm" onClick={() => void handleInstallApp()}>
                   <Download className="mr-2 h-4 w-4" />
                   Install app
                 </Button>
               )}
-              <Button
-                type="button"
-                variant={preferences.vibrationEnabled ? 'default' : 'outline'}
-                size="sm"
-                aria-pressed={preferences.vibrationEnabled}
-                onClick={() => setPreferences((current) => ({ ...current, vibrationEnabled: !current.vibrationEnabled }))}
-                style={preferences.vibrationEnabled ? { backgroundColor: accentColor } : undefined}
-              >
-                <Vibrate className="mr-2 h-4 w-4" />
-                Vibration
-              </Button>
               <Button
                 type="button"
                 variant={preferences.keepAwake ? 'default' : 'outline'}
@@ -407,26 +398,8 @@ export default function Counter() {
                 <Sun className="mr-2 h-4 w-4" />
                 {preferences.keepAwake && wakeLockActive ? 'Screen awake' : 'Keep awake'}
               </Button>
-              <Button
-                type="button"
-                variant={preferences.huntLock ? 'default' : 'outline'}
-                size="sm"
-                aria-pressed={preferences.huntLock}
-                onClick={() => setPreferences((current) => ({ ...current, huntLock: !current.huntLock }))}
-                style={preferences.huntLock ? { backgroundColor: accentColor } : undefined}
-              >
-                {preferences.huntLock
-                  ? <LockKeyhole className="mr-2 h-4 w-4" />
-                  : <UnlockKeyhole className="mr-2 h-4 w-4" />}
-                Hunt lock
-              </Button>
             </div>
           </div>
-          {preferences.huntLock && (
-            <p className="mt-2 text-xs text-muted-foreground">
-              Hunt Lock is active: incrementing remains available; editing, decrementing, setup, finish, and reset are protected.
-            </p>
-          )}
         </section>
 
         {/* CONTENT */}
@@ -441,16 +414,12 @@ export default function Counter() {
             <ShinyCounter
               huntId={huntId}
               enableKeyboardShortcuts
-              vibrationEnabled={preferences.vibrationEnabled}
-              huntLock={preferences.huntLock}
             />
           </div>
         ) : !user ? (
           /* Guest View (Single Demo) */
           <ShinyCounter
             enableKeyboardShortcuts
-            vibrationEnabled={preferences.vibrationEnabled}
-            huntLock={preferences.huntLock}
           />
         ) : (
           /* Multi Counter Grid */
@@ -504,8 +473,6 @@ export default function Counter() {
                         allowGlobalPlusMinusHotkeys={false}
                         compact
                         showSetup={false}
-                        vibrationEnabled={preferences.vibrationEnabled}
-                        huntLock={preferences.huntLock}
                       />
                       <Button
                         type="button"

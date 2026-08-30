@@ -230,6 +230,136 @@ export type Database = {
           },
         ]
       }
+      collection_history: {
+        Row: {
+          action: string
+          after_data: Json | null
+          before_data: Json | null
+          changed_fields: string[]
+          created_at: string
+          id: string
+          record_id: string
+          source_event_id: string | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          after_data?: Json | null
+          before_data?: Json | null
+          changed_fields?: string[]
+          created_at?: string
+          id?: string
+          record_id: string
+          source_event_id?: string | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          after_data?: Json | null
+          before_data?: Json | null
+          changed_fields?: string[]
+          created_at?: string
+          id?: string
+          record_id?: string
+          source_event_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_history_source_event_id_fkey"
+            columns: ["source_event_id"]
+            isOneToOne: false
+            referencedRelation: "collection_history"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hunt_room_members: {
+        Row: {
+          counter: number
+          display_name: string
+          joined_at: string
+          room_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          counter?: number
+          display_name: string
+          joined_at?: string
+          room_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          counter?: number
+          display_name?: string
+          joined_at?: string
+          room_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hunt_room_members_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "hunt_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hunt_rooms: {
+        Row: {
+          created_at: string
+          found_at: string | null
+          host_user_id: string
+          id: string
+          invite_code: string
+          max_members: number
+          name: string
+          pokemon_form: string | null
+          pokemon_id: number
+          pokemon_name: string
+          sprite_url: string | null
+          status: string
+          updated_at: string
+          winner_user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          found_at?: string | null
+          host_user_id: string
+          id?: string
+          invite_code: string
+          max_members?: number
+          name: string
+          pokemon_form?: string | null
+          pokemon_id: number
+          pokemon_name: string
+          sprite_url?: string | null
+          status?: string
+          updated_at?: string
+          winner_user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          found_at?: string | null
+          host_user_id?: string
+          id?: string
+          invite_code?: string
+          max_members?: number
+          name?: string
+          pokemon_form?: string | null
+          pokemon_id?: number
+          pokemon_name?: string
+          sprite_url?: string | null
+          status?: string
+          updated_at?: string
+          winner_user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -364,7 +494,44 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      close_hunt_room: {
+        Args: { selected_room_id: string }
+        Returns: undefined
+      }
+      create_hunt_room: {
+        Args: {
+          room_name: string
+          target_pokemon_form: string | null
+          target_pokemon_id: number
+          target_pokemon_name: string
+          target_sprite_url: string | null
+        }
+        Returns: string
+      }
+      increment_hunt_room_counter: {
+        Args: { counter_delta: number; selected_room_id: string }
+        Returns: number
+      }
+      is_hunt_room_member: {
+        Args: { checked_room_id: string }
+        Returns: boolean
+      }
+      join_hunt_room: {
+        Args: { room_code: string }
+        Returns: string
+      }
+      leave_hunt_room: {
+        Args: { selected_room_id: string }
+        Returns: undefined
+      }
+      mark_hunt_room_found: {
+        Args: { selected_room_id: string }
+        Returns: boolean
+      }
+      restore_collection_history_event: {
+        Args: { history_event_id: string }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

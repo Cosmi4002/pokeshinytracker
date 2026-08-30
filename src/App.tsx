@@ -15,11 +15,14 @@ import Collection from "./pages/Collection";
 import CollectionEvents from "./pages/CollectionEvents";
 import CollectionSpecial from "./pages/CollectionSpecial";
 import CollectionFailUncatchable from "./pages/CollectionFailUncatchable";
+import History from "./pages/History";
+import HuntRooms from "./pages/HuntRooms";
 import UserCollectionsSearch from "./pages/UserCollectionsSearch";
 import Games from "./pages/Bingo";
 import Stats from "./pages/Stats";
 import { ScrollRestoration } from "@/components/layout/ScrollRestoration";
 import { ApplyAppearance } from "@/components/layout/ApplyAppearance";
+import { PwaNotificationManager } from "@/components/notifications/PwaNotificationManager";
 
 import NotFound from "./pages/NotFound";
 import Debug from "./pages/Debug";
@@ -34,6 +37,7 @@ function AppContent() {
   return (
     <>
       <ApplyAppearance />
+      <PwaNotificationManager />
       <Toaster />
       <Sonner />
       <BrowserRouter>
@@ -50,6 +54,9 @@ function AppContent() {
           <Route path="/collection/special" element={<CollectionSpecial />} />
           <Route path="/collection/events" element={<CollectionEvents />} />
           <Route path="/collection/fail-uncatchable" element={<CollectionFailUncatchable />} />
+          <Route path="/history" element={<History />} />
+          <Route path="/rooms" element={<HuntRooms />} />
+          <Route path="/rooms/:roomId" element={<HuntRooms />} />
           <Route path="/users" element={<UserCollectionsSearch />} />
           <Route path="/games" element={<Games />} />
           <Route path="/bingo" element={<Navigate to="/games" replace />} />

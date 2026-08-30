@@ -10,7 +10,6 @@ import type { Tables } from '@/integrations/supabase/types';
 import { getPokemonSpriteUrl } from '@/hooks/use-pokemon';
 import { SHINY_CHARM_ICON, findHuntingMethod, getDynamicOdds, isBreedingMethod, GAMES } from '@/lib/pokemon-data';
 import { GAME_LOGOS } from '@/lib/game-themes';
-import { toLocalISODate } from '@/lib/date';
 import { useRandomColor } from '@/lib/random-color-context';
 import { cn } from '@/lib/utils';
 import { resolvePokemonEntity } from '@/lib/pokemon-entity-resolver-v2';
@@ -71,12 +70,6 @@ export default function UserCollectionsSearch() {
   const [globalRecentEntries, setGlobalRecentEntries] = useState<PublicRecentRow[]>([]);
   const [globalRecentLoading, setGlobalRecentLoading] = useState(true);
   const [globalRecentError, setGlobalRecentError] = useState<string | null>(null);
-
-  const getFourDaysAgoDate = () => {
-    const d = new Date();
-    d.setDate(d.getDate() - 4);
-    return toLocalISODate(d);
-  };
 
   const formatDate = (value?: string | null) => {
     if (!value) return '--';
@@ -235,14 +228,14 @@ export default function UserCollectionsSearch() {
     }
 
     try {
-      const cutoff = getFourDaysAgoDate();
       const { data, error } = await supabase
         .from('caught_shinies')
         .select('id, user_id, pokemon_id, entity_key, pokemon_name, form, gender, caught_date, created_at, sprite_url, game, secondary_game, is_fail, is_unobtainable, hunt_start_date, method, attempts, has_shiny_charm, is_evolved, show_encounters')
-        .gte('caught_date', cutoff)
-        .order('caught_date', { ascending: false })
+        .or('is_fail.is.false,is_fail.is.null')
+        .or('is_unobtainable.is.false,is_unobtainable.is.null')
         .order('created_at', { ascending: false })
-        .limit(120);
+        .order('caught_date', { ascending: false })
+        .limit(10);
 
       if (error) throw error;
 
@@ -800,11 +793,11 @@ export default function UserCollectionsSearch() {
 
             {!selectedProfile && (
             <div className="space-y-2 pt-2 border-t">
-              <h3 className="font-semibold">All-user preview (last 4 days)</h3>
+              <h3 className="font-semibold">Latest 10 Pokémon obtained</h3>
               {globalRecentLoading && <p className="text-sm text-muted-foreground">Loading global preview...</p>}
               {globalRecentError && <p className="text-sm text-destructive">{globalRecentError}</p>}
               {!globalRecentLoading && !globalRecentError && globalRecentEntries.length === 0 && (
-                <p className="text-sm text-muted-foreground">No public catches in the last 4 days.</p>
+                <p className="text-sm text-muted-foreground">No obtained Pokémon have been added yet.</p>
               )}
               {!globalRecentLoading && globalRecentEntries.length > 0 && (
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

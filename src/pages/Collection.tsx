@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Plus, Filter, LogIn, List } from 'lucide-react';
+import { Plus, Filter, History, LogIn, List } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
@@ -133,7 +133,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
       setEntries((prev) => prev.filter((e) => e.id !== id));
       toast({
         title: 'Deleted',
-        description: 'Pokémon removed from the collection',
+        description: 'Pokémon removed. You can recover it from Collection History.',
       });
     } catch (err: any) {
       toast({
@@ -467,6 +467,12 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
 
             {user && (
               <div className="flex flex-wrap justify-center gap-2 w-full md:w-auto">
+                <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-none">
+                  <Link to="/history">
+                    <History className="mr-2 h-4 w-4" />
+                    History
+                  </Link>
+                </Button>
                 {playlists.length > 0 && (
                   <Button variant="outline" size="sm" onClick={() => setIsManagePlaylistsDialogOpen(true)} className="flex-1 sm:flex-none">
                     <List className="mr-2 h-4 w-4" />
