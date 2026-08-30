@@ -108,6 +108,13 @@ const filenameSuffix = (filename: string, speciesId: number) => {
   return afterId.replace(/_(?:m|f)_s\.(?:png|webp)$/i, '').replace(/_s\.(?:png|webp)$/i, '').replace(/\.(?:png|webp)$/i, '');
 };
 
+const normalizeGender = (gender?: string | null): 'female' | 'male' | null => {
+  const normalized = normalize(gender);
+  if (normalized === 'female' || normalized === 'f' || normalized === '♀') return 'female';
+  if (normalized === 'male' || normalized === 'm' || normalized === '♂') return 'male';
+  return null;
+};
+
 export function getGameSpecificShinySpriteUrl(
   pokemonId: number,
   gameId?: string | null,
@@ -136,8 +143,11 @@ export function getGameSpecificShinySpriteUrl(
   }
   if (formCandidates.length === 0) formCandidates = candidates;
 
-  const genderToken = options.gender === 'female' ? /_f_s\.(?:png|webp)$/i : /_m_s\.(?:png|webp)$/i;
-  const genderMatch = formCandidates.find((filename) => genderToken.test(filename));
+  const requestedGender = normalizeGender(options.gender);
+  const genderToken = requestedGender === 'female' ? /_f_s\.(?:png|webp)$/i : /_m_s\.(?:png|webp)$/i;
+  const genderMatch = requestedGender
+    ? formCandidates.find((filename) => genderToken.test(filename))
+    : null;
   const neutralMatch = formCandidates.find((filename) => !/_(?:m|f)_s\.(?:png|webp)$/i.test(filename));
   const maleMatch = formCandidates.find((filename) => /_m_s\.(?:png|webp)$/i.test(filename));
   const filename = genderMatch || neutralMatch || maleMatch || formCandidates[0];
