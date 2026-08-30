@@ -18,6 +18,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
+      - name: Install FFmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
       - name: Convert to animated WebP and remove duplicates
         run: node scripts/optimize-gen5-game-sprites.mjs
       - name: Verify optimized sets
