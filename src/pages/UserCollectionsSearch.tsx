@@ -531,7 +531,7 @@ export default function UserCollectionsSearch() {
 
         <div className="relative p-3">
           <div className="relative flex min-h-[118px] items-center justify-center overflow-hidden rounded-[1.05rem] border border-border bg-muted/55">
-            <div className="absolute inset-x-6 bottom-4 h-6 rounded-full bg-black/20 blur-xl" />
+            {!isGameSpecificSprite && <div className="absolute inset-x-6 bottom-4 h-6 rounded-full bg-black/20 blur-xl" />}
             <img
               src={sprite}
               alt={entry.pokemon_name}
