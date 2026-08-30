@@ -6,8 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import type { Tables } from '@/integrations/supabase/types';
-import { getPokemonSpriteUrl } from '@/hooks/use-pokemon';
-import { SHINY_CHARM_ICON, findHuntingMethod, getDynamicOdds, isBreedingMethod, GAMES } from '@/lib/pokemon-data';
+import { SHINY_CHARM_ICON, findHuntingMethod, getCaughtShinySpriteUrl, getDynamicOdds, isBreedingMethod, GAMES } from '@/lib/pokemon-data';
 import { GAME_LOGOS } from '@/lib/game-themes';
 import { toLocalISODate } from '@/lib/date';
 import { useRandomColor } from '@/lib/random-color-context';
@@ -445,7 +444,13 @@ export default function UserCollectionsSearch() {
     keyPrefix: string,
     options: { showUsername?: boolean; large?: boolean } = {}
   ) => {
-    const sprite = entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, { shiny: true, name: entry.form || entry.pokemon_name });
+    const sprite = getCaughtShinySpriteUrl({
+      pokemonId: entry.pokemon_id,
+      pokemonName: entry.pokemon_name,
+      form: entry.form,
+      gender: entry.gender,
+      spriteUrl: entry.sprite_url,
+    });
     const isEvent = isDistributionEvent(entry.method);
     const showEntryEncounters = shouldShowEncounters(entry.method, entry.game, entry.attempts, entry.show_encounters ?? true);
     const username = 'username' in entry ? entry.username : null;
@@ -597,10 +602,12 @@ export default function UserCollectionsSearch() {
 
     const attempts = Number(entry.attempts || 0);
     const odds = Math.round(getDynamicOdds(entry.method, attempts, entry.has_shiny_charm === true));
-    const sprite = entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, {
-      shiny: true,
-      name: entry.form || entry.pokemon_name,
-      female: entry.gender === 'female',
+    const sprite = getCaughtShinySpriteUrl({
+      pokemonId: entry.pokemon_id,
+      pokemonName: entry.pokemon_name,
+      form: entry.form,
+      gender: entry.gender,
+      spriteUrl: entry.sprite_url,
     });
     const isEvolved = entry.is_evolved === true;
 

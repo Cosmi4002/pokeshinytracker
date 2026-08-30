@@ -13,8 +13,8 @@ import { useAuth } from '@/lib/auth-context';
 import { useRandomColor } from '@/lib/random-color-context';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { getPokemonSpriteUrl, usePokemonList } from '@/hooks/use-pokemon';
-import { findHuntingMethod, GAMES, getDynamicOdds } from '@/lib/pokemon-data';
+import { usePokemonList } from '@/hooks/use-pokemon';
+import { findHuntingMethod, GAMES, getCaughtShinySpriteUrl, getDynamicOdds } from '@/lib/pokemon-data';
 import type { Tables } from '@/integrations/supabase/types';
 
 type CaughtShinyRow = Tables<'caught_shinies'>;
@@ -147,10 +147,12 @@ function RecordHunt({
 
   const attempts = Number(entry.attempts || 0);
   const odds = Math.round(getDynamicOdds(entry.method, attempts, entry.has_shiny_charm === true));
-  const sprite = entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, {
-    shiny: true,
-    name: entry.form || entry.pokemon_name,
-    female: entry.gender === 'female',
+  const sprite = getCaughtShinySpriteUrl({
+    pokemonId: entry.pokemon_id,
+    pokemonName: entry.pokemon_name,
+    form: entry.form,
+    gender: entry.gender,
+    spriteUrl: entry.sprite_url,
   });
   const isEvolved = entry.is_evolved || entry.evolved_from_id || entry.evolved_from_name;
 
