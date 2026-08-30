@@ -15,9 +15,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { getPokemonSpriteUrl, usePokemonList } from '@/hooks/use-pokemon';
 import { findHuntingMethod, GAMES, getDynamicOdds } from '@/lib/pokemon-data';
-import { getGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
+import { getGameSpecificShinySpriteUrl, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
 import type { Tables } from '@/integrations/supabase/types';
 import { resolvePokemonEntity } from '@/lib/pokemon-entity-resolver-v2';
+import { cn } from '@/lib/utils';
 
 type CaughtShinyRow = Tables<'caught_shinies'>;
 
@@ -159,6 +160,7 @@ function RecordHunt({
     name: entry.form || entry.pokemon_name,
     female: entry.gender === 'female',
   });
+  const isGameSpecificSprite = isGameSpecificShinySpriteUrl(sprite);
   const isEvolved = entry.is_evolved || entry.evolved_from_id || entry.evolved_from_name;
 
   return (
@@ -180,7 +182,10 @@ function RecordHunt({
           <img
             src={sprite}
             alt={entry.pokemon_name}
-            className="h-20 w-20 object-contain drop-shadow"
+            className={cn(
+              "h-20 w-20 object-contain",
+              isGameSpecificSprite ? "scale-[0.86]" : "drop-shadow"
+            )}
             loading="lazy"
             onError={(event) => {
               event.currentTarget.src = '/placeholder.svg';
