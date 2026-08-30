@@ -1,0 +1,34 @@
+name: Optimize Gen 5 game sprites
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/optimize-gen5-sprites.yml
+
+permissions:
+  contents: write
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Convert to animated WebP and remove duplicates
+        run: node scripts/optimize-gen5-game-sprites.mjs
+      - name: Verify optimized sets
+        run: |
+          test "$(find public/img/game-sprites/bw -type f -name '*.webp' | wc -l)" -gt 700
+          test "$(find public/img/game-sprites/bw2 -type f -name '*.webp' | wc -l)" -eq 9
+          test -z "$(find public/img/game-sprites/bw public/img/game-sprites/bw2 -type f -name '*.png' -print -quit)"
+      - name: Commit optimized sprites
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A public/img/game-sprites/bw public/img/game-sprites/bw2 src/data/bw-shiny-sprite-manifest.ts src/data/bw2-shiny-sprite-manifest.ts
+          git commit -m "Optimize Gen 5 sprites and remove B2W2 duplicates"
+          git push origin HEAD:main
