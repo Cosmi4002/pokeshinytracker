@@ -1,6 +1,7 @@
 // Complete Pokemon list with all forms for shiny hunting
 import { LOCAL_SPRITE_URLS } from './local-sprite-map.generated';
 import { getGameSpecificShinySpriteUrl } from './game-sprites';
+import pokedexData from './pokedex.json';
 
 export interface Pokemon {
   id: number;
@@ -577,12 +578,214 @@ export function handlePokemonSpriteError(img: HTMLImageElement, fallbackUrl = ge
   img.src = fallbackUrl;
 }
 
+type SpriteDexEntry = {
+  id: number;
+  baseId?: number;
+  name: string;
+};
+
+const SPRITE_FORM_ID_BY_NAME = new Map<string, number>();
+const SPRITE_FORM_ID_BY_BASE_AND_NAME = new Map<string, number>();
+const MANUAL_SPRITE_FORM_ID_BY_NAME: Record<string, number> = {
+  'unown-b': 10001,
+  'unown-c': 10002,
+  'unown-d': 10003,
+  'unown-e': 10004,
+  'unown-f': 10005,
+  'unown-g': 10006,
+  'unown-h': 10007,
+  'unown-i': 10008,
+  'unown-j': 10009,
+  'unown-k': 10010,
+  'unown-l': 10011,
+  'unown-m': 10012,
+  'unown-n': 10013,
+  'unown-o': 10014,
+  'unown-p': 10015,
+  'unown-q': 10016,
+  'unown-r': 10017,
+  'unown-s': 10018,
+  'unown-t': 10019,
+  'unown-u': 10020,
+  'unown-v': 10021,
+  'unown-w': 10022,
+  'unown-x': 10023,
+  'unown-y': 10024,
+  'unown-z': 10025,
+  'unown-exclamation': 10026,
+  'unown-question': 10027,
+  'deoxys-attack': 10001,
+  'deoxys-defense': 10002,
+  'deoxys-speed': 10003,
+  'burmy-sandy': 10004,
+  'burmy-trash': 10005,
+  'wormadam-sandy': 10014,
+  'wormadam-trash': 10015,
+  'shellos-east': 10026,
+  'gastrodon-east': 10027,
+  'rotom-heat': 10008,
+  'rotom-wash': 10009,
+  'rotom-frost': 10010,
+  'rotom-fan': 10011,
+  'rotom-mow': 10012,
+  'dialga-origin': 10243,
+  'palkia-origin': 10244,
+  'giratina-origin': 10007,
+  'shaymin-sky': 10006,
+  'arceus-fighting': 10047,
+  'arceus-flying': 10048,
+  'arceus-poison': 10049,
+  'arceus-ground': 10050,
+  'arceus-rock': 10051,
+  'arceus-bug': 10052,
+  'arceus-ghost': 10053,
+  'arceus-steel': 10054,
+  'arceus-fire': 10055,
+  'arceus-water': 10056,
+  'arceus-grass': 10057,
+  'arceus-electric': 10058,
+  'arceus-psychic': 10059,
+  'arceus-ice': 10060,
+  'arceus-dragon': 10061,
+  'arceus-dark': 10062,
+  'arceus-fairy': 10063,
+  'basculin-blue-striped': 10016,
+  'basculin-white-striped': 10247,
+  'deerling-summer': 10051,
+  'deerling-autumn': 10052,
+  'deerling-winter': 10053,
+  'sawsbuck-summer': 10054,
+  'sawsbuck-autumn': 10055,
+  'sawsbuck-winter': 10056,
+  'tornadus-therian': 10019,
+  'thundurus-therian': 10020,
+  'landorus-therian': 10021,
+  'kyurem-black': 10022,
+  'kyurem-white': 10023,
+  'keldeo-resolute': 10024,
+  'meloetta-pirouette': 10018,
+  'flabebe-yellow': 10064,
+  'flabebe-orange': 10065,
+  'flabebe-blue': 10066,
+  'flabebe-white': 10067,
+  'floette-yellow': 10068,
+  'floette-orange': 10069,
+  'floette-blue': 10070,
+  'floette-white': 10071,
+  'florges-yellow': 10073,
+  'florges-orange': 10074,
+  'florges-blue': 10075,
+  'florges-white': 10076,
+  'furfrou-heart': 10077,
+  'furfrou-star': 10078,
+  'furfrou-diamond': 10079,
+  'furfrou-debutante': 10080,
+  'furfrou-matron': 10081,
+  'furfrou-dandy': 10082,
+  'furfrou-la-reine': 10083,
+  'furfrou-kabuki': 10084,
+  'furfrou-pharaoh': 10085,
+  'pumpkaboo-small': 10027,
+  'pumpkaboo-large': 10028,
+  'pumpkaboo-super': 10029,
+  'gourgeist-small': 10030,
+  'gourgeist-large': 10031,
+  'gourgeist-super': 10032,
+  'zygarde-10': 10118,
+  'lycanroc-midnight': 10126,
+  'lycanroc-dusk': 10152,
+  'silvally-fighting': 10110,
+  'silvally-flying': 10111,
+  'silvally-poison': 10112,
+  'silvally-ground': 10113,
+  'silvally-rock': 10114,
+  'silvally-bug': 10115,
+  'silvally-ghost': 10116,
+  'silvally-steel': 10117,
+  'silvally-fire': 10118,
+  'silvally-water': 10119,
+  'silvally-grass': 10120,
+  'silvally-electric': 10121,
+  'silvally-psychic': 10122,
+  'silvally-ice': 10123,
+  'silvally-dragon': 10124,
+  'silvally-dark': 10125,
+  'silvally-fairy': 10126,
+  'minior-red': 10130,
+  'minior-orange': 10131,
+  'minior-yellow': 10132,
+  'minior-green': 10133,
+  'minior-blue': 10134,
+  'minior-indigo': 10135,
+  'minior-violet': 10136,
+  'minior-orange-meteor': 10137,
+  'minior-yellow-meteor': 10138,
+  'minior-green-meteor': 10139,
+  'minior-blue-meteor': 10140,
+  'minior-indigo-meteor': 10141,
+  'minior-violet-meteor': 10142,
+  'necrozma-dusk': 10155,
+  'necrozma-dawn': 10156,
+  'necrozma-ultra': 10157,
+  'toxtricity-low-key': 10184,
+  'alcremie-strawberry': 10158,
+  'alcremie-berry': 10159,
+  'alcremie-love': 10160,
+  'alcremie-star': 10161,
+  'alcremie-clover': 10162,
+  'alcremie-flower': 10163,
+  'alcremie-ribbon': 10164,
+  'enamorus-therian': 10249,
+  'maushold-family-of-three': 10255,
+  'squawkabilly-blue': 10256,
+  'squawkabilly-yellow': 10257,
+  'squawkabilly-white': 10258,
+  'tatsugiri-droopy': 10259,
+  'tatsugiri-stretchy': 10260,
+  'dudunsparce-three-segment': 10261,
+  'ogerpon-wellspring-mask': 10273,
+  'ogerpon-hearthflame-mask': 10274,
+  'ogerpon-cornerstone-mask': 10275,
+  'terapagos-terastal': 10276,
+  'terapagos-stellar': 10277,
+};
+
+for (const entry of pokedexData as SpriteDexEntry[]) {
+  const normalizedName = (entry.name || '').toLowerCase();
+  if (!normalizedName) continue;
+
+  if (!SPRITE_FORM_ID_BY_NAME.has(normalizedName)) {
+    SPRITE_FORM_ID_BY_NAME.set(normalizedName, entry.id);
+  }
+
+  const baseId = entry.baseId && entry.baseId > 0 ? entry.baseId : entry.id;
+  const compositeKey = `${baseId}:${normalizedName}`;
+  if (!SPRITE_FORM_ID_BY_BASE_AND_NAME.has(compositeKey)) {
+    SPRITE_FORM_ID_BY_BASE_AND_NAME.set(compositeKey, entry.id);
+  }
+}
+
+function resolveSpritePokemonId(pokemonId: number, options: { name?: string; form?: string }): number {
+  const normalizedSlug = (options.form || options.name || '').toLowerCase().trim();
+  if (!normalizedSlug) return pokemonId;
+
+  const manualExact = MANUAL_SPRITE_FORM_ID_BY_NAME[normalizedSlug];
+  if (manualExact) return manualExact;
+
+  const exactByBase = SPRITE_FORM_ID_BY_BASE_AND_NAME.get(`${pokemonId}:${normalizedSlug}`);
+  if (exactByBase) return exactByBase;
+
+  const exact = SPRITE_FORM_ID_BY_NAME.get(normalizedSlug);
+  if (exact) return exact;
+
+  return pokemonId;
+}
+
 export function _getPokemonSpriteUrlRaw(pokemonId: number, options: { shiny?: boolean, name?: string, female?: boolean, form?: string, animated?: boolean } = {}): string {
   if (!pokemonId) return '';
 
-
-  const { shiny = false, form } = options;
-  let { female = false, name } = options;
+  let { shiny = false, female = false, name, form } = options;
+  pokemonId = resolveSpritePokemonId(pokemonId, { name, form });
 
   const slugSource = (form || name || '').toLowerCase();
   const hasExplicitGenderForm = slugSource.includes('-female') || slugSource.includes('-male');
@@ -989,6 +1192,31 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
   if (localUrl !== rawUrl) return localUrl;
 
   return rawUrl;
+}
+
+export function getCaughtShinySpriteUrl(options: {
+  pokemonId?: number | null;
+  pokemonName?: string | null;
+  form?: string | null;
+  gender?: string | null;
+  spriteUrl?: string | null;
+}): string {
+  const { pokemonId, pokemonName, form, gender, spriteUrl } = options;
+
+  if (pokemonId) {
+    const resolvedUrl = getPokemonSpriteUrl(pokemonId, {
+      shiny: true,
+      name: form || pokemonName || undefined,
+      form: form || undefined,
+      female: gender === 'female',
+    });
+
+    if (resolvedUrl) return resolvedUrl;
+  }
+
+  if (spriteUrl) return toLocalPokemonSpriteUrl(spriteUrl);
+
+  return getPokemonSpriteFallbackUrl();
 }
 
 // Alias for transition compatibility
