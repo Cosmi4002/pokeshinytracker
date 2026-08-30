@@ -1,0 +1,36 @@
+name: Add B2W2 sprite overrides
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/add-b2w2-overrides.yml
+
+permissions:
+  contents: write
+
+jobs:
+  add-overrides:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Install FFmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - name: Add Cottonee and Tyranitar overrides
+        run: node scripts/add-gen5-b2w2-overrides.mjs
+      - name: Verify override count
+        run: |
+          test "$(find public/img/game-sprites/bw2 -type f -name '*.webp' | wc -l)" -eq 11
+          test -f public/img/game-sprites/bw2/Spr_5b2_248_s.webp
+          test -f public/img/game-sprites/bw2/Spr_5b2_546_s.webp
+      - name: Commit overrides
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/img/game-sprites/bw2 src/data/bw2-shiny-sprite-manifest.ts
+          git commit -m "Add Cottonee and Tyranitar B2W2 sprites"
+          git push origin HEAD:main
