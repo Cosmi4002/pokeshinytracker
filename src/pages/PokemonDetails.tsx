@@ -35,7 +35,7 @@ import {
     getCuratedShinyOriginGameIds
 } from "@/lib/pokemon-game-availability";
 import { resolveEntityKeyForSelectedPokemon, resolvePokemonEntityKey } from "@/lib/pokemon-entity-resolver-v2";
-import { getGameSpecificShinySpriteUrl, isGameSpecificShinySpriteUrl } from "@/lib/game-sprites";
+import { getGameSpecificShinySpriteUrl } from "@/lib/game-sprites";
 
 interface FormVariant {
     id: number;
