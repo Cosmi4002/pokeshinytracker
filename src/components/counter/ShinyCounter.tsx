@@ -34,6 +34,7 @@ import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
 import { cn } from '@/lib/utils';
 import { resolveEntityKeysForCounterSlots } from '@/lib/pokemon-entity-resolver-v2';
 import { useOnlineStatus } from '@/hooks/use-online-status';
+import { isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
 import {
   migrateCounterSnapshot,
   OFFLINE_HUNT_PREFIX,
