@@ -155,5 +155,8 @@ export function getGameSpecificShinySpriteUrl(
   return `/img/game-sprites/${resolvedSet}/${filename}`;
 }
 
+export const isGameSpecificShinySpriteUrl = (url?: string | null) =>
+  Boolean(url && url.startsWith('/img/game-sprites/'));
+
 export const hasGameSpecificSpriteSet = (gameId?: string | null) =>
   Boolean(gameId && GAME_SPRITE_SET_BY_GAME[gameId]);
