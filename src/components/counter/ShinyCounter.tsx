@@ -749,6 +749,7 @@ export function ShinyCounter({
                           slot.gender
                         );
                         const displaySpriteUrl = eggMethod ? POKEMON_EGG_ICON : spriteUrl;
+                        const isGameSpecificSprite = isGameSpecificShinySpriteUrl(displaySpriteUrl);
                         const setSlotForm = slot.slot === 1
                           ? setSelectedForm
                           : slot.slot === 2
@@ -770,11 +771,12 @@ export function ShinyCounter({
                               alt={slot.name}
                               className={cn(
                                 "object-contain pokemon-sprite animate-in fade-in zoom-in duration-500",
-                                compact ? "h-28 w-28 sm:h-[8.5rem] sm:w-[8.5rem]" : "h-32 w-32 sm:h-40 sm:w-40"
+                                compact ? "h-28 w-28 sm:h-[8.5rem] sm:w-[8.5rem]" : "h-32 w-32 sm:h-40 sm:w-40",
+                                isGameSpecificSprite && "scale-[0.86]"
                               )}
                               style={{
                                 imageRendering: 'auto',
-                                filter: COUNTER_SPRITE_EDGE_SHADOW,
+                                filter: isGameSpecificSprite ? 'none' : COUNTER_SPRITE_EDGE_SHADOW,
                               }}
                               loading="eager"
                               decoding="async"
