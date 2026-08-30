@@ -105,7 +105,7 @@ const getFormSuffix = (speciesId: number, slug: string) => {
 const filenameSuffix = (filename: string, speciesId: number) => {
   const token = String(speciesId).padStart(3, '0');
   const afterId = filename.slice(filename.indexOf(token) + token.length);
-  return afterId.replace(/_(?:m|f)_s\.png$/i, '').replace(/_s\.png$/i, '').replace(/\.png$/i, '');
+  return afterId.replace(/_(?:m|f)_s\.(?:png|webp)$/i, '').replace(/_s\.(?:png|webp)$/i, '').replace(/\.(?:png|webp)$/i, '');
 };
 
 export function getGameSpecificShinySpriteUrl(
@@ -119,8 +119,14 @@ export function getGameSpecificShinySpriteUrl(
   const slug = normalize(options.form || options.name);
   const speciesId = resolveSpeciesId(pokemonId, slug);
   if (!speciesId) return null;
-  const spriteSet = mapsBySet[set];
-  const candidates = spriteSet.bySpecies.get(speciesId) || [];
+  let resolvedSet = set;
+  let spriteSet = mapsBySet[resolvedSet];
+  let candidates = spriteSet.bySpecies.get(speciesId) || [];
+  if (candidates.length === 0 && set === 'bw2') {
+    resolvedSet = 'bw';
+    spriteSet = mapsBySet[resolvedSet];
+    candidates = spriteSet.bySpecies.get(speciesId) || [];
+  }
   if (candidates.length === 0) return null;
 
   const wantedFormSuffix = getFormSuffix(speciesId, slug);
@@ -130,13 +136,13 @@ export function getGameSpecificShinySpriteUrl(
   }
   if (formCandidates.length === 0) formCandidates = candidates;
 
-  const genderToken = options.gender === 'female' ? '_f_s.png' : '_m_s.png';
-  const genderMatch = formCandidates.find((filename) => filename.toLowerCase().endsWith(genderToken));
-  const neutralMatch = formCandidates.find((filename) => !/_(?:m|f)_s\.png$/i.test(filename));
-  const maleMatch = formCandidates.find((filename) => filename.toLowerCase().endsWith('_m_s.png'));
+  const genderToken = options.gender === 'female' ? /_f_s\.(?:png|webp)$/i : /_m_s\.(?:png|webp)$/i;
+  const genderMatch = formCandidates.find((filename) => genderToken.test(filename));
+  const neutralMatch = formCandidates.find((filename) => !/_(?:m|f)_s\.(?:png|webp)$/i.test(filename));
+  const maleMatch = formCandidates.find((filename) => /_m_s\.(?:png|webp)$/i.test(filename));
   const filename = genderMatch || neutralMatch || maleMatch || formCandidates[0];
   if (!filename || !spriteSet.files.has(filename)) return null;
-  return `/img/game-sprites/${set}/${filename}`;
+  return `/img/game-sprites/${resolvedSet}/${filename}`;
 }
 
 export const hasGameSpecificSpriteSet = (gameId?: string | null) =>
