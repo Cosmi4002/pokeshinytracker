@@ -67,7 +67,14 @@ type AcquisitionInfo = {
     transferGameId: string | null;
 };
 
-const isCaughtGender = (gender?: string | null): gender is CaughtGender => gender === 'male' || gender === 'female';
+const normalizeCaughtGender = (gender?: string | null): CaughtGender | null => {
+    const normalized = (gender || '').trim().toLowerCase();
+    if (normalized === 'female' || normalized === 'f' || normalized === '♀') return 'female';
+    if (normalized === 'male' || normalized === 'm' || normalized === '♂') return 'male';
+    return null;
+};
+
+const isCaughtGender = (gender?: string | null): gender is CaughtGender => normalizeCaughtGender(gender) !== null;
 
 const addCaughtGameGender = (
     map: CaughtGameGenderMap,
@@ -147,7 +154,7 @@ export default function PokemonDetails() {
 
             rows.forEach(row => {
                 let matchedThisPokemon = false;
-                let matchedGender: CaughtGender | null = isCaughtGender(row.gender) ? row.gender : null;
+                let matchedGender: CaughtGender | null = normalizeCaughtGender(row.gender);
                 const resolvedKey = resolvePokemonEntityKey({
                     pokemonId: row.pokemon_id,
                     form: row.form,
@@ -464,6 +471,7 @@ export default function PokemonDetails() {
     const prevId = currentId > 1 && currentId < 10000 ? currentId - 1 : null;
     const nextId = currentId < 1025 ? currentId + 1 : null;
     const heroVariant = variants.find(variant => variant.category === 'base') || variants[0];
+    const femaleVariant = variants.find(variant => variant.category === 'gender' && variant.gender === 'female');
     const heroIsCaught = heroVariant ? caughtForms.has(heroVariant.name) : false;
     const gameSpriteGroups = heroVariant
         ? [
@@ -485,15 +493,24 @@ export default function PokemonDetails() {
                 description: 'Original animated shiny sprite shared by Black 2 and White 2.',
                 games: ['black2', 'white2'],
             },
-        ].map(group => ({
-            ...group,
-            spriteUrl: getGameSpecificShinySpriteUrl(heroVariant.id, group.games[0], {
-                name: heroVariant.name,
-                form: heroVariant.name,
-                gender: heroVariant.gender,
-            }),
-            caughtGames: group.games.filter(gameId => caughtGames.has(gameId)),
-        })).filter(group => Boolean(group.spriteUrl))
+        ].map(group => {
+            const caughtGamesForGroup = group.games.filter(gameId => caughtGames.has(gameId));
+            const caughtGendersForGroup = group.games.flatMap(gameId => caughtGameGenders[gameId] || []);
+            const spriteVariant = femaleVariant && caughtGendersForGroup.includes('female') && !caughtGendersForGroup.includes('male')
+                ? femaleVariant
+                : heroVariant;
+
+            return {
+                ...group,
+                spriteVariant,
+                spriteUrl: getGameSpecificShinySpriteUrl(spriteVariant.id, group.games[0], {
+                    name: spriteVariant.name,
+                    form: spriteVariant.name,
+                    gender: spriteVariant.gender,
+                }),
+                caughtGames: caughtGamesForGroup,
+            };
+        }).filter(group => Boolean(group.spriteUrl))
         : [];
     const hasMultipleForms = variants.length > 1;
     const panelClass = "border-border/70 bg-card/95 text-card-foreground shadow-[0_18px_42px_rgba(0,0,0,0.16)] backdrop-blur dark:border-white/15 dark:bg-[#171717]/95 dark:text-white dark:shadow-[0_18px_42px_rgba(0,0,0,0.42)]";
@@ -854,7 +871,7 @@ export default function PokemonDetails() {
                                         <p className="mt-1 min-h-10 text-center text-xs text-muted-foreground">{group.description}</p>
                                         <img
                                             src={group.spriteUrl!}
-                                            alt={`${heroVariant?.displayName || details.displayName} shiny in ${group.label}`}
+                                            alt={`${group.spriteVariant?.displayName || heroVariant?.displayName || details.displayName} shiny in ${group.label}`}
                                             loading="lazy"
                                             decoding="async"
                                             className={cn(
