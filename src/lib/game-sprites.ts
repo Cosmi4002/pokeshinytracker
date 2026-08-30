@@ -1,4 +1,6 @@
 import { HGSS_SHINY_SPRITE_FILES } from '@/data/hgss-shiny-sprite-manifest';
+import { BW_SHINY_SPRITE_FILES } from '@/data/bw-shiny-sprite-manifest';
+import { BW2_SHINY_SPRITE_FILES } from '@/data/bw2-shiny-sprite-manifest';
 
 export type GameSpriteOptions = {
   name?: string | null;
@@ -9,17 +11,27 @@ export type GameSpriteOptions = {
 export const GAME_SPRITE_SET_BY_GAME: Readonly<Record<string, string>> = {
   heartgold: 'hgss',
   soulsilver: 'hgss',
+  black: 'bw',
+  white: 'bw',
+  black2: 'bw2',
+  white2: 'bw2',
 };
 
-const hgssFiles = new Set<string>(HGSS_SHINY_SPRITE_FILES);
-const hgssFilesBySpecies = new Map<number, string[]>();
-
-for (const filename of HGSS_SHINY_SPRITE_FILES) {
-  const match = filename.match(/^Spr_4[dhp]_(\d{3})/i);
-  if (!match) continue;
-  const speciesId = Number(match[1]);
-  hgssFilesBySpecies.set(speciesId, [...(hgssFilesBySpecies.get(speciesId) || []), filename]);
-}
+const filesBySet = {
+  hgss: HGSS_SHINY_SPRITE_FILES,
+  bw: BW_SHINY_SPRITE_FILES,
+  bw2: BW2_SHINY_SPRITE_FILES,
+} as const;
+const mapsBySet = Object.fromEntries(Object.entries(filesBySet).map(([set, files]) => {
+  const map = new Map<number, string[]>();
+  for (const filename of files) {
+    const match = filename.match(/(?:Spr_[^_]+_)(\d{3})/i);
+    if (!match) continue;
+    const speciesId = Number(match[1]);
+    map.set(speciesId, [...(map.get(speciesId) || []), filename]);
+  }
+  return [set, { files: new Set(files), bySpecies: map }];
+})) as Record<string, { files: Set<string>; bySpecies: Map<number, string[]> }>;
 
 const LEGACY_FORM_SPECIES: ReadonlyArray<[RegExp, number]> = [
   [/^unown(?:-|$)/, 201],
@@ -44,8 +56,8 @@ const normalize = (value?: string | null) => (value || '')
   .replace(/[()]/g, '')
   .replace(/[ _]+/g, '-');
 
-const resolveHgssSpeciesId = (pokemonId: number, slug: string) => {
-  if (pokemonId >= 1 && pokemonId <= 493) return pokemonId;
+const resolveSpeciesId = (pokemonId: number, slug: string) => {
+  if (pokemonId >= 1 && pokemonId <= 649) return pokemonId;
   return LEGACY_FORM_SPECIES.find(([pattern]) => pattern.test(slug))?.[1] ?? null;
 };
 
@@ -101,12 +113,14 @@ export function getGameSpecificShinySpriteUrl(
   gameId?: string | null,
   options: GameSpriteOptions = {},
 ): string | null {
-  if (!gameId || GAME_SPRITE_SET_BY_GAME[gameId] !== 'hgss') return null;
+  const set = gameId ? GAME_SPRITE_SET_BY_GAME[gameId] : undefined;
+  if (!set) return null;
 
   const slug = normalize(options.form || options.name);
-  const speciesId = resolveHgssSpeciesId(pokemonId, slug);
+  const speciesId = resolveSpeciesId(pokemonId, slug);
   if (!speciesId) return null;
-  const candidates = hgssFilesBySpecies.get(speciesId) || [];
+  const spriteSet = mapsBySet[set];
+  const candidates = spriteSet.bySpecies.get(speciesId) || [];
   if (candidates.length === 0) return null;
 
   const wantedFormSuffix = getFormSuffix(speciesId, slug);
@@ -121,8 +135,8 @@ export function getGameSpecificShinySpriteUrl(
   const neutralMatch = formCandidates.find((filename) => !/_(?:m|f)_s\.png$/i.test(filename));
   const maleMatch = formCandidates.find((filename) => filename.toLowerCase().endsWith('_m_s.png'));
   const filename = genderMatch || neutralMatch || maleMatch || formCandidates[0];
-  if (!filename || !hgssFiles.has(filename)) return null;
-  return `/img/game-sprites/hgss/${filename}`;
+  if (!filename || !spriteSet.files.has(filename)) return null;
+  return `/img/game-sprites/${set}/${filename}`;
 }
 
 export const hasGameSpecificSpriteSet = (gameId?: string | null) =>
