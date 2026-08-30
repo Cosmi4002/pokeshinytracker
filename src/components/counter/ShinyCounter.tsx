@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { Minus, Plus, RotateCcw, Cloud, CloudOff, Loader2, Check, Sparkles, X, ArrowUp, ArrowDown } from 'lucide-react';
+import { Minus, Plus, RotateCcw, Cloud, CloudOff, Loader2, Check, Sparkles, X, ArrowUp, ArrowDown, Gamepad2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -45,6 +45,8 @@ import {
   type OfflineActiveHunt,
   type OfflineCounterSnapshot,
 } from '@/lib/offline-counter-store';
+import { formatCounterHotkey, normalizeKeyboardHotkey } from '@/lib/gamepad-input';
+import { useGamepadHotkey } from '@/hooks/use-gamepad-hotkey';
 
 interface ShinyCounterProps {
   huntId?: string;
@@ -558,15 +560,11 @@ export function ShinyCounter({
   }, [incrementAmount]);
 
   const normalizeHotkey = useCallback((rawKey: string) => {
-    if (rawKey === ' ') return 'space';
-    return rawKey.toLowerCase();
+    return normalizeKeyboardHotkey(rawKey);
   }, []);
 
   const formatHotkeyLabel = useCallback((hotkey: string) => {
-    if (!hotkey) return 'None';
-    if (hotkey === 'space') return 'Space';
-    if (hotkey.length === 1) return hotkey.toUpperCase();
-    return hotkey.charAt(0).toUpperCase() + hotkey.slice(1);
+    return formatCounterHotkey(hotkey);
   }, []);
 
   const getPokemonSlot = useCallback((index: number): PokemonSlot => {
@@ -708,6 +706,19 @@ export function ShinyCounter({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [allowGlobalPlusMinusHotkeys, decrement, enableKeyboardShortcuts, increment, incrementHotkey, normalizeHotkey]);
+
+  const assignGamepadHotkey = useCallback((hotkey: string) => {
+    setIncrementHotkey(hotkey);
+    setIsAssigningHotkey(false);
+  }, []);
+
+  useGamepadHotkey({
+    enabled: enableKeyboardShortcuts,
+    hotkey: incrementHotkey,
+    assigning: isAssigningHotkey,
+    onAssign: assignGamepadHotkey,
+    onTrigger: increment,
+  });
 
   if (loading) {
     return (
@@ -941,18 +952,19 @@ export function ShinyCounter({
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-2">
-            <Label htmlFor="increment-hotkey" className="text-xs text-muted-foreground">
-              Increment key:
+            <Label htmlFor="increment-hotkey" className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Gamepad2 className="h-3.5 w-3.5" />
+              Increment input:
             </Label>
             <Input
               id="increment-hotkey"
-              value={isAssigningHotkey ? 'Press a key...' : formatHotkeyLabel(incrementHotkey)}
+              value={isAssigningHotkey ? 'Press key or controller button...' : formatHotkeyLabel(incrementHotkey)}
               readOnly
               onFocus={() => setIsAssigningHotkey(true)}
               onBlur={() => setIsAssigningHotkey(false)}
               onKeyDown={handleHotkeyAssignment}
               className={cn(
-                "w-36 h-8 text-center bg-background text-foreground",
+                "w-56 h-8 text-center bg-background text-foreground",
                 compact ? "border border-border/70 bg-background/80 text-foreground shadow-none dark:border-white/15 dark:bg-white/10 dark:text-white" : "border-2 border-input"
               )}
             />

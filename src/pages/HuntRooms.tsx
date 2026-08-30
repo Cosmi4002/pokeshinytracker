@@ -6,6 +6,7 @@ import {
   Copy,
   Crown,
   DoorOpen,
+  Gamepad2,
   LogIn,
   Minus,
   Plus,
@@ -51,12 +52,15 @@ import type { Tables } from '@/integrations/supabase/types';
 import { useAuth } from '@/lib/auth-context';
 import { useRandomColor } from '@/lib/random-color-context';
 import { cn } from '@/lib/utils';
+import { formatCounterHotkey, normalizeKeyboardHotkey } from '@/lib/gamepad-input';
+import { useGamepadHotkey } from '@/hooks/use-gamepad-hotkey';
 
 type HuntRoom = Tables<'hunt_rooms'>;
 type HuntRoomMember = Tables<'hunt_room_members'>;
 type ConfirmAction = 'found' | 'close' | 'leave' | null;
 
 const numberFormatter = new Intl.NumberFormat('en-US');
+const HUNT_ROOM_HOTKEY_PREFIX = 'pokeshiny:hunt-room-hotkey:v1';
 
 const formatPokemonName = (value: string) => value
   .replace(/-/g, ' ')
@@ -91,6 +95,8 @@ export default function HuntRooms() {
   const [joinCode, setJoinCode] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [confirmAction, setConfirmAction] = useState<ConfirmAction>(null);
+  const [counterHotkey, setCounterHotkey] = useState('');
+  const [isAssigningCounterHotkey, setIsAssigningCounterHotkey] = useState(false);
   const pendingDeltaRef = useRef(0);
   const flushTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -110,6 +116,31 @@ export default function HuntRooms() {
     () => members.reduce((total, member) => total + member.counter, 0),
     [members]
   );
+
+  useEffect(() => {
+    if (!user) {
+      setCounterHotkey('');
+      return;
+    }
+
+    try {
+      setCounterHotkey(localStorage.getItem(`${HUNT_ROOM_HOTKEY_PREFIX}:${user.id}`) || '');
+    } catch {
+      setCounterHotkey('');
+    }
+  }, [user]);
+
+  const saveCounterHotkey = useCallback((hotkey: string) => {
+    setCounterHotkey(hotkey);
+    setIsAssigningCounterHotkey(false);
+    if (!user) return;
+    try {
+      if (hotkey) localStorage.setItem(`${HUNT_ROOM_HOTKEY_PREFIX}:${user.id}`, hotkey);
+      else localStorage.removeItem(`${HUNT_ROOM_HOTKEY_PREFIX}:${user.id}`);
+    } catch {
+      // The shortcut still works for this session if device storage is unavailable.
+    }
+  }, [user]);
 
   const loadRooms = useCallback(async () => {
     if (!user) {
@@ -308,7 +339,7 @@ export default function HuntRooms() {
     )));
   }, [loadCurrentRoom, roomId, toast, user]);
 
-  const changeCounter = (delta: number) => {
+  const changeCounter = useCallback((delta: number) => {
     if (!roomId || !user || room?.status !== 'active' || !isOnline) return;
     if (delta < 0 && (currentMember?.counter || 0) <= 0) return;
 
@@ -321,7 +352,51 @@ export default function HuntRooms() {
 
     if (flushTimerRef.current) clearTimeout(flushTimerRef.current);
     flushTimerRef.current = setTimeout(() => { void flushCounterDelta(); }, 180);
-  };
+  }, [currentMember?.counter, flushCounterDelta, isOnline, room?.status, roomId, user]);
+
+  const handleCounterHotkeyAssignment = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Tab') {
+      setIsAssigningCounterHotkey(false);
+      return;
+    }
+
+    event.preventDefault();
+    if (event.key === 'Escape') {
+      setIsAssigningCounterHotkey(false);
+      return;
+    }
+    if (event.key === 'Backspace' || event.key === 'Delete') {
+      saveCounterHotkey('');
+      return;
+    }
+    if (event.ctrlKey || event.altKey || event.metaKey) return;
+    if (['Shift', 'Control', 'Alt', 'Meta', 'CapsLock'].includes(event.key)) return;
+    saveCounterHotkey(normalizeKeyboardHotkey(event.key));
+  }, [saveCounterHotkey]);
+
+  useEffect(() => {
+    if (!counterHotkey || counterHotkey.startsWith('gamepad:')) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement || event.target instanceof HTMLSelectElement) return;
+      if (normalizeKeyboardHotkey(event.key) !== counterHotkey) return;
+      event.preventDefault();
+      changeCounter(1);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [changeCounter, counterHotkey]);
+
+  const incrementRoomCounter = useCallback(() => changeCounter(1), [changeCounter]);
+
+  useGamepadHotkey({
+    enabled: Boolean(roomId),
+    hotkey: counterHotkey,
+    assigning: isAssigningCounterHotkey,
+    onAssign: saveCounterHotkey,
+    onTrigger: incrementRoomCounter,
+  });
 
   useEffect(() => () => {
     if (flushTimerRef.current) clearTimeout(flushTimerRef.current);
@@ -545,6 +620,27 @@ export default function HuntRooms() {
                         <Plus className="h-6 w-6" />
                       </Button>
                     </div>
+                    <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+                      <Label htmlFor="hunt-room-counter-hotkey" className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <Gamepad2 className="h-3.5 w-3.5" />
+                        Increment input:
+                      </Label>
+                      <Input
+                        id="hunt-room-counter-hotkey"
+                        value={isAssigningCounterHotkey ? 'Press key or controller button...' : formatCounterHotkey(counterHotkey)}
+                        readOnly
+                        onFocus={() => setIsAssigningCounterHotkey(true)}
+                        onBlur={() => setIsAssigningCounterHotkey(false)}
+                        onKeyDown={handleCounterHotkeyAssignment}
+                        className="h-8 w-56 bg-background text-center text-foreground"
+                      />
+                      <Button type="button" variant="outline" size="sm" className="h-8 px-3" onClick={() => saveCounterHotkey('')}>
+                        Reset
+                      </Button>
+                    </div>
+                    <p className="mt-2 text-center text-xs text-muted-foreground">
+                      Personal shortcut for your Hunt Room counters on this device.
+                    </p>
                   </CardContent>
                 </Card>
 
