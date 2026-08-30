@@ -6,6 +6,7 @@ import type { Tables } from '@/integrations/supabase/types';
 import { useMemo, useCallback, useId } from 'react';
 import { cn } from '@/lib/utils';
 import type { CardFilterId } from '@/lib/card-effects';
+import { getGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -108,12 +109,17 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
       return 'https://img.pokemondb.net/sprites/home/shiny/maushold-family4.png';
     }
     const spriteSlug = entry.form || spriteName || entry.pokemon_name;
-    return getPokemonSpriteUrl(entry.pokemon_id, {
+    const spriteGame = entry.secondary_game || entry.game;
+    return getGameSpecificShinySpriteUrl(entry.pokemon_id, spriteGame, {
+      name: spriteSlug,
+      form: entry.form,
+      gender: entry.gender,
+    }) || getPokemonSpriteUrl(entry.pokemon_id, {
       shiny: true,
       name: spriteSlug,
       female: entry.gender === 'female',
     });
-  }, [entry.pokemon_id, entry.pokemon_name, entry.form, entry.gender, spriteName]);
+  }, [entry.pokemon_id, entry.pokemon_name, entry.form, entry.gender, entry.game, entry.secondary_game, spriteName]);
 
   const mainSpriteFilter = isFail
     ? 'brightness(0) contrast(1.3) drop-shadow(0 0 12px rgba(255,255,255,0.25))'

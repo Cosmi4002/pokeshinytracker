@@ -22,7 +22,6 @@ import Games from "./pages/Bingo";
 import Stats from "./pages/Stats";
 import { ScrollRestoration } from "@/components/layout/ScrollRestoration";
 import { ApplyAppearance } from "@/components/layout/ApplyAppearance";
-import { PwaNotificationManager } from "@/components/notifications/PwaNotificationManager";
 
 import NotFound from "./pages/NotFound";
 import Debug from "./pages/Debug";
@@ -37,7 +36,6 @@ function AppContent() {
   return (
     <>
       <ApplyAppearance />
-      <PwaNotificationManager />
       <Toaster />
       <Sonner />
       <BrowserRouter>

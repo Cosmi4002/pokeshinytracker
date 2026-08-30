@@ -15,6 +15,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { getPokemonSpriteUrl, usePokemonList } from '@/hooks/use-pokemon';
 import { findHuntingMethod, GAMES, getDynamicOdds } from '@/lib/pokemon-data';
+import { getGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
 import type { Tables } from '@/integrations/supabase/types';
 import { resolvePokemonEntity } from '@/lib/pokemon-entity-resolver-v2';
 
@@ -148,7 +149,12 @@ function RecordHunt({
 
   const attempts = Number(entry.attempts || 0);
   const odds = Math.round(getDynamicOdds(entry.method, attempts, entry.has_shiny_charm === true));
-  const sprite = entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, {
+  const spriteGame = entry.secondary_game || entry.game;
+  const sprite = getGameSpecificShinySpriteUrl(entry.pokemon_id, spriteGame, {
+    name: entry.form || entry.pokemon_name,
+    form: entry.form,
+    gender: entry.gender,
+  }) || entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, {
     shiny: true,
     name: entry.form || entry.pokemon_name,
     female: entry.gender === 'female',

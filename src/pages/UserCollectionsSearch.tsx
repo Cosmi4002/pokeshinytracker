@@ -13,6 +13,7 @@ import { GAME_LOGOS } from '@/lib/game-themes';
 import { useRandomColor } from '@/lib/random-color-context';
 import { cn } from '@/lib/utils';
 import { resolvePokemonEntity } from '@/lib/pokemon-entity-resolver-v2';
+import { getGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
 
 type ProfileRow = Pick<Tables<'profiles'>, 'user_id' | 'username'>;
 type PublicCaughtRow = Pick<
@@ -507,7 +508,12 @@ export default function UserCollectionsSearch() {
     keyPrefix: string,
     options: { showUsername?: boolean; large?: boolean } = {}
   ) => {
-    const sprite = entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, { shiny: true, name: entry.form || entry.pokemon_name });
+    const spriteGame = entry.secondary_game || entry.game;
+    const sprite = getGameSpecificShinySpriteUrl(entry.pokemon_id, spriteGame, {
+      name: entry.form || entry.pokemon_name,
+      form: entry.form,
+      gender: entry.gender,
+    }) || entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, { shiny: true, name: entry.form || entry.pokemon_name });
     const isEvent = isDistributionEvent(entry.method);
     const showEntryEncounters = shouldShowEncounters(entry.method, entry.game, entry.attempts, entry.show_encounters ?? true);
     const username = 'username' in entry ? entry.username : null;
@@ -675,7 +681,12 @@ export default function UserCollectionsSearch() {
 
     const attempts = Number(entry.attempts || 0);
     const odds = Math.round(getDynamicOdds(entry.method, attempts, entry.has_shiny_charm === true));
-    const sprite = entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, {
+    const spriteGame = entry.secondary_game || entry.game;
+    const sprite = getGameSpecificShinySpriteUrl(entry.pokemon_id, spriteGame, {
+      name: entry.form || entry.pokemon_name,
+      form: entry.form,
+      gender: entry.gender,
+    }) || entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, {
       shiny: true,
       name: entry.form || entry.pokemon_name,
       female: entry.gender === 'female',

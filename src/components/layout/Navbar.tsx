@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Bell, Check, Calculator, Search, Grid3X3, History as HistoryIcon, LogOut, Move, Sparkles, Settings2, Pencil, Users, BarChart3 } from 'lucide-react';
+import { Check, Calculator, Search, Grid3X3, History as HistoryIcon, LogOut, Move, Sparkles, Settings2, Pencil, Users, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { supabaseProjectRef } from '@/integrations/supabase/client';
@@ -24,7 +24,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { trainerAvatars } from '@/lib/trainer-avatars';
-import { NotificationSettingsDialog } from '@/components/notifications/NotificationSettingsDialog';
 
 type TrainerAvatarId = (typeof trainerAvatars)[number]['id'];
 
@@ -76,7 +75,6 @@ export function Navbar() {
   const [avatarTouched, setAvatarTouched] = useState(false);
   const [avatarOrderTouched, setAvatarOrderTouched] = useState(false);
   const [avatarPickerOpen, setAvatarPickerOpen] = useState(false);
-  const [notificationSettingsOpen, setNotificationSettingsOpen] = useState(false);
 
   const navLinks = [
     { to: '/counter', label: 'Counter', icon: Calculator },
@@ -506,15 +504,6 @@ export function Navbar() {
                   <Users className="mr-2 h-4 w-4" />
                   Hunt Rooms
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onSelect={(event) => {
-                    event.preventDefault();
-                    setNotificationSettingsOpen(true);
-                  }}
-                >
-                  <Bell className="mr-2 h-4 w-4" />
-                  Notifications
-                </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleSetUsername}>
                   <Pencil className="mr-2 h-4 w-4" />
                   Set username
@@ -667,10 +656,6 @@ export function Navbar() {
                 </div>
               </DialogContent>
             </Dialog>
-            <NotificationSettingsDialog
-              open={notificationSettingsOpen}
-              onOpenChange={setNotificationSettingsOpen}
-            />
             </>
           ) : (
             <Link to="/auth">

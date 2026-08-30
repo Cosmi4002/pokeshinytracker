@@ -47,6 +47,9 @@ RETURNS BOOLEAN AS $$
   );
 $$ LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, pg_temp;
 
+REVOKE ALL ON FUNCTION public.is_hunt_room_member(UUID) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.is_hunt_room_member(UUID) TO authenticated;
+
 DROP POLICY IF EXISTS "Room members can view their rooms" ON public.hunt_rooms;
 CREATE POLICY "Room members can view their rooms"
   ON public.hunt_rooms
@@ -275,8 +278,44 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
+REVOKE ALL ON FUNCTION public.create_hunt_room(TEXT, INTEGER, TEXT, TEXT, TEXT) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.join_hunt_room(TEXT) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.increment_hunt_room_counter(UUID, INTEGER) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.mark_hunt_room_found(UUID) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.close_hunt_room(UUID) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.leave_hunt_room(UUID) FROM PUBLIC;
+
+GRANT EXECUTE ON FUNCTION public.create_hunt_room(TEXT, INTEGER, TEXT, TEXT, TEXT) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.join_hunt_room(TEXT) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.increment_hunt_room_counter(UUID, INTEGER) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.mark_hunt_room_found(UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.close_hunt_room(UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.leave_hunt_room(UUID) TO authenticated;
+
 ALTER TABLE public.hunt_rooms REPLICA IDENTITY FULL;
 ALTER TABLE public.hunt_room_members REPLICA IDENTITY FULL;
+
+DO $realtime$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables
+    WHERE pubname = 'supabase_realtime'
+      AND schemaname = 'public'
+      AND tablename = 'hunt_rooms'
+  ) THEN
+    EXECUTE 'ALTER PUBLICATION supabase_realtime ADD TABLE public.hunt_rooms';
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables
+    WHERE pubname = 'supabase_realtime'
+      AND schemaname = 'public'
+      AND tablename = 'hunt_room_members'
+  ) THEN
+    EXECUTE 'ALTER PUBLICATION supabase_realtime ADD TABLE public.hunt_room_members';
+  END IF;
+END;
+$realtime$;
 
 COMMENT ON TABLE public.hunt_rooms IS 'Invite-only realtime group shiny hunts.';
 COMMENT ON TABLE public.hunt_room_members IS 'Per-user counters and membership for realtime hunt rooms.';

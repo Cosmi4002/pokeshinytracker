@@ -42,12 +42,6 @@
       "short_name": "Collection",
       "url": "/collection",
       "icons": [{ "src": "/pwa/app-icon-192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Open Hunt Rooms",
-      "short_name": "Hunt Rooms",
-      "url": "/rooms",
-      "icons": [{ "src": "/pwa/app-icon-192.png", "sizes": "192x192" }]
     }
   ]
 }

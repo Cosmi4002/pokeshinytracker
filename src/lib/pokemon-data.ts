@@ -1,5 +1,6 @@
 // Complete Pokemon list with all forms for shiny hunting
 import { LOCAL_SPRITE_URLS } from './local-sprite-map.generated';
+import { getGameSpecificShinySpriteUrl } from './game-sprites';
 
 export interface Pokemon {
   id: number;
@@ -991,7 +992,8 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
 }
 
 // Alias for transition compatibility
-export const getGameSpecificSpriteUrl = (id: number, methodId: string, name?: string, form?: string, gender?: string) =>
+export const getGameSpecificSpriteUrl = (id: number, methodId: string, name?: string, form?: string, gender?: string, gameId?: string | null) =>
+  getGameSpecificShinySpriteUrl(id, gameId, { name, form, gender }) ||
   getPokemonSpriteUrl(id, { shiny: true, name, form: form || undefined, female: gender === 'female' });
 
 export function getShinyCharmIcon(): string {

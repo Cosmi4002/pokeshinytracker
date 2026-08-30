@@ -35,6 +35,7 @@ import {
     getCuratedShinyOriginGameIds
 } from "@/lib/pokemon-game-availability";
 import { resolveEntityKeyForSelectedPokemon, resolvePokemonEntityKey } from "@/lib/pokemon-entity-resolver-v2";
+import { getGameSpecificShinySpriteUrl } from "@/lib/game-sprites";
 
 interface FormVariant {
     id: number;
@@ -464,6 +465,14 @@ export default function PokemonDetails() {
     const nextId = currentId < 1025 ? currentId + 1 : null;
     const heroVariant = variants.find(variant => variant.category === 'base') || variants[0];
     const heroIsCaught = heroVariant ? caughtForms.has(heroVariant.name) : false;
+    const hgssSpriteUrl = heroVariant
+        ? getGameSpecificShinySpriteUrl(heroVariant.id, 'heartgold', {
+            name: heroVariant.name,
+            form: heroVariant.name,
+            gender: heroVariant.gender,
+        })
+        : null;
+    const caughtHgssGames = ['heartgold', 'soulsilver'].filter(gameId => caughtGames.has(gameId));
     const hasMultipleForms = variants.length > 1;
     const panelClass = "border-border/70 bg-card/95 text-card-foreground shadow-[0_18px_42px_rgba(0,0,0,0.16)] backdrop-blur dark:border-white/15 dark:bg-[#171717]/95 dark:text-white dark:shadow-[0_18px_42px_rgba(0,0,0,0.42)]";
 
@@ -792,6 +801,53 @@ export default function PokemonDetails() {
                                         </div>
                                     </div>
                                 ))}
+                            </div>
+                        </section>
+                    )}
+
+                    {hgssSpriteUrl && (
+                        <section className={cn("w-full space-y-5 rounded-lg border p-6", panelClass)}>
+                            <div className="border-b border-border pb-4 text-left">
+                                <h2 className="flex items-center gap-3 text-2xl font-black tracking-tight">
+                                    <span className="h-7 w-2 rounded-full bg-primary shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
+                                    Game sprites
+                                </h2>
+                                <p className="mt-1 text-sm font-medium text-muted-foreground">
+                                    Original animated shiny sprite shared by HeartGold and SoulSilver.
+                                </p>
+                            </div>
+
+                            <div
+                                className={cn(
+                                    "relative mx-auto flex max-w-sm flex-col items-center overflow-hidden rounded-xl border p-5 transition-all",
+                                    caughtHgssGames.length > 0
+                                        ? "border-amber-300/70 bg-gradient-to-br from-amber-500/15 via-card to-slate-400/15 shadow-lg"
+                                        : "border-border bg-muted/35"
+                                )}
+                            >
+                                <img
+                                    src={hgssSpriteUrl}
+                                    alt={`${heroVariant?.displayName || details.displayName} shiny in HeartGold and SoulSilver`}
+                                    loading="lazy"
+                                    decoding="async"
+                                    className={cn(
+                                        "h-40 w-40 object-contain pokemon-sprite [image-rendering:pixelated]",
+                                        caughtHgssGames.length === 0 && "opacity-35 grayscale"
+                                    )}
+                                />
+                                <div className="mt-3 flex items-center justify-center gap-3">
+                                    {['heartgold', 'soulsilver'].map(gameId => {
+                                        const caught = caughtGames.has(gameId);
+                                        const game = GAMES.find(item => item.id === gameId)!;
+                                        return (
+                                            <div key={gameId} className={cn("flex items-center gap-1.5 rounded-full border px-2.5 py-1", caught ? "border-primary/50 bg-primary/10" : "border-border bg-background/60 opacity-45")}>
+                                                <img src={GAME_LOGOS[gameId]} alt="" className={cn("h-4 w-8 object-contain", !caught && "grayscale")} />
+                                                <span className="text-[10px] font-black uppercase tracking-wide">{game.name}</span>
+                                                {caught && <CheckCircle2 className="h-3 w-3 text-primary" />}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
                             </div>
                         </section>
                     )}

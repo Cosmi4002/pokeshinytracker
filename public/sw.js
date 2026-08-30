@@ -1,5 +1,5 @@
-const APP_CACHE = 'pokeshiny-app-v2';
-const RUNTIME_CACHE = 'pokeshiny-runtime-v2';
+const APP_CACHE = 'pokeshiny-app-v1';
+const RUNTIME_CACHE = 'pokeshiny-runtime-v1';
 const APP_SHELL = [
   '/',
   '/counter',
@@ -110,40 +110,4 @@ self.addEventListener('fetch', (event) => {
 
 self.addEventListener('message', (event) => {
   if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
-  if (event.data?.type === 'SHOW_NOTIFICATION' && event.data?.title) {
-    event.waitUntil(self.registration.showNotification(event.data.title, event.data.options || {}));
-  }
-});
-
-self.addEventListener('push', (event) => {
-  let payload = {};
-  try {
-    payload = event.data?.json() || {};
-  } catch {
-    payload = { body: event.data?.text() || '' };
-  }
-
-  const title = payload.title || 'Poké Shiny Tracker';
-  const options = {
-    body: payload.body || 'You have a new shiny hunting update.',
-    icon: '/pwa/app-icon-192.png',
-    badge: '/pwa/app-icon-192.png',
-    tag: payload.tag || 'pokeshiny-update',
-    data: { url: payload.url || '/counter' },
-  };
-  event.waitUntil(self.registration.showNotification(title, options));
-});
-
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-  const targetUrl = new URL(event.notification.data?.url || '/counter', self.location.origin).href;
-
-  event.waitUntil((async () => {
-    const clientList = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-    for (const client of clientList) {
-      if ('navigate' in client) await client.navigate(targetUrl);
-      if ('focus' in client) return client.focus();
-    }
-    return self.clients.openWindow(targetUrl);
-  })());
 });
