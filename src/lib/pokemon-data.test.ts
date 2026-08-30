@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { HUNTING_METHODS, calculateShinyStats, formatOdds, getCaughtShinySpriteUrl, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, isBreedingMethod } from './pokemon-data';
+import { HUNTING_METHODS, calculateShinyStats, formatOdds, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, isBreedingMethod } from './pokemon-data';
 
 describe('pokemon sprite helpers', () => {
   it('returns a stable fallback asset for missing sprite images', () => {
@@ -15,31 +15,6 @@ describe('pokemon sprite helpers', () => {
   it('uses Meloetta Pirouette shiny sprite instead of the colliding Meowstic sprite', () => {
     expect(getPokemonSpriteUrl(10025, { shiny: true, name: 'meloetta-pirouette' })).toBe(
       '/img/pokemon-sprites/remote/raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10018.png'
-    );
-  });
-
-  it('recomputes caught shiny sprite URLs from pokemon data instead of trusting stale saved urls', () => {
-    expect(
-      getCaughtShinySpriteUrl({
-        pokemonId: 25,
-        pokemonName: 'pikachu',
-        gender: 'female',
-        spriteUrl: 'https://legacy.example/pikachu.png',
-      })
-    ).toBe(getPokemonSpriteUrl(25, { shiny: true, name: 'pikachu', female: true }));
-  });
-
-  it('resolves saved form slugs to the correct sprite variant id', () => {
-    expect(
-      getPokemonSpriteUrl(550, { shiny: true, name: 'basculin-blue-striped', form: 'basculin-blue-striped' })
-    ).toBe(
-      getPokemonSpriteUrl(10016, { shiny: true, name: 'basculin-blue-striped', form: 'basculin-blue-striped' })
-    );
-
-    expect(
-      getPokemonSpriteUrl(585, { shiny: true, name: 'deerling-autumn', form: 'deerling-autumn' })
-    ).toBe(
-      getPokemonSpriteUrl(10052, { shiny: true, name: 'deerling-autumn', form: 'deerling-autumn' })
     );
   });
 });

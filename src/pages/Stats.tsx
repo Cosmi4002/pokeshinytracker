@@ -13,9 +13,9 @@ import { useAuth } from '@/lib/auth-context';
 import { useRandomColor } from '@/lib/random-color-context';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { getPokemonSpriteUrl, usePokemonList } from '@/hooks/use-pokemon';
+import { findHuntingMethod, GAMES, getDynamicOdds } from '@/lib/pokemon-data';
 import { getGameSpecificShinySpriteUrl, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
-import { usePokemonList } from '@/hooks/use-pokemon';
-import { findHuntingMethod, GAMES, getCaughtShinySpriteUrl, getDynamicOdds } from '@/lib/pokemon-data';
 import type { Tables } from '@/integrations/supabase/types';
 import { resolvePokemonEntity } from '@/lib/pokemon-entity-resolver-v2';
 import { cn } from '@/lib/utils';
@@ -151,19 +151,15 @@ function RecordHunt({
   const attempts = Number(entry.attempts || 0);
   const odds = Math.round(getDynamicOdds(entry.method, attempts, entry.has_shiny_charm === true));
   const spriteGame = entry.secondary_game || entry.game;
-  const sprite =
-    getGameSpecificShinySpriteUrl(entry.pokemon_id, spriteGame, {
-      name: entry.form || entry.pokemon_name,
-      form: entry.form,
-      gender: entry.gender,
-    }) ||
-    getCaughtShinySpriteUrl({
-      pokemonId: entry.pokemon_id,
-      pokemonName: entry.pokemon_name,
-      form: entry.form,
-      gender: entry.gender,
-      spriteUrl: entry.sprite_url,
-    });
+  const sprite = getGameSpecificShinySpriteUrl(entry.pokemon_id, spriteGame, {
+    name: entry.form || entry.pokemon_name,
+    form: entry.form,
+    gender: entry.gender,
+  }) || entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, {
+    shiny: true,
+    name: entry.form || entry.pokemon_name,
+    female: entry.gender === 'female',
+  });
   const isGameSpecificSprite = isGameSpecificShinySpriteUrl(sprite);
   const isEvolved = entry.is_evolved || entry.evolved_from_id || entry.evolved_from_name;
 

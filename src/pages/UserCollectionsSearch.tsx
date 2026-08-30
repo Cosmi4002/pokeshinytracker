@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import type { Tables } from '@/integrations/supabase/types';
-import { SHINY_CHARM_ICON, findHuntingMethod, getCaughtShinySpriteUrl, getDynamicOdds, isBreedingMethod, GAMES } from '@/lib/pokemon-data';
+import { getPokemonSpriteUrl } from '@/hooks/use-pokemon';
+import { SHINY_CHARM_ICON, findHuntingMethod, getDynamicOdds, isBreedingMethod, GAMES } from '@/lib/pokemon-data';
 import { GAME_LOGOS } from '@/lib/game-themes';
 import { useRandomColor } from '@/lib/random-color-context';
 import { cn } from '@/lib/utils';
@@ -508,19 +509,11 @@ export default function UserCollectionsSearch() {
     options: { showUsername?: boolean; large?: boolean } = {}
   ) => {
     const spriteGame = entry.secondary_game || entry.game;
-    const sprite =
-      getGameSpecificShinySpriteUrl(entry.pokemon_id, spriteGame, {
-        name: entry.form || entry.pokemon_name,
-        form: entry.form,
-        gender: entry.gender,
-      }) ||
-      getCaughtShinySpriteUrl({
-      pokemonId: entry.pokemon_id,
-      pokemonName: entry.pokemon_name,
+    const sprite = getGameSpecificShinySpriteUrl(entry.pokemon_id, spriteGame, {
+      name: entry.form || entry.pokemon_name,
       form: entry.form,
       gender: entry.gender,
-      spriteUrl: entry.sprite_url,
-      });
+    }) || entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, { shiny: true, name: entry.form || entry.pokemon_name });
     const isGameSpecificSprite = isGameSpecificShinySpriteUrl(sprite);
     const isEvent = isDistributionEvent(entry.method);
     const showEntryEncounters = shouldShowEncounters(entry.method, entry.game, entry.attempts, entry.show_encounters ?? true);
@@ -691,19 +684,15 @@ export default function UserCollectionsSearch() {
     const attempts = Number(entry.attempts || 0);
     const odds = Math.round(getDynamicOdds(entry.method, attempts, entry.has_shiny_charm === true));
     const spriteGame = entry.secondary_game || entry.game;
-    const sprite =
-      getGameSpecificShinySpriteUrl(entry.pokemon_id, spriteGame, {
-        name: entry.form || entry.pokemon_name,
-        form: entry.form,
-        gender: entry.gender,
-      }) ||
-      getCaughtShinySpriteUrl({
-      pokemonId: entry.pokemon_id,
-      pokemonName: entry.pokemon_name,
+    const sprite = getGameSpecificShinySpriteUrl(entry.pokemon_id, spriteGame, {
+      name: entry.form || entry.pokemon_name,
       form: entry.form,
       gender: entry.gender,
-      spriteUrl: entry.sprite_url,
-      });
+    }) || entry.sprite_url || getPokemonSpriteUrl(entry.pokemon_id, {
+      shiny: true,
+      name: entry.form || entry.pokemon_name,
+      female: entry.gender === 'female',
+    });
     const isEvolved = entry.is_evolved === true;
 
     return (
