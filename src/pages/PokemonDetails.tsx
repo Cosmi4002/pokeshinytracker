@@ -35,7 +35,7 @@ import {
     getCuratedShinyOriginGameIds
 } from "@/lib/pokemon-game-availability";
 import { resolveEntityKeyForSelectedPokemon, resolvePokemonEntityKey } from "@/lib/pokemon-entity-resolver-v2";
-import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteScaleClass } from "@/lib/game-sprites";
+import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleStyle } from "@/lib/game-sprites";
 
 interface FormVariant {
     id: number;
@@ -667,11 +667,12 @@ export default function PokemonDetails() {
                                 <img
                                     src={baseSpriteUrl}
                                     alt={heroVariant.displayName}
-                                    className={cn(
+                                className={cn(
                                         "h-48 w-48 object-contain pokemon-sprite transition-all duration-500 sm:h-56 sm:w-56",
                                         heroMaleCaught ? "scale-105 drop-shadow-2xl" : "opacity-75 grayscale saturate-50",
                                         baseSpriteUrl?.startsWith('/img/game-sprites/') && getGameSpecificSpriteScaleClass(baseSpriteUrl)
                                     )}
+                                    style={baseSpriteUrl?.startsWith('/img/game-sprites/') ? getGameSpecificSpriteScaleStyle(baseSpriteUrl) : undefined}
                                 />
                                 {details.hasGenderDifference && femaleSpriteUrl && (
                                     <img
@@ -682,6 +683,7 @@ export default function PokemonDetails() {
                                             heroFemaleCaught ? "scale-105 drop-shadow-2xl" : "opacity-75 grayscale saturate-50",
                                             femaleSpriteUrl?.startsWith('/img/game-sprites/') && getGameSpecificSpriteScaleClass(femaleSpriteUrl)
                                         )}
+                                        style={femaleSpriteUrl?.startsWith('/img/game-sprites/') ? getGameSpecificSpriteScaleStyle(femaleSpriteUrl) : undefined}
                                     />
                                 )}
                             </div>
@@ -918,6 +920,7 @@ export default function PokemonDetails() {
                                                     getGameSpecificSpriteScaleClass(group.maleSpriteUrl),
                                                     group.caughtGames.length === 0 && "opacity-35 grayscale"
                                                 )}
+                                                style={getGameSpecificSpriteScaleStyle(group.maleSpriteUrl)}
                                             />
                                             {details.hasGenderDifference && group.femaleSpriteUrl && (
                                                 <img
@@ -930,6 +933,7 @@ export default function PokemonDetails() {
                                                         getGameSpecificSpriteScaleClass(group.femaleSpriteUrl),
                                                         (group.femaleCaughtGames ?? []).length === 0 && "opacity-35 grayscale"
                                                     )}
+                                                    style={getGameSpecificSpriteScaleStyle(group.femaleSpriteUrl)}
                                                 />
                                             )}
                                         </div>

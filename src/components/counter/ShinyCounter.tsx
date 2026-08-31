@@ -34,7 +34,7 @@ import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
 import { cn } from '@/lib/utils';
 import { resolveEntityKeysForCounterSlots } from '@/lib/pokemon-entity-resolver-v2';
 import { useOnlineStatus } from '@/hooks/use-online-status';
-import { getGameSpecificSpriteScaleClass, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
+import { getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleStyle, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
 import {
   migrateCounterSnapshot,
   OFFLINE_HUNT_PREFIX,
@@ -779,6 +779,7 @@ export function ShinyCounter({
                               style={{
                                 imageRendering: 'auto',
                                 filter: isGameSpecificSprite ? 'none' : COUNTER_SPRITE_EDGE_SHADOW,
+                                ...(isGameSpecificSprite ? getGameSpecificSpriteScaleStyle(displaySpriteUrl) : {}),
                               }}
                               loading="eager"
                               decoding="async"

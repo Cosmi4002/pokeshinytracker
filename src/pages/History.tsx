@@ -32,7 +32,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import type { Json, Tables } from '@/integrations/supabase/types';
 import { useAuth } from '@/lib/auth-context';
-import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteScaleClass, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
+import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleStyle, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
 import { getCaughtShinySpriteUrl } from '@/lib/pokemon-data';
 import { useRandomColor } from '@/lib/random-color-context';
 import { cn } from '@/lib/utils';
@@ -348,12 +348,13 @@ export default function History() {
                                 <img
                                   src={sprite}
                                   alt={snapshot?.pokemon_name || 'Pokémon'}
-                                  className={cn(
-                                    "h-full w-full object-contain [image-rendering:pixelated]",
-                                    isGameSpecificSprite && spriteScaleClass
-                                  )}
-                                  onError={(event) => { event.currentTarget.src = '/placeholder.svg'; }}
-                                />
+                                className={cn(
+                                  "h-full w-full object-contain [image-rendering:pixelated]",
+                                  isGameSpecificSprite && spriteScaleClass
+                                )}
+                                style={isGameSpecificSprite ? getGameSpecificSpriteScaleStyle(sprite) : undefined}
+                                onError={(event) => { event.currentTarget.src = '/placeholder.svg'; }}
+                              />
                               </div>
                               <div className="min-w-0 flex-1">
                                 <div className="flex flex-wrap items-center gap-2">

@@ -12,7 +12,7 @@ import { GAME_LOGOS } from '@/lib/game-themes';
 import { useRandomColor } from '@/lib/random-color-context';
 import { cn } from '@/lib/utils';
 import { resolvePokemonEntity } from '@/lib/pokemon-entity-resolver-v2';
-import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteScaleClass, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
+import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleStyle, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
 
 type ProfileRow = Pick<Tables<'profiles'>, 'user_id' | 'username'>;
 type PublicCaughtRow = Pick<
@@ -551,7 +551,10 @@ export default function UserCollectionsSearch() {
                 isGameSpecificSprite ? `${spriteScaleClass} group-hover:scale-[0.9]` : 'group-hover:scale-105',
                 entry.is_fail && !isGameSpecificSprite && 'drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]'
               )}
-              style={isGameSpecificSprite && !entry.is_fail && !entry.is_unobtainable ? undefined : getSpriteStyle(entry.is_fail, entry.is_unobtainable)}
+              style={{
+                ...(isGameSpecificSprite ? getGameSpecificSpriteScaleStyle(sprite) : {}),
+                ...(isGameSpecificSprite && !entry.is_fail && !entry.is_unobtainable ? {} : getSpriteStyle(entry.is_fail, entry.is_unobtainable)),
+              }}
               loading="lazy"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = '/placeholder.svg';

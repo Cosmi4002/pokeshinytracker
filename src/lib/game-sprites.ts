@@ -1,6 +1,7 @@
 import { HGSS_SHINY_SPRITE_FILES } from '@/data/hgss-shiny-sprite-manifest';
 import { BW_SHINY_SPRITE_FILES } from '@/data/bw-shiny-sprite-manifest';
 import { BW2_SHINY_SPRITE_FILES } from '@/data/bw2-shiny-sprite-manifest';
+import { GAME_SPRITE_LONG_SIDE_BY_FILE } from '@/data/game-sprite-long-sides.generated';
 
 export type GameSpriteOptions = {
   shiny?: boolean;
@@ -140,6 +141,56 @@ const ARCHIVE_THERIAN_SHINY_OVERRIDE_BY_FORM: Readonly<Record<string, string>> =
   'landorus-therian': 'https://archives.bulbagarden.net/media/upload/3/36/Spr_5b2_645T_s.png',
 };
 
+const GAME_SPRITE_SET_BASE_SCALE: Readonly<Record<string, number>> = {
+  hgss: 0.98,
+  bw: 0.82,
+  bw2: 0.82,
+};
+
+const GAME_SPRITE_SET_MEDIAN_LONG_SIDE = (() => {
+  const grouped = new Map<string, number[]>();
+  for (const [filePath, longSide] of Object.entries(GAME_SPRITE_LONG_SIDE_BY_FILE)) {
+    const set = filePath.split('/')[0];
+    const values = grouped.get(set) || [];
+    values.push(longSide);
+    grouped.set(set, values);
+  }
+
+  const median = (values: number[]) => {
+    if (values.length === 0) return 0;
+    const sorted = [...values].sort((a, b) => a - b);
+    const middle = Math.floor(sorted.length / 2);
+    return sorted.length % 2 === 0
+      ? (sorted[middle - 1] + sorted[middle]) / 2
+      : sorted[middle];
+  };
+
+  return {
+    hgss: median(grouped.get('hgss') || []),
+    bw: median(grouped.get('bw') || []),
+    bw2: median(grouped.get('bw2') || []),
+  } as const;
+})();
+
+const getGameSpecificSpriteFilePath = (url?: string | null) => {
+  if (!url || !url.startsWith('/img/game-sprites/')) return null;
+  const parts = url.split('/');
+  if (parts.length < 5) return null;
+  return `${parts[3]}/${parts.slice(4).join('/')}`;
+};
+
+const getGameSpecificSpriteScaleFactorFromFile = (filePath?: string | null) => {
+  if (!filePath) return null;
+  const longSide = GAME_SPRITE_LONG_SIDE_BY_FILE[filePath];
+  if (!longSide) return null;
+  const set = filePath.split('/')[0];
+  const median = GAME_SPRITE_SET_MEDIAN_LONG_SIDE[set as keyof typeof GAME_SPRITE_SET_MEDIAN_LONG_SIDE];
+  if (!median) return null;
+  const baseScale = GAME_SPRITE_SET_BASE_SCALE[set] ?? 1;
+  const relativeScale = longSide / median;
+  return Math.min(1.2, Math.max(0.7, baseScale * relativeScale));
+};
+
 export function getGameSpecificShinySpriteUrl(
   pokemonId: number,
   gameId?: string | null,
@@ -203,11 +254,22 @@ export function getArchiveShinySpriteUrl(
 }
 
 export function getGameSpecificSpriteScaleClass(url?: string | null): string {
-  if (!url || !url.startsWith('/img/game-sprites/')) return '';
-  const set = url.split('/')[3];
-  if (set === 'hgss') return 'scale-[0.98]';
-  if (set === 'bw' || set === 'bw2') return 'scale-[0.82]';
-  return 'scale-[0.86]';
+  return url && url.startsWith('/img/game-sprites/') ? 'scale-[var(--sprite-scale)]' : '';
+}
+
+export function getGameSpecificSpriteScaleFactor(url?: string | null): number {
+  const filePath = getGameSpecificSpriteFilePath(url);
+  const scaleFromFile = getGameSpecificSpriteScaleFactorFromFile(filePath);
+  if (scaleFromFile) return scaleFromFile;
+  if (!filePath) return 1;
+  const set = filePath.split('/')[0];
+  return GAME_SPRITE_SET_BASE_SCALE[set] ?? 0.86;
+}
+
+export function getGameSpecificSpriteScaleStyle(url?: string | null): any {
+  return {
+    '--sprite-scale': String(getGameSpecificSpriteScaleFactor(url)),
+  };
 }
 
 export const isGameSpecificShinySpriteUrl = (url?: string | null) =>

@@ -3,10 +3,10 @@ import { Button } from '@/components/ui/button';
 import { getGameTheme, GAME_LOGOS, type GameTheme } from '@/lib/game-themes';
 import { GIGAMAX_ICON, POKEBALLS, POKEMON_EGG_ICON, findHuntingMethod, getArchiveShinySpriteUrl, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, handlePokemonSpriteError, isBreedingMethod, supportsGigamaxMark, toLocalPokemonSpriteUrl } from '@/lib/pokemon-data';
 import type { Tables } from '@/integrations/supabase/types';
-import { useMemo, useCallback, useId } from 'react';
+import { useMemo, useCallback, useEffect, useId, useState } from 'react';
 import { cn } from '@/lib/utils';
 import type { CardFilterId } from '@/lib/card-effects';
-import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteScaleClass, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
+import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleFactor, getGameSpecificSpriteScaleStyle, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,18 +33,15 @@ interface ShinyCardProps {
   spriteName?: string;
 }
 
-const getEvolvedFromSpriteScale = (name?: string | null) => {
-  const normalized = (name || '').toString().trim().toLowerCase();
-  if (normalized.includes('buizel')) return 1.22;
-  return 1;
-};
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
-const getEvolvedFromSpriteSize = (name?: string | null, compact = false) =>
-  `${2.58 * getEvolvedFromSpriteScale(name) * (compact ? 0.82 : 1)}rem`;
+const getEvolvedFromSpriteSize = (_name?: string | null, compact = false, fitScale = 1) =>
+  `${2.58 * fitScale * (compact ? 0.82 : 1)}rem`;
 
 export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverride, secondaryThemeOverride, applyBlackEffect = false, cardFilter = 'none', spriteName }: ShinyCardProps) {
   const spriteOutlineSeed = useId().replace(/:/g, '');
   const mainSpriteOutlineId = `main-sprite-outline-${spriteOutlineSeed}`;
+  const [evolvedFromSpriteDimensions, setEvolvedFromSpriteDimensions] = useState<{ width: number; height: number } | null>(null);
   const isFail = entry.is_fail === true;
   const isEvolved = entry.is_evolved === true;
   const isGigamax = entry.is_gigamax === true && supportsGigamaxMark(entry.game);
@@ -179,6 +176,19 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
     });
     return byName || getPokemonSpriteUrl(evolvedFromId, { shiny: true });
   }, [isEvolved, evolvedFromId, evolvedFromName]);
+  const evolvedFromSpriteBaseScale = useMemo(() => getGameSpecificSpriteScaleFactor(evolvedFromSpriteUrl), [evolvedFromSpriteUrl]);
+  const evolvedFromSpriteFitScale = useMemo(() => {
+    if (!evolvedFromSpriteDimensions) return 1;
+    const longestSide = Math.max(evolvedFromSpriteDimensions.width, evolvedFromSpriteDimensions.height);
+    if (!longestSide) return 1;
+    const targetSize = showEncounters ? 40 : 36;
+    return clamp(targetSize / longestSide, 0.72, 1.05);
+  }, [evolvedFromSpriteDimensions, showEncounters]);
+  const evolvedFromSpriteDisplayScale = evolvedFromSpriteFitScale * evolvedFromSpriteBaseScale;
+
+  useEffect(() => {
+    setEvolvedFromSpriteDimensions(null);
+  }, [evolvedFromSpriteUrl]);
 
   const formatDate = useCallback((dateString: string) => {
     if (!dateString) return '--';
@@ -330,16 +340,23 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                     alt="Evoluto da"
                     className="block max-w-none object-contain"
                     style={{
-                      width: getEvolvedFromSpriteSize(evolvedFromName, !showEncounters),
-                      height: getEvolvedFromSpriteSize(evolvedFromName, !showEncounters),
+                      width: getEvolvedFromSpriteSize(evolvedFromName, !showEncounters, evolvedFromSpriteDisplayScale),
+                      height: getEvolvedFromSpriteSize(evolvedFromName, !showEncounters, evolvedFromSpriteDisplayScale),
                       display: 'block',
                       filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.85))',
                       backgroundColor: 'transparent',
                       margin: 0,
                       padding: 0,
+                      ...(isGameSpecificShinySpriteUrl(evolvedFromSpriteUrl) ? getGameSpecificSpriteScaleStyle(evolvedFromSpriteUrl) : {}),
                     }}
                     title={`Evoluto da ${evolvedFromName || 'pokemon precedente'}`}
                     referrerPolicy="no-referrer"
+                    onLoad={(e) => {
+                      setEvolvedFromSpriteDimensions({
+                        width: e.currentTarget.naturalWidth,
+                        height: e.currentTarget.naturalHeight,
+                      });
+                    }}
                     onError={(e) => {
                       handlePokemonSpriteError(e.currentTarget);
                     }}
@@ -361,9 +378,9 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                     </feMerge>
                   </filter>
                 </svg>
-                <img
-                  key={spriteUrl}
-                  src={toLocalPokemonSpriteUrl(spriteUrl)}
+                  <img
+                    key={spriteUrl}
+                    src={toLocalPokemonSpriteUrl(spriteUrl)}
                   loading="lazy"
                   decoding="async"
                   referrerPolicy="no-referrer"
@@ -375,6 +392,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                   style={{
                     imageRendering: 'auto',
                     filter: mainSpriteFilter,
+                    ...(isGameSpecificSprite ? getGameSpecificSpriteScaleStyle(spriteUrl) : {}),
                   }}
                   onError={(e) => {
                     handlePokemonSpriteError(e.currentTarget);

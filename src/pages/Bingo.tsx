@@ -973,7 +973,7 @@ export default function Games() {
                   </svg>
                   <img
                     key={`${displayedRandomPokemon.id}-${displayedRandomPokemon.name}`}
-                    src={getArchiveShinySpriteUrl(displayedRandomPokemon.id, { shiny: true, name: displayedRandomPokemon.name, form: displayedRandomPokemon.name }) || getPokemonSpriteUrl(displayedRandomPokemon.id, { shiny: true, name: displayedRandomPokemon.name })}
+                    src={getPokemonSpriteUrl(displayedRandomPokemon.id, { shiny: true, name: displayedRandomPokemon.name, form: displayedRandomPokemon.name })}
                     alt={displayedRandomPokemon.displayName}
                     className="h-40 w-40 object-contain"
                     style={{
