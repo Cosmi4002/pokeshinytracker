@@ -476,7 +476,8 @@ export default function PokemonDetails() {
     const nextId = currentId < 1025 ? currentId + 1 : null;
 
     const heroVariant = variants.find(variant => variant.category === 'base') || variants[0];
-    const heroIsCaught = heroVariant ? caughtForms.has(heroVariant.name) : false;
+    const heroMaleCaught = heroVariant ? caughtForms.has(heroVariant.name) : false;
+    const heroFemaleCaught = details?.hasGenderDifference && heroVariant ? caughtForms.has(`${details.name}-female`) : false;
     const gameSpriteGroups = heroVariant
         ? [
             {
@@ -498,7 +499,14 @@ export default function PokemonDetails() {
                 games: ['black2', 'white2'],
             },
         ].map(group => {
-            const caughtGamesForGroup = group.games.filter(gameId => caughtGames.has(gameId));
+            const maleCaughtGamesForGroup = group.games.filter(gameId => {
+                if (!details.hasGenderDifference) return caughtGames.has(gameId);
+                return caughtGameGenders[gameId]?.includes('male') ?? false;
+            });
+            const femaleCaughtGamesForGroup = group.games.filter(gameId => {
+                if (!details.hasGenderDifference) return false;
+                return caughtGameGenders[gameId]?.includes('female') ?? false;
+            });
             const gameId = group.games[0];
 
             return {
@@ -518,7 +526,8 @@ export default function PokemonDetails() {
                         gender: 'female',
                     })
                     : null,
-                caughtGames: caughtGamesForGroup,
+                caughtGames: maleCaughtGamesForGroup,
+                femaleCaughtGames: femaleCaughtGamesForGroup,
             };
         }).filter(group => Boolean(group.maleSpriteUrl))
         : [];
@@ -660,7 +669,7 @@ export default function PokemonDetails() {
                                     alt={heroVariant.displayName}
                                     className={cn(
                                         "h-48 w-48 object-contain pokemon-sprite transition-all duration-500 sm:h-56 sm:w-56",
-                                        heroIsCaught ? "scale-105 drop-shadow-2xl" : "opacity-75 grayscale saturate-50"
+                                        heroMaleCaught ? "scale-105 drop-shadow-2xl" : "opacity-75 grayscale saturate-50"
                                     )}
                                 />
                                 {details.hasGenderDifference && femaleSpriteUrl && (
@@ -669,7 +678,7 @@ export default function PokemonDetails() {
                                         alt={`${details.displayName} female`}
                                         className={cn(
                                             "h-44 w-44 object-contain pokemon-sprite transition-all duration-500 sm:h-52 sm:w-52",
-                                            heroIsCaught ? "scale-105 drop-shadow-2xl" : "opacity-75 grayscale saturate-50"
+                                            heroFemaleCaught ? "scale-105 drop-shadow-2xl" : "opacity-75 grayscale saturate-50"
                                         )}
                                     />
                                 )}
@@ -915,7 +924,7 @@ export default function PokemonDetails() {
                                                     decoding="async"
                                                     className={cn(
                                                         "h-32 w-32 object-contain pokemon-sprite scale-[0.9] [image-rendering:pixelated]",
-                                                        group.caughtGames.length === 0 && "opacity-35 grayscale"
+                                                        (group.femaleCaughtGames ?? []).length === 0 && "opacity-35 grayscale"
                                                     )}
                                                 />
                                             )}

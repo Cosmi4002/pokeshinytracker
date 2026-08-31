@@ -101,11 +101,39 @@ function buildNativeEncounterRoutes(tuple: NativeEncounterTuple): PokemonHuntRou
   return targetEntityKeys.flatMap((targetEntityKey): PokemonHuntRoute[] => {
     const entity = POKEMON_CATALOG_V2_BY_KEY.get(targetEntityKey);
     if (!entity) return [];
+
+    let method: PokemonHuntRoute['method'];
+    if (isGen5StarterGift) {
+      method = 'soft-reset-gift';
+    } else if (isGift) {
+      method = 'gift-pokemon';
+    } else if (isRadar) {
+      method = 'poke-radar';
+    } else if (isRoaming) {
+      method = 'roaming-encounter';
+    } else if (isStatic) {
+      method = 'static-encounter';
+    } else {
+      method = 'wild-random-encounter';
+    }
+
+    const centralWikiSource = huntingMethodId.startsWith('gen2-') || huntingMethodId.startsWith('gen3-') || huntingMethodId.startsWith('gen5-')
+      ? [{
+          provider: 'Pokémon Central Wiki' as const,
+          url: pokemonCentralUrl(entity.canonicalName),
+          note: huntingMethodId.startsWith('gen2-')
+            ? `Pokémon Central Wiki is used as the Italian Gen 2 cross-check for the species' game zones and encounter table; Surf entries are intentionally treated as Random Encounter, while Fishing, Headbutt and Rock Smash remain separate methods.`
+            : huntingMethodId.startsWith('gen3-')
+              ? `Pokémon Central Wiki is used as the Italian Gen 3 cross-check for the species' game zones and encounter table; Surf entries are intentionally treated as Random Encounter, while Fishing, Safari Zone and Rock Smash remain separate methods.`
+              : `Pokémon Central Wiki is used as the Italian Gen 5 cross-check for the species' game zones and encounter table; Fishing, Fishing — Rippling Waters, Surf and other encounter categories remain separate.`,
+        }]
+      : [];
+
     return [{
       id: `${targetEntityKey}:${gameId}:native-${slugify(huntingMethodId)}${usesExternalSetup ? '-external' : ''}` as HuntRouteId,
       targetEntityKey,
       gameId,
-      method: isGen5StarterGift ? 'soft-reset-gift' : isGift ? 'gift-pokemon' : isRadar ? 'poke-radar' : isRoaming ? 'roaming-encounter' : isStatic ? 'static-encounter' : 'wild-random-encounter',
+      method,
       huntingMethodId,
       access: usesExternalSetup ? 'external-game-feature' : 'native',
       recommendation: usesExternalSetup ? 'eligible-with-external-setup' : 'eligible-native',
@@ -126,15 +154,7 @@ function buildNativeEncounterRoutes(tuple: NativeEncounterTuple): PokemonHuntRou
           url: bulbapediaUrl(entity.canonicalName),
           note: `Species game-location tables used to cross-check the listed ${methodName} route.`,
         },
-        ...(huntingMethodId.startsWith('gen2-') || huntingMethodId.startsWith('gen3-') || huntingMethodId.startsWith('gen5-') ? [{
-          provider: 'Pokémon Central Wiki' as const,
-          url: pokemonCentralUrl(entity.canonicalName),
-          note: huntingMethodId.startsWith('gen2-')
-            ? `Pokémon Central Wiki is used as the Italian Gen 2 cross-check for the species' game zones and encounter table; Surf entries are intentionally treated as Random Encounter, while Fishing, Headbutt and Rock Smash remain separate methods.`
-            : huntingMethodId.startsWith('gen3-')
-              ? `Pokémon Central Wiki is used as the Italian Gen 3 cross-check for the species' game zones and encounter table; Surf entries are intentionally treated as Random Encounter, while Fishing, Safari Zone and Rock Smash remain separate methods.`
-              : `Pokémon Central Wiki is used as the Italian Gen 5 cross-check for the species' game zones and encounter table; Fishing, Fishing — Rippling Waters, Surf and other encounter categories remain separate.`,
-        }] : []),
+        ...centralWikiSource,
       ],
       verifiedAt,
     }];
