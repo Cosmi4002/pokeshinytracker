@@ -325,36 +325,25 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                   <ArrowUpCircle className="h-3.5 w-3.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]" />
                 </div>
                 {evolvedFromSpriteUrl && (
-                  <>
-                    <svg className="absolute h-0 w-0" aria-hidden="true" focusable="false">
-                      <filter id={evolvedSpriteOutlineId} x="-24%" y="-24%" width="148%" height="148%" colorInterpolationFilters="sRGB">
-                        <feMorphology in="SourceAlpha" operator="dilate" radius="0.5" result="outline" />
-                        <feFlood floodColor="#050505" result="outlineColor" />
-                        <feComposite in="outlineColor" in2="outline" operator="in" result="outlineShape" />
-                        <feMerge>
-                          <feMergeNode in="outlineShape" />
-                          <feMergeNode in="SourceGraphic" />
-                        </feMerge>
-                      </filter>
-                    </svg>
-                    <span className="inline-flex h-[2.58rem] w-[2.58rem] items-center justify-center">
-                      <img
-                        src={toLocalPokemonSpriteUrl(evolvedFromSpriteUrl)}
-                        alt="Evoluto da"
-                        className="max-w-none object-contain"
-                        style={{
-                          height: getEvolvedFromSpriteSize(evolvedFromName, !showEncounters),
-                          width: getEvolvedFromSpriteSize(evolvedFromName, !showEncounters),
-                          filter: `url(#${evolvedSpriteOutlineId}) drop-shadow(0 4px 8px rgba(0,0,0,0.85))`,
-                        }}
-                        title={`Evoluto da ${evolvedFromName || 'pokemon precedente'}`}
-                        referrerPolicy="no-referrer"
-                        onError={(e) => {
-                          handlePokemonSpriteError(e.currentTarget);
-                        }}
-                      />
-                    </span>
-                  </>
+                  <span className="inline-flex h-[2.58rem] w-[2.58rem] items-center justify-center overflow-hidden rounded-sm">
+                    <img
+                      src={toLocalPokemonSpriteUrl(evolvedFromSpriteUrl)}
+                      alt="Evoluto da"
+                      className="block max-w-none object-contain"
+                      style={{
+                        height: getEvolvedFromSpriteSize(evolvedFromName, !showEncounters),
+                        width: getEvolvedFromSpriteSize(evolvedFromName, !showEncounters),
+                        filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.85))',
+                        backgroundColor: 'transparent',
+                        display: 'block',
+                      }}
+                      title={`Evoluto da ${evolvedFromName || 'pokemon precedente'}`}
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        handlePokemonSpriteError(e.currentTarget);
+                      }}
+                    />
+                  </span>
                 )}
               </div>
             )}

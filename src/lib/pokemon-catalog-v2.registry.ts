@@ -14,14 +14,12 @@ type GeneratedIdentity = (typeof generatedIdentities)[number];
 const identityKey = (speciesId: number, canonicalName: string) => `${speciesId}:${canonicalName}`;
 
 function normalizeVerification(
-  verification?: (
-    Partial<PokemonCatalogEntity['verification']> & {
-      status?: VerificationStatus | string | null;
-      sourceUrls?: unknown;
-      lastVerifiedAt?: string | null;
-      notes?: string | null;
-    }
-  ) | null,
+  verification?: {
+    status?: string | VerificationStatus | null;
+    sourceUrls?: unknown;
+    lastVerifiedAt?: string | null;
+    notes?: string | null;
+  } | null,
 ): PokemonCatalogEntity['verification'] {
   const statusValue = verification?.status ?? 'unverified';
   const status: VerificationStatus =
