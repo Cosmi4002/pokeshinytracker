@@ -235,12 +235,12 @@ export function ShinyCounter({
     setHuntCreatedAt(snapshot.huntCreatedAt);
   }, []);
 
-  const applyRemoteHunt = useCallback((data: ActiveHuntWithVariant) => {
+  const applyRemoteHunt = useCallback((data: ActiveHuntWithVariant, selectedGameIdOverride?: string | null) => {
     const slots = decodePokemonSlots(data.pokemon_name, data.pokemon_id, data.form, data.gender);
     setCounter(data.counter ?? 0);
     setIncrementAmount(data.increment_amount ?? 1);
     setIncrementHotkey(data.increment_hotkey ?? '');
-    setSelectedGameId('black2');
+    setSelectedGameId(selectedGameIdOverride || 'black2');
     setSelectedPokemonId(slots[0].id);
     setSelectedPokemonName(slots[0].name);
     setSelectedForm(slots[0].form);
@@ -351,7 +351,7 @@ export function ShinyCounter({
             applyCounterSnapshot(pendingSnapshot);
             setSaveStatus('saving');
           } else {
-            applyRemoteHunt(data);
+            applyRemoteHunt(data, pendingSnapshot?.selectedGameId || localSnapshot?.selectedGameId);
             const remoteSlots = decodePokemonSlots(data.pokemon_name, data.pokemon_id, data.form, data.gender);
             writeCounterSnapshot({
               version: 1,
