@@ -474,7 +474,6 @@ export default function PokemonDetails() {
     const prevId = currentId > 1 && currentId < 10000 ? currentId - 1 : null;
     const nextId = currentId < 1025 ? currentId + 1 : null;
     const heroVariant = variants.find(variant => variant.category === 'base') || variants[0];
-    const femaleVariant = variants.find(variant => variant.category === 'gender' && variant.gender === 'female');
     const heroIsCaught = heroVariant ? caughtForms.has(heroVariant.name) : false;
     const gameSpriteGroups = heroVariant
         ? [
@@ -498,22 +497,28 @@ export default function PokemonDetails() {
             },
         ].map(group => {
             const caughtGamesForGroup = group.games.filter(gameId => caughtGames.has(gameId));
-            const caughtGendersForGroup = group.games.flatMap(gameId => caughtGameGenders[gameId] || []);
-            const spriteVariant = femaleVariant && caughtGendersForGroup.includes('female') && !caughtGendersForGroup.includes('male')
-                ? femaleVariant
-                : heroVariant;
+            const gameId = group.games[0];
 
             return {
                 ...group,
-                spriteVariant,
-                spriteUrl: getGameSpecificShinySpriteUrl(spriteVariant.id, group.games[0], {
-                    name: spriteVariant.name,
-                    form: spriteVariant.name,
-                    gender: spriteVariant.gender,
+                maleSpriteUrl: getGameSpecificShinySpriteUrl(heroVariant.id, gameId, {
+                    name: heroVariant.name,
+                    form: heroVariant.name,
+                    gender: 'male',
+                }) || getGameSpecificShinySpriteUrl(heroVariant.id, gameId, {
+                    name: heroVariant.name,
+                    form: heroVariant.name,
                 }),
+                femaleSpriteUrl: details.hasGenderDifference
+                    ? getGameSpecificShinySpriteUrl(heroVariant.id, gameId, {
+                        name: details.name,
+                        form: details.name,
+                        gender: 'female',
+                    })
+                    : null,
                 caughtGames: caughtGamesForGroup,
             };
-        }).filter(group => Boolean(group.spriteUrl))
+        }).filter(group => Boolean(group.maleSpriteUrl))
         : [];
     const hasMultipleForms = variants.length > 1;
     const panelClass = "border-border/70 bg-card/95 text-card-foreground shadow-[0_18px_42px_rgba(0,0,0,0.16)] backdrop-blur dark:border-white/15 dark:bg-[#171717]/95 dark:text-white dark:shadow-[0_18px_42px_rgba(0,0,0,0.42)]";
@@ -872,16 +877,33 @@ export default function PokemonDetails() {
                                     >
                                         <p className="text-center text-sm font-black">{group.label}</p>
                                         <p className="mt-1 min-h-10 text-center text-xs text-muted-foreground">{group.description}</p>
-                                        <img
-                                            src={group.spriteUrl!}
-                                            alt={`${group.spriteVariant?.displayName || heroVariant?.displayName || details.displayName} shiny in ${group.label}`}
-                                            loading="lazy"
-                                            decoding="async"
-                                            className={cn(
-                                                "mt-2 h-32 w-32 object-contain pokemon-sprite scale-[0.9] [image-rendering:pixelated]",
-                                                group.caughtGames.length === 0 && "opacity-35 grayscale"
+                                        <div className={cn(
+                                            "mt-2 flex items-center justify-center gap-2",
+                                            details.hasGenderDifference ? "w-full" : "w-auto"
+                                        )}>
+                                            <img
+                                                src={group.maleSpriteUrl!}
+                                                alt={`${heroVariant?.displayName || details.displayName} male shiny in ${group.label}`}
+                                                loading="lazy"
+                                                decoding="async"
+                                                className={cn(
+                                                    "h-32 w-32 object-contain pokemon-sprite scale-[0.9] [image-rendering:pixelated]",
+                                                    group.caughtGames.length === 0 && "opacity-35 grayscale"
+                                                )}
+                                            />
+                                            {details.hasGenderDifference && group.femaleSpriteUrl && (
+                                                <img
+                                                    src={group.femaleSpriteUrl}
+                                                    alt={`${details.displayName} female shiny in ${group.label}`}
+                                                    loading="lazy"
+                                                    decoding="async"
+                                                    className={cn(
+                                                        "h-32 w-32 object-contain pokemon-sprite scale-[0.9] [image-rendering:pixelated]",
+                                                        group.caughtGames.length === 0 && "opacity-35 grayscale"
+                                                    )}
+                                                />
                                             )}
-                                        />
+                                        </div>
                                         <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
                                             {group.games.map(gameId => {
                                                 const caught = caughtGames.has(gameId);
