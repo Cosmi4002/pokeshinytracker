@@ -519,6 +519,8 @@ export default function UserCollectionsSearch() {
       pokemonName: entry.pokemon_name,
       form: entry.form,
       gender: entry.gender,
+      game: entry.game,
+      secondaryGame: entry.secondary_game,
       spriteUrl: entry.sprite_url,
       });
     const isGameSpecificSprite = isGameSpecificShinySpriteUrl(sprite);
@@ -702,6 +704,8 @@ export default function UserCollectionsSearch() {
       pokemonName: entry.pokemon_name,
       form: entry.form,
       gender: entry.gender,
+      game: entry.game,
+      secondaryGame: entry.secondary_game,
       spriteUrl: entry.sprite_url,
       });
     const isEvolved = entry.is_evolved === true;

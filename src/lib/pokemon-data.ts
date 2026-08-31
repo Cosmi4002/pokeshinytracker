@@ -1,6 +1,7 @@
 // Complete Pokemon list with all forms for shiny hunting
 import { LOCAL_SPRITE_URLS } from './local-sprite-map.generated';
-import { getGameSpecificShinySpriteUrl } from './game-sprites';
+import { getArchiveShinySpriteUrl, getGameSpecificShinySpriteUrl } from './game-sprites';
+export { getArchiveShinySpriteUrl } from './game-sprites';
 import pokedexData from './pokedex.json';
 
 export interface Pokemon {
@@ -1199,16 +1200,19 @@ export function getCaughtShinySpriteUrl(options: {
   pokemonName?: string | null;
   form?: string | null;
   gender?: string | null;
+  game?: string | null;
+  secondaryGame?: string | null;
   spriteUrl?: string | null;
 }): string {
-  const { pokemonId, pokemonName, form, gender, spriteUrl } = options;
+  const { pokemonId, pokemonName, form, gender, game, secondaryGame, spriteUrl } = options;
 
   if (pokemonId) {
-    const resolvedUrl = getPokemonSpriteUrl(pokemonId, {
+    const resolvedUrl = getArchiveShinySpriteUrl(pokemonId, {
       shiny: true,
       name: form || pokemonName || undefined,
       form: form || undefined,
-      female: gender === 'female',
+      gender,
+      preferredGameIds: [secondaryGame, game],
     });
 
     if (resolvedUrl) return resolvedUrl;
@@ -1222,6 +1226,7 @@ export function getCaughtShinySpriteUrl(options: {
 // Alias for transition compatibility
 export const getGameSpecificSpriteUrl = (id: number, methodId: string, name?: string, form?: string, gender?: string, gameId?: string | null) =>
   getGameSpecificShinySpriteUrl(id, gameId, { name, form, gender }) ||
+  getArchiveShinySpriteUrl(id, { name, form, gender }) ||
   getPokemonSpriteUrl(id, { shiny: true, name, form: form || undefined, female: gender === 'female' });
 
 export function getShinyCharmIcon(): string {

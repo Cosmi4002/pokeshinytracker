@@ -24,7 +24,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
-import { POKEBALLS, GAMES, GIGAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, canHideEncountersForMethod, findHuntingMethod, getPokemonSpriteUrl, supportsGigamaxMark } from '@/lib/pokemon-data';
+import { POKEBALLS, GAMES, GIGAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, canHideEncountersForMethod, findHuntingMethod, getArchiveShinySpriteUrl, getPokemonSpriteUrl, supportsGigamaxMark } from '@/lib/pokemon-data';
 import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
 import { MethodSelector } from '@/components/counter/MethodSelector';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -170,7 +170,12 @@ export function FinishHuntDialog({
     // Otherwise, always use default (male) sprite to avoid 404/white square.
     const showFemaleSprite = gender === 'female' && pokemonDetails?.hasGenderDifference;
 
-    return getPokemonSpriteUrl(displayId, {
+    return getArchiveShinySpriteUrl(displayId, {
+      shiny: true,
+      female: showFemaleSprite,
+      form: form || undefined,
+      name: pokemonName,
+    }) || getPokemonSpriteUrl(displayId, {
       shiny: true,
       female: showFemaleSprite,
       form: form || undefined,

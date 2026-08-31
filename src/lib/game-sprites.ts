@@ -3,10 +3,14 @@ import { BW_SHINY_SPRITE_FILES } from '@/data/bw-shiny-sprite-manifest';
 import { BW2_SHINY_SPRITE_FILES } from '@/data/bw2-shiny-sprite-manifest';
 
 export type GameSpriteOptions = {
+  shiny?: boolean;
+  female?: boolean;
   name?: string | null;
   form?: string | null;
   gender?: string | null;
 };
+
+const ARCHIVE_GAME_PRIORITY = ['black2', 'white2', 'black', 'white', 'heartgold', 'soulsilver'] as const;
 
 export const GAME_SPRITE_SET_BY_GAME: Readonly<Record<string, string>> = {
   heartgold: 'hgss',
@@ -43,6 +47,12 @@ const LEGACY_FORM_SPECIES: ReadonlyArray<[RegExp, number]> = [
   [/^shellos(?:-|$)/, 422],
   [/^gastrodon(?:-|$)/, 423],
   [/^rotom(?:-|$)/, 479],
+  [/^basculin(?:-|$)/, 550],
+  [/^deerling(?:-|$)/, 585],
+  [/^sawsbuck(?:-|$)/, 586],
+  [/^tornadus(?:-|$)/, 641],
+  [/^thundurus(?:-|$)/, 642],
+  [/^landorus(?:-|$)/, 645],
   [/^giratina(?:-|$)/, 487],
   [/^shaymin(?:-|$)/, 492],
   [/^arceus(?:-|$)/, 493],
@@ -79,9 +89,18 @@ const getFormSuffix = (speciesId: number, slug: string) => {
     if (slug.includes('defense')) return 'D';
     if (slug.includes('speed')) return 'S';
   }
+  if (speciesId === 550) {
+    if (slug.includes('blue')) return 'B';
+    if (slug.includes('white')) return 'W';
+  }
   if (speciesId === 412 || speciesId === 413) {
     if (slug.includes('sandy')) return 'S';
     if (slug.includes('trash')) return 'G';
+  }
+  if (speciesId === 585 || speciesId === 586) {
+    if (slug.includes('summer')) return 'S';
+    if (slug.includes('autumn') || slug.includes('fall')) return 'A';
+    if (slug.includes('winter')) return 'W';
   }
   if (speciesId === 421 && slug.includes('sunshine')) return 'S';
   if ((speciesId === 422 || speciesId === 423) && slug.includes('east')) return 'E';
@@ -153,6 +172,23 @@ export function getGameSpecificShinySpriteUrl(
   const filename = genderMatch || neutralMatch || maleMatch || formCandidates[0];
   if (!filename || !spriteSet.files.has(filename)) return null;
   return `/img/game-sprites/${resolvedSet}/${filename}`;
+}
+
+export function getArchiveShinySpriteUrl(
+  pokemonId: number,
+  options: GameSpriteOptions & { preferredGameIds?: Array<string | null | undefined> } = {},
+): string | null {
+  const orderedGameIds = [
+    ...(options.preferredGameIds || []),
+    ...ARCHIVE_GAME_PRIORITY,
+  ].filter((gameId, index, values): gameId is string => Boolean(gameId) && values.indexOf(gameId) === index);
+
+  for (const gameId of orderedGameIds) {
+    const resolved = getGameSpecificShinySpriteUrl(pokemonId, gameId, options);
+    if (resolved) return resolved;
+  }
+
+  return null;
 }
 
 export const isGameSpecificShinySpriteUrl = (url?: string | null) =>

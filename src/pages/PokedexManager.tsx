@@ -20,7 +20,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { useAuth } from "@/lib/auth-context";
 import { useToast } from "@/hooks/use-toast";
 import { useGlobalCollectionThemes } from "@/hooks/use-global-collection-themes";
-import { GAMES, getPokemonSpriteUrl } from "@/lib/pokemon-data";
+import { GAMES, getArchiveShinySpriteUrl, getPokemonSpriteUrl } from "@/lib/pokemon-data";
 import { getGameTheme, type GameTheme } from "@/lib/game-themes";
 import { cn } from "@/lib/utils";
 import { COLLECTION_CARD_FILTER_OPTIONS, POKEDEX_CARD_FILTER_OPTIONS, getCardFilterOption, type CardFilterId } from "@/lib/card-effects";
@@ -130,7 +130,7 @@ export default function PokedexManager() {
         [overrides]
     );
     const selectedFilter = getCardFilterOption(collectionCardFilter);
-    const previewSprite = getPokemonSpriteUrl(373, { shiny: true, name: "salamence" });
+    const previewSprite = getArchiveShinySpriteUrl(373, { shiny: true, name: "salamence", form: "salamence" }) || getPokemonSpriteUrl(373, { shiny: true, name: "salamence" });
     const previewLogo = selectedGameData.logo || `/img/game-logos/${selectedGameData.id}.png`;
 
     useEffect(() => {

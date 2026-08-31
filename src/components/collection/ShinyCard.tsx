@@ -1,7 +1,7 @@
 import { Pencil, Trash2, Calendar, ArrowUpCircle, Crosshair, Sparkles, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getGameTheme, GAME_LOGOS, type GameTheme } from '@/lib/game-themes';
-import { GIGAMAX_ICON, POKEBALLS, POKEMON_EGG_ICON, findHuntingMethod, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, handlePokemonSpriteError, isBreedingMethod, supportsGigamaxMark, toLocalPokemonSpriteUrl } from '@/lib/pokemon-data';
+import { GIGAMAX_ICON, POKEBALLS, POKEMON_EGG_ICON, findHuntingMethod, getArchiveShinySpriteUrl, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, handlePokemonSpriteError, isBreedingMethod, supportsGigamaxMark, toLocalPokemonSpriteUrl } from '@/lib/pokemon-data';
 import type { Tables } from '@/integrations/supabase/types';
 import { useMemo, useCallback, useId } from 'react';
 import { cn } from '@/lib/utils';
@@ -170,7 +170,10 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
       : `linear-gradient(135deg, ${theme.secondary} 0%, color-mix(in srgb, ${theme.secondary} 55%, ${theme.primary}) 52%, ${theme.primary} 100%)`;
   const evolvedFromSpriteUrl = useMemo(() => {
     if (!isEvolved || !evolvedFromId) return '';
-    const byName = getPokemonSpriteUrl(evolvedFromId, {
+    const byName = getArchiveShinySpriteUrl(evolvedFromId, {
+      shiny: true,
+      name: evolvedFromName || undefined,
+    }) || getPokemonSpriteUrl(evolvedFromId, {
       shiny: true,
       name: evolvedFromName || undefined,
     });

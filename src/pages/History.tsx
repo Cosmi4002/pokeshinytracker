@@ -29,10 +29,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
-import { getPokemonSpriteUrl } from '@/hooks/use-pokemon';
 import { supabase } from '@/integrations/supabase/client';
 import type { Json, Tables } from '@/integrations/supabase/types';
 import { useAuth } from '@/lib/auth-context';
+import { getGameSpecificShinySpriteUrl, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
+import { getCaughtShinySpriteUrl } from '@/lib/pokemon-data';
 import { useRandomColor } from '@/lib/random-color-context';
 import { cn } from '@/lib/utils';
 
@@ -317,13 +318,25 @@ export default function History() {
                     const details = actionDetails[event.action as keyof typeof actionDetails] || actionDetails.update;
                     const Icon = details.icon;
                     const visibleFields = event.changed_fields.filter((field) => !hiddenFields.has(field)).slice(0, 5);
-                    const sprite = snapshot?.sprite_url || (snapshot?.pokemon_id
-                      ? getPokemonSpriteUrl(snapshot.pokemon_id, {
-                        shiny: true,
-                        name: snapshot.form || snapshot.pokemon_name,
-                        female: snapshot.gender === 'female',
-                      })
-                      : '/placeholder.svg');
+                    const sprite = snapshot?.pokemon_id
+                      ? (
+                        getGameSpecificShinySpriteUrl(snapshot.pokemon_id, snapshot.secondary_game || snapshot.game, {
+                          name: snapshot.form || snapshot.pokemon_name,
+                          form: snapshot.form,
+                          gender: snapshot.gender,
+                        }) ||
+                        getCaughtShinySpriteUrl({
+                          pokemonId: snapshot.pokemon_id,
+                          pokemonName: snapshot.pokemon_name,
+                          form: snapshot.form,
+                          gender: snapshot.gender,
+                          game: snapshot.game,
+                          secondaryGame: snapshot.secondary_game,
+                          spriteUrl: snapshot.sprite_url,
+                        })
+                      )
+                      : '/placeholder.svg';
+                    const isGameSpecificSprite = isGameSpecificShinySpriteUrl(sprite);
 
                     return (
                       <Card key={event.id} className="overflow-hidden border-border bg-card shadow-lg">
@@ -334,7 +347,10 @@ export default function History() {
                                 <img
                                   src={sprite}
                                   alt={snapshot?.pokemon_name || 'Pokémon'}
-                                  className="h-full w-full object-contain [image-rendering:pixelated]"
+                                  className={cn(
+                                    "h-full w-full object-contain [image-rendering:pixelated]",
+                                    isGameSpecificSprite && "scale-[0.86]"
+                                  )}
                                   onError={(event) => { event.currentTarget.src = '/placeholder.svg'; }}
                                 />
                               </div>

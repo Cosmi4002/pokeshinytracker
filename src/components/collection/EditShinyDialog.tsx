@@ -25,7 +25,7 @@ import { PokemonSelector } from '@/components/counter/PokemonSelector';
 import { MethodSelector } from '@/components/counter/MethodSelector';
 import { POKEBALLS, GAMES, GIGAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, canHideEncountersForMethod, findHuntingMethod, supportsGigamaxMark } from '@/lib/pokemon-data';
 import { usePokemonDetails, usePokemonList, formatPokemonName, MANUAL_VARIETIES } from '@/hooks/use-pokemon';
-import { getPokemonSpriteUrl } from '@/lib/pokemon-data';
+import { getArchiveShinySpriteUrl, getPokemonSpriteUrl } from '@/lib/pokemon-data';
 import { GenderSelector } from '@/components/ui/GenderSelector';
 import { Sparkles } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
@@ -123,7 +123,12 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
     // When a form is selected, use the full form name as 'name' to ensure sprite URL generation works correctly
     const spriteName = form ? form : pokemonName;
 
-    return getPokemonSpriteUrl(displayId, {
+    return getArchiveShinySpriteUrl(displayId, {
+      shiny: true,
+      female: showFemaleSprite,
+      form: form || undefined,
+      name: spriteName,
+    }) || getPokemonSpriteUrl(displayId, {
       shiny: true,
       female: showFemaleSprite,
       form: form || undefined,

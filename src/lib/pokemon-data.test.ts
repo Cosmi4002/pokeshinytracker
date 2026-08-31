@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { HUNTING_METHODS, calculateShinyStats, formatOdds, getCaughtShinySpriteUrl, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, isBreedingMethod } from './pokemon-data';
+import { HUNTING_METHODS, calculateShinyStats, formatOdds, getArchiveShinySpriteUrl, getCaughtShinySpriteUrl, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, isBreedingMethod } from './pokemon-data';
 
 describe('pokemon sprite helpers', () => {
   it('returns a stable fallback asset for missing sprite images', () => {
@@ -18,15 +18,31 @@ describe('pokemon sprite helpers', () => {
     );
   });
 
+  it('prefers archive sprites for gender-diff and seasonal forms', () => {
+    expect(getArchiveShinySpriteUrl(154, { shiny: true, name: 'meganium', gender: 'female' })).toBe(
+      '/img/game-sprites/bw/Spr_5b_154_f_s.webp'
+    );
+    expect(getArchiveShinySpriteUrl(550, { shiny: true, name: 'basculin-blue-striped', form: 'basculin-blue-striped' })).toBe(
+      '/img/game-sprites/bw/Spr_5b_550B_s.webp'
+    );
+    expect(getArchiveShinySpriteUrl(585, { shiny: true, name: 'deerling-winter', form: 'deerling-winter' })).toBe(
+      '/img/game-sprites/bw/Spr_5b_585W_s.webp'
+    );
+    expect(getArchiveShinySpriteUrl(10020, { shiny: true, name: 'thundurus-therian', form: 'thundurus-therian' })).toBe(
+      '/img/game-sprites/bw/Spr_5b_642_s.webp'
+    );
+  });
+
   it('recomputes caught shiny sprite URLs from pokemon data instead of trusting stale saved urls', () => {
     expect(
       getCaughtShinySpriteUrl({
         pokemonId: 25,
         pokemonName: 'pikachu',
         gender: 'female',
+        game: 'heartgold',
         spriteUrl: 'https://legacy.example/pikachu.png',
       })
-    ).toBe(getPokemonSpriteUrl(25, { shiny: true, name: 'pikachu', female: true }));
+    ).toBe('/img/game-sprites/hgss/Spr_4h_025_f_s.png');
   });
 
   it('resolves saved form slugs to the correct sprite variant id', () => {

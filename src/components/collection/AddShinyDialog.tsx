@@ -28,7 +28,7 @@ import { MethodSelector } from '@/components/counter/MethodSelector';
 import { Checkbox } from '@/components/ui/checkbox';
 import { POKEBALLS, GAMES, GIGAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, canHideEncountersForMethod, supportsGigamaxMark } from '@/lib/pokemon-data';
 import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
-import { getPokemonSpriteUrl } from '@/lib/pokemon-data';
+import { getArchiveShinySpriteUrl, getPokemonSpriteUrl } from '@/lib/pokemon-data';
 import { todayLocalISODate } from '@/lib/date';
 import { resolveEntityKeyForSelectedPokemon } from '@/lib/pokemon-entity-resolver-v2';
 
@@ -133,7 +133,12 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
     // Otherwise, always use default (male) sprite to avoid 404/white square.
     const showFemaleSprite = gender === 'female' && pokemonDetails?.hasGenderDifference;
 
-    return getPokemonSpriteUrl(displayId, {
+    return getArchiveShinySpriteUrl(displayId, {
+      shiny: true,
+      female: showFemaleSprite,
+      form: form || undefined,
+      name: pokemonName,
+    }) || getPokemonSpriteUrl(displayId, {
       shiny: true,
       female: showFemaleSprite,
       form: form || undefined,

@@ -5,12 +5,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
-import { getPokemonSpriteUrl } from '@/hooks/use-pokemon';
 import { usePokemonList } from '@/hooks/use-pokemon';
 import { canEvolve, getNextEvolutions } from '@/lib/evolution-data';
 import type { Tables } from '@/integrations/supabase/types';
 import { cn } from '@/lib/utils';
 import { resolveEntityKeyForSelectedPokemon, resolvePokemonEntityKey } from '@/lib/pokemon-entity-resolver-v2';
+import { getArchiveShinySpriteUrl, getPokemonSpriteUrl } from '@/lib/pokemon-data';
 
 type CaughtShinyRow = Tables<'caught_shinies'>;
 
@@ -92,7 +92,12 @@ export function EvolveDialog({ open, onOpenChange, entry, onSuccess }: EvolveDia
 
   const currentSpriteUrl = useMemo(() => {
     if (!entry) return '';
-    return getPokemonSpriteUrl(entry.pokemon_id, {
+    return getArchiveShinySpriteUrl(entry.pokemon_id, {
+      shiny: true,
+      name: entry.pokemon_name,
+      form: entry.form || undefined,
+      female: entry.gender === 'female'
+    }) || getPokemonSpriteUrl(entry.pokemon_id, {
       shiny: true,
       name: entry.pokemon_name,
       form: entry.form || undefined,
@@ -112,7 +117,10 @@ export function EvolveDialog({ open, onOpenChange, entry, onSuccess }: EvolveDia
       }
 
       // Generate the new sprite URL
-      const newSpriteUrl = getPokemonSpriteUrl(selectedEvolution, {
+      const newSpriteUrl = getArchiveShinySpriteUrl(selectedEvolution, {
+        shiny: true,
+        name: evolutionPokemon.name,
+      }) || getPokemonSpriteUrl(selectedEvolution, {
         shiny: true,
         name: evolutionPokemon.name,
       });

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { usePokedexOverrides } from './use-pokedex-overrides';
-import { toShowdownSlug, getPokemonSpriteUrl } from '@/lib/pokemon-data';
+import { toShowdownSlug, getArchiveShinySpriteUrl, getPokemonSpriteUrl } from '@/lib/pokemon-data';
 export { toShowdownSlug, getPokemonSpriteUrl } from '@/lib/pokemon-data';
 import pokedexData from '@/lib/pokedex.json';
 import { isFormEliminated, POKEMON_DATA_OVERRIDES } from '@/lib/form-filters';
@@ -786,10 +786,10 @@ export function usePokemonDetails(pokemonId: number | null) {
         const hasGenderDiff = !isRegionalForm && POKEMON_WITH_GENDER_DIFF.includes(baseId) && !isExcludedGenderForm;
 
         const sprites = {
-          default: getPokemonSpriteUrl(pokemonId!, { name: name, animated: true }),
-          shiny: getPokemonSpriteUrl(pokemonId!, { shiny: true, name: name, animated: true }),
-          femaleDefault: hasGenderDiff ? getPokemonSpriteUrl(pokemonId!, { female: true, name: name, animated: true }) : undefined,
-          femaleShiny: hasGenderDiff ? getPokemonSpriteUrl(pokemonId!, { shiny: true, female: true, name: name, animated: true }) : undefined,
+          default: getArchiveShinySpriteUrl(pokemonId!, { name, form: name }) || getPokemonSpriteUrl(pokemonId!, { name: name, animated: true }),
+          shiny: getArchiveShinySpriteUrl(pokemonId!, { shiny: true, name, form: name }) || getPokemonSpriteUrl(pokemonId!, { shiny: true, name: name, animated: true }),
+          femaleDefault: hasGenderDiff ? (getArchiveShinySpriteUrl(pokemonId!, { name, form: name, gender: 'female' }) || getPokemonSpriteUrl(pokemonId!, { female: true, name: name, animated: true })) : undefined,
+          femaleShiny: hasGenderDiff ? (getArchiveShinySpriteUrl(pokemonId!, { shiny: true, name, form: name, gender: 'female' }) || getPokemonSpriteUrl(pokemonId!, { shiny: true, female: true, name: name, animated: true })) : undefined,
         };
 
         const forms: PokemonFormDetailed[] = relatives
@@ -807,20 +807,20 @@ export function usePokemonDetails(pokemonId: number | null) {
             formName: r.name,
             displayName: formatPokemonName(r.name, r.id, baseId),
             sprites: {
-              default: getPokemonSpriteUrl(r.id, { name: r.name }),
-              shiny: getPokemonSpriteUrl(r.id, { name: r.name, shiny: true }),
+              default: getArchiveShinySpriteUrl(r.id, { name: r.name, form: r.name }) || getPokemonSpriteUrl(r.id, { name: r.name }),
+              shiny: getArchiveShinySpriteUrl(r.id, { name: r.name, form: r.name, shiny: true }) || getPokemonSpriteUrl(r.id, { name: r.name, shiny: true }),
             },
           }));
 
         // In our purely local system, Varieties and Forms are essentially the same relatives
         const varieties: PokemonVariety[] = relatives.map(r => ({
           isDefault: r.id === baseId,
-          pokemon: {
-            id: r.id,
-            name: r.name,
-            spriteUrl: getPokemonSpriteUrl(r.id, { name: r.name, shiny: true })
-          }
-        }));
+            pokemon: {
+              id: r.id,
+              name: r.name,
+              spriteUrl: getArchiveShinySpriteUrl(r.id, { name: r.name, form: r.name, shiny: true }) || getPokemonSpriteUrl(r.id, { name: r.name, shiny: true })
+            }
+          }));
 
         // Final result with overrides
         const override = (overrides[`${pokemonId}-${name}`] || POKEMON_DATA_OVERRIDES[pokemonId!]) as any;

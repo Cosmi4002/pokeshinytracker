@@ -7,6 +7,7 @@ import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
 import { PokemonSelector } from '@/components/counter/PokemonSelector';
 import { usePokemonList, getPokemonSpriteUrl, PokemonBasic } from '@/hooks/use-pokemon';
+import { getArchiveShinySpriteUrl } from '@/lib/pokemon-data';
 import { useRandomColor } from '@/lib/random-color-context';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth-context';
@@ -972,7 +973,7 @@ export default function Games() {
                   </svg>
                   <img
                     key={`${displayedRandomPokemon.id}-${displayedRandomPokemon.name}`}
-                    src={getPokemonSpriteUrl(displayedRandomPokemon.id, { shiny: true, name: displayedRandomPokemon.name })}
+                    src={getArchiveShinySpriteUrl(displayedRandomPokemon.id, { shiny: true, name: displayedRandomPokemon.name, form: displayedRandomPokemon.name }) || getPokemonSpriteUrl(displayedRandomPokemon.id, { shiny: true, name: displayedRandomPokemon.name })}
                     alt={displayedRandomPokemon.displayName}
                     className="h-40 w-40 object-contain"
                     style={{
@@ -1160,10 +1161,14 @@ export default function Games() {
                               src={
                                 isGame
                                   ? (cell as GameCell).logo
-                                  : getPokemonSpriteUrl((cell as PokemonBasic).id, {
+                                  : (getArchiveShinySpriteUrl((cell as PokemonBasic).id, {
                                       shiny: true,
                                       name: (cell as PokemonBasic).name,
-                                    })
+                                      form: (cell as PokemonBasic).name,
+                                    }) || getPokemonSpriteUrl((cell as PokemonBasic).id, {
+                                      shiny: true,
+                                      name: (cell as PokemonBasic).name,
+                                    }))
                               }
                               alt={label}
                               className={cn(
