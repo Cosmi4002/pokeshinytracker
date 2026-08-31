@@ -466,14 +466,15 @@ export default function PokemonDetails() {
 
     if (!details) return null;
 
+    const baseSpriteUrl = getPokemonSpriteUrl(details.id, { name: details.name });
+    const femaleSpriteUrl = details.hasGenderDifference
+        ? getPokemonSpriteUrl(details.id, { female: true, name: details.name })
+        : null;
+
     const currentId = details.id;
     const prevId = currentId > 1 && currentId < 10000 ? currentId - 1 : null;
     const nextId = currentId < 1025 ? currentId + 1 : null;
     const heroVariant = variants.find(variant => variant.category === 'base') || variants[0];
-    const baseSpriteUrl = heroVariant?.spriteUrl || getPokemonSpriteUrl(details.id, { name: details.name });
-    const femaleSpriteUrl = details.hasGenderDifference
-        ? getPokemonSpriteUrl(details.id, { female: true, name: details.name })
-        : null;
     const heroIsCaught = heroVariant ? caughtForms.has(heroVariant.name) : false;
     const gameSpriteGroups = heroVariant
         ? [
