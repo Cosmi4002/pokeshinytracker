@@ -256,8 +256,10 @@ export default function PokemonDetails() {
         const items: FormVariant[] = [];
 
         // Add Base + Gender variants if applicable
-        const baseSpriteUrl = details.sprites.shiny || details.sprites.default;
-        const femaleSpriteUrl = details.sprites.femaleShiny || details.sprites.femaleDefault;
+        const baseSpriteUrl = getPokemonSpriteUrl(details.id, { shiny: true, name: details.name });
+        const femaleSpriteUrl = details.hasGenderDifference
+            ? getPokemonSpriteUrl(details.id, { shiny: true, female: true, name: details.name })
+            : null;
 
         const baseVariant: FormVariant = {
             id: details.id,
@@ -304,7 +306,7 @@ export default function PokemonDetails() {
                 displayName: f.displayName,
                 category,
                 gender: 'genderless',
-                spriteUrl: f.sprites.shiny
+                spriteUrl: getPokemonSpriteUrl(f.id, { shiny: true, name: f.formName })
             });
         });
 
