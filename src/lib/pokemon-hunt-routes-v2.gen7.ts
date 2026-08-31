@@ -166,7 +166,7 @@ function normalAlolaRoute(key: PokemonEntityKey, gameId: TrackedGameId): Pokemon
       evolveFromEntityKey: previous,
       locations: ['Let’s Go Alolan-form evolution line'],
       prerequisites: previous ? [
-        ...(requiresTradeEvolution ? [{ type: 'external-game-feature' as const, entityKey: previous, note: 'Requires a compatible trade-evolution setup for shiny Alolan Graveler.' }] : []),
+        ...(requiresTradeEvolution ? [{ type: 'external-game-feature' as const, entityKey: previous as PokemonEntityKey, note: 'Requires a compatible trade-evolution setup for shiny Alolan Graveler.' }] : []),
         { type: 'evolve-shiny', entityKey: previous, note: `Obtain shiny ${entity(previous).displayName}, then evolve it into ${current.displayName}.` },
       ] : [],
       explanation: `${current.displayName} is tracked as its own Alolan form and comes from evolving the shiny Alolan-form family member in Let’s Go.`,

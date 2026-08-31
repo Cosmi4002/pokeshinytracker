@@ -75,10 +75,15 @@ function buildNativeEncounterRoutes(tuple: NativeEncounterTuple): PokemonHuntRou
     ? [baseKey]
     : [...(generatedTargetsForFormOnlySpecies[speciesId] ?? [])];
 
-  const prerequisites: HuntRoutePrerequisite[] = [
-    ...progressionNotes.map((note): HuntRoutePrerequisite => ({ type: 'game-progression', note })),
-    ...externalNotes.map((note): HuntRoutePrerequisite => ({ type: 'external-game-feature', note })),
-  ];
+  const progressionPrereqs: HuntRoutePrerequisite[] = progressionNotes.map((note): HuntRoutePrerequisite => ({
+    type: 'game-progression',
+    note,
+  }));
+  const externalPrereqs: HuntRoutePrerequisite[] = externalNotes.map((note): HuntRoutePrerequisite => ({
+    type: 'external-game-feature',
+    note,
+  }));
+  const prerequisites: HuntRoutePrerequisite[] = [...progressionPrereqs, ...externalPrereqs];
   const isRadar = huntingMethodId.includes('pokeradar');
   const isRoaming = huntingMethodId.includes('roaming');
   const isStatic = huntingMethodId.includes('soft-reset')

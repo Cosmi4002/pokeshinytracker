@@ -292,15 +292,15 @@ function cloneBaseRoutesForKantoStarter(config: KantoStarterCloneConfig): Pokemo
     clone.prerequisites = clone.prerequisites.map((item) => ({
       ...item,
       entityKey: item.entityKey === 'pokemon:1:base' ? targetKey : item.entityKey,
-      note: item.note.replaceAll('Bulbasaur', config.name).replaceAll('Bulbasaur-family', `${config.name} family`),
+      note: item.note.replace(/Bulbasaur/g, config.name).replace(/Bulbasaur-family/g, `${config.name} family`),
     }));
-    clone.explanation = clone.explanation.replaceAll('Bulbasaur', config.name);
+    clone.explanation = clone.explanation.replace(/Bulbasaur/g, config.name);
     clone.sources = clone.sources.map((source) => {
       let url = source.url;
       if (url.includes('bulbapedia.bulbagarden.net/wiki/Bulbasaur_')) url = config.bulbapediaPage;
       else if (config.baseId === 4) url = url.replace('/001.shtml', '/004.shtml').replace('/bulbasaur', '/charmander');
       else url = url.replace('/001.shtml', '/007.shtml').replace('/bulbasaur', '/squirtle');
-      return { ...source, url, note: source.note.replaceAll('Bulbasaur', config.name) };
+      return { ...source, url, note: source.note.replace(/Bulbasaur/g, config.name) };
     });
 
     if (route.gameId === 'ultrasun' || route.gameId === 'ultramoon') {

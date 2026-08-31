@@ -225,7 +225,7 @@ function directOrBreedingRoute(speciesId: number, gameId: TrackedGameId): Pokemo
   const rootKey = baseKey(rootId);
   const xyExclusiveNativeGame = xyVersionNativeGameBySpecies.get(speciesId);
   const direct = (gameId === 'x' || gameId === 'y') && (!xyExclusiveNativeGame || xyExclusiveNativeGame === gameId);
-  const sourceGameIds = xyExclusiveNativeGame ? [xyExclusiveNativeGame] : ['x', 'y'];
+  const sourceGameIds: TrackedGameId[] = xyExclusiveNativeGame ? [xyExclusiveNativeGame] : ['x', 'y'];
   const requiresTradeEvolution = tradeEvolutionSpecies.has(speciesId);
   const externalEvolution = evolved && requiresTradeEvolution;
   const breedingAccess = evolved ? 'external-parent-breeding-evolution' : 'external-parent-breeding';

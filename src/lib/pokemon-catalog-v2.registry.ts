@@ -7,11 +7,21 @@ import {
   createPokemonEntityKey,
   validatePokemonCatalog,
 } from './pokemon-catalog-v2';
-import type { PokemonCatalogEntity, PokemonCatalogEntityOverride } from './pokemon-catalog-v2';
+import type { PokemonCatalogEntity, PokemonCatalogEntityOverride, VerificationStatus } from './pokemon-catalog-v2';
 
 type GeneratedIdentity = (typeof generatedIdentities)[number];
 
 const identityKey = (speciesId: number, canonicalName: string) => `${speciesId}:${canonicalName}`;
+
+function normalizeVerification(verification?: Partial<PokemonCatalogEntity['verification']> | null): PokemonCatalogEntity['verification'] {
+  const status = (verification?.status ?? 'unverified') as VerificationStatus;
+  return {
+    status,
+    sourceUrls: verification?.sourceUrls ?? [],
+    lastVerifiedAt: verification?.lastVerifiedAt,
+    notes: verification?.notes,
+  };
+}
 
 function defaultEntity(identity: GeneratedIdentity): PokemonCatalogEntity {
   const classification = classifyPokemonForm(identity.speciesId, identity.canonicalName, identity.formKey);
@@ -27,7 +37,7 @@ function defaultEntity(identity: GeneratedIdentity): PokemonCatalogEntity {
     completionPolicy: classification.completionPolicy,
     assets: {},
     legacy: identity.legacy,
-    verification: identity.verification,
+    verification: normalizeVerification(identity.verification),
   };
 }
 
@@ -44,7 +54,7 @@ function applyOverride(entity: PokemonCatalogEntity, override: PokemonCatalogEnt
       formNames: override.legacy?.formNames || entity.legacy.formNames,
       displayNames: override.legacy?.displayNames || entity.legacy.displayNames,
     },
-    verification: override.verification || entity.verification,
+    verification: normalizeVerification(override.verification || entity.verification),
   };
 }
 

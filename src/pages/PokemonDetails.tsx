@@ -250,6 +250,11 @@ export default function PokemonDetails() {
         }
     };
 
+    const baseSpriteUrl = details ? getPokemonSpriteUrl(details.id, { name: details.name }) : '';
+    const femaleSpriteUrl = details && details.hasGenderDifference
+        ? getPokemonSpriteUrl(details.id, { female: true, name: details.name })
+        : null;
+
     // Flatten all variants from the hook data
     const variants = useMemo((): FormVariant[] => {
         if (!details) return [];
@@ -466,14 +471,10 @@ export default function PokemonDetails() {
 
     if (!details) return null;
 
-    const baseSpriteUrl = getPokemonSpriteUrl(details.id, { name: details.name });
-    const femaleSpriteUrl = details.hasGenderDifference
-        ? getPokemonSpriteUrl(details.id, { female: true, name: details.name })
-        : null;
-
     const currentId = details.id;
     const prevId = currentId > 1 && currentId < 10000 ? currentId - 1 : null;
     const nextId = currentId < 1025 ? currentId + 1 : null;
+
     const heroVariant = variants.find(variant => variant.category === 'base') || variants[0];
     const heroIsCaught = heroVariant ? caughtForms.has(heroVariant.name) : false;
     const gameSpriteGroups = heroVariant
