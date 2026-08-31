@@ -134,10 +134,10 @@ const normalizeGender = (gender?: string | null): 'female' | 'male' | null => {
   return null;
 };
 
-const HOME_SHINY_OVERRIDE_BY_FORM: Readonly<Record<string, string>> = {
-  'tornadus-therian': '/img/pokemon-sprites/remote/raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10019.png',
-  'thundurus-therian': '/img/pokemon-sprites/remote/raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10020.png',
-  'landorus-therian': '/img/pokemon-sprites/remote/raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10021.png',
+const ARCHIVE_THERIAN_SHINY_OVERRIDE_BY_FORM: Readonly<Record<string, string>> = {
+  'tornadus-therian': 'https://archives.bulbagarden.net/media/upload/3/3c/Spr_5b2_641T_s.png',
+  'thundurus-therian': 'https://archives.bulbagarden.net/media/upload/2/21/Spr_5b2_642T_s.png',
+  'landorus-therian': 'https://archives.bulbagarden.net/media/upload/3/36/Spr_5b2_645T_s.png',
 };
 
 export function getGameSpecificShinySpriteUrl(
@@ -149,9 +149,9 @@ export function getGameSpecificShinySpriteUrl(
   if (!set) return null;
 
   const slug = normalize(options.form || options.name);
-  const homeOverride = slug ? HOME_SHINY_OVERRIDE_BY_FORM[slug] : undefined;
-  if (homeOverride && ['black', 'white', 'black2', 'white2'].includes(gameId ?? '')) {
-    return homeOverride;
+  const archiveTherianOverride = slug ? ARCHIVE_THERIAN_SHINY_OVERRIDE_BY_FORM[slug] : undefined;
+  if (archiveTherianOverride && ['black', 'white', 'black2', 'white2'].includes(gameId ?? '')) {
+    return archiveTherianOverride;
   }
 
   const speciesId = resolveSpeciesId(pokemonId, slug);

@@ -29,7 +29,7 @@ describe('pokemon sprite helpers', () => {
       '/img/game-sprites/bw/Spr_5b_585W_s.webp'
     );
     expect(getArchiveShinySpriteUrl(10020, { shiny: true, name: 'thundurus-therian', form: 'thundurus-therian' })).toBe(
-      '/img/game-sprites/bw/Spr_5b_642_s.webp'
+      'https://archives.bulbagarden.net/media/upload/2/21/Spr_5b2_642T_s.png'
     );
   });
 

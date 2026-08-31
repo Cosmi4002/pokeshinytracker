@@ -18,13 +18,13 @@ describe('game-specific shiny sprites', () => {
       .toBe('/img/game-sprites/bw2/Spr_5b2_495_s.webp');
   });
 
-  it('prefers the correct Therian HOME shiny sprite for BW/BW2 forms', () => {
+  it('prefers the exact Bulbagarden Therian shiny sprite for BW/BW2 forms', () => {
     expect(getGameSpecificShinySpriteUrl(641, 'black', { name: 'tornadus-therian', form: 'tornadus-therian' }))
-      .toBe('/img/pokemon-sprites/remote/raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10019.png');
+      .toBe('https://archives.bulbagarden.net/media/upload/3/3c/Spr_5b2_641T_s.png');
     expect(getGameSpecificShinySpriteUrl(642, 'black2', { name: 'thundurus-therian', form: 'thundurus-therian' }))
-      .toBe('/img/pokemon-sprites/remote/raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10020.png');
+      .toBe('https://archives.bulbagarden.net/media/upload/2/21/Spr_5b2_642T_s.png');
     expect(getGameSpecificShinySpriteUrl(645, 'white2', { name: 'landorus-therian', form: 'landorus-therian' }))
-      .toBe('/img/pokemon-sprites/remote/raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10021.png');
+      .toBe('https://archives.bulbagarden.net/media/upload/3/36/Spr_5b2_645T_s.png');
   });
 
   it.each([
