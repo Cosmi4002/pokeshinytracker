@@ -256,9 +256,9 @@ export default function PokemonDetails() {
         const items: FormVariant[] = [];
 
         // Add Base + Gender variants if applicable
-        const baseSpriteUrl = getPokemonSpriteUrl(details.id, { shiny: true, name: details.name });
+        const baseSpriteUrl = getPokemonSpriteUrl(details.id, { name: details.name });
         const femaleSpriteUrl = details.hasGenderDifference
-            ? getPokemonSpriteUrl(details.id, { shiny: true, female: true, name: details.name })
+            ? getPokemonSpriteUrl(details.id, { female: true, name: details.name })
             : null;
 
         const baseVariant: FormVariant = {
@@ -306,7 +306,7 @@ export default function PokemonDetails() {
                 displayName: f.displayName,
                 category,
                 gender: 'genderless',
-                spriteUrl: getPokemonSpriteUrl(f.id, { shiny: true, name: f.formName })
+                spriteUrl: getPokemonSpriteUrl(f.id, { name: f.formName })
             });
         });
 
@@ -522,7 +522,8 @@ export default function PokemonDetails() {
             };
         }).filter(group => Boolean(group.maleSpriteUrl))
         : [];
-    const hasMultipleForms = variants.length > 1;
+    const collectibleVariants = variants.filter(variant => variant.category !== 'gender');
+    const hasMultipleForms = collectibleVariants.length > 1;
     const panelClass = "border-border/70 bg-card/95 text-card-foreground shadow-[0_18px_42px_rgba(0,0,0,0.16)] backdrop-blur dark:border-white/15 dark:bg-[#171717]/95 dark:text-white dark:shadow-[0_18px_42px_rgba(0,0,0,0.42)]";
 
     return (
@@ -650,15 +651,28 @@ export default function PokemonDetails() {
                         </div>
 
                         {heroVariant && (
-                            <div className="mx-auto flex w-full max-w-sm items-center justify-center px-4">
+                            <div className={cn(
+                                "mx-auto flex w-full items-center justify-center gap-3 px-4",
+                                details.hasGenderDifference ? "max-w-xl flex-wrap sm:flex-nowrap" : "max-w-sm"
+                            )}>
                                 <img
-                                    src={heroVariant.spriteUrl}
+                                    src={baseSpriteUrl}
                                     alt={heroVariant.displayName}
                                     className={cn(
-                                        "h-56 w-56 object-contain pokemon-sprite transition-all duration-500 sm:h-64 sm:w-64",
+                                        "h-48 w-48 object-contain pokemon-sprite transition-all duration-500 sm:h-56 sm:w-56",
                                         heroIsCaught ? "scale-105 drop-shadow-2xl" : "opacity-75 grayscale saturate-50"
                                     )}
                                 />
+                                {details.hasGenderDifference && femaleSpriteUrl && (
+                                    <img
+                                        src={femaleSpriteUrl}
+                                        alt={`${details.displayName} female`}
+                                        className={cn(
+                                            "h-44 w-44 object-contain pokemon-sprite transition-all duration-500 sm:h-52 sm:w-52",
+                                            heroIsCaught ? "scale-105 drop-shadow-2xl" : "opacity-75 grayscale saturate-50"
+                                        )}
+                                    />
+                                )}
                             </div>
                         )}
 
@@ -939,14 +953,14 @@ export default function PokemonDetails() {
                             <div className="flex items-center gap-3 rounded-lg border border-border/70 bg-background/80 px-5 py-2.5 text-card-foreground shadow-inner dark:border-white/15 dark:bg-white/10">
                                 <Sparkles className="h-4 w-4 text-primary" />
                                 <span className="text-sm font-bold text-foreground">
-                                    {caughtForms.size} <span className="text-muted-foreground mx-1">/</span> {variants.length}
+                                    {caughtForms.size} <span className="text-muted-foreground mx-1">/</span> {collectibleVariants.length}
                                 </span>
                                 <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest ml-2">complete</span>
                             </div>
                         </div>
 
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                            {variants.map(variant => {
+                            {collectibleVariants.map(variant => {
                                 const isCaught = caughtForms.has(variant.name);
                                 const isLoading = actionLoading === variant.name;
                                 const caughtCardColor = `color-mix(in srgb, ${accentColor} 52%, hsl(var(--card)) 48%)`;
