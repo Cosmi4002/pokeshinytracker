@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { PokemonSelector } from './PokemonSelector';
 import { MethodSelector } from './MethodSelector';
-import { calculateShinyStats, findHuntingMethod, HUNTING_METHODS, HuntingMethod, POKEMON_EGG_ICON, SHINY_CHARM_ICON, getGameSpecificSpriteUrl, formatOdds, isBreedingMethod } from '@/lib/pokemon-data';
+import { calculateShinyStats, findHuntingMethod, GAMES, HUNTING_METHODS, HuntingMethod, POKEMON_EGG_ICON, SHINY_CHARM_ICON, formatOdds, isBreedingMethod, getArchiveShinySpriteUrl, getPokemonSpriteUrl } from '@/lib/pokemon-data';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
 import type { Tables } from '@/integrations/supabase/types';
@@ -34,7 +34,7 @@ import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
 import { cn } from '@/lib/utils';
 import { resolveEntityKeysForCounterSlots } from '@/lib/pokemon-entity-resolver-v2';
 import { useOnlineStatus } from '@/hooks/use-online-status';
-import { getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleStyle, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
+import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleStyle, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
 import {
   migrateCounterSnapshot,
   OFFLINE_HUNT_PREFIX,
@@ -160,6 +160,7 @@ export function ShinyCounter({
   const [selectedPokemon3Id, setSelectedPokemon3Id] = useState<number | null>(null);
   const [selectedPokemon3Name, setSelectedPokemon3Name] = useState<string>('');
   const [selectedMethod, setSelectedMethod] = useState<HuntingMethod>(HUNTING_METHODS[0]);
+  const [selectedGameId, setSelectedGameId] = useState<string>('black2');
   const [hasShinyCharm, setHasShinyCharm] = useState(false);
   const [selectedForm, setSelectedForm] = useState<string>('');
   const [selectedPokemon2Form, setSelectedPokemon2Form] = useState<string>('');
@@ -187,6 +188,7 @@ export function ShinyCounter({
   const { pokemon: pokemonDetails } = usePokemonDetails(selectedPokemonId || 0);
   const { pokemon: pokemon2Details } = usePokemonDetails(selectedPokemon2Id || 0);
   const { pokemon: pokemon3Details } = usePokemonDetails(selectedPokemon3Id || 0);
+  const selectedGame = useMemo(() => GAMES.find((game) => game.id === selectedGameId) || GAMES[0], [selectedGameId]);
   const selectedPokemonSlots = useMemo(() => [
     { slot: 1, id: selectedPokemonId, name: selectedPokemonName, form: selectedForm, gender: selectedGender, details: pokemonDetails },
     { slot: 2, id: selectedPokemon2Id, name: selectedPokemon2Name, form: selectedPokemon2Form, gender: selectedPokemon2Gender, details: pokemon2Details },
@@ -214,6 +216,7 @@ export function ShinyCounter({
     setCounter(Math.max(0, snapshot.counter || 0));
     setIncrementAmount(Math.max(1, snapshot.incrementAmount || 1));
     setIncrementHotkey(snapshot.incrementHotkey || '');
+    setSelectedGameId(snapshot.selectedGameId || 'black2');
     setSelectedPokemonId(slots[0].id);
     setSelectedPokemonName(slots[0].name);
     setSelectedForm(slots[0].form);
@@ -237,6 +240,7 @@ export function ShinyCounter({
     setCounter(data.counter ?? 0);
     setIncrementAmount(data.increment_amount ?? 1);
     setIncrementHotkey(data.increment_hotkey ?? '');
+    setSelectedGameId('black2');
     setSelectedPokemonId(slots[0].id);
     setSelectedPokemonName(slots[0].name);
     setSelectedForm(slots[0].form);
@@ -272,6 +276,7 @@ export function ShinyCounter({
     setSelectedPokemon3Form('');
     setSelectedPokemon3Gender('');
     setSelectedMethod(HUNTING_METHODS[0]);
+    setSelectedGameId('black2');
     setHasShinyCharm(false);
     setCustomOdds(4096);
     setHuntCreatedAt(null);
@@ -357,6 +362,7 @@ export function ShinyCounter({
               counter: data.counter ?? 0,
               incrementAmount: data.increment_amount ?? 1,
               incrementHotkey: data.increment_hotkey ?? '',
+              selectedGameId: 'black2',
               pokemonSlots: remoteSlots,
               methodId: data.method,
               hasShinyCharm: data.has_shiny_charm ?? false,
@@ -424,6 +430,7 @@ export function ShinyCounter({
       counter,
       incrementAmount,
       incrementHotkey,
+      selectedGameId,
       pokemonSlots: pokemonSlotsPayload,
       methodId: selectedMethod.id,
       hasShinyCharm,
@@ -434,6 +441,7 @@ export function ShinyCounter({
       counter: previousSnapshot.counter,
       incrementAmount: previousSnapshot.incrementAmount,
       incrementHotkey: previousSnapshot.incrementHotkey,
+      selectedGameId: previousSnapshot.selectedGameId,
       pokemonSlots: previousSnapshot.pokemonSlots,
       methodId: previousSnapshot.methodId,
       hasShinyCharm: previousSnapshot.hasShinyCharm,
@@ -542,7 +550,7 @@ export function ShinyCounter({
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [counter, customOdds, hasShinyCharm, huntCreatedAt, incrementAmount, incrementHotkey, initialLoadComplete, isOnline, ownerId, selectedForm, selectedGender, selectedMethod.id, selectedPokemon2Form, selectedPokemon2Gender, selectedPokemon2Id, selectedPokemon2Name, selectedPokemon3Form, selectedPokemon3Gender, selectedPokemon3Id, selectedPokemon3Name, selectedPokemonId, selectedPokemonName, storageHuntId, user]);
+  }, [counter, customOdds, hasShinyCharm, huntCreatedAt, incrementAmount, incrementHotkey, initialLoadComplete, isOnline, ownerId, selectedForm, selectedGender, selectedGameId, selectedMethod.id, selectedPokemon2Form, selectedPokemon2Gender, selectedPokemon2Id, selectedPokemon2Name, selectedPokemon3Form, selectedPokemon3Gender, selectedPokemon3Id, selectedPokemon3Name, selectedPokemonId, selectedPokemonName, storageHuntId, user]);
 
   // Calculate stats based on current counter and method
   const stats = useMemo(() => {
@@ -742,13 +750,23 @@ export function ShinyCounter({
                         const currentVariant = slotFormOptions.find(f => f.name === slot.form);
                         const spriteId = currentVariant ? currentVariant.id : slot.id;
                         const eggMethod = isBreedingMethod(safeSelectedMethod.id);
-                        const spriteUrl = getGameSpecificSpriteUrl(
-                          spriteId || slot.id,
-                          safeSelectedMethod.id,
-                          slot.name,
-                          slot.form,
-                          slot.gender
-                        );
+                        const spriteGameId = selectedGame?.id || '';
+                        const spriteUrl = getGameSpecificShinySpriteUrl(spriteId || slot.id, spriteGameId, {
+                          name: slot.name,
+                          form: slot.form,
+                          gender: slot.gender,
+                        }) || getArchiveShinySpriteUrl(spriteId || slot.id, {
+                          shiny: true,
+                          name: slot.name,
+                          form: slot.form,
+                          gender: slot.gender,
+                          preferredGameIds: [spriteGameId],
+                        }) || getPokemonSpriteUrl(spriteId || slot.id, {
+                          shiny: true,
+                          name: slot.name,
+                          form: slot.form || undefined,
+                          female: slot.gender === 'female',
+                        });
                         const displaySpriteUrl = eggMethod ? POKEMON_EGG_ICON : spriteUrl;
                         const isGameSpecificSprite = isGameSpecificShinySpriteUrl(displaySpriteUrl);
                         const spriteScaleClass = getGameSpecificSpriteScaleClass(displaySpriteUrl);
@@ -1174,6 +1192,30 @@ export function ShinyCounter({
               </div>
             </div>
 
+            {/* Game Selector */}
+            <div className="space-y-2">
+              <Label>Game</Label>
+              <Select value={selectedGameId} onValueChange={setSelectedGameId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a game" />
+                </SelectTrigger>
+                <SelectContent>
+                  {GAMES.map((game) => (
+                    <SelectItem key={game.id} value={game.id}>
+                      <div className="flex items-center gap-2">
+                        <img
+                          src={game.logo || `/img/game-logos/${game.id}.png`}
+                          alt=""
+                          className="h-4 w-8 object-contain"
+                        />
+                        <span>{game.name}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             {/* Method Selector */}
             <div className="space-y-2">
               <Label>Method</Label>
@@ -1281,6 +1323,7 @@ export function ShinyCounter({
           startDate={huntCreatedAt}
           initialForm={selectedForm}
           initialGender={selectedGender}
+          initialGameId={selectedGameId}
         />
       </div>
     );

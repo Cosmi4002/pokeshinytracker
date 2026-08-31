@@ -31,6 +31,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { getPokemonSpriteFallbackUrl } from '@/lib/pokemon-data';
 import { todayLocalISODate } from '@/lib/date';
 import { resolveEntityKeyForSelectedPokemon } from '@/lib/pokemon-entity-resolver-v2';
+import { getGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
 
 interface FinishHuntDialogProps {
   open: boolean;
@@ -45,6 +46,7 @@ interface FinishHuntDialogProps {
   startDate?: string | null;
   initialForm?: string;
   initialGender?: string;
+  initialGameId?: string;
 }
 
 export function FinishHuntDialog({
@@ -60,6 +62,7 @@ export function FinishHuntDialog({
   startDate,
   initialForm = '',
   initialGender = '',
+  initialGameId = '',
 }: FinishHuntDialogProps) {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -72,7 +75,7 @@ export function FinishHuntDialog({
   const [gender, setGender] = useState<string>(initialGender);
   const [currentHasShinyCharm, setCurrentHasShinyCharm] = useState(initialHasShinyCharm);
   const [pokeball, setPokeball] = useState('pokeball');
-  const [game, setGame] = useState('');
+  const [game, setGame] = useState(initialGameId);
   const [method, setMethod] = useState<HuntingMethod>(initialMethod);
   const [attempts, setAttempts] = useState(counter);
   const [attemptsDirty, setAttemptsDirty] = useState(false);
@@ -125,7 +128,8 @@ export function FinishHuntDialog({
     setHideCounterEncounters(false);
     setShowEncounters(true);
     setAttempts(counter);
-  }, [open, counter]);
+    setGame(initialGameId);
+  }, [open, counter, initialGameId]);
 
   useEffect(() => {
     if (!open) return;
@@ -170,7 +174,13 @@ export function FinishHuntDialog({
     // Otherwise, always use default (male) sprite to avoid 404/white square.
     const showFemaleSprite = gender === 'female' && pokemonDetails?.hasGenderDifference;
 
-    return getArchiveShinySpriteUrl(displayId, {
+    return getGameSpecificShinySpriteUrl(displayId, game, {
+      shiny: true,
+      female: showFemaleSprite,
+      form: form || undefined,
+      name: pokemonName,
+      gender,
+    }) || getArchiveShinySpriteUrl(displayId, {
       shiny: true,
       female: showFemaleSprite,
       form: form || undefined,
@@ -181,7 +191,7 @@ export function FinishHuntDialog({
       form: form || undefined,
       name: pokemonName,
     });
-  }, [pokemonId, gender, form, pokemonName, formOptions, pokemonDetails]);
+  }, [game, pokemonId, gender, form, pokemonName, formOptions, pokemonDetails]);
 
   const selectedDisplayName = useMemo(() => {
     if (form) {

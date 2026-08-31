@@ -21,6 +21,7 @@ export type OfflineCounterSnapshot = {
   counter: number;
   incrementAmount: number;
   incrementHotkey: string;
+  selectedGameId: string | null;
   pokemonSlots: OfflineCounterPokemonSlot[];
   methodId: string;
   hasShinyCharm: boolean;
