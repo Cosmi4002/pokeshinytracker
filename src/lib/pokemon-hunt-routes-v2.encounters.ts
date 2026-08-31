@@ -71,7 +71,7 @@ const generatedTargetsForFormOnlySpecies: Partial<Record<number, readonly Pokemo
 function buildNativeEncounterRoutes(tuple: NativeEncounterTuple): PokemonHuntRoute[] {
   const [speciesId, gameId, huntingMethodId, locations, progressionNotes, externalNotes] = tuple;
   const baseKey = `pokemon:${speciesId}:base` as PokemonEntityKey;
-  const targetEntityKeys = POKEMON_CATALOG_V2_BY_KEY.has(baseKey)
+  const targetEntityKeys: PokemonEntityKey[] = POKEMON_CATALOG_V2_BY_KEY.has(baseKey)
     ? [baseKey]
     : [...(generatedTargetsForFormOnlySpecies[speciesId] ?? [])];
 
@@ -278,18 +278,31 @@ const EXPANDED_GENERATED_ENCOUNTER_TUPLES = NORMALIZED_GENERATED_ENCOUNTER_TUPLE
 ]);
 
 const uniqueGeneratedTuples = new Map<string, NativeEncounterTuple>();
+const mergeGeneratedTuple = (
+  existing: NativeEncounterTuple,
+  next: NativeEncounterTuple,
+): NativeEncounterTuple => {
+  const [, existingGameId, existingMethodId, existingLocations, existingProgressionNotes, existingExternalNotes] = existing;
+  const [, nextGameId, nextMethodId, nextLocations, nextProgressionNotes, nextExternalNotes] = next;
+
+  return [
+    next[0],
+    existingGameId ?? nextGameId,
+    existingMethodId ?? nextMethodId,
+    [...new Set([...existingLocations, ...nextLocations])].slice(0, 5),
+    [...new Set([...existingProgressionNotes, ...nextProgressionNotes])],
+    [...new Set([...existingExternalNotes, ...nextExternalNotes])],
+  ];
+};
+
 for (const tuple of EXPANDED_GENERATED_ENCOUNTER_TUPLES) {
   const [speciesId, gameId, huntingMethodId, locations, progressionNotes, externalNotes] = tuple;
   const key = `${speciesId}:${gameId}:${huntingMethodId}:${externalNotes.length ? 'external' : 'native'}`;
   const existing = uniqueGeneratedTuples.get(key);
-  uniqueGeneratedTuples.set(key, existing ? [
-    speciesId,
-    gameId,
-    huntingMethodId,
-    [...new Set([...existing[3], ...locations])].slice(0, 5),
-    [...new Set([...existing[4], ...progressionNotes])],
-    [...new Set([...existing[5], ...externalNotes])],
-  ] : tuple);
+  uniqueGeneratedTuples.set(
+    key,
+    existing ? mergeGeneratedTuple(existing, tuple) : tuple,
+  );
 }
 
 export const NATIVE_ENCOUNTER_HUNT_ROUTES = [...uniqueGeneratedTuples.values()]

@@ -13,11 +13,18 @@ type GeneratedIdentity = (typeof generatedIdentities)[number];
 
 const identityKey = (speciesId: number, canonicalName: string) => `${speciesId}:${canonicalName}`;
 
-function normalizeVerification(verification?: Partial<PokemonCatalogEntity['verification']> | null): PokemonCatalogEntity['verification'] {
-  const status = (verification?.status ?? 'unverified') as VerificationStatus;
+function normalizeVerification(
+  verification?: Partial<PokemonCatalogEntity['verification']> & { status?: VerificationStatus | string } | null,
+): PokemonCatalogEntity['verification'] {
+  const statusValue = verification?.status ?? 'unverified';
+  const status: VerificationStatus =
+    statusValue === 'verified' || statusValue === 'partial' || statusValue === 'disputed'
+      ? statusValue
+      : 'unverified';
+
   return {
     status,
-    sourceUrls: verification?.sourceUrls ?? [],
+    sourceUrls: Array.isArray(verification?.sourceUrls) ? verification.sourceUrls : [],
     lastVerifiedAt: verification?.lastVerifiedAt,
     notes: verification?.notes,
   };

@@ -250,9 +250,9 @@ export default function PokemonDetails() {
         }
     };
 
-    const baseSpriteUrl = details ? getPokemonSpriteUrl(details.id, { name: details.name }) : '';
+    const baseSpriteUrl = details ? getPokemonSpriteUrl(details.id, { shiny: true, name: details.name }) : '';
     const femaleSpriteUrl = details && details.hasGenderDifference
-        ? getPokemonSpriteUrl(details.id, { female: true, name: details.name })
+        ? getPokemonSpriteUrl(details.id, { shiny: true, female: true, name: details.name })
         : null;
 
     // Flatten all variants from the hook data
@@ -305,7 +305,7 @@ export default function PokemonDetails() {
                 displayName: f.displayName,
                 category,
                 gender: 'genderless',
-                spriteUrl: getPokemonSpriteUrl(f.id, { name: f.formName })
+                spriteUrl: getPokemonSpriteUrl(f.id, { shiny: true, name: f.formName })
             });
         });
 
