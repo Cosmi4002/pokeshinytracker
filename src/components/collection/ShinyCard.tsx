@@ -35,6 +35,13 @@ interface ShinyCardProps {
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
+const getEvolvedFromSpriteBoost = (name?: string | null) => {
+  const normalized = (name || '').toString().trim().toLowerCase();
+  if (normalized.includes('bidoof')) return 1.28;
+  if (normalized.includes('misdreavus')) return 1.2;
+  return 1;
+};
+
 const getEvolvedFromSpriteSize = (_name?: string | null, compact = false, fitScale = 1) =>
   `${2.58 * fitScale * (compact ? 0.82 : 1)}rem`;
 
@@ -181,10 +188,10 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
     if (!evolvedFromSpriteDimensions) return 1;
     const longestSide = Math.max(evolvedFromSpriteDimensions.width, evolvedFromSpriteDimensions.height);
     if (!longestSide) return 1;
-    const targetSize = showEncounters ? 40 : 36;
-    return clamp(targetSize / longestSide, 0.72, 1.05);
+    const targetSize = showEncounters ? 54 : 48;
+    return clamp(targetSize / longestSide, 0.82, 1.18);
   }, [evolvedFromSpriteDimensions, showEncounters]);
-  const evolvedFromSpriteDisplayScale = evolvedFromSpriteFitScale * evolvedFromSpriteBaseScale;
+  const evolvedFromSpriteDisplayScale = evolvedFromSpriteFitScale * evolvedFromSpriteBaseScale * getEvolvedFromSpriteBoost(evolvedFromName);
 
   useEffect(() => {
     setEvolvedFromSpriteDimensions(null);
@@ -327,9 +334,9 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
               </AlertDialog>
             </div>
             {isEvolved && (
-              <div className="absolute right-2 top-2 z-30 flex w-9 flex-col items-center gap-1">
+              <div className="absolute right-2 top-2 z-30 flex w-14 flex-col items-center gap-1">
                 <div
-                  className="flex h-7 w-7 items-center justify-center rounded-full border border-white/55 bg-emerald-700 text-white shadow-[0_3px_12px_rgba(0,0,0,0.6),0_0_0_1px_rgba(0,0,0,0.45)] ring-1 ring-emerald-200/45 backdrop-blur-md"
+                  className="flex h-7 w-7 items-center justify-center rounded-full border border-white/55 bg-emerald-700 text-white shadow-[0_3px_12px_rgba(0,0,0,0.6),0_0_0_1px_rgba(0,0,0,0.45)] ring-1 ring-emerald-200/45 backdrop-blur-md self-center"
                   title="Pokemon evoluto"
                 >
                   <ArrowUpCircle className="h-3.5 w-3.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]" />
@@ -338,7 +345,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                   <img
                     src={toLocalPokemonSpriteUrl(evolvedFromSpriteUrl)}
                     alt="Evoluto da"
-                    className="block max-w-none object-contain"
+                    className="block max-w-none object-contain self-center mx-auto"
                     style={{
                       width: getEvolvedFromSpriteSize(evolvedFromName, !showEncounters, evolvedFromSpriteDisplayScale),
                       height: getEvolvedFromSpriteSize(evolvedFromName, !showEncounters, evolvedFromSpriteDisplayScale),
@@ -347,6 +354,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                       backgroundColor: 'transparent',
                       margin: 0,
                       padding: 0,
+                      transformOrigin: 'center center',
                       ...(isGameSpecificShinySpriteUrl(evolvedFromSpriteUrl) ? getGameSpecificSpriteScaleStyle(evolvedFromSpriteUrl) : {}),
                     }}
                     title={`Evoluto da ${evolvedFromName || 'pokemon precedente'}`}

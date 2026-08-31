@@ -266,9 +266,9 @@ export function getGameSpecificSpriteScaleFactor(url?: string | null): number {
   return GAME_SPRITE_SET_BASE_SCALE[set] ?? 0.86;
 }
 
-export function getGameSpecificSpriteScaleStyle(url?: string | null): any {
+export function getGameSpecificSpriteScaleStyle(url?: string | null, multiplier = 1): any {
   return {
-    '--sprite-scale': String(getGameSpecificSpriteScaleFactor(url)),
+    '--sprite-scale': String(getGameSpecificSpriteScaleFactor(url) * multiplier),
   };
 }
 
