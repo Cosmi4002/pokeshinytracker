@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getGameSpecificShinySpriteUrl } from './game-sprites';
+import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteScaleClass } from './game-sprites';
 
 describe('game-specific shiny sprites', () => {
   it.each([
@@ -17,6 +17,16 @@ describe('game-specific shiny sprites', () => {
     expect(getGameSpecificShinySpriteUrl(495, 'black2', { name: 'snivy' }))
       .toBe('/img/game-sprites/bw2/Spr_5b2_495_s.webp');
   });
+
+  it('prefers the correct Therian HOME shiny sprite for BW/BW2 forms', () => {
+    expect(getGameSpecificShinySpriteUrl(641, 'black', { name: 'tornadus-therian', form: 'tornadus-therian' }))
+      .toBe('/img/pokemon-sprites/remote/raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10019.png');
+    expect(getGameSpecificShinySpriteUrl(642, 'black2', { name: 'thundurus-therian', form: 'thundurus-therian' }))
+      .toBe('/img/pokemon-sprites/remote/raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10020.png');
+    expect(getGameSpecificShinySpriteUrl(645, 'white2', { name: 'landorus-therian', form: 'landorus-therian' }))
+      .toBe('/img/pokemon-sprites/remote/raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10021.png');
+  });
+
   it.each([
     ['heartgold', 'Female', '/img/game-sprites/hgss/Spr_4h_003_f_s.png'],
     ['soulsilver', 'f', '/img/game-sprites/hgss/Spr_4h_003_f_s.png'],
@@ -34,6 +44,15 @@ describe('game-specific shiny sprites', () => {
     ['black2', '♂', '/img/game-sprites/bw/Spr_5b_003_m_s.webp'],
   ])('resolves male gender-specific variants for %s', (gameId, gender, expected) => {
     expect(getGameSpecificShinySpriteUrl(3, gameId, { name: 'venusaur', gender })).toBe(expected);
+  });
+
+  it.each([
+    ['/img/game-sprites/hgss/Spr_4h_001_s.png', 'scale-[0.98]'],
+    ['/img/game-sprites/bw/Spr_5b_001_s.webp', 'scale-[0.82]'],
+    ['/img/game-sprites/bw2/Spr_5b2_495_s.webp', 'scale-[0.82]'],
+    ['/img/pokemon-sprites/remote/raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/1.png', ''],
+  ])('uses the right display scale for %s', (url, expected) => {
+    expect(getGameSpecificSpriteScaleClass(url)).toBe(expected);
   });
 
 });

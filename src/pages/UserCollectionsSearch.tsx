@@ -12,7 +12,7 @@ import { GAME_LOGOS } from '@/lib/game-themes';
 import { useRandomColor } from '@/lib/random-color-context';
 import { cn } from '@/lib/utils';
 import { resolvePokemonEntity } from '@/lib/pokemon-entity-resolver-v2';
-import { getGameSpecificShinySpriteUrl, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
+import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteScaleClass, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
 
 type ProfileRow = Pick<Tables<'profiles'>, 'user_id' | 'username'>;
 type PublicCaughtRow = Pick<
@@ -524,6 +524,7 @@ export default function UserCollectionsSearch() {
       spriteUrl: entry.sprite_url,
       });
     const isGameSpecificSprite = isGameSpecificShinySpriteUrl(sprite);
+    const spriteScaleClass = getGameSpecificSpriteScaleClass(sprite);
     const isEvent = isDistributionEvent(entry.method);
     const showEntryEncounters = shouldShowEncounters(entry.method, entry.game, entry.attempts, entry.show_encounters ?? true);
     const username = 'username' in entry ? entry.username : null;
@@ -547,7 +548,7 @@ export default function UserCollectionsSearch() {
               className={cn(
                 'relative z-10 object-contain transition-transform duration-300',
                 options.large ? 'h-28 w-28' : 'h-24 w-24',
-                isGameSpecificSprite ? 'scale-[0.86] group-hover:scale-[0.9]' : 'group-hover:scale-105',
+                isGameSpecificSprite ? `${spriteScaleClass} group-hover:scale-[0.9]` : 'group-hover:scale-105',
                 entry.is_fail && !isGameSpecificSprite && 'drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]'
               )}
               style={isGameSpecificSprite && !entry.is_fail && !entry.is_unobtainable ? undefined : getSpriteStyle(entry.is_fail, entry.is_unobtainable)}

@@ -32,7 +32,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import type { Json, Tables } from '@/integrations/supabase/types';
 import { useAuth } from '@/lib/auth-context';
-import { getGameSpecificShinySpriteUrl, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
+import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteScaleClass, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
 import { getCaughtShinySpriteUrl } from '@/lib/pokemon-data';
 import { useRandomColor } from '@/lib/random-color-context';
 import { cn } from '@/lib/utils';
@@ -337,6 +337,7 @@ export default function History() {
                       )
                       : '/placeholder.svg';
                     const isGameSpecificSprite = isGameSpecificShinySpriteUrl(sprite);
+                    const spriteScaleClass = getGameSpecificSpriteScaleClass(sprite);
 
                     return (
                       <Card key={event.id} className="overflow-hidden border-border bg-card shadow-lg">
@@ -349,7 +350,7 @@ export default function History() {
                                   alt={snapshot?.pokemon_name || 'Pokémon'}
                                   className={cn(
                                     "h-full w-full object-contain [image-rendering:pixelated]",
-                                    isGameSpecificSprite && "scale-[0.86]"
+                                    isGameSpecificSprite && spriteScaleClass
                                   )}
                                   onError={(event) => { event.currentTarget.src = '/placeholder.svg'; }}
                                 />

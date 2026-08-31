@@ -13,7 +13,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useRandomColor } from '@/lib/random-color-context';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { getGameSpecificShinySpriteUrl, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
+import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteScaleClass, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
 import { usePokemonList } from '@/hooks/use-pokemon';
 import { findHuntingMethod, GAMES, getCaughtShinySpriteUrl, getDynamicOdds } from '@/lib/pokemon-data';
 import type { Tables } from '@/integrations/supabase/types';
@@ -167,6 +167,7 @@ function RecordHunt({
       spriteUrl: entry.sprite_url,
     });
   const isGameSpecificSprite = isGameSpecificShinySpriteUrl(sprite);
+  const spriteScaleClass = getGameSpecificSpriteScaleClass(sprite);
   const isEvolved = entry.is_evolved || entry.evolved_from_id || entry.evolved_from_name;
 
   return (
@@ -190,7 +191,7 @@ function RecordHunt({
             alt={entry.pokemon_name}
             className={cn(
               "h-20 w-20 object-contain",
-              isGameSpecificSprite ? "scale-[0.86]" : "drop-shadow"
+              isGameSpecificSprite ? spriteScaleClass : "drop-shadow"
             )}
             loading="lazy"
             onError={(event) => {

@@ -72,9 +72,16 @@ const generatedTargetsForFormOnlySpecies: Partial<Record<number, readonly Pokemo
 function buildNativeEncounterRoutes(tuple: NativeEncounterTuple): PokemonHuntRoute[] {
   const [speciesId, gameId, huntingMethodId, locations, progressionNotes, externalNotes] = tuple;
   const baseKey = `pokemon:${speciesId}:base` as PokemonEntityKey;
-  const targetEntityKeys: PokemonEntityKey[] = POKEMON_CATALOG_V2_BY_KEY.has(baseKey)
-    ? [baseKey]
-    : [...(generatedTargetsForFormOnlySpecies[speciesId] ?? [])];
+  const targetEntityKeys: PokemonEntityKey[] = [];
+
+  if (POKEMON_CATALOG_V2_BY_KEY.has(baseKey)) {
+    targetEntityKeys.push(baseKey);
+  } else {
+    const generatedTargets = generatedTargetsForFormOnlySpecies[speciesId];
+    if (generatedTargets) {
+      targetEntityKeys.push(...generatedTargets);
+    }
+  }
 
   const progressionPrereqs: HuntRoutePrerequisite[] = progressionNotes.map((note): HuntRoutePrerequisite => ({
     type: 'game-progression',
@@ -150,8 +157,9 @@ function buildNativeEncounterRoutes(tuple: NativeEncounterTuple): PokemonHuntRou
       sources.push(...centralWikiSource);
     }
 
-    return [{
-      id: `${targetEntityKey}:${gameId}:native-${slugify(huntingMethodId)}${usesExternalSetup ? '-external' : ''}` as HuntRouteId,
+    const routeId: HuntRouteId = `${String(targetEntityKey)}:${gameId}:native-${slugify(huntingMethodId)}${usesExternalSetup ? '-external' : ''}` as HuntRouteId;
+    const route: PokemonHuntRoute = {
+      id: routeId,
       targetEntityKey,
       gameId,
       method,
@@ -166,16 +174,19 @@ function buildNativeEncounterRoutes(tuple: NativeEncounterTuple): PokemonHuntRou
         : `${entity.displayName} has a documented ${methodName} encounter in ${gameId}; this native route is kept separate from Breeding and Masuda Method alternatives.`,
       sources,
       verifiedAt,
-    }];
+    };
+
+    return [route];
   });
 }
 
-const ALL_GENERATED_ENCOUNTER_TUPLES = [
-  ...GENERATED_NATIVE_ENCOUNTER_TUPLES,
-  ...GENERATED_CONTEXT_ENCOUNTER_TUPLES,
-  ...GENERATED_SPECIAL_ENCOUNTER_TUPLES,
-  ...GENERATED_GEN5_ENCOUNTER_TUPLES,
-] as readonly NativeEncounterTuple[];
+const ALL_GENERATED_ENCOUNTER_TUPLES: NativeEncounterTuple[] = [];
+ALL_GENERATED_ENCOUNTER_TUPLES.push(
+  ... (GENERATED_NATIVE_ENCOUNTER_TUPLES as readonly NativeEncounterTuple[]),
+  ... (GENERATED_CONTEXT_ENCOUNTER_TUPLES as readonly NativeEncounterTuple[]),
+  ... (GENERATED_SPECIAL_ENCOUNTER_TUPLES as readonly NativeEncounterTuple[]),
+  ... (GENERATED_GEN5_ENCOUNTER_TUPLES as readonly NativeEncounterTuple[]),
+);
 
 function deriveAdditionalMethods(tuple: NativeEncounterTuple): NativeEncounterTuple[] {
   const [speciesId, gameId, huntingMethodId, locations, progressionNotes, externalNotes] = tuple;

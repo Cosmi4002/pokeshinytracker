@@ -34,7 +34,7 @@ import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
 import { cn } from '@/lib/utils';
 import { resolveEntityKeysForCounterSlots } from '@/lib/pokemon-entity-resolver-v2';
 import { useOnlineStatus } from '@/hooks/use-online-status';
-import { isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
+import { getGameSpecificSpriteScaleClass, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
 import {
   migrateCounterSnapshot,
   OFFLINE_HUNT_PREFIX,
@@ -751,6 +751,7 @@ export function ShinyCounter({
                         );
                         const displaySpriteUrl = eggMethod ? POKEMON_EGG_ICON : spriteUrl;
                         const isGameSpecificSprite = isGameSpecificShinySpriteUrl(displaySpriteUrl);
+                        const spriteScaleClass = getGameSpecificSpriteScaleClass(displaySpriteUrl);
                         const setSlotForm = slot.slot === 1
                           ? setSelectedForm
                           : slot.slot === 2
@@ -773,7 +774,7 @@ export function ShinyCounter({
                               className={cn(
                                 "object-contain pokemon-sprite animate-in fade-in zoom-in duration-500",
                                 compact ? "h-28 w-28 sm:h-[8.5rem] sm:w-[8.5rem]" : "h-32 w-32 sm:h-40 sm:w-40",
-                                isGameSpecificSprite && "scale-[0.86]"
+                                isGameSpecificSprite && spriteScaleClass
                               )}
                               style={{
                                 imageRendering: 'auto',

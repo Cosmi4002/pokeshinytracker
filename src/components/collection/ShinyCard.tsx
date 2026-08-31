@@ -6,7 +6,7 @@ import type { Tables } from '@/integrations/supabase/types';
 import { useMemo, useCallback, useId } from 'react';
 import { cn } from '@/lib/utils';
 import type { CardFilterId } from '@/lib/card-effects';
-import { getGameSpecificShinySpriteUrl, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
+import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteScaleClass, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -121,6 +121,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   }, [entry.pokemon_id, entry.pokemon_name, entry.form, entry.gender, entry.game, entry.secondary_game, spriteName]);
 
   const isGameSpecificSprite = isGameSpecificShinySpriteUrl(spriteUrl);
+  const spriteScaleClass = getGameSpecificSpriteScaleClass(spriteUrl);
   const mainSpriteFilter = isGameSpecificSprite
     ? isFail
       ? 'brightness(0) contrast(1.3)'
@@ -369,7 +370,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                   alt={entry.pokemon_name}
                   className={cn(
                     "relative z-10 h-full w-full object-contain pokemon-sprite transition-all duration-300",
-                    isGameSpecificSprite && "scale-[0.86]"
+                    isGameSpecificSprite && spriteScaleClass
                   )}
                   style={{
                     imageRendering: 'auto',

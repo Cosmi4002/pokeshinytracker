@@ -134,6 +134,12 @@ const normalizeGender = (gender?: string | null): 'female' | 'male' | null => {
   return null;
 };
 
+const HOME_SHINY_OVERRIDE_BY_FORM: Readonly<Record<string, string>> = {
+  'tornadus-therian': '/img/pokemon-sprites/remote/raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10019.png',
+  'thundurus-therian': '/img/pokemon-sprites/remote/raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10020.png',
+  'landorus-therian': '/img/pokemon-sprites/remote/raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10021.png',
+};
+
 export function getGameSpecificShinySpriteUrl(
   pokemonId: number,
   gameId?: string | null,
@@ -143,6 +149,11 @@ export function getGameSpecificShinySpriteUrl(
   if (!set) return null;
 
   const slug = normalize(options.form || options.name);
+  const homeOverride = slug ? HOME_SHINY_OVERRIDE_BY_FORM[slug] : undefined;
+  if (homeOverride && ['black', 'white', 'black2', 'white2'].includes(gameId ?? '')) {
+    return homeOverride;
+  }
+
   const speciesId = resolveSpeciesId(pokemonId, slug);
   if (!speciesId) return null;
   let resolvedSet = set;
@@ -189,6 +200,14 @@ export function getArchiveShinySpriteUrl(
   }
 
   return null;
+}
+
+export function getGameSpecificSpriteScaleClass(url?: string | null): string {
+  if (!url || !url.startsWith('/img/game-sprites/')) return '';
+  const set = url.split('/')[3];
+  if (set === 'hgss') return 'scale-[0.98]';
+  if (set === 'bw' || set === 'bw2') return 'scale-[0.82]';
+  return 'scale-[0.86]';
 }
 
 export const isGameSpecificShinySpriteUrl = (url?: string | null) =>
