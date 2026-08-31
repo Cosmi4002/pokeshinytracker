@@ -68,6 +68,12 @@ const statusStyle: Record<string, string> = {
   closed: 'border-border bg-muted text-muted-foreground',
 };
 
+const getHuntRoomSpriteUrl = (room: Pick<HuntRoom, 'pokemon_id' | 'pokemon_name' | 'sprite_url'>) =>
+  getPokemonSpriteUrl(room.pokemon_id, {
+    shiny: true,
+    name: room.pokemon_name,
+  }) || room.sprite_url || '/placeholder.svg';
+
 export default function HuntRooms() {
   const { roomId } = useParams<{ roomId?: string }>();
   const location = useLocation();
@@ -438,7 +444,7 @@ export default function HuntRooms() {
                 <CardContent className="relative grid gap-6 p-5 sm:p-7 lg:grid-cols-[220px_1fr]">
                   <div className="flex min-h-52 items-center justify-center rounded-3xl border border-border bg-muted/25 p-4">
                     <img
-                      src={room.sprite_url || getPokemonSpriteUrl(room.pokemon_id, { shiny: true, name: room.pokemon_name })}
+                      src={getHuntRoomSpriteUrl(room)}
                       alt={room.pokemon_name}
                       className="h-44 w-44 object-contain drop-shadow-[0_8px_12px_rgba(0,0,0,0.45)] [image-rendering:pixelated]"
                       onError={(event) => { event.currentTarget.src = '/placeholder.svg'; }}
@@ -589,7 +595,7 @@ export default function HuntRooms() {
                         <CardContent className="flex h-full items-center gap-4 p-4">
                           <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl border border-border bg-muted/30 p-2">
                             <img
-                              src={listedRoom.sprite_url || getPokemonSpriteUrl(listedRoom.pokemon_id, { shiny: true, name: listedRoom.pokemon_name })}
+                              src={getHuntRoomSpriteUrl(listedRoom)}
                               alt={listedRoom.pokemon_name}
                               className="h-full w-full object-contain [image-rendering:pixelated]"
                             />
