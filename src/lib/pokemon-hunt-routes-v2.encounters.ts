@@ -120,17 +120,34 @@ function buildNativeEncounterRoutes(tuple: NativeEncounterTuple): PokemonHuntRou
 
     const centralWikiSource: HuntRouteSource[] = [];
     if (huntingMethodId.startsWith('gen2-') || huntingMethodId.startsWith('gen3-') || huntingMethodId.startsWith('gen5-')) {
-      const note = huntingMethodId.startsWith('gen2-')
-        ? `Pokémon Central Wiki is used as the Italian Gen 2 cross-check for the species' game zones and encounter table; Surf entries are intentionally treated as Random Encounter, while Fishing, Headbutt and Rock Smash remain separate methods.`
-        : huntingMethodId.startsWith('gen3-')
-          ? `Pokémon Central Wiki is used as the Italian Gen 3 cross-check for the species' game zones and encounter table; Surf entries are intentionally treated as Random Encounter, while Fishing, Safari Zone and Rock Smash remain separate methods.`
-          : `Pokémon Central Wiki is used as the Italian Gen 5 cross-check for the species' game zones and encounter table; Fishing, Fishing — Rippling Waters, Surf and other encounter categories remain separate.`;
+      let note = `Pokémon Central Wiki is used as the Italian Gen 5 cross-check for the species' game zones and encounter table; Fishing, Fishing — Rippling Waters, Surf and other encounter categories remain separate.`;
+
+      if (huntingMethodId.startsWith('gen2-')) {
+        note = `Pokémon Central Wiki is used as the Italian Gen 2 cross-check for the species' game zones and encounter table; Surf entries are intentionally treated as Random Encounter, while Fishing, Headbutt and Rock Smash remain separate methods.`;
+      } else if (huntingMethodId.startsWith('gen3-')) {
+        note = `Pokémon Central Wiki is used as the Italian Gen 3 cross-check for the species' game zones and encounter table; Surf entries are intentionally treated as Random Encounter, while Fishing, Safari Zone and Rock Smash remain separate methods.`;
+      }
 
       centralWikiSource.push({
         provider: 'Pokémon Central Wiki',
         url: pokemonCentralUrl(entity.canonicalName),
         note,
       });
+    }
+
+    const sources: HuntRouteSource[] = [];
+    sources.push({
+      provider: 'Serebii',
+      url: serebiiUrl(speciesId, entity.canonicalName, huntingMethodId),
+      note: `Species encounter reference used to cross-check ${entity.displayName} availability and hunting origins.`,
+    });
+    sources.push({
+      provider: 'Bulbapedia',
+      url: bulbapediaUrl(entity.canonicalName),
+      note: `Species game-location tables used to cross-check the listed ${methodName} route.`,
+    });
+    if (centralWikiSource.length > 0) {
+      sources.push(...centralWikiSource);
     }
 
     return [{
@@ -147,19 +164,7 @@ function buildNativeEncounterRoutes(tuple: NativeEncounterTuple): PokemonHuntRou
       explanation: isGen5StarterGift
         ? `${entity.displayName} is a non-shiny-locked Unova first partner in ${gameId}; it is hunted by soft resetting before selection and kept separate from Breeding and Masuda Method alternatives.`
         : `${entity.displayName} has a documented ${methodName} encounter in ${gameId}; this native route is kept separate from Breeding and Masuda Method alternatives.`,
-      sources: [
-        {
-          provider: 'Serebii',
-          url: serebiiUrl(speciesId, entity.canonicalName, huntingMethodId),
-          note: `Species encounter reference used to cross-check ${entity.displayName} availability and hunting origins.`,
-        },
-        {
-          provider: 'Bulbapedia',
-          url: bulbapediaUrl(entity.canonicalName),
-          note: `Species game-location tables used to cross-check the listed ${methodName} route.`,
-        },
-        ...centralWikiSource,
-      ],
+      sources,
       verifiedAt,
     }];
   });
