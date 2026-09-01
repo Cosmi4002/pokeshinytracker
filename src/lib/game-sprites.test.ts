@@ -3,28 +3,33 @@ import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteScaleClass, getGame
 
 describe('game-specific shiny sprites', () => {
   it.each([
-    ['diamond', 'https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_4d_001_s.png'],
-    ['platinum', 'https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_4d_001_s.png'],
+    ['diamond', 'https://archives.bulbagarden.net/media/upload/7/7c/Spr_4d_001_s.png'],
+    ['platinum', 'https://archives.bulbagarden.net/media/upload/7/7c/Spr_4d_001_s.png'],
     ['heartgold', '/img/game-sprites/hgss/Spr_4h_001_s.png'],
     ['black2', '/img/game-sprites/bw/Spr_5b_001_s.webp'],
   ])('resolves Bulbasaur for %s', (gameId, expected) => {
     expect(getGameSpecificShinySpriteUrl(1, gameId, { name: 'bulbasaur' })).toBe(expected);
   });
 
-  it('resolves Giratina Origin in Platinum through the archive redirect URL', () => {
+  it('resolves Giratina Origin in Platinum through the archive media URL', () => {
     expect(getGameSpecificShinySpriteUrl(487, 'platinum', { name: 'giratina-origin', form: 'giratina-origin' }))
-      .toBe('https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_4p_487O_s.png');
+      .toBe('https://archives.bulbagarden.net/media/upload/2/2f/Spr_4p_487O_s.png');
+  });
+
+  it('resolves Mismagius in Platinum through the archive media URL', () => {
+    expect(getGameSpecificShinySpriteUrl(429, 'platinum', { name: 'mismagius' }))
+      .toBe('https://archives.bulbagarden.net/media/upload/3/38/Spr_4p_429_s.png');
   });
 
   it('resolves Deoxys forms in Diamond, Pearl, and Platinum', () => {
     expect(getGameSpecificShinySpriteUrl(386, 'diamond', { name: 'deoxys', form: 'deoxys' }))
-      .toBe('https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_4d_386_s.png');
+      .toBe('https://archives.bulbagarden.net/media/upload/2/29/Spr_4d_386_s.png');
     expect(getGameSpecificShinySpriteUrl(386, 'pearl', { name: 'deoxys-attack', form: 'deoxys-attack' }))
-      .toBe('https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_4d_386A_s.png');
+      .toBe('https://archives.bulbagarden.net/media/upload/9/99/Spr_4d_386A_s.png');
     expect(getGameSpecificShinySpriteUrl(386, 'platinum', { name: 'deoxys-defense', form: 'deoxys-defense' }))
-      .toBe('https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_4d_386D_s.png');
+      .toBe('https://archives.bulbagarden.net/media/upload/5/5c/Spr_4d_386D_s.png');
     expect(getGameSpecificShinySpriteUrl(386, 'platinum', { name: 'deoxys-speed', form: 'deoxys-speed' }))
-      .toBe('https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_4d_386S_s.png');
+      .toBe('https://archives.bulbagarden.net/media/upload/0/05/Spr_4d_386S_s.png');
   });
 
   it.each([
@@ -35,7 +40,7 @@ describe('game-specific shiny sprites', () => {
   });
 
   it.each([
-    ['https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_4d_001_s.png', 'scale-[var(--sprite-scale)]'],
+    ['https://archives.bulbagarden.net/media/upload/7/7c/Spr_4d_001_s.png', 'scale-[var(--sprite-scale)]'],
     ['/img/game-sprites/hgss/Spr_4h_001_s.png', 'scale-[var(--sprite-scale)]'],
     ['/img/pokemon-sprites/remote/raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/1.png', ''],
   ])('uses the right display scale for %s', (url, expected) => {
@@ -43,7 +48,7 @@ describe('game-specific shiny sprites', () => {
   });
 
   it.each([
-    ['https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_4d_001_s.png', 0],
+    ['https://archives.bulbagarden.net/media/upload/7/7c/Spr_4d_001_s.png', 0],
     ['/img/game-sprites/hgss/Spr_4h_001_s.png', 0],
     ['/img/pokemon-sprites/remote/raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/1.png', 1],
   ])('uses the right numeric scale for %s', (url, expected) => {

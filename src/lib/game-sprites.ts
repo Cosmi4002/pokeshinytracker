@@ -1,6 +1,8 @@
 import { HGSS_SHINY_SPRITE_FILES } from '@/data/hgss-shiny-sprite-manifest';
 import { DP_SHINY_SPRITE_FILES } from '@/data/dp-shiny-sprite-manifest';
+import { DP_SHINY_SPRITE_URL_BY_FILE } from '@/data/dp-shiny-sprite-url-map.generated';
 import { PT_SHINY_SPRITE_FILES } from '@/data/pt-shiny-sprite-manifest';
+import { PT_SHINY_SPRITE_URL_BY_FILE } from '@/data/pt-shiny-sprite-url-map.generated';
 import { BW_SHINY_SPRITE_FILES } from '@/data/bw-shiny-sprite-manifest';
 import { BW2_SHINY_SPRITE_FILES } from '@/data/bw2-shiny-sprite-manifest';
 import { GAME_SPRITE_LONG_SIDE_BY_FILE } from '@/data/game-sprite-long-sides.generated';
@@ -186,6 +188,12 @@ const getGameSpecificSpriteFilePath = (url?: string | null) => {
     if (parts.length < 5) return null;
     return `${parts[3]}/${parts.slice(4).join('/')}`;
   }
+  const mediaUploadMatch = url.match(/archives\.bulbagarden\.net\/media\/upload\/[^/]+\/[^/]+\/(Spr_[^/?#]+)$/i);
+  if (mediaUploadMatch) {
+    const filename = decodeURIComponent(mediaUploadMatch[1]);
+    if (filename.startsWith('Spr_4d_')) return `dp/${filename}`;
+    if (filename.startsWith('Spr_4p_')) return `pt/${filename}`;
+  }
   const archiveMatch = url.match(/\/Special:Redirect\/file\/([^?]+)/i);
   if (archiveMatch) {
     const filename = decodeURIComponent(archiveMatch[1]);
@@ -250,9 +258,8 @@ export function getGameSpecificShinySpriteUrl(
   const maleMatch = formCandidates.find((filename) => /_m_s\.(?:png|webp)$/i.test(filename));
   const filename = genderMatch || neutralMatch || maleMatch || formCandidates[0];
   if (!filename || !spriteSet.files.has(filename)) return null;
-  if (resolvedSet === 'dp' || resolvedSet === 'pt') {
-    return `https://archives.bulbagarden.net/wiki/Special:Redirect/file/${encodeURIComponent(filename)}`;
-  }
+  if (resolvedSet === 'dp') return DP_SHINY_SPRITE_URL_BY_FILE[filename] || null;
+  if (resolvedSet === 'pt') return PT_SHINY_SPRITE_URL_BY_FILE[filename] || null;
   return `/img/game-sprites/${resolvedSet}/${filename}`;
 }
 
