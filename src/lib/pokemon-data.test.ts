@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { HUNTING_METHODS, calculateShinyStats, formatOdds, getArchiveShinySpriteUrl, getCaughtShinySpriteUrl, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, isBreedingMethod } from './pokemon-data';
+import { HUNTING_METHODS, calculateShinyStats, formatOdds, getArchiveShinySpriteUrl, getCaughtShinySpriteUrl, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, getSelectedGameSpriteUrl, isBreedingMethod, toLocalPokemonSpriteUrl } from './pokemon-data';
 
 describe('pokemon sprite helpers', () => {
   it('returns a stable fallback asset for missing sprite images', () => {
@@ -43,6 +43,35 @@ describe('pokemon sprite helpers', () => {
         spriteUrl: 'https://legacy.example/pikachu.png',
       })
     ).toBe('/img/game-sprites/hgss/Spr_4h_025_f_s.png');
+  });
+
+  it('prefers the selected game when rebuilding the sprite URL for save/edit flows', () => {
+    expect(
+      getSelectedGameSpriteUrl({
+        pokemonId: 445,
+        pokemonName: 'garchomp',
+        gender: 'male',
+        game: 'diamond',
+        spriteUrl: 'https://legacy.example/old.png',
+      })
+    ).toBe('https://archives.bulbagarden.net/media/upload/0/0d/Spr_4d_445_m_s.png');
+
+    expect(
+      getSelectedGameSpriteUrl({
+        pokemonId: 445,
+        pokemonName: 'garchomp',
+        gender: 'female',
+        game: 'platinum',
+        secondaryGame: 'diamond',
+        spriteUrl: 'https://legacy.example/old.png',
+      })
+    ).toBe('https://archives.bulbagarden.net/media/upload/f/f5/Spr_4p_445_f_s.png');
+  });
+
+  it('remaps archive sprite URLs to a local cached path instead of depending on the browser cache', () => {
+    expect(
+      toLocalPokemonSpriteUrl('https://archives.bulbagarden.net/media/upload/8/87/Spr_4p_445_m_s.png')
+    ).toBe('/img/pokemon-sprites/remote/archives.bulbagarden.net/media/upload/8/87/Spr_4p_445_m_s.png');
   });
 
   it('resolves saved form slugs to the correct sprite variant id', () => {

@@ -451,6 +451,8 @@ export const PokedexCard = memo(function PokedexCard({
                             key={spriteUrl}
                             src={toLocalPokemonSpriteUrl(spriteUrl)}
                             alt={`${displayName} shiny`}
+                            loading={isGameSpecificShinySpriteUrl(spriteUrl) ? 'eager' : 'lazy'}
+                            fetchPriority={isGameSpecificShinySpriteUrl(spriteUrl) ? 'high' : 'auto'}
                             className={cn(
                                 "pokemon-sprite h-full w-full object-contain transition-all duration-500",
                                 isPrimaryCaught
@@ -484,6 +486,8 @@ export const PokedexCard = memo(function PokedexCard({
                                 key={secondarySprite}
                                 src={toLocalPokemonSpriteUrl(secondarySprite)}
                                 alt={`${displayName} shiny secondary`}
+                                loading={isGameSpecificShinySpriteUrl(secondarySprite) ? 'eager' : 'lazy'}
+                                fetchPriority={isGameSpecificShinySpriteUrl(secondarySprite) ? 'high' : 'auto'}
                                 className={cn(
                                     "pokemon-sprite h-full w-full object-contain transition-all duration-500",
                                     isSecondaryCaught

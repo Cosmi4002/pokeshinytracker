@@ -10,7 +10,7 @@ import { canEvolve, getNextEvolutions } from '@/lib/evolution-data';
 import type { Tables } from '@/integrations/supabase/types';
 import { cn } from '@/lib/utils';
 import { resolveEntityKeyForSelectedPokemon, resolvePokemonEntityKey } from '@/lib/pokemon-entity-resolver-v2';
-import { getArchiveShinySpriteUrl, getPokemonSpriteUrl } from '@/lib/pokemon-data';
+import { getArchiveShinySpriteUrl, getPokemonSpriteUrl, getSelectedGameSpriteUrl } from '@/lib/pokemon-data';
 
 type CaughtShinyRow = Tables<'caught_shinies'>;
 
@@ -92,16 +92,13 @@ export function EvolveDialog({ open, onOpenChange, entry, onSuccess }: EvolveDia
 
   const currentSpriteUrl = useMemo(() => {
     if (!entry) return '';
-    return getArchiveShinySpriteUrl(entry.pokemon_id, {
-      shiny: true,
-      name: entry.pokemon_name,
+    return getSelectedGameSpriteUrl({
+      pokemonId: entry.pokemon_id,
+      pokemonName: entry.pokemon_name,
       form: entry.form || undefined,
-      female: entry.gender === 'female'
-    }) || getPokemonSpriteUrl(entry.pokemon_id, {
-      shiny: true,
-      name: entry.pokemon_name,
-      form: entry.form || undefined,
-      female: entry.gender === 'female'
+      gender: entry.gender || undefined,
+      game: entry.game,
+      secondaryGame: (entry as any).secondary_game || undefined,
     });
   }, [entry]);
 
@@ -117,12 +114,13 @@ export function EvolveDialog({ open, onOpenChange, entry, onSuccess }: EvolveDia
       }
 
       // Generate the new sprite URL
-      const newSpriteUrl = getArchiveShinySpriteUrl(selectedEvolution, {
-        shiny: true,
-        name: evolutionPokemon.name,
-      }) || getPokemonSpriteUrl(selectedEvolution, {
-        shiny: true,
-        name: evolutionPokemon.name,
+      const newSpriteUrl = getSelectedGameSpriteUrl({
+        pokemonId: selectedEvolution,
+        pokemonName: evolutionPokemon.name,
+        form: nextForm || undefined,
+        gender: entry.gender || undefined,
+        game: entry.game,
+        secondaryGame: (entry as any).secondary_game || undefined,
       });
       const nextForm = evolutionPokemon.id !== evolutionPokemon.baseId ? evolutionPokemon.name : null;
       const nextEntityKey = resolveEntityKeyForSelectedPokemon({

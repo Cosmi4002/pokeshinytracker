@@ -181,7 +181,7 @@ const ARCHIVE_THERIAN_SHINY_OVERRIDE_BY_FORM: Readonly<Record<string, string>> =
 };
 
 const GAME_SPRITE_SET_BASE_SCALE: Readonly<Record<string, number>> = {
-  hgss: 0.98,
+  hgss: 0.882,
   bw: 0.82,
   bw2: 0.82,
 };

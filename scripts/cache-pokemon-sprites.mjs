@@ -16,6 +16,11 @@ const SOURCE_FILES = [
   'src/pages/Bingo.tsx',
   'src/pages/UserCollectionsSearch.tsx',
 ];
+const ARCHIVE_SPRITE_MAP_FILES = [
+  'src/data/dp-shiny-sprite-url-map.generated.ts',
+  'src/data/pt-shiny-sprite-url-map.generated.ts',
+  'src/data/hgss-shiny-sprite-url-map.generated.ts',
+];
 
 const POKEAPI_HOME_BASE = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home';
 const CONCURRENCY = Number(process.env.SPRITE_CACHE_CONCURRENCY || 8);
@@ -49,7 +54,7 @@ async function collectLiteralUrls() {
   const urls = new Set();
   const urlPattern = /https?:\/\/[^'"`\s)]+/g;
 
-  for (const file of SOURCE_FILES) {
+  for (const file of [...SOURCE_FILES, ...ARCHIVE_SPRITE_MAP_FILES]) {
     try {
       const content = await fs.readFile(path.join(ROOT, file), 'utf8');
       for (const match of content.matchAll(urlPattern)) {

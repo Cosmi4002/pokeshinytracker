@@ -106,6 +106,8 @@ export function PokemonSelector({ value, valueName, onChange }: PokemonSelectorP
                 src={toLocalPokemonSpriteUrl(getArchiveShinySpriteUrl(selectedPokemon.id, { shiny: true, name: selectedPokemon.name, form: selectedPokemon.name }) || getPokemonSpriteUrl(selectedPokemon.id, { shiny: true, name: selectedPokemon.name }))}
                 alt={selectedPokemon.displayName}
                 className="h-8 w-8 pokemon-sprite object-contain"
+                loading={getArchiveShinySpriteUrl(selectedPokemon.id, { shiny: true, name: selectedPokemon.name, form: selectedPokemon.name })?.startsWith('/img/game-sprites/') ? 'eager' : 'lazy'}
+                fetchPriority={getArchiveShinySpriteUrl(selectedPokemon.id, { shiny: true, name: selectedPokemon.name, form: selectedPokemon.name })?.startsWith('/img/game-sprites/') ? 'high' : 'auto'}
                 decoding="async"
                 referrerPolicy="no-referrer"
                 onError={(e) => {

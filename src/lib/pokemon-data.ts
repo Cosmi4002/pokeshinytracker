@@ -571,6 +571,18 @@ export function toLocalPokemonSpriteUrl(remoteUrl: string): string {
   const localUrl = LOCAL_SPRITE_URLS[remoteUrl];
   if (localUrl) return localUrl;
 
+  try {
+    const parsed = new URL(remoteUrl);
+    if (parsed.hostname === 'archives.bulbagarden.net' && parsed.pathname.includes('/media/upload/')) {
+      const decodedPath = decodeURIComponent(parsed.pathname)
+        .replace(/^\/+/, '')
+        .replace(/[^a-zA-Z0-9._/-]/g, '-');
+      return `/${['img', 'pokemon-sprites', 'remote', parsed.hostname, decodedPath].join('/')}`;
+    }
+  } catch {
+    // Invalid URL: fall through to the original remote value.
+  }
+
   return remoteUrl;
 }
 
@@ -1195,7 +1207,7 @@ export function getPokemonSpriteUrl(pokemonId: number, options: { shiny?: boolea
   return rawUrl;
 }
 
-export function getCaughtShinySpriteUrl(options: {
+export function getSelectedGameSpriteUrl(options: {
   pokemonId?: number | null;
   pokemonName?: string | null;
   form?: string | null;
@@ -1207,13 +1219,27 @@ export function getCaughtShinySpriteUrl(options: {
   const { pokemonId, pokemonName, form, gender, game, secondaryGame, spriteUrl } = options;
 
   if (pokemonId) {
-    const resolvedUrl = getArchiveShinySpriteUrl(pokemonId, {
-      shiny: true,
-      name: form || pokemonName || undefined,
-      form: form || undefined,
-      gender,
-      preferredGameIds: [secondaryGame, game],
-    });
+    const selectedGameId = game || secondaryGame || undefined;
+    const resolvedUrl =
+      (selectedGameId ? getGameSpecificShinySpriteUrl(pokemonId, selectedGameId, {
+        shiny: true,
+        name: form || pokemonName || undefined,
+        form: form || undefined,
+        gender,
+      }) : null) ||
+      getArchiveShinySpriteUrl(pokemonId, {
+        shiny: true,
+        name: form || pokemonName || undefined,
+        form: form || undefined,
+        gender,
+        preferredGameIds: [secondaryGame, game],
+      }) ||
+      getPokemonSpriteUrl(pokemonId, {
+        shiny: true,
+        name: form || pokemonName || undefined,
+        form: form || undefined,
+        female: gender === 'female',
+      });
 
     if (resolvedUrl) return resolvedUrl;
   }
@@ -1221,6 +1247,18 @@ export function getCaughtShinySpriteUrl(options: {
   if (spriteUrl) return toLocalPokemonSpriteUrl(spriteUrl);
 
   return getPokemonSpriteFallbackUrl();
+}
+
+export function getCaughtShinySpriteUrl(options: {
+  pokemonId?: number | null;
+  pokemonName?: string | null;
+  form?: string | null;
+  gender?: string | null;
+  game?: string | null;
+  secondaryGame?: string | null;
+  spriteUrl?: string | null;
+}): string {
+  return getSelectedGameSpriteUrl(options);
 }
 
 // Alias for transition compatibility
