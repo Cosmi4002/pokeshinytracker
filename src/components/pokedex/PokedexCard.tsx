@@ -4,6 +4,7 @@ import { useRandomColor } from '@/lib/random-color-context';
 import type { ShinyAvailability } from '@/lib/shiny-availability';
 import { Lock, UserX } from "lucide-react";
 import { handlePokemonSpriteError, toLocalPokemonSpriteUrl } from "@/lib/pokemon-data";
+import { isGameSpecificShinySpriteUrl } from "@/lib/game-sprites";
 import type { CardFilterId } from "@/lib/card-effects";
 
 interface PokedexCardProps {
@@ -467,7 +468,6 @@ export const PokedexCard = memo(function PokedexCard({
                                     ? `url(#${primaryOutlineId}) ${POKEDEX_SPRITE_EDGE_SHADOW}`
                                     : `grayscale(1) brightness(0.78) url(#${primaryOutlineId}) ${POKEDEX_SPRITE_EDGE_SHADOW}`,
                             }}
-                            loading="lazy"
                             decoding="async"
                             referrerPolicy="no-referrer"
                             onError={(e) => {
@@ -502,7 +502,6 @@ export const PokedexCard = memo(function PokedexCard({
                                         ? `url(#${secondaryOutlineId}) ${POKEDEX_SPRITE_EDGE_SHADOW}`
                                         : `grayscale(1) brightness(0.78) url(#${secondaryOutlineId}) ${POKEDEX_SPRITE_EDGE_SHADOW}`,
                                 }}
-                                loading="lazy"
                                 decoding="async"
                                 referrerPolicy="no-referrer"
                                 onError={(e) => {
