@@ -232,6 +232,11 @@ export function getGameSpecificShinySpriteUrl(
     spriteSet = mapsBySet[resolvedSet];
     candidates = spriteSet.bySpecies.get(speciesId) || [];
   }
+  if (candidates.length === 0 && set === 'pt') {
+    resolvedSet = 'dp';
+    spriteSet = mapsBySet[resolvedSet];
+    candidates = spriteSet.bySpecies.get(speciesId) || [];
+  }
   if (candidates.length === 0) return null;
 
   const wantedFormSuffix = getFormSuffix(speciesId, slug);
