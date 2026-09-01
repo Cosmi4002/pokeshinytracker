@@ -36,16 +36,52 @@ const filesBySet = {
   bw: BW_SHINY_SPRITE_FILES,
   bw2: BW2_SHINY_SPRITE_FILES,
 } as const;
+
+type ParsedGameSpriteFile = {
+  filename: string;
+  speciesId: number;
+  formSuffix: string;
+  gender: 'female' | 'male' | null;
+};
+
+const parseGameSpriteFilename = (filename: string): ParsedGameSpriteFile | null => {
+  const match = filename.match(/^Spr_[^_]+_(\d{3})(.*?)\.(?:png|webp)$/i);
+  if (!match) return null;
+
+  let formSuffix = match[2] || '';
+  formSuffix = formSuffix.replace(/_s$/i, '');
+
+  let gender: ParsedGameSpriteFile['gender'] = null;
+  const genderMatch = formSuffix.match(/_([fm])$/i);
+  if (genderMatch) {
+    gender = genderMatch[1].toLowerCase() === 'f' ? 'female' : 'male';
+    formSuffix = formSuffix.slice(0, -2);
+  }
+
+  return {
+    filename,
+    speciesId: Number(match[1]),
+    formSuffix,
+    gender,
+  };
+};
+
 const mapsBySet = Object.fromEntries(Object.entries(filesBySet).map(([set, files]) => {
-  const map = new Map<number, string[]>();
+  const map = new Map<number, ParsedGameSpriteFile[]>();
   for (const filename of files) {
-    const match = filename.match(/(?:Spr_[^_]+_)(\d{3})/i);
-    if (!match) continue;
-    const speciesId = Number(match[1]);
-    map.set(speciesId, [...(map.get(speciesId) || []), filename]);
+    const parsed = parseGameSpriteFilename(filename);
+    if (!parsed) continue;
+    map.set(parsed.speciesId, [...(map.get(parsed.speciesId) || []), parsed]);
   }
   return [set, { files: new Set(files), bySpecies: map }];
-})) as Record<string, { files: Set<string>; bySpecies: Map<number, string[]> }>;
+})) as Record<string, { files: Set<string>; bySpecies: Map<number, ParsedGameSpriteFile[]> }>;
+
+const DP_SHINY_SPRITE_FILE_BY_URL = new Map(
+  Object.entries(DP_SHINY_SPRITE_URL_BY_FILE).map(([filename, url]) => [url, filename]),
+);
+const PT_SHINY_SPRITE_FILE_BY_URL = new Map(
+  Object.entries(PT_SHINY_SPRITE_URL_BY_FILE).map(([filename, url]) => [url, filename]),
+);
 
 const LEGACY_FORM_SPECIES: ReadonlyArray<[RegExp, number]> = [
   [/^unown(?:-|$)/, 201],
@@ -131,12 +167,6 @@ const getFormSuffix = (speciesId: number, slug: string) => {
   return '';
 };
 
-const filenameSuffix = (filename: string, speciesId: number) => {
-  const token = String(speciesId).padStart(3, '0');
-  const afterId = filename.slice(filename.indexOf(token) + token.length);
-  return afterId.replace(/_(?:m|f)_s\.(?:png|webp)$/i, '').replace(/_s\.(?:png|webp)$/i, '').replace(/\.(?:png|webp)$/i, '');
-};
-
 const normalizeGender = (gender?: string | null): 'female' | 'male' | null => {
   const normalized = normalize(gender);
   if (normalized === 'female' || normalized === 'f' || normalized === '♀') return 'female';
@@ -191,6 +221,8 @@ const getGameSpecificSpriteFilePath = (url?: string | null) => {
   const mediaUploadMatch = url.match(/archives\.bulbagarden\.net\/media\/upload\/[^/]+\/[^/]+\/(Spr_[^/?#]+)$/i);
   if (mediaUploadMatch) {
     const filename = decodeURIComponent(mediaUploadMatch[1]);
+    if (PT_SHINY_SPRITE_FILE_BY_URL.get(url)) return `pt/${filename}`;
+    if (DP_SHINY_SPRITE_FILE_BY_URL.get(url)) return `dp/${filename}`;
     if (filename.startsWith('Spr_4d_')) return `dp/${filename}`;
     if (filename.startsWith('Spr_4p_')) return `pt/${filename}`;
   }
@@ -243,20 +275,19 @@ export function getGameSpecificShinySpriteUrl(
   if (candidates.length === 0) return null;
 
   const wantedFormSuffix = getFormSuffix(speciesId, slug);
-  let formCandidates = candidates.filter((filename) => filenameSuffix(filename, speciesId) === wantedFormSuffix);
+  let formCandidates = candidates.filter((spriteFile) => spriteFile.formSuffix === wantedFormSuffix);
   if (formCandidates.length === 0 && wantedFormSuffix) {
-    formCandidates = candidates.filter((filename) => filenameSuffix(filename, speciesId) === '');
+    formCandidates = candidates.filter((spriteFile) => spriteFile.formSuffix === '');
   }
   if (formCandidates.length === 0) formCandidates = candidates;
 
   const requestedGender = normalizeGender(options.gender);
-  const genderToken = requestedGender === 'female' ? /_f_s\.(?:png|webp)$/i : /_m_s\.(?:png|webp)$/i;
   const genderMatch = requestedGender
-    ? formCandidates.find((filename) => genderToken.test(filename))
+    ? formCandidates.find((spriteFile) => spriteFile.gender === requestedGender)
     : null;
-  const neutralMatch = formCandidates.find((filename) => !/_(?:m|f)_s\.(?:png|webp)$/i.test(filename));
-  const maleMatch = formCandidates.find((filename) => /_m_s\.(?:png|webp)$/i.test(filename));
-  const filename = genderMatch || neutralMatch || maleMatch || formCandidates[0];
+  const neutralMatch = formCandidates.find((spriteFile) => spriteFile.gender === null);
+  const maleMatch = formCandidates.find((spriteFile) => spriteFile.gender === 'male');
+  const filename = (genderMatch || neutralMatch || maleMatch || formCandidates[0])?.filename;
   if (!filename || !spriteSet.files.has(filename)) return null;
   if (resolvedSet === 'dp') return DP_SHINY_SPRITE_URL_BY_FILE[filename] || null;
   if (resolvedSet === 'pt') return PT_SHINY_SPRITE_URL_BY_FILE[filename] || null;

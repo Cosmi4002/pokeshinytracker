@@ -21,6 +21,21 @@ describe('game-specific shiny sprites', () => {
       .toBe('https://archives.bulbagarden.net/media/upload/3/38/Spr_4p_429_s.png');
   });
 
+  it.each([
+    [458, 'mantyke', 'https://archives.bulbagarden.net/media/upload/9/9b/Spr_4p_458_s.png'],
+    [462, 'magnezone', 'https://archives.bulbagarden.net/media/upload/b/b8/Spr_4p_462_s.png'],
+  ])('resolves Platinum-only sprite %s through the archive media URL', (pokemonId, name, expected) => {
+    expect(getGameSpecificShinySpriteUrl(pokemonId, 'platinum', { name })).toBe(expected);
+  });
+
+  it.each([
+    ['diamond', 'male', 'https://archives.bulbagarden.net/media/upload/0/0d/Spr_4d_445_m_s.png'],
+    ['platinum', 'male', 'https://archives.bulbagarden.net/media/upload/8/87/Spr_4p_445_m_s.png'],
+    ['platinum', 'female', 'https://archives.bulbagarden.net/media/upload/f/f5/Spr_4p_445_f_s.png'],
+  ])('resolves Garchomp gender-specific sprite for %s %s', (gameId, gender, expected) => {
+    expect(getGameSpecificShinySpriteUrl(445, gameId, { name: 'garchomp', gender })).toBe(expected);
+  });
+
   it('resolves Deoxys forms in Diamond, Pearl, and Platinum', () => {
     expect(getGameSpecificShinySpriteUrl(386, 'diamond', { name: 'deoxys', form: 'deoxys' }))
       .toBe('https://archives.bulbagarden.net/media/upload/2/29/Spr_4d_386_s.png');
