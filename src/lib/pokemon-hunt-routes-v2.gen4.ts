@@ -358,6 +358,7 @@ function originDialgaPalkiaRoute(key: PokemonEntityKey, gameId: TrackedGameId): 
 }
 
 function giratinaOriginRoute(key: PokemonEntityKey, gameId: TrackedGameId): PokemonHuntRoute {
+  if (gameId === 'diamond' || gameId === 'pearl') return unavailableRoute(key, gameId, 'Giratina (Origin Forme) is not obtainable in original Diamond/Pearl; it becomes available starting in Platinum.');
   if (gameId === 'platinum') return { id: `${key}:${gameId}:gen4-coverage-distortion-world` as HuntRouteId, targetEntityKey: key, gameId, method: 'static-encounter', huntingMethodId: 'gen4-soft-reset', access: 'native', recommendation: 'eligible-native', directEncounter: false, locations: ['Distortion World'], prerequisites: [], explanation: 'Giratina is encountered directly in Origin Forme in the Distortion World and is not shiny locked.', sources: sourcesFor(key, gameId, 'Cross-checked for the Platinum Distortion World Origin Forme encounter.'), verifiedAt };
   const alteredKey = 'pokemon:487:altered' as PokemonEntityKey;
   const altered = alteredLegendaryFormRoute(alteredKey, gameId);

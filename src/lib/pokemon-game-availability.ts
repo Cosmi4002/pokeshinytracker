@@ -1072,6 +1072,18 @@ const CURATED_SHINY_ORIGIN_BY_ID: AvailabilityById = {
   1025: [],
 };
 
+const ROTOM_APPLIANCE_FORMS = new Set([
+  'rotom-heat',
+  'rotom-wash',
+  'rotom-frost',
+  'rotom-fan',
+  'rotom-mow',
+]);
+
+const ORIGIN_FORMS_WITH_RESTRICTED_DPP = new Set([
+  'giratina-origin',
+]);
+
 const CURATED_SHINY_ORIGIN_BY_NAME: AvailabilityByName = {
   'abomasnow': ["diamond","pearl","platinum","heartgold","soulsilver","black","white","black2","white2","x","y","omegaruby","alphasapphire","sun","moon","ultrasun","ultramoon","sword","shield","brilliantdiamond","shiningpearl","pla","scarlet","violet","za"],
   'abra': ["gold","silver","crystal","ruby","sapphire","firered","leafgreen","emerald","diamond","pearl","platinum","heartgold","soulsilver","black","white","black2","white2","x","y","omegaruby","alphasapphire","sun","moon","ultrasun","ultramoon","lgp","lge","sword","shield","brilliantdiamond","shiningpearl","pla","za"],
@@ -2136,6 +2148,13 @@ const CURATED_SHINY_ORIGIN_BY_NAME: AvailabilityByName = {
 };
 
 export function getCuratedShinyOriginGameIds(pokemonId: number, pokemonName?: string): readonly TrackedGameId[] | null {
+  if (pokemonName && ROTOM_APPLIANCE_FORMS.has(pokemonName)) {
+    return (CURATED_SHINY_ORIGIN_BY_ID[pokemonId] || []).filter((gameId) => gameId !== 'diamond' && gameId !== 'pearl');
+  }
+  if (pokemonName && ORIGIN_FORMS_WITH_RESTRICTED_DPP.has(pokemonName)) {
+    return (CURATED_SHINY_ORIGIN_BY_ID[pokemonId] || []).filter((gameId) => gameId !== 'diamond' && gameId !== 'pearl');
+  }
+
   if (pokemonName && pokemonName in CURATED_SHINY_ORIGIN_BY_NAME) {
     return CURATED_SHINY_ORIGIN_BY_NAME[pokemonName] || [];
   }

@@ -1,4 +1,6 @@
 import { HGSS_SHINY_SPRITE_FILES } from '@/data/hgss-shiny-sprite-manifest';
+import { DP_SHINY_SPRITE_FILES } from '@/data/dp-shiny-sprite-manifest';
+import { PT_SHINY_SPRITE_FILES } from '@/data/pt-shiny-sprite-manifest';
 import { BW_SHINY_SPRITE_FILES } from '@/data/bw-shiny-sprite-manifest';
 import { BW2_SHINY_SPRITE_FILES } from '@/data/bw2-shiny-sprite-manifest';
 import { GAME_SPRITE_LONG_SIDE_BY_FILE } from '@/data/game-sprite-long-sides.generated';
@@ -11,9 +13,12 @@ export type GameSpriteOptions = {
   gender?: string | null;
 };
 
-const ARCHIVE_GAME_PRIORITY = ['black2', 'white2', 'black', 'white', 'heartgold', 'soulsilver'] as const;
+const ARCHIVE_GAME_PRIORITY = ['black2', 'white2', 'black', 'white', 'platinum', 'diamond', 'pearl', 'heartgold', 'soulsilver'] as const;
 
 export const GAME_SPRITE_SET_BY_GAME: Readonly<Record<string, string>> = {
+  diamond: 'dp',
+  pearl: 'dp',
+  platinum: 'pt',
   heartgold: 'hgss',
   soulsilver: 'hgss',
   black: 'bw',
@@ -23,7 +28,9 @@ export const GAME_SPRITE_SET_BY_GAME: Readonly<Record<string, string>> = {
 };
 
 const filesBySet = {
+  dp: DP_SHINY_SPRITE_FILES,
   hgss: HGSS_SHINY_SPRITE_FILES,
+  pt: PT_SHINY_SPRITE_FILES,
   bw: BW_SHINY_SPRITE_FILES,
   bw2: BW2_SHINY_SPRITE_FILES,
 } as const;
@@ -173,10 +180,20 @@ const GAME_SPRITE_SET_MEDIAN_LONG_SIDE = (() => {
 })();
 
 const getGameSpecificSpriteFilePath = (url?: string | null) => {
-  if (!url || !url.startsWith('/img/game-sprites/')) return null;
-  const parts = url.split('/');
-  if (parts.length < 5) return null;
-  return `${parts[3]}/${parts.slice(4).join('/')}`;
+  if (!url) return null;
+  if (url.startsWith('/img/game-sprites/')) {
+    const parts = url.split('/');
+    if (parts.length < 5) return null;
+    return `${parts[3]}/${parts.slice(4).join('/')}`;
+  }
+  const archiveMatch = url.match(/\/Special:Redirect\/file\/([^?]+)/i);
+  if (archiveMatch) {
+    const filename = decodeURIComponent(archiveMatch[1]);
+    if (filename.startsWith('Spr_4d_') || filename.startsWith('Spr_4p_')) {
+      return `${filename.startsWith('Spr_4d_') ? 'dp' : 'pt'}/${filename}`;
+    }
+  }
+  return null;
 };
 
 const getGameSpecificSpriteScaleFactorFromFile = (filePath?: string | null) => {
@@ -233,6 +250,9 @@ export function getGameSpecificShinySpriteUrl(
   const maleMatch = formCandidates.find((filename) => /_m_s\.(?:png|webp)$/i.test(filename));
   const filename = genderMatch || neutralMatch || maleMatch || formCandidates[0];
   if (!filename || !spriteSet.files.has(filename)) return null;
+  if (resolvedSet === 'dp' || resolvedSet === 'pt') {
+    return `https://archives.bulbagarden.net/wiki/Special:Redirect/file/${encodeURIComponent(filename)}`;
+  }
   return `/img/game-sprites/${resolvedSet}/${filename}`;
 }
 
@@ -254,7 +274,7 @@ export function getArchiveShinySpriteUrl(
 }
 
 export function getGameSpecificSpriteScaleClass(url?: string | null): string {
-  return url && url.startsWith('/img/game-sprites/') ? 'scale-[var(--sprite-scale)]' : '';
+  return getGameSpecificSpriteFilePath(url) ? 'scale-[var(--sprite-scale)]' : '';
 }
 
 export function getGameSpecificSpriteScaleFactor(url?: string | null): number {
@@ -273,7 +293,7 @@ export function getGameSpecificSpriteScaleStyle(url?: string | null, multiplier 
 }
 
 export const isGameSpecificShinySpriteUrl = (url?: string | null) =>
-  Boolean(url && url.startsWith('/img/game-sprites/'));
+  Boolean(getGameSpecificSpriteFilePath(url));
 
 export const hasGameSpecificSpriteSet = (gameId?: string | null) =>
   Boolean(gameId && GAME_SPRITE_SET_BY_GAME[gameId]);
