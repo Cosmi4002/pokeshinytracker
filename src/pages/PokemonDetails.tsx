@@ -482,7 +482,11 @@ export default function PokemonDetails() {
     const prevId = currentId > 1 && currentId < 10000 ? currentId - 1 : null;
     const nextId = currentId < 1025 ? currentId + 1 : null;
 
-    const heroVariant = variants.find(variant => variant.category === 'base') || variants[0];
+    const heroVariant =
+        variants.find(variant => variant.name === details.name)
+        || variants.find(variant => variant.id === details.id && variant.category !== 'gender')
+        || variants.find(variant => variant.category === 'base')
+        || variants[0];
     const heroMaleCaught = heroVariant ? caughtForms.has(heroVariant.name) : false;
     const heroFemaleCaught = details?.hasGenderDifference && heroVariant ? caughtForms.has(`${details.name}-female`) : false;
     const gameSpriteGroups = heroVariant
