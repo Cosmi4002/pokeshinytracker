@@ -16,6 +16,17 @@ describe('game-specific shiny sprites', () => {
       .toBe('https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_4p_487O_s.png');
   });
 
+  it('resolves Deoxys forms in Diamond, Pearl, and Platinum', () => {
+    expect(getGameSpecificShinySpriteUrl(386, 'diamond', { name: 'deoxys', form: 'deoxys' }))
+      .toBe('https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_4d_386_s.png');
+    expect(getGameSpecificShinySpriteUrl(386, 'pearl', { name: 'deoxys-attack', form: 'deoxys-attack' }))
+      .toBe('https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_4d_386A_s.png');
+    expect(getGameSpecificShinySpriteUrl(386, 'platinum', { name: 'deoxys-defense', form: 'deoxys-defense' }))
+      .toBe('https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_4d_386D_s.png');
+    expect(getGameSpecificShinySpriteUrl(386, 'platinum', { name: 'deoxys-speed', form: 'deoxys-speed' }))
+      .toBe('https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_4d_386S_s.png');
+  });
+
   it.each([
     ['heartgold', 'Female', '/img/game-sprites/hgss/Spr_4h_003_f_s.png'],
     ['black2', 'f', '/img/game-sprites/bw/Spr_5b_003_f_s.webp'],
