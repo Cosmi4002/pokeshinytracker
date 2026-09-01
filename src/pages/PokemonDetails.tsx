@@ -488,6 +488,18 @@ export default function PokemonDetails() {
     const gameSpriteGroups = heroVariant
         ? [
             {
+                id: 'dp',
+                label: 'Diamond / Pearl',
+                description: 'Original shiny sprite shared by Diamond and Pearl.',
+                games: ['diamond', 'pearl'],
+            },
+            {
+                id: 'pt',
+                label: 'Platinum',
+                description: 'Original shiny sprite from Platinum.',
+                games: ['platinum'],
+            },
+            {
                 id: 'hgss',
                 label: 'HeartGold / SoulSilver',
                 description: 'Original animated shiny sprite shared by HeartGold and SoulSilver.',
