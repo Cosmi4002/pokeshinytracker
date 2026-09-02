@@ -225,6 +225,15 @@ const HGSS_SPRITE_MEDIAN_LONG_SIDE = (() => {
   return median(grouped.get('hgss') || []);
 })();
 
+// The Gen V artwork has a noticeably larger visual footprint than the earlier
+// in-game sprites, even after normalizing its opaque canvas. Keep Black, White,
+// Black 2 and White 2 deliberately smaller so it stays within card and counter
+// layouts instead of dominating them.
+const GAME_SPRITE_SET_DISPLAY_SCALE: Readonly<Record<string, number>> = {
+  bw: 0.75,
+  bw2: 0.75,
+};
+
 const getGameSpecificSpriteFilePath = (url?: string | null) => {
   if (!url) return null;
   if (url.startsWith('/img/game-sprites/')) {
@@ -269,7 +278,9 @@ const getGameSpecificSpriteScaleFactorFromFile = (filePath?: string | null) => {
   // be inverse to the opaque sprite size. HGSS is the visual baseline across the
   // site, so DP, Pt, BW and BW2 sprites are normalized to the same footprint
   // rather than to a median that differs for each game set.
-  return (HGSS_SPRITE_MEDIAN_LONG_SIDE / longSide) * 1.1;
+  const set = filePath.split('/')[0];
+  const displayScale = GAME_SPRITE_SET_DISPLAY_SCALE[set] ?? 1;
+  return (HGSS_SPRITE_MEDIAN_LONG_SIDE / longSide) * 1.1 * displayScale;
 };
 
 export function getGameSpecificShinySpriteUrl(

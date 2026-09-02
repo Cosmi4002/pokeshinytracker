@@ -80,26 +80,26 @@ describe('game-specific shiny sprites', () => {
     }
   });
 
-  it('enlarges small game sprites and reduces unusually large ones', () => {
+  it('does not enlarge small Gen V sprites and reduces unusually large ones', () => {
     const mankey = getGameSpecificSpriteScaleFactor('/img/game-sprites/bw/Spr_5b_056_s.webp');
     const pidgeotto = getGameSpecificSpriteScaleFactor('/img/game-sprites/bw/Spr_5b_017_s.webp');
 
-    expect(mankey).toBeGreaterThan(1);
+    expect(mankey).toBe(1);
     expect(pidgeotto).toBeLessThan(1);
   });
 
-  it('normalizes every supported game set to the HGSS sprite footprint', () => {
+  it('keeps Gen V sprites smaller than the shared HGSS sprite footprint', () => {
     const samples = [
-      ['hgss/Spr_4h_001_s.png', '/img/game-sprites/hgss/Spr_4h_001_s.png'],
-      ['dp/Spr_4d_001_s.png', 'https://archives.bulbagarden.net/media/upload/7/7c/Spr_4d_001_s.png'],
-      ['pt/Spr_4p_429_s.png', 'https://archives.bulbagarden.net/media/upload/3/38/Spr_4p_429_s.png'],
-      ['bw/Spr_5b_001_s.webp', '/img/game-sprites/bw/Spr_5b_001_s.webp'],
-      ['bw2/Spr_5b2_495_s.webp', '/img/game-sprites/bw2/Spr_5b2_495_s.webp'],
+      ['hgss/Spr_4h_001_s.png', '/img/game-sprites/hgss/Spr_4h_001_s.png', 88],
+      ['dp/Spr_4d_001_s.png', 'https://archives.bulbagarden.net/media/upload/7/7c/Spr_4d_001_s.png', 88],
+      ['pt/Spr_4p_429_s.png', 'https://archives.bulbagarden.net/media/upload/3/38/Spr_4p_429_s.png', 88],
+      ['bw/Spr_5b_001_s.webp', '/img/game-sprites/bw/Spr_5b_001_s.webp', 66],
+      ['bw2/Spr_5b2_495_s.webp', '/img/game-sprites/bw2/Spr_5b2_495_s.webp', 66],
     ] as const;
 
-    for (const [filePath, url] of samples) {
+    for (const [filePath, url, expectedLongSide] of samples) {
       const longSide = GAME_SPRITE_LONG_SIDE_BY_FILE[filePath];
-      expect(longSide * getGameSpecificSpriteScaleFactor(url)).toBeCloseTo(88);
+      expect(longSide * getGameSpecificSpriteScaleFactor(url)).toBeCloseTo(expectedLongSide);
     }
   });
 
