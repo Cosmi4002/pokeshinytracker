@@ -233,8 +233,10 @@ export default function UserCollectionsSearch() {
         .select('id, user_id, pokemon_id, entity_key, pokemon_name, form, gender, caught_date, created_at, sprite_url, game, secondary_game, is_fail, is_unobtainable, hunt_start_date, method, attempts, has_shiny_charm, is_evolved, show_encounters')
         .or('is_fail.is.false,is_fail.is.null')
         .or('is_unobtainable.is.false,is_unobtainable.is.null')
-        .order('created_at', { ascending: false })
+        // "Ultimi catturati" is based on when the Pokémon was obtained, not
+        // when an older catch was later added to the collection.
         .order('caught_date', { ascending: false })
+        .order('created_at', { ascending: false })
         .limit(10);
 
       if (error) throw error;

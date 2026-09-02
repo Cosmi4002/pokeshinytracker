@@ -59,6 +59,8 @@ describe('game-specific shiny sprites', () => {
 
   it.each([
     ['https://archives.bulbagarden.net/media/upload/7/7c/Spr_4d_001_s.png', 'scale-[var(--sprite-scale)]'],
+    ['/img/pokemon-sprites/remote/archives.bulbagarden.net/media/upload/5/54/Spr_4d_200_s.png', 'scale-[var(--sprite-scale)]'],
+    ['/img/pokemon-sprites/remote/archives.bulbagarden.net/media/upload/6/6d/Spr_4d_399_m_s.png', 'scale-[var(--sprite-scale)]'],
     ['/img/game-sprites/hgss/Spr_4h_001_s.png', 'scale-[var(--sprite-scale)]'],
     ['/img/pokemon-sprites/remote/raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/1.png', ''],
   ])('uses the right display scale for %s', (url, expected) => {
@@ -75,5 +77,13 @@ describe('game-specific shiny sprites', () => {
     } else {
       expect(getGameSpecificSpriteScaleFactor(url)).toBeGreaterThan(0.6);
     }
+  });
+
+  it('enlarges small game sprites and reduces unusually large ones', () => {
+    const mankey = getGameSpecificSpriteScaleFactor('/img/game-sprites/bw/Spr_5b_056_s.webp');
+    const pidgeotto = getGameSpecificSpriteScaleFactor('/img/game-sprites/bw/Spr_5b_017_s.webp');
+
+    expect(mankey).toBeGreaterThan(1);
+    expect(pidgeotto).toBeLessThan(1);
   });
 });

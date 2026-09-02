@@ -204,12 +204,6 @@ const ARCHIVE_THERIAN_SHINY_OVERRIDE_BY_FORM: Readonly<Record<string, string>> =
   'landorus-therian': 'https://archives.bulbagarden.net/media/upload/3/36/Spr_5b2_645T_s.png',
 };
 
-const GAME_SPRITE_SET_BASE_SCALE: Readonly<Record<string, number>> = {
-  hgss: 0.882,
-  bw: 0.82,
-  bw2: 0.82,
-};
-
 const GAME_SPRITE_SET_MEDIAN_LONG_SIDE = (() => {
   const grouped = new Map<string, number[]>();
   for (const [filePath, longSide] of Object.entries(GAME_SPRITE_LONG_SIDE_BY_FILE)) {
@@ -242,6 +236,16 @@ const getGameSpecificSpriteFilePath = (url?: string | null) => {
     if (parts.length < 5) return null;
     return `${parts[3]}/${parts.slice(4).join('/')}`;
   }
+  // Diamond, Pearl and Platinum sprites are cached from Bulbagarden under the
+  // generic remote-assets directory. Keep recognizing those local URLs as game
+  // sprites, otherwise they miss the same scaling treatment as every other
+  // game asset and can render as an unscaled transparent canvas on cards.
+  const localArchiveMatch = url.match(/\/img\/pokemon-sprites\/remote\/archives\.bulbagarden\.net\/media\/upload\/[^/]+\/[^/]+\/(Spr_[^/?#]+)$/i);
+  if (localArchiveMatch) {
+    const filename = decodeURIComponent(localArchiveMatch[1]);
+    if (filename.startsWith('Spr_4d_')) return `dp/${filename}`;
+    if (filename.startsWith('Spr_4p_')) return `pt/${filename}`;
+  }
   const mediaUploadMatch = url.match(/archives\.bulbagarden\.net\/media\/upload\/[^/]+\/[^/]+\/(Spr_[^/?#]+)$/i);
   if (mediaUploadMatch) {
     const filename = decodeURIComponent(mediaUploadMatch[1]);
@@ -267,9 +271,12 @@ const getGameSpecificSpriteScaleFactorFromFile = (filePath?: string | null) => {
   const set = filePath.split('/')[0];
   const median = GAME_SPRITE_SET_MEDIAN_LONG_SIDE[set as keyof typeof GAME_SPRITE_SET_MEDIAN_LONG_SIDE];
   if (!median) return null;
-  const baseScale = GAME_SPRITE_SET_BASE_SCALE[set] ?? 1;
-  const relativeScale = longSide / median;
-  return Math.min(1.2, Math.max(0.7, baseScale * relativeScale));
+  // `object-contain` gives every source canvas the same box. Scale must therefore
+  // be inverse to the opaque sprite size: smaller in-game sprites need a larger
+  // multiplier, while large sprites need a smaller one. This keeps the Pokémon's
+  // visible footprint consistent instead of shrinking the already-small sprites.
+  const normalizedScale = (median / longSide) * 1.1;
+  return Math.min(1.25, Math.max(0.9, normalizedScale));
 };
 
 export function getGameSpecificShinySpriteUrl(
@@ -353,8 +360,7 @@ export function getGameSpecificSpriteScaleFactor(url?: string | null): number {
   const scaleFromFile = getGameSpecificSpriteScaleFactorFromFile(filePath);
   if (scaleFromFile) return scaleFromFile;
   if (!filePath) return 1;
-  const set = filePath.split('/')[0];
-  return GAME_SPRITE_SET_BASE_SCALE[set] ?? 0.86;
+  return 1;
 }
 
 export function getGameSpecificSpriteScaleStyle(url?: string | null, multiplier = 1): any {
