@@ -225,11 +225,11 @@ const HGSS_SPRITE_MEDIAN_LONG_SIDE = (() => {
   return median(grouped.get('hgss') || []);
 })();
 
-// The Gen V artwork has a noticeably larger visual footprint than the earlier
-// in-game sprites, even after normalizing its opaque canvas. Keep Black, White,
-// Black 2 and White 2 deliberately smaller so it stays within card and counter
-// layouts instead of dominating them.
-const GAME_SPRITE_SET_DISPLAY_SCALE: Readonly<Record<string, number>> = {
+// BW/BW2 assets are animated and their WebP canvases have been trimmed to
+// different sizes. Normalizing each canvas independently makes sprites with
+// the same game presentation render at inconsistent sizes, so Gen V always
+// uses the same reduced display scale.
+const GAME_SPRITE_SET_FIXED_SCALE: Readonly<Record<string, number>> = {
   bw: 0.75,
   bw2: 0.75,
 };
@@ -276,11 +276,13 @@ const getGameSpecificSpriteScaleFactorFromFile = (filePath?: string | null) => {
   if (!HGSS_SPRITE_MEDIAN_LONG_SIDE) return null;
   // `object-contain` gives every source canvas the same box. Scale must therefore
   // be inverse to the opaque sprite size. HGSS is the visual baseline across the
-  // site, so DP, Pt, BW and BW2 sprites are normalized to the same footprint
-  // rather than to a median that differs for each game set.
+  // site, so DP and Pt sprites are normalized to the same footprint rather
+  // than to a median that differs for each game set. Gen V uses its fixed
+  // scale below because its animated WebP canvases are not consistent.
   const set = filePath.split('/')[0];
-  const displayScale = GAME_SPRITE_SET_DISPLAY_SCALE[set] ?? 1;
-  return (HGSS_SPRITE_MEDIAN_LONG_SIDE / longSide) * 1.1 * displayScale;
+  const fixedScale = GAME_SPRITE_SET_FIXED_SCALE[set];
+  if (fixedScale !== undefined) return fixedScale;
+  return (HGSS_SPRITE_MEDIAN_LONG_SIDE / longSide) * 1.1;
 };
 
 export function getGameSpecificShinySpriteUrl(

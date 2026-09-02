@@ -84,6 +84,17 @@
         @apply border-border;
     }
 
+    /*
+     * Some compact views resolve their sprite through the archive fallback
+     * instead of the game-sprite component helper. Keep every local BW/BW2
+     * sprite at the same scale there as well. Views already using the helper
+     * set --sprite-scale inline and must not receive this transform twice.
+     */
+    img[src*="Spr_5b_"]:not([style*="--sprite-scale"]),
+    img[src*="Spr_5b2_"]:not([style*="--sprite-scale"]) {
+        transform: scale(0.75) !important;
+    }
+
     body {
         @apply bg-background text-foreground;
         zoom: 0.9;
