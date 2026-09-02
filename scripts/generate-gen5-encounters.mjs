@@ -8,7 +8,7 @@ const methods = new Map([
   ['grass-spots', 'gen5-rustling-grass'],
   ['cave-spots', 'gen5-dust-clouds'],
   ['dust-clouds', 'gen5-dust-clouds'], ['surf', 'gen5-random'],
-  ['old-rod', 'gen5-old-rod'], ['good-rod', 'gen5-good-rod'], ['super-rod', 'gen5-super-rod'],
+  ['old-rod', 'gen5-fishing'], ['good-rod', 'gen5-fishing'], ['super-rod', 'gen5-fishing'],
   ['super-rod-spots', 'gen5-rippling-waters'],
   ['surf-spots', 'gen5-rippling-waters'], ['bridge-spots', 'gen5-rippling-waters'],
   // Hidden Grotto encounters are shiny-locked in Gen 5. They must not become
