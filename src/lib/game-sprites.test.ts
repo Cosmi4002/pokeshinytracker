@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleFactor } from './game-sprites';
+import { toLocalPokemonSpriteUrl } from './pokemon-data';
+
+const expectedSpriteUrl = (url: string) => toLocalPokemonSpriteUrl(url);
 
 describe('game-specific shiny sprites', () => {
   it.each([
@@ -8,24 +11,24 @@ describe('game-specific shiny sprites', () => {
     ['heartgold', '/img/game-sprites/hgss/Spr_4h_001_s.png'],
     ['black2', '/img/game-sprites/bw/Spr_5b_001_s.webp'],
   ])('resolves Bulbasaur for %s', (gameId, expected) => {
-    expect(getGameSpecificShinySpriteUrl(1, gameId, { name: 'bulbasaur' })).toBe(expected);
+    expect(getGameSpecificShinySpriteUrl(1, gameId, { name: 'bulbasaur' })).toBe(expectedSpriteUrl(expected));
   });
 
   it('resolves Giratina Origin in Platinum through the archive media URL', () => {
     expect(getGameSpecificShinySpriteUrl(487, 'platinum', { name: 'giratina-origin', form: 'giratina-origin' }))
-      .toBe('https://archives.bulbagarden.net/media/upload/2/2f/Spr_4p_487O_s.png');
+      .toBe(expectedSpriteUrl('https://archives.bulbagarden.net/media/upload/2/2f/Spr_4p_487O_s.png'));
   });
 
   it('resolves Mismagius in Platinum through the archive media URL', () => {
     expect(getGameSpecificShinySpriteUrl(429, 'platinum', { name: 'mismagius' }))
-      .toBe('https://archives.bulbagarden.net/media/upload/3/38/Spr_4p_429_s.png');
+      .toBe(expectedSpriteUrl('https://archives.bulbagarden.net/media/upload/3/38/Spr_4p_429_s.png'));
   });
 
   it.each([
     [458, 'mantyke', 'https://archives.bulbagarden.net/media/upload/9/9b/Spr_4p_458_s.png'],
     [462, 'magnezone', 'https://archives.bulbagarden.net/media/upload/b/b8/Spr_4p_462_s.png'],
   ])('resolves Platinum-only sprite %s through the archive media URL', (pokemonId, name, expected) => {
-    expect(getGameSpecificShinySpriteUrl(pokemonId, 'platinum', { name })).toBe(expected);
+    expect(getGameSpecificShinySpriteUrl(pokemonId, 'platinum', { name })).toBe(expectedSpriteUrl(expected));
   });
 
   it.each([
@@ -33,18 +36,18 @@ describe('game-specific shiny sprites', () => {
     ['platinum', 'male', 'https://archives.bulbagarden.net/media/upload/8/87/Spr_4p_445_m_s.png'],
     ['platinum', 'female', 'https://archives.bulbagarden.net/media/upload/f/f5/Spr_4p_445_f_s.png'],
   ])('resolves Garchomp gender-specific sprite for %s %s', (gameId, gender, expected) => {
-    expect(getGameSpecificShinySpriteUrl(445, gameId, { name: 'garchomp', gender })).toBe(expected);
+    expect(getGameSpecificShinySpriteUrl(445, gameId, { name: 'garchomp', gender })).toBe(expectedSpriteUrl(expected));
   });
 
   it('resolves Deoxys forms in Diamond, Pearl, and Platinum', () => {
     expect(getGameSpecificShinySpriteUrl(386, 'diamond', { name: 'deoxys', form: 'deoxys' }))
-      .toBe('https://archives.bulbagarden.net/media/upload/2/29/Spr_4d_386_s.png');
+      .toBe(expectedSpriteUrl('https://archives.bulbagarden.net/media/upload/2/29/Spr_4d_386_s.png'));
     expect(getGameSpecificShinySpriteUrl(386, 'pearl', { name: 'deoxys-attack', form: 'deoxys-attack' }))
-      .toBe('https://archives.bulbagarden.net/media/upload/9/99/Spr_4d_386A_s.png');
+      .toBe(expectedSpriteUrl('https://archives.bulbagarden.net/media/upload/9/99/Spr_4d_386A_s.png'));
     expect(getGameSpecificShinySpriteUrl(386, 'platinum', { name: 'deoxys-defense', form: 'deoxys-defense' }))
-      .toBe('https://archives.bulbagarden.net/media/upload/5/5c/Spr_4d_386D_s.png');
+      .toBe(expectedSpriteUrl('https://archives.bulbagarden.net/media/upload/5/5c/Spr_4d_386D_s.png'));
     expect(getGameSpecificShinySpriteUrl(386, 'platinum', { name: 'deoxys-speed', form: 'deoxys-speed' }))
-      .toBe('https://archives.bulbagarden.net/media/upload/0/05/Spr_4d_386S_s.png');
+      .toBe(expectedSpriteUrl('https://archives.bulbagarden.net/media/upload/0/05/Spr_4d_386S_s.png'));
   });
 
   it.each([
