@@ -339,7 +339,7 @@ for (const [speciesId, gameId, originalMethodId, locations] of generatedMethodMa
     : generationMatch && locations.every((location) => /safari zone|great marsh/iu.test(location))
     ? `gen${generationMatch[1]}-safari`
     : originalMethodId === 'gen5-fishing'
-      ? 'gen5-super-rod'
+      ? 'gen5-fishing'
       : originalMethodId;
   const connectedRoute = routes.find((route) => speciesIdByEntityKey.get(route.targetEntityKey) === speciesId
     && route.gameId === gameId
@@ -791,10 +791,10 @@ for (const [gameId, methodIds] of Object.entries(gen4ExpectedMethodsByGame)) {
   }
 }
 const gen5ExpectedMethodsByGame = {
-  black: ['gen5-random', 'gen5-double-encounter', 'gen5-rustling-grass', 'gen5-dust-clouds', 'gen5-super-rod', 'gen5-rippling-waters', 'gen5-soft-reset', 'gen5-fossil-restore', 'gen5-gift', 'gen5-egg-hatching', 'gen5-masuda'],
-  white: ['gen5-random', 'gen5-double-encounter', 'gen5-rustling-grass', 'gen5-dust-clouds', 'gen5-super-rod', 'gen5-rippling-waters', 'gen5-soft-reset', 'gen5-fossil-restore', 'gen5-gift', 'gen5-egg-hatching', 'gen5-masuda'],
-  black2: ['gen5-random', 'gen5-double-encounter', 'gen5-rustling-grass', 'gen5-double-rustling-grass', 'gen5-dust-clouds', 'gen5-double-dust-clouds', 'gen5-super-rod', 'gen5-rippling-waters', 'gen5-soft-reset', 'gen5-fossil-restore', 'gen5-gift', 'gen5-guaranteed-shiny', 'gen5-egg-hatching', 'gen5-masuda'],
-  white2: ['gen5-random', 'gen5-double-encounter', 'gen5-rustling-grass', 'gen5-double-rustling-grass', 'gen5-dust-clouds', 'gen5-double-dust-clouds', 'gen5-super-rod', 'gen5-rippling-waters', 'gen5-soft-reset', 'gen5-fossil-restore', 'gen5-gift', 'gen5-guaranteed-shiny', 'gen5-egg-hatching', 'gen5-masuda'],
+  black: ['gen5-random', 'gen5-double-encounter', 'gen5-rustling-grass', 'gen5-dust-clouds', 'gen5-fishing', 'gen5-rippling-waters', 'gen5-soft-reset', 'gen5-fossil-restore', 'gen5-gift', 'gen5-egg-hatching', 'gen5-masuda'],
+  white: ['gen5-random', 'gen5-double-encounter', 'gen5-rustling-grass', 'gen5-dust-clouds', 'gen5-fishing', 'gen5-rippling-waters', 'gen5-soft-reset', 'gen5-fossil-restore', 'gen5-gift', 'gen5-egg-hatching', 'gen5-masuda'],
+  black2: ['gen5-random', 'gen5-double-encounter', 'gen5-rustling-grass', 'gen5-double-rustling-grass', 'gen5-dust-clouds', 'gen5-double-dust-clouds', 'gen5-fishing', 'gen5-rippling-waters', 'gen5-soft-reset', 'gen5-fossil-restore', 'gen5-gift', 'gen5-guaranteed-shiny', 'gen5-egg-hatching', 'gen5-masuda'],
+  white2: ['gen5-random', 'gen5-double-encounter', 'gen5-rustling-grass', 'gen5-double-rustling-grass', 'gen5-dust-clouds', 'gen5-double-dust-clouds', 'gen5-fishing', 'gen5-rippling-waters', 'gen5-soft-reset', 'gen5-fossil-restore', 'gen5-gift', 'gen5-guaranteed-shiny', 'gen5-egg-hatching', 'gen5-masuda'],
 };
 for (const [gameId, methodIds] of Object.entries(gen5ExpectedMethodsByGame)) {
   for (const methodId of methodIds) {
@@ -836,8 +836,8 @@ for (const [key, gameId] of [['pokemon:380:base', 'alphasapphire'], ['pokemon:38
 }
 if (routes.some((route) => gen5Games.includes(route.gameId)
   && route.recommendation !== 'not-eligible'
-  && ['gen5-fishing', 'gen5-old-rod', 'gen5-good-rod'].includes(route.huntingMethodId))) {
-  fail('Generation V ordinary fishing must use Super Rod; Old Rod and Good Rod must not be invented for Gen 5');
+  && ['gen5-old-rod', 'gen5-good-rod', 'gen5-super-rod'].includes(route.huntingMethodId))) {
+  fail('Generation V fishing must use the unified Fishing method rather than rod-specific methods');
 }
 for (const speciesId of [495, 498, 501]) {
   for (const gameId of gen5Games) {

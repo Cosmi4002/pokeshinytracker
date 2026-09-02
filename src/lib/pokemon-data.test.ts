@@ -15,6 +15,15 @@ describe('pokemon sprite helpers', () => {
     );
   });
 
+  it('uses the unified Fishing method for Generation V games', () => {
+    const gen5Methods = getHuntingMethodsForGame('black2');
+
+    expect(gen5Methods).toContainEqual(expect.objectContaining({ id: 'gen5-fishing', name: 'Fishing' }));
+    expect(gen5Methods.map((method) => method.id)).not.toEqual(
+      expect.arrayContaining(['gen5-old-rod', 'gen5-good-rod', 'gen5-super-rod']),
+    );
+  });
+
   it('returns a stable fallback asset for missing sprite images', () => {
     expect(getPokemonSpriteFallbackUrl()).toBe('/placeholder.svg');
   });
