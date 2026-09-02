@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleFactor } from './game-sprites';
+import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleFactor, getGameSpecificSpriteScaleStyle } from './game-sprites';
 import { toLocalPokemonSpriteUrl } from './pokemon-data';
 import { GAME_SPRITE_LONG_SIDE_BY_FILE } from '@/data/game-sprite-long-sides.generated';
 
@@ -101,5 +101,12 @@ describe('game-specific shiny sprites', () => {
       const longSide = GAME_SPRITE_LONG_SIDE_BY_FILE[filePath];
       expect(longSide * getGameSpecificSpriteScaleFactor(url)).toBeCloseTo(88);
     }
+  });
+
+  it('uses the shared normalized scale directly in the rendered style', () => {
+    const url = '/img/game-sprites/bw2/Spr_5b2_495_s.webp';
+
+    expect(getGameSpecificSpriteScaleStyle(url)['--sprite-scale'])
+      .toBe(String(getGameSpecificSpriteScaleFactor(url)));
   });
 });
