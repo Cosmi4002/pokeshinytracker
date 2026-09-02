@@ -337,8 +337,8 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                   <img
                     src={toLocalPokemonSpriteUrl(evolvedFromSpriteUrl)}
                     alt="Evoluto da"
-                    loading={isGameSpecificShinySpriteUrl(evolvedFromSpriteUrl) ? 'eager' : 'lazy'}
-                    fetchPriority={isGameSpecificShinySpriteUrl(evolvedFromSpriteUrl) ? 'high' : 'auto'}
+                    loading="lazy"
+                    fetchPriority="auto"
                     className="block max-w-none object-contain self-center mx-auto"
                     style={{
                       width: getEvolvedFromSpriteSize(evolvedFromName, !showEncounters, evolvedFromSpriteDisplayScale),
@@ -383,8 +383,8 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                   <img
                     key={spriteUrl}
                     src={toLocalPokemonSpriteUrl(spriteUrl)}
-                  loading={isGameSpecificShinySpriteUrl(spriteUrl) ? 'eager' : 'lazy'}
-                  fetchPriority={isGameSpecificShinySpriteUrl(spriteUrl) ? 'high' : 'auto'}
+                  loading="lazy"
+                  fetchPriority="auto"
                   decoding="async"
                   referrerPolicy="no-referrer"
                   alt={entry.pokemon_name}
