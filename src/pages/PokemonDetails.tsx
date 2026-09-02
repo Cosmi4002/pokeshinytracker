@@ -154,6 +154,7 @@ export default function PokemonDetails() {
 
             rows.forEach(row => {
                 let matchedThisPokemon = false;
+                let matchedVariant: FormVariant | null = null;
                 let matchedGender: CaughtGender | null = normalizeCaughtGender(row.gender);
                 const resolvedKey = resolvePokemonEntityKey({
                     pokemonId: row.pokemon_id,
@@ -170,6 +171,7 @@ export default function PokemonDetails() {
 
                 if (matchedByEntity) {
                     caughtSet.add(matchedByEntity.name);
+                    matchedVariant = matchedByEntity;
                     if (!matchedGender && isCaughtGender(matchedByEntity.gender)) {
                         matchedGender = matchedByEntity.gender;
                     }
@@ -178,16 +180,21 @@ export default function PokemonDetails() {
 
                 // Priority 1: Exact form name match (new standard)
                 if (!matchedThisPokemon && row.form) {
-                    caughtSet.add(row.form);
-                    const matchedVariant = variants.find(v => v.name === row.form);
-                    if (!matchedGender && isCaughtGender(matchedVariant?.gender)) {
-                        matchedGender = matchedVariant.gender;
+                    const exactFormVariant = variants.find(v => v.name === row.form);
+                    if (exactFormVariant) {
+                        caughtSet.add(exactFormVariant.name);
+                        matchedVariant = exactFormVariant;
+                        if (!matchedGender && isCaughtGender(exactFormVariant.gender)) {
+                            matchedGender = exactFormVariant.gender;
+                        }
+                        matchedThisPokemon = true;
                     }
-                    matchedThisPokemon = true;
-                } else if (!matchedThisPokemon) {
+                }
+
+                if (!matchedThisPokemon) {
                     // Priority 2: Legacy fallback using ID and gender
                     const g = row.gender || 'genderless';
-                    let matchedVariant = variants.find(v => v.id === row.pokemon_id && v.gender === g);
+                    matchedVariant = variants.find(v => v.id === row.pokemon_id && v.gender === g) || null;
 
                     // Second-chance fallback for base forms (often saved as genderless)
                     if (!matchedVariant && g === 'genderless') {
@@ -230,15 +237,21 @@ export default function PokemonDetails() {
                     // For an evolved entry, the secondary game is the game where
                     // the current species/form was obtained. The primary game
                     // remains provenance only and must not mark this form as caught.
-                    const gamesForCurrentPokemon = row.is_evolved && row.secondary_game
-                        ? [row.secondary_game]
-                        : [row.game, row.secondary_game];
-                    gamesForCurrentPokemon.forEach(gameId => {
-                        if (gameId && gameId !== 'unknown' && GAME_LOGOS[gameId]) {
-                            gameSet.add(gameId);
-                            addCaughtGameGender(gameGenderMap, gameId, matchedGender);
-                        }
-                    });
+                    // The game badges and hero sprite describe the base/current detail
+                    // Pokémon, not any alternate form listed on this page. For example,
+                    // catching a Paldean Tauros must not mark the Gen 1 Tauros as caught
+                    // in Scarlet or Violet.
+                    if (matchedVariant?.name === details.name) {
+                        const gamesForCurrentPokemon = row.is_evolved && row.secondary_game
+                            ? [row.secondary_game]
+                            : [row.game, row.secondary_game];
+                        gamesForCurrentPokemon.forEach(gameId => {
+                            if (gameId && gameId !== 'unknown' && GAME_LOGOS[gameId]) {
+                                gameSet.add(gameId);
+                                addCaughtGameGender(gameGenderMap, gameId, matchedGender);
+                            }
+                        });
+                    }
                 }
             });
             setCaughtForms(caughtSet);

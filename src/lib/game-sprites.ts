@@ -6,6 +6,7 @@ import { PT_SHINY_SPRITE_URL_BY_FILE } from '@/data/pt-shiny-sprite-url-map.gene
 import { BW_SHINY_SPRITE_FILES } from '@/data/bw-shiny-sprite-manifest';
 import { BW2_SHINY_SPRITE_FILES } from '@/data/bw2-shiny-sprite-manifest';
 import { GAME_SPRITE_LONG_SIDE_BY_FILE } from '@/data/game-sprite-long-sides.generated';
+import { LOCAL_SPRITE_URLS } from './local-sprite-map.generated';
 
 export type GameSpriteOptions = {
   shiny?: boolean;
@@ -111,6 +112,29 @@ const normalize = (value?: string | null) => (value || '')
   .toLowerCase()
   .replace(/[()]/g, '')
   .replace(/[ _]+/g, '-');
+
+// Keep this module independent from pokemon-data: pokemon-data also uses the
+// game sprite resolver, so importing its URL helper here would create a cycle.
+const toLocalPokemonSpriteUrl = (remoteUrl: string): string => {
+  if (!remoteUrl || !remoteUrl.startsWith('http')) return remoteUrl;
+
+  const localUrl = LOCAL_SPRITE_URLS[remoteUrl];
+  if (localUrl) return localUrl;
+
+  try {
+    const parsed = new URL(remoteUrl);
+    if (parsed.hostname === 'archives.bulbagarden.net' && parsed.pathname.includes('/media/upload/')) {
+      const decodedPath = decodeURIComponent(parsed.pathname)
+        .replace(/^\/+/, '')
+        .replace(/[^a-zA-Z0-9._/-]/g, '-');
+      return `/${['img', 'pokemon-sprites', 'remote', parsed.hostname, decodedPath].join('/')}`;
+    }
+  } catch {
+    // Use the original URL when it cannot be normalized to a local asset.
+  }
+
+  return remoteUrl;
+};
 
 const resolveSpeciesId = (pokemonId: number, slug: string) => {
   if (pokemonId >= 1 && pokemonId <= 649) return pokemonId;

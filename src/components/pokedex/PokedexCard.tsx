@@ -4,7 +4,6 @@ import { useRandomColor } from '@/lib/random-color-context';
 import type { ShinyAvailability } from '@/lib/shiny-availability';
 import { Lock, UserX } from "lucide-react";
 import { handlePokemonSpriteError, toLocalPokemonSpriteUrl } from "@/lib/pokemon-data";
-import { isGameSpecificShinySpriteUrl } from "@/lib/game-sprites";
 import type { CardFilterId } from "@/lib/card-effects";
 
 interface PokedexCardProps {
@@ -452,8 +451,8 @@ export const PokedexCard = memo(function PokedexCard({
                             key={spriteUrl}
                             src={toLocalPokemonSpriteUrl(spriteUrl)}
                             alt={`${displayName} shiny`}
-                            loading={isGameSpecificShinySpriteUrl(spriteUrl) ? 'eager' : 'lazy'}
-                            fetchPriority={isGameSpecificShinySpriteUrl(spriteUrl) ? 'high' : 'auto'}
+                            loading="lazy"
+                            fetchPriority="auto"
                             className={cn(
                                 "pokemon-sprite h-full w-full object-contain transition-all duration-500",
                                 isPrimaryCaught
@@ -486,8 +485,8 @@ export const PokedexCard = memo(function PokedexCard({
                                 key={secondarySprite}
                                 src={toLocalPokemonSpriteUrl(secondarySprite)}
                                 alt={`${displayName} shiny secondary`}
-                                loading={isGameSpecificShinySpriteUrl(secondarySprite) ? 'eager' : 'lazy'}
-                                fetchPriority={isGameSpecificShinySpriteUrl(secondarySprite) ? 'high' : 'auto'}
+                                loading="lazy"
+                                fetchPriority="auto"
                                 className={cn(
                                     "pokemon-sprite h-full w-full object-contain transition-all duration-500",
                                     isSecondaryCaught

@@ -42,6 +42,7 @@ const makeSnapshot = (huntId: string): OfflineCounterSnapshot => ({
   counter: 42,
   incrementAmount: 1,
   incrementHotkey: 'space',
+  selectedGameId: null,
   pokemonSlots: [
     { id: 1, name: 'Bulbasaur', form: '', gender: '' },
     { id: null, name: '', form: '', gender: '' },
