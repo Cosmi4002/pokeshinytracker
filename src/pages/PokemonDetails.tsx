@@ -267,14 +267,6 @@ export default function PokemonDetails() {
     const femaleSpriteUrl = details && details.hasGenderDifference
         ? getPokemonSpriteUrl(details.id, { shiny: true, female: true, name: details.name })
         : null;
-    const getInGameSpriteScaleMultiplier = (url?: string | null) => {
-        if (!url?.startsWith('/img/game-sprites/')) return 1;
-        const gameSet = url.split('/')[3];
-        if (gameSet === 'hgss') return 1.16;
-        if (gameSet === 'bw' || gameSet === 'bw2') return 0.94;
-        return 1;
-    };
-
     // Flatten all variants from the hook data
     const variants = useMemo((): FormVariant[] => {
         if (!details) return [];
@@ -956,7 +948,7 @@ export default function PokemonDetails() {
                                                     getGameSpecificSpriteScaleClass(group.maleSpriteUrl),
                                                     group.caughtGames.length === 0 && "opacity-35 grayscale"
                                                 )}
-                                                style={getGameSpecificSpriteScaleStyle(group.maleSpriteUrl, getInGameSpriteScaleMultiplier(group.maleSpriteUrl))}
+                                                style={getGameSpecificSpriteScaleStyle(group.maleSpriteUrl)}
                                             />
                                             {details.hasGenderDifference && group.femaleSpriteUrl && (
                                                 <img
@@ -969,7 +961,7 @@ export default function PokemonDetails() {
                                                         getGameSpecificSpriteScaleClass(group.femaleSpriteUrl),
                                                         (group.femaleCaughtGames ?? []).length === 0 && "opacity-35 grayscale"
                                                     )}
-                                                    style={getGameSpecificSpriteScaleStyle(group.femaleSpriteUrl, getInGameSpriteScaleMultiplier(group.femaleSpriteUrl))}
+                                                    style={getGameSpecificSpriteScaleStyle(group.femaleSpriteUrl)}
                                                 />
                                             )}
                                         </div>
