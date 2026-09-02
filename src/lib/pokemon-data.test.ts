@@ -8,7 +8,7 @@ describe('pokemon sprite helpers', () => {
 
   it('builds the expected HOME sprite URL for a base shiny Pokémon', () => {
     expect(getPokemonSpriteUrl(25, { shiny: true })).toBe(
-      'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/25.png'
+      '/img/pokemon-sprites/remote/raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/25.png'
     );
   });
 
@@ -29,7 +29,7 @@ describe('pokemon sprite helpers', () => {
       '/img/game-sprites/bw/Spr_5b_585W_s.webp'
     );
     expect(getArchiveShinySpriteUrl(10020, { shiny: true, name: 'thundurus-therian', form: 'thundurus-therian' })).toBe(
-      'https://archives.bulbagarden.net/media/upload/2/21/Spr_5b2_642T_s.png'
+      '/img/pokemon-sprites/remote/archives.bulbagarden.net/media/upload/2/21/Spr_5b2_642T_s.png'
     );
   });
 
