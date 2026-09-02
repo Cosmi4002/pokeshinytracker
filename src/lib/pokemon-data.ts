@@ -459,6 +459,22 @@ export const GAMES = [
   { id: 'za', name: 'Pokemon Legends Z-A', generation: 9, logo: 'https://archives.bulbagarden.net/media/upload/thumb/f/f7/Pok%C3%A9mon_Legends_Z-A_logo.png/1280px-Pok%C3%A9mon_Legends_Z-A_logo.png' },
 ];
 
+/** Returns the generation associated with a saved game id, when known. */
+export const getGameGeneration = (gameId?: string | null): number | null =>
+  GAMES.find((game) => game.id === gameId)?.generation ?? null;
+
+/**
+ * Returns the existing hunting methods that match a game's generation. This is
+ * used to put the most relevant methods first without preventing a user from
+ * selecting an exceptional method from a different generation.
+ */
+export const getHuntingMethodsForGame = (gameId?: string | null): HuntingMethod[] => {
+  const generation = getGameGeneration(gameId);
+  return generation === null
+    ? []
+    : HUNTING_METHODS.filter((method) => method.generation === generation);
+};
+
 // Calculate shiny probability statistics
 export function calculateShinyStats(encounters: number, methodId: string, hasShinyCharm: boolean, customOdds?: number) {
   let currentOdds = 4096;

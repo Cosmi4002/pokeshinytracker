@@ -415,7 +415,7 @@ export function FinishHuntDialog({
 
           <div className="space-y-2">
             <Label>Method *</Label>
-            <MethodSelector value={method.id} onChange={setMethod} />
+            <MethodSelector value={method.id} onChange={setMethod} gameId={game} />
           </div>
 
           {canHideCounterEncounters && (

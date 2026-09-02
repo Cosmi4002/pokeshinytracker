@@ -240,7 +240,7 @@ export function ShinyCounter({
     setCounter(data.counter ?? 0);
     setIncrementAmount(data.increment_amount ?? 1);
     setIncrementHotkey(data.increment_hotkey ?? '');
-    setSelectedGameId(selectedGameIdOverride || 'black2');
+    setSelectedGameId(data.selected_game_id || selectedGameIdOverride || 'black2');
     setSelectedPokemonId(slots[0].id);
     setSelectedPokemonName(slots[0].name);
     setSelectedForm(slots[0].form);
@@ -362,7 +362,7 @@ export function ShinyCounter({
               counter: data.counter ?? 0,
               incrementAmount: data.increment_amount ?? 1,
               incrementHotkey: data.increment_hotkey ?? '',
-              selectedGameId: 'black2',
+              selectedGameId: data.selected_game_id || pendingSnapshot?.selectedGameId || localSnapshot?.selectedGameId || 'black2',
               pokemonSlots: remoteSlots,
               methodId: data.method,
               hasShinyCharm: data.has_shiny_charm ?? false,
@@ -491,6 +491,7 @@ export function ShinyCounter({
         has_shiny_charm: hasShinyCharm,
         increment_amount: incrementAmount,
         increment_hotkey: incrementHotkey || null,
+        selected_game_id: selectedGameId,
         form: selectedForm || null,
         gender: selectedGender || null,
         updated_at: snapshot.updatedAt,
@@ -1223,6 +1224,7 @@ export function ShinyCounter({
                 value={safeSelectedMethod.id}
                 onChange={setSelectedMethod}
                 currentOdds={stats.currentOdds}
+                gameId={selectedGameId}
               />
             </div>
 

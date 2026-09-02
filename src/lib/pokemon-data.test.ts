@@ -1,7 +1,20 @@
 import { describe, expect, it } from 'vitest';
-import { HUNTING_METHODS, calculateShinyStats, formatOdds, getArchiveShinySpriteUrl, getCaughtShinySpriteUrl, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, getSelectedGameSpriteUrl, isBreedingMethod, toLocalPokemonSpriteUrl } from './pokemon-data';
+import { HUNTING_METHODS, calculateShinyStats, formatOdds, getArchiveShinySpriteUrl, getCaughtShinySpriteUrl, getGameGeneration, getHuntingMethodsForGame, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, getSelectedGameSpriteUrl, isBreedingMethod, toLocalPokemonSpriteUrl } from './pokemon-data';
 
 describe('pokemon sprite helpers', () => {
+  it('suggests generation-appropriate methods for the selected game', () => {
+    expect(getGameGeneration('pearl')).toBe(4);
+    expect(getHuntingMethodsForGame('pearl')).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'gen4-random', generation: 4 }),
+        expect.objectContaining({ id: 'gen4-pokeradar', generation: 4 }),
+      ]),
+    );
+    expect(getHuntingMethodsForGame('pearl')).not.toContainEqual(
+      expect.objectContaining({ generation: 5 }),
+    );
+  });
+
   it('returns a stable fallback asset for missing sprite images', () => {
     expect(getPokemonSpriteFallbackUrl()).toBe('/placeholder.svg');
   });

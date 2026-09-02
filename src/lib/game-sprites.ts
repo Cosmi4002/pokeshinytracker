@@ -204,7 +204,7 @@ const ARCHIVE_THERIAN_SHINY_OVERRIDE_BY_FORM: Readonly<Record<string, string>> =
   'landorus-therian': 'https://archives.bulbagarden.net/media/upload/3/36/Spr_5b2_645T_s.png',
 };
 
-const GAME_SPRITE_SET_MEDIAN_LONG_SIDE = (() => {
+const HGSS_SPRITE_MEDIAN_LONG_SIDE = (() => {
   const grouped = new Map<string, number[]>();
   for (const [filePath, longSide] of Object.entries(GAME_SPRITE_LONG_SIDE_BY_FILE)) {
     const set = filePath.split('/')[0];
@@ -222,11 +222,7 @@ const GAME_SPRITE_SET_MEDIAN_LONG_SIDE = (() => {
       : sorted[middle];
   };
 
-  return {
-    hgss: median(grouped.get('hgss') || []),
-    bw: median(grouped.get('bw') || []),
-    bw2: median(grouped.get('bw2') || []),
-  } as const;
+  return median(grouped.get('hgss') || []);
 })();
 
 const getGameSpecificSpriteFilePath = (url?: string | null) => {
@@ -268,15 +264,12 @@ const getGameSpecificSpriteScaleFactorFromFile = (filePath?: string | null) => {
   if (!filePath) return null;
   const longSide = GAME_SPRITE_LONG_SIDE_BY_FILE[filePath];
   if (!longSide) return null;
-  const set = filePath.split('/')[0];
-  const median = GAME_SPRITE_SET_MEDIAN_LONG_SIDE[set as keyof typeof GAME_SPRITE_SET_MEDIAN_LONG_SIDE];
-  if (!median) return null;
+  if (!HGSS_SPRITE_MEDIAN_LONG_SIDE) return null;
   // `object-contain` gives every source canvas the same box. Scale must therefore
-  // be inverse to the opaque sprite size: smaller in-game sprites need a larger
-  // multiplier, while large sprites need a smaller one. This keeps the Pokémon's
-  // visible footprint consistent instead of shrinking the already-small sprites.
-  const normalizedScale = (median / longSide) * 1.1;
-  return Math.min(1.25, Math.max(0.9, normalizedScale));
+  // be inverse to the opaque sprite size. HGSS is the visual baseline across the
+  // site, so DP, Pt, BW and BW2 sprites are normalized to the same footprint
+  // rather than to a median that differs for each game set.
+  return (HGSS_SPRITE_MEDIAN_LONG_SIDE / longSide) * 1.1;
 };
 
 export function getGameSpecificShinySpriteUrl(
