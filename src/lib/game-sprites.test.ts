@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleFactor } from './game-sprites';
 import { toLocalPokemonSpriteUrl } from './pokemon-data';
+import { GAME_SPRITE_LONG_SIDE_BY_FILE } from '@/data/game-sprite-long-sides.generated';
 
 const expectedSpriteUrl = (url: string) => toLocalPokemonSpriteUrl(url);
 
@@ -85,5 +86,20 @@ describe('game-specific shiny sprites', () => {
 
     expect(mankey).toBeGreaterThan(1);
     expect(pidgeotto).toBeLessThan(1);
+  });
+
+  it('normalizes every supported game set to the HGSS sprite footprint', () => {
+    const samples = [
+      ['hgss/Spr_4h_001_s.png', '/img/game-sprites/hgss/Spr_4h_001_s.png'],
+      ['dp/Spr_4d_001_s.png', 'https://archives.bulbagarden.net/media/upload/7/7c/Spr_4d_001_s.png'],
+      ['pt/Spr_4p_429_s.png', 'https://archives.bulbagarden.net/media/upload/3/38/Spr_4p_429_s.png'],
+      ['bw/Spr_5b_001_s.webp', '/img/game-sprites/bw/Spr_5b_001_s.webp'],
+      ['bw2/Spr_5b2_495_s.webp', '/img/game-sprites/bw2/Spr_5b2_495_s.webp'],
+    ] as const;
+
+    for (const [filePath, url] of samples) {
+      const longSide = GAME_SPRITE_LONG_SIDE_BY_FILE[filePath];
+      expect(longSide * getGameSpecificSpriteScaleFactor(url)).toBeCloseTo(88);
+    }
   });
 });

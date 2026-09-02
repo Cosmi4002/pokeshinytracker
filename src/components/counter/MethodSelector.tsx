@@ -15,15 +15,16 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { findHuntingMethod, HUNTING_METHODS, HuntingMethod } from '@/lib/pokemon-data';
+import { findHuntingMethod, getGameGeneration, getHuntingMethodsForGame, HUNTING_METHODS, HuntingMethod } from '@/lib/pokemon-data';
 
 interface MethodSelectorProps {
   value: string;
   onChange: (method: HuntingMethod) => void;
   currentOdds?: number;
+  gameId?: string | null;
 }
 
-export function MethodSelector({ value, onChange, currentOdds }: MethodSelectorProps) {
+export function MethodSelector({ value, onChange, currentOdds, gameId }: MethodSelectorProps) {
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -58,6 +59,22 @@ export function MethodSelector({ value, onChange, currentOdds }: MethodSelectorP
     return filtered;
   }, [searchTerm, methodsByGen]);
 
+  const displayedMethodsByGen = useMemo(() => {
+    const suggestedGeneration = getGameGeneration(gameId);
+    if (searchTerm || suggestedGeneration === null) return filteredMethodsByGen;
+
+    const suggestedMethods = getHuntingMethodsForGame(gameId);
+    if (suggestedMethods.length === 0) return filteredMethodsByGen;
+
+    return {
+      [`Recommended — Generation ${suggestedGeneration}`]: suggestedMethods,
+      ...Object.fromEntries(
+        Object.entries(filteredMethodsByGen)
+          .filter(([generation]) => generation !== `Generation ${suggestedGeneration}`),
+      ),
+    };
+  }, [filteredMethodsByGen, gameId, searchTerm]);
+
   return (
     <Popover open={open} onOpenChange={setOpen} modal={true}>
       <PopoverTrigger asChild>
@@ -89,7 +106,7 @@ export function MethodSelector({ value, onChange, currentOdds }: MethodSelectorP
           />
           <CommandList className="max-h-[300px] overflow-y-auto">
             <CommandEmpty>No method found.</CommandEmpty>
-            {Object.entries(filteredMethodsByGen).map(([gen, methods]) => (
+            {Object.entries(displayedMethodsByGen).map(([gen, methods]) => (
               <CommandGroup key={gen} heading={gen}>
                 {methods.map((method) => (
                   <CommandItem
