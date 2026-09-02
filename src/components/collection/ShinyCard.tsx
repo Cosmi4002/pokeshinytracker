@@ -248,14 +248,6 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
           <div className="absolute left-0 right-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-fuchsia-300/70 to-transparent" />
         </div>
       )}
-      {cardFilter === 'holo' && (
-        <div className="pointer-events-none absolute inset-0 z-30 rounded-xl opacity-100 mix-blend-screen">
-          <div className="absolute inset-[1px] rounded-xl border border-white/35 bg-[linear-gradient(118deg,rgba(255,255,255,0.28),rgba(134,239,172,0.16)_18%,rgba(125,211,252,0.20)_35%,transparent_52%,rgba(216,180,254,0.22)_70%,rgba(255,255,255,0.22))]" />
-          <div className="absolute -left-12 top-10 h-24 w-[145%] -rotate-12 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-          <div className="absolute inset-x-5 top-3 h-px bg-gradient-to-r from-transparent via-white/75 to-transparent" />
-          <div className="absolute inset-y-6 right-3 w-px bg-gradient-to-b from-transparent via-cyan-100/60 to-transparent" />
-        </div>
-      )}
       {cardFilter === 'prism' && (
         <div className="pointer-events-none absolute inset-[1px] z-20 rounded-xl opacity-[0.42] mix-blend-screen" style={{ background: 'linear-gradient(130deg, transparent 0 13%, rgba(255,255,255,0.18) 16%, rgba(244,114,182,0.10) 24%, transparent 36%), linear-gradient(42deg, transparent 0 24%, rgba(34,211,238,0.13) 31%, rgba(167,139,250,0.10) 40%, transparent 56%), linear-gradient(158deg, transparent 0 48%, rgba(250,204,21,0.10) 58%, transparent 76%)' }} />
       )}

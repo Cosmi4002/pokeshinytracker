@@ -259,7 +259,7 @@ export function getGameSpecificShinySpriteUrl(
   const slug = normalize(options.form || options.name);
   const archiveTherianOverride = slug ? ARCHIVE_THERIAN_SHINY_OVERRIDE_BY_FORM[slug] : undefined;
   if (archiveTherianOverride && ['black', 'white', 'black2', 'white2'].includes(gameId ?? '')) {
-    return archiveTherianOverride;
+    return toLocalPokemonSpriteUrl(archiveTherianOverride) || archiveTherianOverride;
   }
 
   const speciesId = resolveSpeciesId(pokemonId, slug);
@@ -289,9 +289,18 @@ export function getGameSpecificShinySpriteUrl(
   const maleMatch = formCandidates.find((spriteFile) => spriteFile.gender === 'male');
   const filename = (genderMatch || neutralMatch || maleMatch || formCandidates[0])?.filename;
   if (!filename || !spriteSet.files.has(filename)) return null;
-  if (resolvedSet === 'dp') return DP_SHINY_SPRITE_URL_BY_FILE[filename] || null;
-  if (resolvedSet === 'pt') return PT_SHINY_SPRITE_URL_BY_FILE[filename] || null;
-  return `/img/game-sprites/${resolvedSet}/${filename}`;
+
+  let resolvedUrl: string | null = null;
+  if (resolvedSet === 'dp') {
+    resolvedUrl = DP_SHINY_SPRITE_URL_BY_FILE[filename] || null;
+  } else if (resolvedSet === 'pt') {
+    resolvedUrl = PT_SHINY_SPRITE_URL_BY_FILE[filename] || null;
+  } else {
+    resolvedUrl = `/img/game-sprites/${resolvedSet}/${filename}`;
+  }
+
+  if (!resolvedUrl) return null;
+  return toLocalPokemonSpriteUrl(resolvedUrl) || resolvedUrl;
 }
 
 export function getArchiveShinySpriteUrl(

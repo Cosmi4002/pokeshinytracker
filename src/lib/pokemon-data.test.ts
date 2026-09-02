@@ -54,7 +54,7 @@ describe('pokemon sprite helpers', () => {
         game: 'diamond',
         spriteUrl: 'https://legacy.example/old.png',
       })
-    ).toBe('https://archives.bulbagarden.net/media/upload/0/0d/Spr_4d_445_m_s.png');
+    ).toBe('/img/pokemon-sprites/remote/archives.bulbagarden.net/media/upload/0/0d/Spr_4d_445_m_s.png');
 
     expect(
       getSelectedGameSpriteUrl({
@@ -65,7 +65,7 @@ describe('pokemon sprite helpers', () => {
         secondaryGame: 'diamond',
         spriteUrl: 'https://legacy.example/old.png',
       })
-    ).toBe('https://archives.bulbagarden.net/media/upload/f/f5/Spr_4p_445_f_s.png');
+    ).toBe('/img/pokemon-sprites/remote/archives.bulbagarden.net/media/upload/f/f5/Spr_4p_445_f_s.png');
   });
 
   it('remaps archive sprite URLs to a local cached path instead of depending on the browser cache', () => {

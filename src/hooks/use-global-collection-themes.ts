@@ -66,7 +66,7 @@ function sanitizeEffects(input: unknown): CollectionThemeEffects {
   return {
     blackEffectEnabled: raw.blackEffectEnabled === true,
     pokedexCardFilter: normalizeFilter(raw.pokedexCardFilter, DEFAULT_EFFECTS.pokedexCardFilter, ['none', 'holo', 'cosmic', 'prism', 'ember', 'shadow']),
-    collectionCardFilter: normalizeFilter(raw.collectionCardFilter, DEFAULT_EFFECTS.collectionCardFilter, ['none', 'holo', 'prism', 'ember', 'shadow']),
+    collectionCardFilter: normalizeFilter(raw.collectionCardFilter, DEFAULT_EFFECTS.collectionCardFilter, ['none', 'prism', 'ember', 'shadow']),
   };
 }
 

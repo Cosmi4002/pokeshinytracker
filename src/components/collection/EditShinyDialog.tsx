@@ -230,6 +230,9 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
 
     setLoading(true);
     try {
+      const currentVariant = formOptions.find(f => f.name === form);
+      const displayId = currentVariant ? currentVariant.id : pokemonId;
+
       const finalSpriteUrl = getSelectedGameSpriteUrl({
         pokemonId: displayId,
         pokemonName,
@@ -244,8 +247,6 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
         ? formOptions.find(f => f.name === form)?.displayName || formatPokemonName(pokemonName, pokemonId)
         : formatPokemonName(pokemonName, pokemonId);
 
-      const currentVariant = formOptions.find(f => f.name === form);
-      const displayId = currentVariant ? currentVariant.id : pokemonId;
       const entityKey = resolveEntityKeyForSelectedPokemon({
         pokemonId: displayId,
         pokemonName: finalDisplayName,

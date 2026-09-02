@@ -22,7 +22,7 @@ export const POKEDEX_CARD_FILTER_OPTIONS: CardFilterOption[] = CARD_FILTER_OPTIO
 );
 
 export const COLLECTION_CARD_FILTER_OPTIONS: CardFilterOption[] = CARD_FILTER_OPTIONS.filter(
-  (option) => option.id !== 'cosmic' && option.id !== 'pixel' && option.id !== 'neon'
+  (option) => option.id !== 'holo' && option.id !== 'cosmic' && option.id !== 'pixel' && option.id !== 'neon'
 );
 
 export const isCardFilterId = (value: unknown): value is CardFilterId =>

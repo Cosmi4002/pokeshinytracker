@@ -181,6 +181,9 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
 
     setLoading(true);
     try {
+      const currentVariant = formOptions.find(f => f.name === form);
+      const displayId = currentVariant ? currentVariant.id : pokemonId;
+
       const finalSpriteUrl = getSelectedGameSpriteUrl({
         pokemonId: displayId,
         pokemonName,
@@ -195,8 +198,6 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
         ? formOptions.find(f => f.name === form)?.displayName || formatPokemonName(pokemonName, pokemonId)
         : formatPokemonName(pokemonName, pokemonId);
 
-      const currentVariant = formOptions.find(f => f.name === form);
-      const displayId = currentVariant ? currentVariant.id : pokemonId;
       const entityKey = resolveEntityKeyForSelectedPokemon({
         pokemonId: displayId,
         pokemonName: finalDisplayName,

@@ -2,6 +2,11 @@
   {
     "ok": false,
     "status": 404,
+    "url": "https://img.pokemondb.net/sprites/home/${subPath}/${normalized}.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
     "url": "https://img.pokemondb.net/sprites/home/${subPath}/furfrou-dandy.png"
   },
   {
@@ -27,12 +32,7 @@
   {
     "ok": false,
     "status": 404,
-    "url": "https://img.pokemondb.net/sprites/home/${subPath}/${normalized}.png"
-  },
-  {
-    "ok": false,
-    "status": 404,
-    "url": "https://img.pokemondb.net/sprites/home/${subPath}/minior-core.png"
+    "url": "https://img.pokemondb.net/sprites/home/${subPath}/gourgeist.png"
   },
   {
     "ok": false,
@@ -42,7 +42,12 @@
   {
     "ok": false,
     "status": 404,
-    "url": "https://img.pokemondb.net/sprites/home/${subPath}/oricorio-sensu.png"
+    "url": "https://img.pokemondb.net/sprites/home/${subPath}/minior-core.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://img.pokemondb.net/sprites/home/${subPath}/oricorio-pau.png"
   },
   {
     "ok": false,
@@ -52,7 +57,62 @@
   {
     "ok": false,
     "status": 404,
+    "url": "https://img.pokemondb.net/sprites/home/${subPath}/oricorio-sensu.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://img.pokemondb.net/sprites/home/${subPath}/poltchageist-artisan.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://img.pokemondb.net/sprites/home/${subPath}/poltchageist.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://img.pokemondb.net/sprites/home/${subPath}/polteageist-antique.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://img.pokemondb.net/sprites/home/${subPath}/pumpkaboo-small.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
     "url": "https://img.pokemondb.net/sprites/home/${subPath}/pumpkaboo-large.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://img.pokemondb.net/sprites/home/${subPath}/polteageist.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://img.pokemondb.net/sprites/home/${subPath}/pumpkaboo-super.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://img.pokemondb.net/sprites/home/${subPath}/sinistcha.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://img.pokemondb.net/sprites/home/${subPath}/pumpkaboo.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://img.pokemondb.net/sprites/home/${subPath}/sinistea-antique.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://img.pokemondb.net/sprites/home/${subPath}/sinistea.png"
   },
   {
     "ok": false,
@@ -67,7 +127,7 @@
   {
     "ok": false,
     "status": 404,
-    "url": "https://img.pokemondb.net/sprites/home/${subPath}/pumpkaboo-super.png"
+    "url": "https://img.pokemondb.net/sprites/home/${subPath}/vivillon-meadow.png"
   },
   {
     "ok": false,
@@ -77,67 +137,12 @@
   {
     "ok": false,
     "status": 404,
-    "url": "https://img.pokemondb.net/sprites/home/${subPath}/vivillon-meadow.png"
-  },
-  {
-    "ok": false,
-    "status": 404,
-    "url": "https://img.pokemondb.net/sprites/home/${subPath}/pumpkaboo-small.png"
-  },
-  {
-    "ok": false,
-    "status": 404,
-    "url": "https://img.pokemondb.net/sprites/home/${subPath}/oricorio-pau.png"
-  },
-  {
-    "ok": false,
-    "status": 404,
     "url": "https://img.pokemondb.net/sprites/home/shiny/unown-${letter}.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10002.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/100.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/1002.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10047.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10023.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10026.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10052.png"
-  },
-  {
-    "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10084.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home"
   },
   {
     "ok": false,
@@ -147,22 +152,7 @@
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10083.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10068.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10064.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10065.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10081.png"
   },
   {
     "ok": false,
@@ -171,78 +161,28 @@
   },
   {
     "ok": false,
-    "status": 429,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10083.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10084.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
     "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10085.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10081.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10108.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10113.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10109.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10111.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10121.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10158.png"
   },
   {
     "ok": false,
     "status": 404,
     "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10159.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10119.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10137.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10158.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10179.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10194.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10230.png"
-  },
-  {
-    "ok": false,
-    "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10328.png"
   },
   {
     "ok": false,
@@ -252,12 +192,17 @@
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10330.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10328.png"
   },
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10332.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10329.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10330.png"
   },
   {
     "ok": false,
@@ -273,6 +218,11 @@
     "ok": false,
     "status": 404,
     "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10334.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10332.png"
   },
   {
     "ok": false,
@@ -302,6 +252,11 @@
   {
     "ok": false,
     "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10338.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
     "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10341.png"
   },
   {
@@ -312,22 +267,17 @@
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10344.png"
-  },
-  {
-    "ok": false,
-    "status": 404,
     "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10343.png"
   },
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10338.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10345.png"
   },
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10349.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10344.png"
   },
   {
     "ok": false,
@@ -352,6 +302,31 @@
   {
     "ok": false,
     "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10349.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10350.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10354.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10353.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10352.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
     "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10356.png"
   },
   {
@@ -367,27 +342,22 @@
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10329.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10358.png"
   },
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10350.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10359.png"
   },
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10353.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10360.png"
   },
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10352.png"
-  },
-  {
-    "ok": false,
-    "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10354.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10362.png"
   },
   {
     "ok": false,
@@ -397,7 +367,7 @@
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10365.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10361.png"
   },
   {
     "ok": false,
@@ -407,17 +377,27 @@
   {
     "ok": false,
     "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10365.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10366.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
     "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10367.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10345.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10368.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10359.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10369.png"
   },
   {
     "ok": false,
@@ -431,13 +411,13 @@
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10358.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10372.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10366.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10373.png"
   },
   {
     "ok": false,
@@ -457,37 +437,7 @@
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10373.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10362.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10361.png"
-  },
-  {
-    "ok": false,
-    "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10380.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10360.png"
-  },
-  {
-    "ok": false,
-    "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10382.png"
-  },
-  {
-    "ok": false,
-    "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10368.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10377.png"
   },
   {
     "ok": false,
@@ -497,7 +447,37 @@
   {
     "ok": false,
     "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10379.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10380.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10381.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10382.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
     "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10383.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10384.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10385.png"
   },
   {
     "ok": false,
@@ -507,422 +487,77 @@
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10381.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10369.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10389.png"
   },
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10385.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10372.png"
-  },
-  {
-    "ok": false,
-    "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10384.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10377.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10379.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
     "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10387.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/121.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10388.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/178.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/1041201.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/156.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10390.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/182.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/10391.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/185.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/1041202.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/184.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/1041301.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/180.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/1041302.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/191.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/1058502.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/199.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/1058501.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/248.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/1058503.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/293.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/1058603.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/273.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/1058602.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/302.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/309.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/306.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/323.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/305.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/336.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/335.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/35.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/341.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/351.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/345.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/350.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/353.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/39.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/422.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/451.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/445.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/477.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/489.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/508.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/513.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/573.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/551.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/601.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/575.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/610.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/62.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/622.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/614.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/627.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/636.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/655.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/659.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/672.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/694.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/697.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/71.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/711.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/723.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/727.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/759.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/780.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/845.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/834.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/867.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/868.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/872.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/903.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/962.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/947.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/983.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/987.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/99.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/967.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/995.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/1000.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10004.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10006.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10022.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10048.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10052.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10054.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/1006.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10058.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/1058601.png"
   },
   {
     "ok": false,
@@ -956,41 +591,6 @@
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10060.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10066.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10087.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10074.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10075.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10090.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10104.png"
-  },
-  {
-    "ok": false,
     "status": 404,
     "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10158.png"
   },
@@ -1006,118 +606,13 @@
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10131.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10135.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10136.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10142.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10157.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10163.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/1016.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10166.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10172.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/1019.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10231.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10180.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10230.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/1020.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10236.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/1025.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10250.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10258.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10261.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10276.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10327.png"
   },
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10332.png"
-  },
-  {
-    "ok": false,
-    "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10333.png"
-  },
-  {
-    "ok": false,
-    "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10334.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10328.png"
   },
   {
     "ok": false,
@@ -1127,7 +622,37 @@
   {
     "ok": false,
     "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10330.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
     "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10331.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10332.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10334.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10333.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10336.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10335.png"
   },
   {
     "ok": false,
@@ -1147,32 +672,37 @@
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10328.png"
-  },
-  {
-    "ok": false,
-    "status": 404,
     "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10340.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10323.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10341.png"
   },
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10335.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10342.png"
   },
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10336.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10344.png"
   },
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10330.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10343.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10345.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10346.png"
   },
   {
     "ok": false,
@@ -1192,17 +722,17 @@
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10343.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10350.png"
   },
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10342.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10351.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10327.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10352.png"
   },
   {
     "ok": false,
@@ -1212,17 +742,17 @@
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10344.png"
-  },
-  {
-    "ok": false,
-    "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10341.png"
-  },
-  {
-    "ok": false,
-    "status": 404,
     "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10354.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10355.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10356.png"
   },
   {
     "ok": false,
@@ -1237,12 +767,12 @@
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10356.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10359.png"
   },
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10355.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10360.png"
   },
   {
     "ok": false,
@@ -1252,17 +782,17 @@
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10351.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10362.png"
   },
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10352.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10363.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10345.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10364.png"
   },
   {
     "ok": false,
@@ -1271,8 +801,8 @@
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10346.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10366.png"
   },
   {
     "ok": false,
@@ -1287,22 +817,7 @@
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10359.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10350.png"
-  },
-  {
-    "ok": false,
-    "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10371.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10363.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10369.png"
   },
   {
     "ok": false,
@@ -1312,7 +827,17 @@
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10362.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10371.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10372.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10373.png"
   },
   {
     "ok": false,
@@ -1327,12 +852,12 @@
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10377.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10376.png"
   },
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10376.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10377.png"
   },
   {
     "ok": false,
@@ -1347,12 +872,17 @@
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10372.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10380.png"
   },
   {
     "ok": false,
     "status": 404,
     "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10382.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10381.png"
   },
   {
     "ok": false,
@@ -1377,942 +907,77 @@
   {
     "ok": false,
     "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10388.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
     "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10387.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10366.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10360.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10364.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10369.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10389.png"
   },
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10381.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10391.png"
   },
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10380.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10390.png"
   },
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10373.png"
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/1041201.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/105.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/1041202.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/112.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/1041301.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/118.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/1041302.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/12.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/1058501.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/126.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/1058502.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/132.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/1058503.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/138.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/1058601.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/14.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/1058602.png"
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/148.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/157.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/155.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/165.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/175.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/172.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/180.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/181.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/190.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/203.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/20.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/196.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/200.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/206.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/212.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/211.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/214.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/210.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/231.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/228.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/232.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/238.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/237.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/244.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/24.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/239.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/245.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/240.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/246.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/247.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/248.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/25.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/249.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/251.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/250.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/252.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/253.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/254.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/255.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/256.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/258.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/257.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/259.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/26.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/260.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/261.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/262.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/263.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/264.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/265.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/266.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/267.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/268.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/269.png"
-  },
-  {
-    "ok": false,
-    "status": 0,
-    "error": "fetch failed",
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/27.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/274.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/270.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/275.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/271.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/272.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/273.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/295.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/300.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/313.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/316.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/325.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/328.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/334.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/340.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/344.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/354.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/358.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/352.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/356.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/355.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/359.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/361.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/360.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/37.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/370.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/374.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/430.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/432.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/444.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/443.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/452.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/446.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/455.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/461.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/466.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/462.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/47.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/472.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/488.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/490.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/493.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/501.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/504.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/513.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/520.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/528.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/525.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/526.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/531.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/534.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/536.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/535.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/542.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/54.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/540.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/541.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/545.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/550.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/551.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/563.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/559.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/568.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/566.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/577.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/574.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/589.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/594.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/601.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/614.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/624.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/628.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/643.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/632.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/647.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/65.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/652.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/656.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/653.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/669.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/673.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/671.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/678.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/662.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/782.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/785.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/796.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/801.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/816.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/899.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/904.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/914.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/912.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/921.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/923.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/922.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/924.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/929.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/930.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/938.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/937.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/933.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/942.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/947.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/952.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/956.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/97.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/964.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/972.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/96.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/976.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/1058603.png"
   },
   {
     "ok": false,
@@ -2323,6 +988,11 @@
     "ok": false,
     "status": 404,
     "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/black-2.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/black.png"
   },
   {
     "ok": false,
@@ -2347,12 +1017,12 @@
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/gold.png"
+    "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/firered.png"
   },
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/firered.png"
+    "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/gold.png"
   },
   {
     "ok": false,
@@ -2362,12 +1032,12 @@
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/legends-arceus.png"
+    "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/leafgreen.png"
   },
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/black.png"
+    "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/legends-arceus.png"
   },
   {
     "ok": false,
@@ -2377,12 +1047,12 @@
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/moon.png"
+    "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/lets-go-pikachu.png"
   },
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/leafgreen.png"
+    "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/moon.png"
   },
   {
     "ok": false,
@@ -2391,18 +1061,18 @@
   },
   {
     "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/995.png"
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/omega-ruby.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/platinum.png"
   },
   {
     "ok": false,
     "status": 404,
     "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/ruby.png"
-  },
-  {
-    "ok": false,
-    "status": 404,
-    "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/omega-ruby.png"
   },
   {
     "ok": false,
@@ -2417,17 +1087,12 @@
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/shining-pearl.png"
-  },
-  {
-    "ok": false,
-    "status": 404,
     "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/shield.png"
   },
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/lets-go-pikachu.png"
+    "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/shining-pearl.png"
   },
   {
     "ok": false,
@@ -2442,22 +1107,32 @@
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/ultra-moon.png"
-  },
-  {
-    "ok": false,
-    "status": 404,
     "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/sun.png"
   },
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/platinum.png"
+    "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/sword.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/ultra-moon.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/ultra-sun.png"
   },
   {
     "ok": false,
     "status": 404,
     "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/violet.png"
+  },
+  {
+    "ok": false,
+    "status": 404,
+    "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/white-2.png"
   },
   {
     "ok": false,
@@ -2472,32 +1147,7 @@
   {
     "ok": false,
     "status": 404,
-    "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/sword.png"
-  },
-  {
-    "ok": false,
-    "status": 404,
-    "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/ultra-sun.png"
-  },
-  {
-    "ok": false,
-    "status": 404,
-    "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/white-2.png"
-  },
-  {
-    "ok": false,
-    "status": 404,
     "url": "https://raw.githubusercontent.com/msikma/pokesprite/master/icons/software/pkg/y.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/996.png"
-  },
-  {
-    "ok": false,
-    "status": 429,
-    "url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/979.png"
   },
   {
     "ok": false,
