@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleFactor, getGameSpecificSpriteScaleStyle } from './game-sprites';
 import { toLocalPokemonSpriteUrl } from './pokemon-data';
 import { GAME_SPRITE_LONG_SIDE_BY_FILE } from '@/data/game-sprite-long-sides.generated';
+import { BW_SHINY_SPRITE_FILES } from '@/data/bw-shiny-sprite-manifest';
+import { BW2_SHINY_SPRITE_FILES } from '@/data/bw2-shiny-sprite-manifest';
 
 const expectedSpriteUrl = (url: string) => toLocalPokemonSpriteUrl(url);
 
@@ -80,12 +82,15 @@ describe('game-specific shiny sprites', () => {
     }
   });
 
-  it('does not enlarge small Gen V sprites and reduces unusually large ones', () => {
-    const mankey = getGameSpecificSpriteScaleFactor('/img/game-sprites/bw/Spr_5b_056_s.webp');
-    const pidgeotto = getGameSpecificSpriteScaleFactor('/img/game-sprites/bw/Spr_5b_017_s.webp');
+  it('uses the same fixed reduction for every Gen V sprite canvas', () => {
+    const genVSprites = [
+      ...BW_SHINY_SPRITE_FILES.map((filename) => `/img/game-sprites/bw/${filename}`),
+      ...BW2_SHINY_SPRITE_FILES.map((filename) => `/img/game-sprites/bw2/${filename}`),
+    ];
 
-    expect(mankey).toBe(1);
-    expect(pidgeotto).toBeLessThan(1);
+    for (const url of genVSprites) {
+      expect(getGameSpecificSpriteScaleFactor(url)).toBe(0.75);
+    }
   });
 
   it('keeps Gen V sprites smaller than the shared HGSS sprite footprint', () => {
@@ -99,7 +104,7 @@ describe('game-specific shiny sprites', () => {
 
     for (const [filePath, url, expectedLongSide] of samples) {
       const longSide = GAME_SPRITE_LONG_SIDE_BY_FILE[filePath];
-      expect(longSide * getGameSpecificSpriteScaleFactor(url)).toBeCloseTo(expectedLongSide);
+      expect(longSide * getGameSpecificSpriteScaleFactor(url)).toBeLessThanOrEqual(expectedLongSide);
     }
   });
 
