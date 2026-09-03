@@ -338,7 +338,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                     alt="Evoluto da"
                     loading="lazy"
                     fetchPriority="auto"
-                    className={cn('block max-w-none object-contain self-center mx-auto', evolvedFromSpriteScaleClass)}
+                    className={cn('block max-w-none object-contain pokemon-sprite self-center mx-auto', evolvedFromSpriteScaleClass)}
                     style={{
                       width: getEvolvedFromSpriteSize(evolvedFromName, !showEncounters, evolvedFromSpriteDisplayScale),
                       height: getEvolvedFromSpriteSize(evolvedFromName, !showEncounters, evolvedFromSpriteDisplayScale),

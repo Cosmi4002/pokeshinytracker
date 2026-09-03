@@ -548,7 +548,7 @@ export default function UserCollectionsSearch() {
               src={sprite}
               alt={entry.pokemon_name}
               className={cn(
-                'relative z-10 object-contain transition-transform duration-300',
+                'relative z-10 object-contain pokemon-sprite transition-transform duration-300',
                 options.large ? 'h-28 w-28' : 'h-24 w-24',
                 isGameSpecificSprite ? `${spriteScaleClass} group-hover:scale-[0.9]` : 'group-hover:scale-105',
                 entry.is_fail && !isGameSpecificSprite && 'drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]'
