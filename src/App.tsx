@@ -26,6 +26,7 @@ import { ApplyAppearance } from "@/components/layout/ApplyAppearance";
 import NotFound from "./pages/NotFound";
 import Debug from "./pages/Debug";
 import { useUserPreferences } from "@/hooks/use-user-preferences";
+import { SpriteScaleProvider } from "@/lib/sprite-scale-context";
 
 const queryClient = new QueryClient();
 
@@ -74,7 +75,9 @@ const App = () => (
     <AuthProvider>
       <TooltipProvider>
         <RandomColorProvider>
-          <AppContent />
+          <SpriteScaleProvider>
+            <AppContent />
+          </SpriteScaleProvider>
         </RandomColorProvider>
       </TooltipProvider>
     </AuthProvider>
