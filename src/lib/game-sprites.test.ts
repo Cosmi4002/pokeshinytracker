@@ -22,6 +22,14 @@ describe('game-specific shiny sprites', () => {
       .toBe(expectedSpriteUrl('https://archives.bulbagarden.net/media/upload/2/2f/Spr_4p_487O_s.png'));
   });
 
+  it.each([
+    [487, 'giratina-origin'],
+    [492, 'shaymin-sky'],
+  ])('does not substitute the base form for %s (%s) in Diamond or Pearl', (pokemonId, form) => {
+    expect(getGameSpecificShinySpriteUrl(pokemonId, 'diamond', { name: form, form })).toBeNull();
+    expect(getGameSpecificShinySpriteUrl(pokemonId, 'pearl', { name: form, form })).toBeNull();
+  });
+
   it('resolves Mismagius in Platinum through the archive media URL', () => {
     expect(getGameSpecificShinySpriteUrl(429, 'platinum', { name: 'mismagius' }))
       .toBe(expectedSpriteUrl('https://archives.bulbagarden.net/media/upload/3/38/Spr_4p_429_s.png'));

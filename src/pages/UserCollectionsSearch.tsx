@@ -237,7 +237,7 @@ export default function UserCollectionsSearch() {
         // when an older catch was later added to the collection.
         .order('caught_date', { ascending: false })
         .order('created_at', { ascending: false })
-        .limit(10);
+        .limit(20);
 
       if (error) throw error;
 
@@ -827,7 +827,7 @@ export default function UserCollectionsSearch() {
 
             {!selectedProfile && (
             <div className="space-y-2 pt-2 border-t">
-              <h3 className="font-semibold">Latest 10 Pokémon obtained</h3>
+              <h3 className="font-semibold">Latest 20 Pokémon obtained</h3>
               {globalRecentLoading && <p className="text-sm text-muted-foreground">Loading global preview...</p>}
               {globalRecentError && <p className="text-sm text-destructive">{globalRecentError}</p>}
               {!globalRecentLoading && !globalRecentError && globalRecentEntries.length === 0 && (

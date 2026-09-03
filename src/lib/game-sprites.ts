@@ -313,9 +313,10 @@ export function getGameSpecificShinySpriteUrl(
 
   const wantedFormSuffix = getFormSuffix(speciesId, slug);
   let formCandidates = candidates.filter((spriteFile) => spriteFile.formSuffix === wantedFormSuffix);
-  if (formCandidates.length === 0 && wantedFormSuffix) {
-    formCandidates = candidates.filter((spriteFile) => spriteFile.formSuffix === '');
-  }
+  // A form-specific request must never fall back to the base-form sprite.
+  // For example, Giratina Origin and Shaymin Sky do not exist in Diamond and
+  // Pearl; displaying their base forms there incorrectly implies that they do.
+  if (formCandidates.length === 0 && wantedFormSuffix) return null;
   if (formCandidates.length === 0) formCandidates = candidates;
 
   const requestedGender = normalizeGender(options.gender);
