@@ -336,6 +336,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                   <img
                     src={toLocalPokemonSpriteUrl(evolvedFromSpriteUrl)}
                     alt="Evoluto da"
+                    data-sprite-scale-key={`evolved-from:${entry.id}`}
                     loading="lazy"
                     fetchPriority="auto"
                     className={cn('block max-w-none object-contain pokemon-sprite self-center mx-auto', evolvedFromSpriteScaleClass)}
