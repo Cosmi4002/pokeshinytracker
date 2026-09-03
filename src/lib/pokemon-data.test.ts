@@ -90,6 +90,19 @@ describe('pokemon sprite helpers', () => {
     ).toBe('/img/pokemon-sprites/remote/archives.bulbagarden.net/media/upload/f/f5/Spr_4p_445_f_s.png');
   });
 
+  it('uses the HOME sprite when the selected game has no game-specific sprite set', () => {
+    expect(
+      getSelectedGameSpriteUrl({
+        pokemonId: 515,
+        pokemonName: 'panpour',
+        game: 'y',
+        spriteUrl: '/img/game-sprites/bw/Spr_5b_515_s.webp',
+      })
+    ).toBe(
+      '/img/pokemon-sprites/remote/raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/515.png'
+    );
+  });
+
   it('remaps archive sprite URLs to a local cached path instead of depending on the browser cache', () => {
     expect(
       toLocalPokemonSpriteUrl('https://archives.bulbagarden.net/media/upload/8/87/Spr_4p_445_m_s.png')
