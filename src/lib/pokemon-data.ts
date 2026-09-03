@@ -1239,15 +1239,7 @@ export function getSelectedGameSpriteUrl(options: {
         name: form || pokemonName || undefined,
         form: form || undefined,
         gender,
-      }) : null) ||
-      getArchiveShinySpriteUrl(pokemonId, {
-        shiny: true,
-        name: form || pokemonName || undefined,
-        form: form || undefined,
-        gender,
-        preferredGameIds: [secondaryGame, game],
-      }) ||
-      getPokemonSpriteUrl(pokemonId, {
+      }) : null) || getPokemonSpriteUrl(pokemonId, {
         shiny: true,
         name: form || pokemonName || undefined,
         form: form || undefined,
