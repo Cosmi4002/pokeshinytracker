@@ -258,7 +258,7 @@ export default function PokedexManager() {
                             <div className="mt-4 flex items-center justify-between gap-4 rounded-lg border border-border bg-background/60 p-4 dark:border-white/10 dark:bg-white/[0.03]">
                                 <div>
                                     <Label htmlFor="sprite-scale-editor" className="text-base font-bold">Global Sprite Size Editor</Label>
-                                    <p className="text-sm text-muted-foreground">When enabled, click any Pokémon sprite on the site to adjust and save its global size.</p>
+                                    <p className="text-sm text-muted-foreground">When enabled, click any Pokémon sprite on the site to adjust and save its global size. The small “Evoluto da” sprite is saved only on its own card.</p>
                                 </div>
                                 <Switch id="sprite-scale-editor" checked={spriteEditorEnabled} onCheckedChange={setSpriteEditorEnabled} />
                             </div>

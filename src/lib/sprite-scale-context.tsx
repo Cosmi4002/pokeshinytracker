@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 const SPRITE_MANAGER_EMAIL = 'chritel04@gmail.com';
 const EDITOR_STORAGE_KEY = 'sprite-scale-editor-enabled';
 
-type SelectedSprite = { url: string; alt: string };
+type SelectedSprite = { key: string; url: string; alt: string; isScoped: boolean };
 
 type SpriteScaleContextValue = {
   editorEnabled: boolean;
@@ -26,9 +26,18 @@ const getSpriteKey = (url: string) => {
     : parsed.toString();
 };
 
+// Most corrections are deliberately shared by URL. Some sprites, however,
+// are decorative copies of a Pokémon inside one specific card (for example
+// the small "Evoluto da" sprite). Those must keep an independent correction.
+const getImageScaleKey = (image: HTMLImageElement) =>
+  image.dataset.spriteScaleKey || getSpriteKey(image.currentSrc || image.src);
+
 const applyScalesToDocument = (overrides: Record<string, number>) => {
   document.querySelectorAll<HTMLImageElement>('img.pokemon-sprite').forEach((image) => {
-    const scale = overrides[getSpriteKey(image.currentSrc || image.src)] ?? overrides[getSpriteKey(image.getAttribute('src') || image.src)] ?? 1;
+    const scopedKey = image.dataset.spriteScaleKey;
+    const scale = scopedKey
+      ? overrides[scopedKey] ?? 1
+      : overrides[getImageScaleKey(image)] ?? overrides[getSpriteKey(image.getAttribute('src') || image.src)] ?? 1;
     image.style.setProperty('--admin-sprite-scale', String(scale));
   });
 };
@@ -89,9 +98,10 @@ export function SpriteScaleProvider({ children }: { children: ReactNode }) {
       if (!image) return;
       event.preventDefault();
       event.stopPropagation();
-      const url = getSpriteKey(image.currentSrc || image.src);
-      setSelectedSprite({ url, alt: image.alt || 'Pokémon sprite' });
-      setDraftScale(overrides[url] ?? overrides[getSpriteKey(image.getAttribute('src') || image.src)] ?? 1);
+      const key = getImageScaleKey(image);
+      const isScoped = Boolean(image.dataset.spriteScaleKey);
+      setSelectedSprite({ key, url: getSpriteKey(image.currentSrc || image.src), alt: image.alt || 'Pokémon sprite', isScoped });
+      setDraftScale(overrides[key] ?? (isScoped ? 1 : overrides[getSpriteKey(image.getAttribute('src') || image.src)] ?? 1));
     };
     document.addEventListener('click', selectSprite, true);
     return () => document.removeEventListener('click', selectSprite, true);
@@ -101,7 +111,7 @@ export function SpriteScaleProvider({ children }: { children: ReactNode }) {
     if (!selectedSprite) return;
     setSaving(true);
     const { error } = await supabase.from('sprite_scale_overrides').upsert({
-      sprite_url: selectedSprite.url,
+      sprite_url: selectedSprite.key,
       scale: Number(draftScale.toFixed(2)),
       updated_at: new Date().toISOString(),
     });
@@ -110,22 +120,24 @@ export function SpriteScaleProvider({ children }: { children: ReactNode }) {
       toast({ variant: 'destructive', title: 'Unable to save sprite size', description: error.message });
       return;
     }
-    setOverrides((current) => ({ ...current, [selectedSprite.url]: Number(draftScale.toFixed(2)) }));
-    toast({ title: 'Sprite size saved globally', description: 'The correction is now visible to every visitor.' });
+    setOverrides((current) => ({ ...current, [selectedSprite.key]: Number(draftScale.toFixed(2)) }));
+    toast(selectedSprite.isScoped
+      ? { title: 'Dimensione salvata per questo “Evoluto da”', description: 'La correzione resta solo su questa card.' }
+      : { title: 'Sprite size saved globally', description: 'The correction is now visible to every visitor.' });
     setSelectedSprite(null);
   };
 
   const resetScale = async () => {
     if (!selectedSprite) return;
     setSaving(true);
-    const { error } = await supabase.from('sprite_scale_overrides').delete().eq('sprite_url', selectedSprite.url);
+    const { error } = await supabase.from('sprite_scale_overrides').delete().eq('sprite_url', selectedSprite.key);
     setSaving(false);
     if (error) {
       toast({ variant: 'destructive', title: 'Unable to reset sprite size', description: error.message });
       return;
     }
     setOverrides((current) => {
-      const { [selectedSprite.url]: _removed, ...rest } = current;
+      const { [selectedSprite.key]: _removed, ...rest } = current;
       return rest;
     });
     setSelectedSprite(null);
@@ -139,13 +151,17 @@ export function SpriteScaleProvider({ children }: { children: ReactNode }) {
       <Dialog open={Boolean(selectedSprite)} onOpenChange={(open) => !open && setSelectedSprite(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Global sprite size</DialogTitle>
-            <DialogDescription>Adjust this exact sprite. The change applies globally on every page.</DialogDescription>
+            <DialogTitle>{selectedSprite?.isScoped ? 'Dimensione sprite “Evoluto da”' : 'Global sprite size'}</DialogTitle>
+            <DialogDescription>
+              {selectedSprite?.isScoped
+                ? 'La modifica si applica solo allo sprite “Evoluto da” di questa card.'
+                : 'Adjust this exact sprite. The change applies globally on every page.'}
+            </DialogDescription>
           </DialogHeader>
           {selectedSprite && (
             <div className="space-y-5">
               <div className="flex items-center gap-4 rounded-lg border bg-muted/30 p-3">
-                <img src={selectedSprite.url} alt={selectedSprite.alt} className="h-20 w-20 object-contain pokemon-sprite" style={{ '--admin-sprite-scale': draftScale } as React.CSSProperties} />
+                <img src={selectedSprite.url} alt={selectedSprite.alt} data-sprite-scale-key={selectedSprite.key} className="h-20 w-20 object-contain pokemon-sprite" style={{ '--admin-sprite-scale': draftScale } as React.CSSProperties} />
                 <p className="min-w-0 break-all text-xs text-muted-foreground">{selectedSprite.alt}</p>
               </div>
               <div className="space-y-3">
@@ -155,8 +171,8 @@ export function SpriteScaleProvider({ children }: { children: ReactNode }) {
             </div>
           )}
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => void resetScale()} disabled={saving || !selectedSprite || !(selectedSprite.url in overrides)}>Reset automatic</Button>
-            <Button type="button" onClick={() => void saveScale()} disabled={saving}>{saving ? 'Saving...' : 'Save globally'}</Button>
+            <Button type="button" variant="outline" onClick={() => void resetScale()} disabled={saving || !selectedSprite || !(selectedSprite.key in overrides)}>Reset automatic</Button>
+            <Button type="button" onClick={() => void saveScale()} disabled={saving}>{saving ? 'Saving...' : selectedSprite?.isScoped ? 'Salva solo qui' : 'Save globally'}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
