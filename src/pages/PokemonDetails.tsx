@@ -376,6 +376,8 @@ export default function PokemonDetails() {
         ? 'Non è un incontro shiny separato: trasferisci un Dialga shiny legittimo in Leggende: Arceus o Pokémon Scarlatto/Violetto e usa l’Adamant Crystal. Il Dialga della storia in Leggende: Arceus è shiny-locked.'
         : details?.name === 'palkia-origin'
             ? 'Non è un incontro shiny separato: trasferisci un Palkia shiny legittimo in Leggende: Arceus o Pokémon Scarlatto/Violetto e usa il Lustrous Globe. Il Palkia della storia in Leggende: Arceus è shiny-locked.'
+            : details?.name === 'deoxys-normal'
+                ? 'Non è un incontro shiny separato: ottieni un Deoxys shiny legittimo sull’Isola Materna tramite l’Aurora Ticket in Pokémon Rosso Fuoco, Verde Foglia o Smeraldo, quindi trasferiscilo in Rubino o Zaffiro per farlo apparire in Forma Normale. Le forme di Deoxys dipendono dal gioco e non rappresentano nuovi incontri shiny.'
             : null;
 
     const toggleCaught = async (variant: FormVariant) => {
