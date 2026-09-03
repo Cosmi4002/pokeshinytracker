@@ -492,6 +492,24 @@ export type Database = {
         }
         Relationships: []
       }
+      sprite_scale_overrides: {
+        Row: {
+          scale: number
+          sprite_url: string
+          updated_at: string
+        }
+        Insert: {
+          scale: number
+          sprite_url: string
+          updated_at?: string
+        }
+        Update: {
+          scale?: number
+          sprite_url?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

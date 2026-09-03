@@ -24,6 +24,7 @@ import { GAMES, getArchiveShinySpriteUrl, getPokemonSpriteUrl } from "@/lib/poke
 import { getGameTheme, type GameTheme } from "@/lib/game-themes";
 import { cn } from "@/lib/utils";
 import { COLLECTION_CARD_FILTER_OPTIONS, POKEDEX_CARD_FILTER_OPTIONS, getCardFilterOption, type CardFilterId } from "@/lib/card-effects";
+import { useSpriteScaleEditor } from "@/lib/sprite-scale-context";
 
 const previewFilterOverlay = (filter: CardFilterId) => {
     if (filter === "holo") {
@@ -98,6 +99,7 @@ export default function PokedexManager() {
     const { user, loading: authLoading } = useAuth();
     const { toast } = useToast();
     const { overrides, effects, saveConfig, loading: themesLoading } = useGlobalCollectionThemes();
+    const { editorEnabled: spriteEditorEnabled, setEditorEnabled: setSpriteEditorEnabled } = useSpriteScaleEditor();
     const [isEditorEnabled, setIsEditorEnabled] = useState(() => localStorage.getItem("pokedex-editor-enabled") === "true");
     const [selectedGame, setSelectedGame] = useState("black2");
     const [draftOverrides, setDraftOverrides] = useState(overrides);
@@ -252,6 +254,13 @@ export default function PokedexManager() {
                                     <p className="text-sm text-muted-foreground">Rename or hide Pokémon and forms.</p>
                                 </div>
                                 <Switch id="editor-mode" checked={isEditorEnabled} onCheckedChange={handleToggleEditor} />
+                            </div>
+                            <div className="mt-4 flex items-center justify-between gap-4 rounded-lg border border-border bg-background/60 p-4 dark:border-white/10 dark:bg-white/[0.03]">
+                                <div>
+                                    <Label htmlFor="sprite-scale-editor" className="text-base font-bold">Global Sprite Size Editor</Label>
+                                    <p className="text-sm text-muted-foreground">When enabled, click any Pokémon sprite on the site to adjust and save its global size.</p>
+                                </div>
+                                <Switch id="sprite-scale-editor" checked={spriteEditorEnabled} onCheckedChange={setSpriteEditorEnabled} />
                             </div>
                         </CardContent>
                     </Card>
