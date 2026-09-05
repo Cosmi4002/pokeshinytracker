@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleFactor } from './game-sprites';
+import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleFactor, getGameSpecificSpriteScaleStyle } from './game-sprites';
+import { toLocalPokemonSpriteUrl } from './pokemon-data';
+import { GAME_SPRITE_LONG_SIDE_BY_FILE } from '@/data/game-sprite-long-sides.generated';
+import { BW_SHINY_SPRITE_FILES } from '@/data/bw-shiny-sprite-manifest';
+import { BW2_SHINY_SPRITE_FILES } from '@/data/bw2-shiny-sprite-manifest';
+
+const expectedSpriteUrl = (url: string) => toLocalPokemonSpriteUrl(url);
 
 describe('game-specific shiny sprites', () => {
   it.each([
@@ -8,24 +14,32 @@ describe('game-specific shiny sprites', () => {
     ['heartgold', '/img/game-sprites/hgss/Spr_4h_001_s.png'],
     ['black2', '/img/game-sprites/bw/Spr_5b_001_s.webp'],
   ])('resolves Bulbasaur for %s', (gameId, expected) => {
-    expect(getGameSpecificShinySpriteUrl(1, gameId, { name: 'bulbasaur' })).toBe(expected);
+    expect(getGameSpecificShinySpriteUrl(1, gameId, { name: 'bulbasaur' })).toBe(expectedSpriteUrl(expected));
   });
 
   it('resolves Giratina Origin in Platinum through the archive media URL', () => {
     expect(getGameSpecificShinySpriteUrl(487, 'platinum', { name: 'giratina-origin', form: 'giratina-origin' }))
-      .toBe('https://archives.bulbagarden.net/media/upload/2/2f/Spr_4p_487O_s.png');
+      .toBe(expectedSpriteUrl('https://archives.bulbagarden.net/media/upload/2/2f/Spr_4p_487O_s.png'));
+  });
+
+  it.each([
+    [487, 'giratina-origin'],
+    [492, 'shaymin-sky'],
+  ])('does not substitute the base form for %s (%s) in Diamond or Pearl', (pokemonId, form) => {
+    expect(getGameSpecificShinySpriteUrl(pokemonId, 'diamond', { name: form, form })).toBeNull();
+    expect(getGameSpecificShinySpriteUrl(pokemonId, 'pearl', { name: form, form })).toBeNull();
   });
 
   it('resolves Mismagius in Platinum through the archive media URL', () => {
     expect(getGameSpecificShinySpriteUrl(429, 'platinum', { name: 'mismagius' }))
-      .toBe('https://archives.bulbagarden.net/media/upload/3/38/Spr_4p_429_s.png');
+      .toBe(expectedSpriteUrl('https://archives.bulbagarden.net/media/upload/3/38/Spr_4p_429_s.png'));
   });
 
   it.each([
     [458, 'mantyke', 'https://archives.bulbagarden.net/media/upload/9/9b/Spr_4p_458_s.png'],
     [462, 'magnezone', 'https://archives.bulbagarden.net/media/upload/b/b8/Spr_4p_462_s.png'],
   ])('resolves Platinum-only sprite %s through the archive media URL', (pokemonId, name, expected) => {
-    expect(getGameSpecificShinySpriteUrl(pokemonId, 'platinum', { name })).toBe(expected);
+    expect(getGameSpecificShinySpriteUrl(pokemonId, 'platinum', { name })).toBe(expectedSpriteUrl(expected));
   });
 
   it.each([
@@ -33,18 +47,18 @@ describe('game-specific shiny sprites', () => {
     ['platinum', 'male', 'https://archives.bulbagarden.net/media/upload/8/87/Spr_4p_445_m_s.png'],
     ['platinum', 'female', 'https://archives.bulbagarden.net/media/upload/f/f5/Spr_4p_445_f_s.png'],
   ])('resolves Garchomp gender-specific sprite for %s %s', (gameId, gender, expected) => {
-    expect(getGameSpecificShinySpriteUrl(445, gameId, { name: 'garchomp', gender })).toBe(expected);
+    expect(getGameSpecificShinySpriteUrl(445, gameId, { name: 'garchomp', gender })).toBe(expectedSpriteUrl(expected));
   });
 
   it('resolves Deoxys forms in Diamond, Pearl, and Platinum', () => {
     expect(getGameSpecificShinySpriteUrl(386, 'diamond', { name: 'deoxys', form: 'deoxys' }))
-      .toBe('https://archives.bulbagarden.net/media/upload/2/29/Spr_4d_386_s.png');
+      .toBe(expectedSpriteUrl('https://archives.bulbagarden.net/media/upload/2/29/Spr_4d_386_s.png'));
     expect(getGameSpecificShinySpriteUrl(386, 'pearl', { name: 'deoxys-attack', form: 'deoxys-attack' }))
-      .toBe('https://archives.bulbagarden.net/media/upload/9/99/Spr_4d_386A_s.png');
+      .toBe(expectedSpriteUrl('https://archives.bulbagarden.net/media/upload/9/99/Spr_4d_386A_s.png'));
     expect(getGameSpecificShinySpriteUrl(386, 'platinum', { name: 'deoxys-defense', form: 'deoxys-defense' }))
-      .toBe('https://archives.bulbagarden.net/media/upload/5/5c/Spr_4d_386D_s.png');
+      .toBe(expectedSpriteUrl('https://archives.bulbagarden.net/media/upload/5/5c/Spr_4d_386D_s.png'));
     expect(getGameSpecificShinySpriteUrl(386, 'platinum', { name: 'deoxys-speed', form: 'deoxys-speed' }))
-      .toBe('https://archives.bulbagarden.net/media/upload/0/05/Spr_4d_386S_s.png');
+      .toBe(expectedSpriteUrl('https://archives.bulbagarden.net/media/upload/0/05/Spr_4d_386S_s.png'));
   });
 
   it.each([
@@ -75,6 +89,8 @@ describe('game-specific shiny sprites', () => {
 
   it.each([
     ['https://archives.bulbagarden.net/media/upload/7/7c/Spr_4d_001_s.png', 'scale-[var(--sprite-scale)]'],
+    ['/img/pokemon-sprites/remote/archives.bulbagarden.net/media/upload/5/54/Spr_4d_200_s.png', 'scale-[var(--sprite-scale)]'],
+    ['/img/pokemon-sprites/remote/archives.bulbagarden.net/media/upload/6/6d/Spr_4d_399_m_s.png', 'scale-[var(--sprite-scale)]'],
     ['/img/game-sprites/hgss/Spr_4h_001_s.png', 'scale-[var(--sprite-scale)]'],
     ['/img/pokemon-sprites/remote/raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/1.png', ''],
   ])('uses the right display scale for %s', (url, expected) => {
@@ -91,5 +107,38 @@ describe('game-specific shiny sprites', () => {
     } else {
       expect(getGameSpecificSpriteScaleFactor(url)).toBeGreaterThan(0.6);
     }
+  });
+
+  it('uses the same fixed reduction for every Gen V sprite canvas', () => {
+    const genVSprites = [
+      ...BW_SHINY_SPRITE_FILES.map((filename) => `/img/game-sprites/bw/${filename}`),
+      ...BW2_SHINY_SPRITE_FILES.map((filename) => `/img/game-sprites/bw2/${filename}`),
+    ];
+
+    for (const url of genVSprites) {
+      expect(getGameSpecificSpriteScaleFactor(url)).toBe(0.75);
+    }
+  });
+
+  it('keeps Gen V sprites smaller than the shared HGSS sprite footprint', () => {
+    const samples = [
+      ['hgss/Spr_4h_001_s.png', '/img/game-sprites/hgss/Spr_4h_001_s.png', 88],
+      ['dp/Spr_4d_001_s.png', 'https://archives.bulbagarden.net/media/upload/7/7c/Spr_4d_001_s.png', 88],
+      ['pt/Spr_4p_429_s.png', 'https://archives.bulbagarden.net/media/upload/3/38/Spr_4p_429_s.png', 88],
+      ['bw/Spr_5b_001_s.webp', '/img/game-sprites/bw/Spr_5b_001_s.webp', 66],
+      ['bw2/Spr_5b2_495_s.webp', '/img/game-sprites/bw2/Spr_5b2_495_s.webp', 66],
+    ] as const;
+
+    for (const [filePath, url, expectedLongSide] of samples) {
+      const longSide = GAME_SPRITE_LONG_SIDE_BY_FILE[filePath];
+      expect(longSide * getGameSpecificSpriteScaleFactor(url)).toBeLessThanOrEqual(expectedLongSide);
+    }
+  });
+
+  it('uses the shared normalized scale directly in the rendered style', () => {
+    const url = '/img/game-sprites/bw2/Spr_5b2_495_s.webp';
+
+    expect(getGameSpecificSpriteScaleStyle(url)['--sprite-scale'])
+      .toBe(String(getGameSpecificSpriteScaleFactor(url)));
   });
 });

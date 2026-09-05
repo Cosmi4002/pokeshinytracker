@@ -1,5 +1,5 @@
-const APP_CACHE = 'pokeshiny-app-v1';
-const RUNTIME_CACHE = 'pokeshiny-runtime-v1';
+const APP_CACHE = 'pokeshiny-app-v2';
+const RUNTIME_CACHE = 'pokeshiny-runtime-v2';
 const APP_SHELL = [
   '/',
   '/counter',
@@ -96,7 +96,10 @@ self.addEventListener('fetch', (event) => {
       try {
         const response = await fetch(request);
         await cacheResponse(cacheName, request, response);
-        if (isReusableAsset) void trimCache(RUNTIME_CACHE, 350);
+        // A Pokédex view can display hundreds of unique HOME and game sprites.
+        // Keep enough assets to avoid evicting them while the user rapidly moves
+        // between pages, which otherwise causes repeated downloads and blank cards.
+        if (isReusableAsset) void trimCache(RUNTIME_CACHE, 1500);
         return response;
       } catch {
         if (request.destination === 'image') {

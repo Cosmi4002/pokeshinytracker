@@ -300,9 +300,6 @@ export const HUNTING_METHODS: HuntingMethod[] = [
   { id: 'gen5-fossil-restore', name: 'Fossil Restore', baseOdds: 8192, generation: 5, supportsShinyCharm: true },
   { id: 'gen5-guaranteed-shiny', name: 'Guaranteed Shiny Encounter', baseOdds: 1, generation: 5, supportsShinyCharm: false },
   { id: 'gen5-fishing', name: 'Fishing', baseOdds: 8192, generation: 5, supportsShinyCharm: true },
-  { id: 'gen5-old-rod', name: 'Fishing — Old Rod', baseOdds: 8192, generation: 5, supportsShinyCharm: true },
-  { id: 'gen5-good-rod', name: 'Fishing — Good Rod', baseOdds: 8192, generation: 5, supportsShinyCharm: true },
-  { id: 'gen5-super-rod', name: 'Fishing — Super Rod', baseOdds: 8192, generation: 5, supportsShinyCharm: true },
   { id: 'gen5-gift', name: 'Gift Pokémon', baseOdds: 8192, generation: 5, supportsShinyCharm: true },
   { id: 'gen5-masuda', name: 'Masuda Method', baseOdds: oddsFromRolls(6, 8192), generation: 5, supportsShinyCharm: true },
   { id: 'gen5-random', name: 'Random Encounter', baseOdds: 8192, generation: 5, supportsShinyCharm: true },
@@ -458,6 +455,22 @@ export const GAMES = [
   { id: 'violet', name: 'Violet', generation: 9 },
   { id: 'za', name: 'Pokemon Legends Z-A', generation: 9, logo: 'https://archives.bulbagarden.net/media/upload/thumb/f/f7/Pok%C3%A9mon_Legends_Z-A_logo.png/1280px-Pok%C3%A9mon_Legends_Z-A_logo.png' },
 ];
+
+/** Returns the generation associated with a saved game id, when known. */
+export const getGameGeneration = (gameId?: string | null): number | null =>
+  GAMES.find((game) => game.id === gameId)?.generation ?? null;
+
+/**
+ * Returns the existing hunting methods that match a game's generation. This is
+ * used to put the most relevant methods first without preventing a user from
+ * selecting an exceptional method from a different generation.
+ */
+export const getHuntingMethodsForGame = (gameId?: string | null): HuntingMethod[] => {
+  const generation = getGameGeneration(gameId);
+  return generation === null
+    ? []
+    : HUNTING_METHODS.filter((method) => method.generation === generation);
+};
 
 // Calculate shiny probability statistics
 export function calculateShinyStats(encounters: number, methodId: string, hasShinyCharm: boolean, customOdds?: number) {
@@ -1226,15 +1239,7 @@ export function getSelectedGameSpriteUrl(options: {
         name: form || pokemonName || undefined,
         form: form || undefined,
         gender,
-      }) : null) ||
-      getArchiveShinySpriteUrl(pokemonId, {
-        shiny: true,
-        name: form || pokemonName || undefined,
-        form: form || undefined,
-        gender,
-        preferredGameIds: [secondaryGame, game],
-      }) ||
-      getPokemonSpriteUrl(pokemonId, {
+      }) : null) || getPokemonSpriteUrl(pokemonId, {
         shiny: true,
         name: form || pokemonName || undefined,
         form: form || undefined,

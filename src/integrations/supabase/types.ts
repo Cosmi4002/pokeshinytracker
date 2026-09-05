@@ -76,6 +76,7 @@ export type Database = {
           pokemon_id: number | null
           pokemon_entity_keys: string[]
           pokemon_name: string | null
+          selected_game_id: string | null
           updated_at: string
           user_id: string
         }
@@ -91,6 +92,7 @@ export type Database = {
           pokemon_id?: number | null
           pokemon_entity_keys?: string[]
           pokemon_name?: string | null
+          selected_game_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -106,6 +108,7 @@ export type Database = {
           pokemon_id?: number | null
           pokemon_entity_keys?: string[]
           pokemon_name?: string | null
+          selected_game_id?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -486,6 +489,24 @@ export type Database = {
           theme_color?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      sprite_scale_overrides: {
+        Row: {
+          scale: number
+          sprite_url: string
+          updated_at: string
+        }
+        Insert: {
+          scale: number
+          sprite_url: string
+          updated_at?: string
+        }
+        Update: {
+          scale?: number
+          sprite_url?: string
+          updated_at?: string
         }
         Relationships: []
       }

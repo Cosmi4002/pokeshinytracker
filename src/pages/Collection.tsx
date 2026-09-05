@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Plus, Filter, History, LogIn, List } from 'lucide-react';
+import { Plus, Filter, History, LogIn, List, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
@@ -23,6 +23,8 @@ import { isFormEliminated } from '@/lib/form-filters';
 import { cn } from '@/lib/utils';
 import type { Tables } from '@/integrations/supabase/types';
 import { resolvePokemonBasicByEntity } from '@/lib/pokemon-entity-resolver-v2';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 type CaughtShinyRow = Tables<'caught_shinies'>;
 type PlaylistRow = Tables<'shiny_playlists'>;
@@ -32,6 +34,59 @@ type CollectionSort = 'date_desc' | 'date_asc';
 type DexOrder = 'none' | 'dex_asc' | 'dex_desc';
 interface CollectionProps {
   mode?: CollectionMode;
+}
+
+type MultiFilterOption = { value: string; label: string };
+
+function MultiFilter({ label, options, value, onChange }: {
+  label: string;
+  options: MultiFilterOption[];
+  value: string[];
+  onChange: (value: string[]) => void;
+}) {
+  const toggleOption = (optionValue: string) => {
+    onChange(value.includes(optionValue)
+      ? value.filter((selected) => selected !== optionValue)
+      : [...value, optionValue]);
+  };
+
+  const triggerLabel = value.length === 0
+    ? `All ${label.toLowerCase()}s`
+    : value.length === 1
+      ? options.find((option) => option.value === value[0])?.label || `1 ${label.toLowerCase()}`
+      : `${value.length} ${label.toLowerCase()}s selected`;
+
+  return (
+    <div>
+      <Label>{label}</Label>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button type="button" variant="outline" className="h-10 w-full justify-between bg-background font-normal dark:border-white/15 dark:bg-[#181818]/95">
+            <span className="truncate">{triggerLabel}</span>
+            <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-60" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-2">
+          <div className="mb-2 flex items-center justify-between gap-2 px-1">
+            <span className="text-xs font-medium text-muted-foreground">Select one or more</span>
+            {value.length > 0 && (
+              <Button type="button" variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={() => onChange([])}>
+                Clear
+              </Button>
+            )}
+          </div>
+          <div className="max-h-64 space-y-1 overflow-y-auto pr-1">
+            {options.map((option) => (
+              <label key={option.value} className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-muted">
+                <Checkbox checked={value.includes(option.value)} onCheckedChange={() => toggleOption(option.value)} />
+                <span>{option.label}</span>
+              </label>
+            ))}
+          </div>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
 }
 
 export default function Collection({ mode = 'obtained' }: CollectionProps) {
@@ -53,9 +108,9 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
   const [isEvolveDialogOpen, setIsEvolveDialogOpen] = useState(false);
 
   // Filters
-  const [filterGen, setFilterGen] = useState<string>('all');
-  const [filterGame, setFilterGame] = useState<string>('all');
-  const [filterMethod, setFilterMethod] = useState<string>('all');
+  const [filterGens, setFilterGens] = useState<string[]>([]);
+  const [filterGames, setFilterGames] = useState<string[]>([]);
+  const [filterMethods, setFilterMethods] = useState<string[]>([]);
   const [filterPlaylist, setFilterPlaylist] = useState<string>('all');
   const [sortBy, setSortBy] = useState<CollectionSort>('date_desc');
   const [dexOrder, setDexOrder] = useState<DexOrder>('none');
@@ -311,11 +366,8 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
   }, [getMethodFilterLabel, scopedEntries]);
 
   useEffect(() => {
-    if (filterMethod === 'all') return;
-    if (!methodOptions.some((method) => method.value === filterMethod)) {
-      setFilterMethod('all');
-    }
-  }, [filterMethod, methodOptions]);
+    setFilterMethods((current) => current.filter((selected) => methodOptions.some((method) => method.value === selected)));
+  }, [methodOptions]);
 
   const filteredEntries = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
@@ -343,11 +395,11 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
           ].join(' ').toLowerCase();
           if (!haystack.includes(query)) return false;
         }
-        if (filterGen !== 'all') {
-          if (!poke || poke.generation.toString() !== filterGen) return false;
+        if (filterGens.length > 0) {
+          if (!poke || !filterGens.includes(poke.generation.toString())) return false;
         }
-        if (filterGame !== 'all' && entry.game !== filterGame) return false;
-        if (filterMethod !== 'all' && normalize(getMethodFilterLabel(entry.method)) !== filterMethod) return false;
+        if (filterGames.length > 0 && !filterGames.includes(entry.game)) return false;
+        if (filterMethods.length > 0 && !filterMethods.includes(normalize(getMethodFilterLabel(entry.method)))) return false;
         if (filterPlaylist !== 'all') {
           const plName = entry.playlist_id ? playlistMap[entry.playlist_id] : null;
           if (plName !== filterPlaylist) return false;
@@ -383,7 +435,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
         if (sortBy === 'date_desc') return bCreated - aCreated;
         return bCreated - aCreated;
       });
-  }, [scopedEntries, searchQuery, filterGen, filterGame, filterMethod, filterPlaylist, playlistMap, pokemonById, pokemonByName, pokemonByDisplayName, sortBy, dexOrder, getMethodFilterLabel]);
+  }, [scopedEntries, searchQuery, filterGens, filterGames, filterMethods, filterPlaylist, playlistMap, pokemonById, pokemonByName, pokemonByDisplayName, sortBy, dexOrder, getMethodFilterLabel]);
 
   if (authLoading || (user && loading)) {
     return (
@@ -543,51 +595,24 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 </div>
-                <div>
-                  <Label>Generation</Label>
-                  <select
-                    value={filterGen}
-                    onChange={(e) => setFilterGen(e.target.value)}
-                    className={nativeSelectClassName}
-                  >
-                    <option value="all">All</option>
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((gen) => (
-                        <option key={gen} value={gen.toString()}>
-                          Gen {gen}
-                        </option>
-                      ))}
-                  </select>
-                </div>
-                <div>
-                  <Label>Game</Label>
-                  <select
-                    value={filterGame}
-                    onChange={(e) => setFilterGame(e.target.value)}
-                    className={nativeSelectClassName}
-                  >
-                      <option value="all">All</option>
-                      {GAMES.map((game) => (
-                        <option key={game.id} value={game.id}>
-                          {game.name}
-                        </option>
-                      ))}
-                  </select>
-                </div>
-                <div>
-                  <Label>Method</Label>
-                  <select
-                    value={filterMethod}
-                    onChange={(e) => setFilterMethod(e.target.value)}
-                    className={nativeSelectClassName}
-                  >
-                    <option value="all">All</option>
-                      {methodOptions.map((method) => (
-                        <option key={method.value} value={method.value}>
-                          {method.label}
-                        </option>
-                      ))}
-                  </select>
-                </div>
+                <MultiFilter
+                  label="Generation"
+                  options={[1, 2, 3, 4, 5, 6, 7, 8, 9].map((gen) => ({ value: gen.toString(), label: `Gen ${gen}` }))}
+                  value={filterGens}
+                  onChange={setFilterGens}
+                />
+                <MultiFilter
+                  label="Game"
+                  options={GAMES.map((game) => ({ value: game.id, label: game.name }))}
+                  value={filterGames}
+                  onChange={setFilterGames}
+                />
+                <MultiFilter
+                  label="Method"
+                  options={methodOptions}
+                  value={filterMethods}
+                  onChange={setFilterMethods}
+                />
                 <div>
                   <Label>Sort</Label>
                   <select

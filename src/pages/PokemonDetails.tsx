@@ -154,6 +154,7 @@ export default function PokemonDetails() {
 
             rows.forEach(row => {
                 let matchedThisPokemon = false;
+                let matchedVariant: FormVariant | null = null;
                 let matchedGender: CaughtGender | null = normalizeCaughtGender(row.gender);
                 const resolvedKey = resolvePokemonEntityKey({
                     pokemonId: row.pokemon_id,
@@ -170,6 +171,7 @@ export default function PokemonDetails() {
 
                 if (matchedByEntity) {
                     caughtSet.add(matchedByEntity.name);
+                    matchedVariant = matchedByEntity;
                     if (!matchedGender && isCaughtGender(matchedByEntity.gender)) {
                         matchedGender = matchedByEntity.gender;
                     }
@@ -178,16 +180,21 @@ export default function PokemonDetails() {
 
                 // Priority 1: Exact form name match (new standard)
                 if (!matchedThisPokemon && row.form) {
-                    caughtSet.add(row.form);
-                    const matchedVariant = variants.find(v => v.name === row.form);
-                    if (!matchedGender && isCaughtGender(matchedVariant?.gender)) {
-                        matchedGender = matchedVariant.gender;
+                    const exactFormVariant = variants.find(v => v.name === row.form);
+                    if (exactFormVariant) {
+                        caughtSet.add(exactFormVariant.name);
+                        matchedVariant = exactFormVariant;
+                        if (!matchedGender && isCaughtGender(exactFormVariant.gender)) {
+                            matchedGender = exactFormVariant.gender;
+                        }
+                        matchedThisPokemon = true;
                     }
-                    matchedThisPokemon = true;
-                } else if (!matchedThisPokemon) {
+                }
+
+                if (!matchedThisPokemon) {
                     // Priority 2: Legacy fallback using ID and gender
                     const g = row.gender || 'genderless';
-                    let matchedVariant = variants.find(v => v.id === row.pokemon_id && v.gender === g);
+                    matchedVariant = variants.find(v => v.id === row.pokemon_id && v.gender === g) || null;
 
                     // Second-chance fallback for base forms (often saved as genderless)
                     if (!matchedVariant && g === 'genderless') {
@@ -230,15 +237,21 @@ export default function PokemonDetails() {
                     // For an evolved entry, the secondary game is the game where
                     // the current species/form was obtained. The primary game
                     // remains provenance only and must not mark this form as caught.
-                    const gamesForCurrentPokemon = row.is_evolved && row.secondary_game
-                        ? [row.secondary_game]
-                        : [row.game, row.secondary_game];
-                    gamesForCurrentPokemon.forEach(gameId => {
-                        if (gameId && gameId !== 'unknown' && GAME_LOGOS[gameId]) {
-                            gameSet.add(gameId);
-                            addCaughtGameGender(gameGenderMap, gameId, matchedGender);
-                        }
-                    });
+                    // The game badges and hero sprite describe the base/current detail
+                    // Pokémon, not any alternate form listed on this page. For example,
+                    // catching a Paldean Tauros must not mark the Gen 1 Tauros as caught
+                    // in Scarlet or Violet.
+                    if (matchedVariant?.name === details.name) {
+                        const gamesForCurrentPokemon = row.is_evolved && row.secondary_game
+                            ? [row.secondary_game]
+                            : [row.game, row.secondary_game];
+                        gamesForCurrentPokemon.forEach(gameId => {
+                            if (gameId && gameId !== 'unknown' && GAME_LOGOS[gameId]) {
+                                gameSet.add(gameId);
+                                addCaughtGameGender(gameGenderMap, gameId, matchedGender);
+                            }
+                        });
+                    }
                 }
             });
             setCaughtForms(caughtSet);
@@ -254,14 +267,6 @@ export default function PokemonDetails() {
     const femaleSpriteUrl = details && details.hasGenderDifference
         ? getPokemonSpriteUrl(details.id, { shiny: true, female: true, name: details.name })
         : null;
-    const getInGameSpriteScaleMultiplier = (url?: string | null) => {
-        if (!url?.startsWith('/img/game-sprites/')) return 1;
-        const gameSet = url.split('/')[3];
-        if (gameSet === 'hgss') return 1.16;
-        if (gameSet === 'bw' || gameSet === 'bw2') return 0.94;
-        return 1;
-    };
-
     // Flatten all variants from the hook data
     const variants = useMemo((): FormVariant[] => {
         if (!details) return [];
@@ -368,10 +373,12 @@ export default function PokemonDetails() {
     const caughtGameCount = availableGames.filter(game => game.isCaught).length;
 
     const originFormNote = details?.name === 'dialga-origin'
-        ? 'Non è un incontro shiny separato: trasferisci un Dialga shiny legittimo in Leggende: Arceus o Pokémon Scarlatto/Violetto e usa l’Adamant Crystal. Il Dialga della storia in Leggende: Arceus è shiny-locked.'
+        ? 'This is not a separate shiny encounter: transfer a legitimate shiny Dialga to Pokémon Legends: Arceus or Pokémon Scarlet/Violet and use the Adamant Crystal. The story Dialga in Pokémon Legends: Arceus is shiny locked.'
         : details?.name === 'palkia-origin'
-            ? 'Non è un incontro shiny separato: trasferisci un Palkia shiny legittimo in Leggende: Arceus o Pokémon Scarlatto/Violetto e usa il Lustrous Globe. Il Palkia della storia in Leggende: Arceus è shiny-locked.'
-            : null;
+            ? 'This is not a separate shiny encounter: transfer a legitimate shiny Palkia to Pokémon Legends: Arceus or Pokémon Scarlet/Violet and use the Lustrous Globe. The story Palkia in Pokémon Legends: Arceus is shiny locked.'
+            : details?.name === 'deoxys-normal'
+                ? 'This is not a separate shiny encounter: obtain a legitimate shiny Deoxys on Birth Island with the Aurora Ticket in Pokémon FireRed, LeafGreen, or Emerald, then transfer it to Ruby or Sapphire for its Normal Forme. Deoxys formes depend on the game and do not represent new shiny encounters.'
+                : null;
 
     const toggleCaught = async (variant: FormVariant) => {
         if (!user) {
@@ -943,7 +950,7 @@ export default function PokemonDetails() {
                                                     getGameSpecificSpriteScaleClass(group.maleSpriteUrl),
                                                     group.caughtGames.length === 0 && "opacity-35 grayscale"
                                                 )}
-                                                style={getGameSpecificSpriteScaleStyle(group.maleSpriteUrl, getInGameSpriteScaleMultiplier(group.maleSpriteUrl))}
+                                                style={getGameSpecificSpriteScaleStyle(group.maleSpriteUrl)}
                                             />
                                             {details.hasGenderDifference && group.femaleSpriteUrl && (
                                                 <img
@@ -956,7 +963,7 @@ export default function PokemonDetails() {
                                                         getGameSpecificSpriteScaleClass(group.femaleSpriteUrl),
                                                         (group.femaleCaughtGames ?? []).length === 0 && "opacity-35 grayscale"
                                                     )}
-                                                    style={getGameSpecificSpriteScaleStyle(group.femaleSpriteUrl, getInGameSpriteScaleMultiplier(group.femaleSpriteUrl))}
+                                                    style={getGameSpecificSpriteScaleStyle(group.femaleSpriteUrl)}
                                                 />
                                             )}
                                         </div>

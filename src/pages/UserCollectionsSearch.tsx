@@ -233,9 +233,11 @@ export default function UserCollectionsSearch() {
         .select('id, user_id, pokemon_id, entity_key, pokemon_name, form, gender, caught_date, created_at, sprite_url, game, secondary_game, is_fail, is_unobtainable, hunt_start_date, method, attempts, has_shiny_charm, is_evolved, show_encounters')
         .or('is_fail.is.false,is_fail.is.null')
         .or('is_unobtainable.is.false,is_unobtainable.is.null')
-        .order('created_at', { ascending: false })
+        // "Ultimi catturati" is based on when the Pokémon was obtained, not
+        // when an older catch was later added to the collection.
         .order('caught_date', { ascending: false })
-        .limit(10);
+        .order('created_at', { ascending: false })
+        .limit(20);
 
       if (error) throw error;
 
@@ -507,7 +509,7 @@ export default function UserCollectionsSearch() {
     keyPrefix: string,
     options: { showUsername?: boolean; large?: boolean } = {}
   ) => {
-    const spriteGame = entry.secondary_game || entry.game;
+    const spriteGame = entry.game || entry.secondary_game;
     const sprite =
       getGameSpecificShinySpriteUrl(entry.pokemon_id, spriteGame, {
         name: entry.form || entry.pokemon_name,
@@ -546,7 +548,7 @@ export default function UserCollectionsSearch() {
               src={sprite}
               alt={entry.pokemon_name}
               className={cn(
-                'relative z-10 object-contain transition-transform duration-300',
+                'relative z-10 object-contain pokemon-sprite transition-transform duration-300',
                 options.large ? 'h-28 w-28' : 'h-24 w-24',
                 isGameSpecificSprite ? `${spriteScaleClass} group-hover:scale-[0.9]` : 'group-hover:scale-105',
                 entry.is_fail && !isGameSpecificSprite && 'drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]'
@@ -696,7 +698,7 @@ export default function UserCollectionsSearch() {
 
     const attempts = Number(entry.attempts || 0);
     const odds = Math.round(getDynamicOdds(entry.method, attempts, entry.has_shiny_charm === true));
-    const spriteGame = entry.secondary_game || entry.game;
+    const spriteGame = entry.game || entry.secondary_game;
     const sprite =
       getGameSpecificShinySpriteUrl(entry.pokemon_id, spriteGame, {
         name: entry.form || entry.pokemon_name,
@@ -825,7 +827,7 @@ export default function UserCollectionsSearch() {
 
             {!selectedProfile && (
             <div className="space-y-2 pt-2 border-t">
-              <h3 className="font-semibold">Latest 10 Pokémon obtained</h3>
+              <h3 className="font-semibold">Latest 20 Pokémon obtained</h3>
               {globalRecentLoading && <p className="text-sm text-muted-foreground">Loading global preview...</p>}
               {globalRecentError && <p className="text-sm text-destructive">{globalRecentError}</p>}
               {!globalRecentLoading && !globalRecentError && globalRecentEntries.length === 0 && (

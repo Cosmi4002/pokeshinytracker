@@ -1,12 +1,12 @@
 import { Pencil, Trash2, Calendar, ArrowUpCircle, Crosshair, Sparkles, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getGameTheme, GAME_LOGOS, type GameTheme } from '@/lib/game-themes';
-import { GIGAMAX_ICON, POKEBALLS, POKEMON_EGG_ICON, findHuntingMethod, getArchiveShinySpriteUrl, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, handlePokemonSpriteError, isBreedingMethod, supportsGigamaxMark, toLocalPokemonSpriteUrl } from '@/lib/pokemon-data';
+import { GIGAMAX_ICON, POKEBALLS, POKEMON_EGG_ICON, findHuntingMethod, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, handlePokemonSpriteError, isBreedingMethod, supportsGigamaxMark, toLocalPokemonSpriteUrl } from '@/lib/pokemon-data';
 import type { Tables } from '@/integrations/supabase/types';
 import { useMemo, useCallback, useEffect, useId, useState } from 'react';
 import { cn } from '@/lib/utils';
 import type { CardFilterId } from '@/lib/card-effects';
-import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleFactor, getGameSpecificSpriteScaleStyle, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
+import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleStyle, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -174,16 +174,15 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
       : `linear-gradient(135deg, ${theme.secondary} 0%, color-mix(in srgb, ${theme.secondary} 55%, ${theme.primary}) 52%, ${theme.primary} 100%)`;
   const evolvedFromSpriteUrl = useMemo(() => {
     if (!isEvolved || !evolvedFromId) return '';
-    const byName = getArchiveShinySpriteUrl(evolvedFromId, {
-      shiny: true,
+    const spriteGame = entry.secondary_game || entry.game;
+    return getGameSpecificShinySpriteUrl(evolvedFromId, spriteGame, {
       name: evolvedFromName || undefined,
     }) || getPokemonSpriteUrl(evolvedFromId, {
       shiny: true,
       name: evolvedFromName || undefined,
-    });
-    return byName || getPokemonSpriteUrl(evolvedFromId, { shiny: true });
-  }, [isEvolved, evolvedFromId, evolvedFromName]);
-  const evolvedFromSpriteBaseScale = useMemo(() => getGameSpecificSpriteScaleFactor(evolvedFromSpriteUrl), [evolvedFromSpriteUrl]);
+    }) || getPokemonSpriteUrl(evolvedFromId, { shiny: true });
+  }, [entry.game, entry.secondary_game, isEvolved, evolvedFromId, evolvedFromName]);
+  const evolvedFromSpriteScaleClass = getGameSpecificSpriteScaleClass(evolvedFromSpriteUrl);
   const evolvedFromSpriteFitScale = useMemo(() => {
     if (!evolvedFromSpriteDimensions) return 1;
     const longestSide = Math.max(evolvedFromSpriteDimensions.width, evolvedFromSpriteDimensions.height);
@@ -191,7 +190,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
     const targetSize = showEncounters ? 54 : 48;
     return clamp(targetSize / longestSide, 0.82, 1.18);
   }, [evolvedFromSpriteDimensions, showEncounters]);
-  const evolvedFromSpriteDisplayScale = evolvedFromSpriteFitScale * evolvedFromSpriteBaseScale * getEvolvedFromSpriteBoost(evolvedFromName);
+  const evolvedFromSpriteDisplayScale = evolvedFromSpriteFitScale * getEvolvedFromSpriteBoost(evolvedFromName);
 
   useEffect(() => {
     setEvolvedFromSpriteDimensions(null);
@@ -337,14 +336,16 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                   <img
                     src={toLocalPokemonSpriteUrl(evolvedFromSpriteUrl)}
                     alt="Evoluto da"
-                    loading={isGameSpecificShinySpriteUrl(evolvedFromSpriteUrl) ? 'eager' : 'lazy'}
-                    fetchPriority={isGameSpecificShinySpriteUrl(evolvedFromSpriteUrl) ? 'high' : 'auto'}
-                    className="block max-w-none object-contain self-center mx-auto"
+                    data-sprite-scale-key={`evolved-from:${entry.id}`}
+                    loading="lazy"
+                    fetchPriority="auto"
+                    className={cn('block max-w-none object-contain pokemon-sprite self-center mx-auto', evolvedFromSpriteScaleClass)}
                     style={{
                       width: getEvolvedFromSpriteSize(evolvedFromName, !showEncounters, evolvedFromSpriteDisplayScale),
                       height: getEvolvedFromSpriteSize(evolvedFromName, !showEncounters, evolvedFromSpriteDisplayScale),
                       display: 'block',
                       filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.85))',
+                      imageRendering: 'pixelated',
                       backgroundColor: 'transparent',
                       margin: 0,
                       padding: 0,
@@ -383,8 +384,8 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                   <img
                     key={spriteUrl}
                     src={toLocalPokemonSpriteUrl(spriteUrl)}
-                  loading={isGameSpecificShinySpriteUrl(spriteUrl) ? 'eager' : 'lazy'}
-                  fetchPriority={isGameSpecificShinySpriteUrl(spriteUrl) ? 'high' : 'auto'}
+                  loading="lazy"
+                  fetchPriority="auto"
                   decoding="async"
                   referrerPolicy="no-referrer"
                   alt={entry.pokemon_name}

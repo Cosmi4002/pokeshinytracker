@@ -266,7 +266,7 @@ function normalizeGeneratedTuple(tuple: NativeEncounterTuple): NativeEncounterTu
   const [speciesId, gameId, huntingMethodId, locations, progressionNotes, externalNotes] = tuple;
 
   if (huntingMethodId === 'gen5-fishing') {
-    return [[speciesId, gameId, 'gen5-super-rod', locations, progressionNotes, externalNotes]];
+    return [[speciesId, gameId, 'gen5-fishing', locations, progressionNotes, externalNotes]];
   }
 
   if (huntingMethodId === 'gen4-pokeradar') {

@@ -40,6 +40,7 @@ export type OfflineActiveHunt = {
   has_shiny_charm: boolean | null;
   increment_amount: number | null;
   increment_hotkey: string | null;
+  selected_game_id?: string | null;
   is_visible_on_counter: boolean | null;
   created_at: string;
   updated_at: string;

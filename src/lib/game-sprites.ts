@@ -7,6 +7,7 @@ import { BW_SHINY_SPRITE_FILES } from '@/data/bw-shiny-sprite-manifest';
 import { BW2_SHINY_SPRITE_FILES } from '@/data/bw2-shiny-sprite-manifest';
 import { GEN6_7_SHINY_SPRITE_ENTRIES } from '@/data/gen6-7-shiny-sprite-manifest';
 import { GAME_SPRITE_LONG_SIDE_BY_FILE } from '@/data/game-sprite-long-sides.generated';
+import { LOCAL_SPRITE_URLS } from './local-sprite-map.generated';
 
 export type GameSpriteOptions = {
   shiny?: boolean;
@@ -129,6 +130,29 @@ const normalize = (value?: string | null) => (value || '')
   .replace(/[()]/g, '')
   .replace(/[ _]+/g, '-');
 
+// Keep this module independent from pokemon-data: pokemon-data also uses the
+// game sprite resolver, so importing its URL helper here would create a cycle.
+const toLocalPokemonSpriteUrl = (remoteUrl: string): string => {
+  if (!remoteUrl || !remoteUrl.startsWith('http')) return remoteUrl;
+
+  const localUrl = LOCAL_SPRITE_URLS[remoteUrl];
+  if (localUrl) return localUrl;
+
+  try {
+    const parsed = new URL(remoteUrl);
+    if (parsed.hostname === 'archives.bulbagarden.net' && parsed.pathname.includes('/media/upload/')) {
+      const decodedPath = decodeURIComponent(parsed.pathname)
+        .replace(/^\/+/, '')
+        .replace(/[^a-zA-Z0-9._/-]/g, '-');
+      return `/${['img', 'pokemon-sprites', 'remote', parsed.hostname, decodedPath].join('/')}`;
+    }
+  } catch {
+    // Use the original URL when it cannot be normalized to a local asset.
+  }
+
+  return remoteUrl;
+};
+
 const resolveSpeciesId = (pokemonId: number, slug: string) => {
   if (pokemonId >= 1 && pokemonId <= 649) return pokemonId;
   return LEGACY_FORM_SPECIES.find(([pattern]) => pattern.test(slug))?.[1] ?? null;
@@ -197,13 +221,7 @@ const ARCHIVE_THERIAN_SHINY_OVERRIDE_BY_FORM: Readonly<Record<string, string>> =
   'landorus-therian': 'https://archives.bulbagarden.net/media/upload/3/36/Spr_5b2_645T_s.png',
 };
 
-const GAME_SPRITE_SET_BASE_SCALE: Readonly<Record<string, number>> = {
-  hgss: 0.882,
-  bw: 0.82,
-  bw2: 0.82,
-};
-
-const GAME_SPRITE_SET_MEDIAN_LONG_SIDE = (() => {
+const HGSS_SPRITE_MEDIAN_LONG_SIDE = (() => {
   const grouped = new Map<string, number[]>();
   for (const [filePath, longSide] of Object.entries(GAME_SPRITE_LONG_SIDE_BY_FILE)) {
     const set = filePath.split('/')[0];
@@ -221,12 +239,17 @@ const GAME_SPRITE_SET_MEDIAN_LONG_SIDE = (() => {
       : sorted[middle];
   };
 
-  return {
-    hgss: median(grouped.get('hgss') || []),
-    bw: median(grouped.get('bw') || []),
-    bw2: median(grouped.get('bw2') || []),
-  } as const;
+  return median(grouped.get('hgss') || []);
 })();
+
+// BW/BW2 assets are animated and their WebP canvases have been trimmed to
+// different sizes. Normalizing each canvas independently makes sprites with
+// the same game presentation render at inconsistent sizes, so Gen V always
+// uses the same reduced display scale.
+const GAME_SPRITE_SET_FIXED_SCALE: Readonly<Record<string, number>> = {
+  bw: 0.75,
+  bw2: 0.75,
+};
 
 const getGameSpecificSpriteFilePath = (url?: string | null) => {
   if (!url) return null;
@@ -234,6 +257,16 @@ const getGameSpecificSpriteFilePath = (url?: string | null) => {
     const parts = url.split('/');
     if (parts.length < 5) return null;
     return `${parts[3]}/${parts.slice(4).join('/')}`;
+  }
+  // Diamond, Pearl and Platinum sprites are cached from Bulbagarden under the
+  // generic remote-assets directory. Keep recognizing those local URLs as game
+  // sprites, otherwise they miss the same scaling treatment as every other
+  // game asset and can render as an unscaled transparent canvas on cards.
+  const localArchiveMatch = url.match(/\/img\/pokemon-sprites\/remote\/archives\.bulbagarden\.net\/media\/upload\/[^/]+\/[^/]+\/(Spr_[^/?#]+)$/i);
+  if (localArchiveMatch) {
+    const filename = decodeURIComponent(localArchiveMatch[1]);
+    if (filename.startsWith('Spr_4d_')) return `dp/${filename}`;
+    if (filename.startsWith('Spr_4p_')) return `pt/${filename}`;
   }
   const mediaUploadMatch = url.match(/archives\.bulbagarden\.net\/media\/upload\/[^/]+\/[^/]+\/(Spr_[^/?#]+)$/i);
   if (mediaUploadMatch) {
@@ -257,12 +290,16 @@ const getGameSpecificSpriteScaleFactorFromFile = (filePath?: string | null) => {
   if (!filePath) return null;
   const longSide = GAME_SPRITE_LONG_SIDE_BY_FILE[filePath];
   if (!longSide) return null;
+  if (!HGSS_SPRITE_MEDIAN_LONG_SIDE) return null;
+  // `object-contain` gives every source canvas the same box. Scale must therefore
+  // be inverse to the opaque sprite size. HGSS is the visual baseline across the
+  // site, so DP and Pt sprites are normalized to the same footprint rather
+  // than to a median that differs for each game set. Gen V uses its fixed
+  // scale below because its animated WebP canvases are not consistent.
   const set = filePath.split('/')[0];
-  const median = GAME_SPRITE_SET_MEDIAN_LONG_SIDE[set as keyof typeof GAME_SPRITE_SET_MEDIAN_LONG_SIDE];
-  if (!median) return null;
-  const baseScale = GAME_SPRITE_SET_BASE_SCALE[set] ?? 1;
-  const relativeScale = longSide / median;
-  return Math.min(1.2, Math.max(0.7, baseScale * relativeScale));
+  const fixedScale = GAME_SPRITE_SET_FIXED_SCALE[set];
+  if (fixedScale !== undefined) return fixedScale;
+  return (HGSS_SPRITE_MEDIAN_LONG_SIDE / longSide) * 1.1;
 };
 
 export function getGameSpecificShinySpriteUrl(
@@ -334,9 +371,10 @@ export function getGameSpecificShinySpriteUrl(
 
   const wantedFormSuffix = getFormSuffix(speciesId, slug);
   let formCandidates = candidates.filter((spriteFile) => spriteFile.formSuffix === wantedFormSuffix);
-  if (formCandidates.length === 0 && wantedFormSuffix) {
-    formCandidates = candidates.filter((spriteFile) => spriteFile.formSuffix === '');
-  }
+  // A form-specific request must never fall back to the base-form sprite.
+  // For example, Giratina Origin and Shaymin Sky do not exist in Diamond and
+  // Pearl; displaying their base forms there incorrectly implies that they do.
+  if (formCandidates.length === 0 && wantedFormSuffix) return null;
   if (formCandidates.length === 0) formCandidates = candidates;
 
   const requestedGender = normalizeGender(options.gender);
@@ -387,13 +425,12 @@ export function getGameSpecificSpriteScaleFactor(url?: string | null): number {
   const scaleFromFile = getGameSpecificSpriteScaleFactorFromFile(filePath);
   if (scaleFromFile) return scaleFromFile;
   if (!filePath) return 1;
-  const set = filePath.split('/')[0];
-  return GAME_SPRITE_SET_BASE_SCALE[set] ?? 0.86;
+  return 1;
 }
 
-export function getGameSpecificSpriteScaleStyle(url?: string | null, multiplier = 1): any {
+export function getGameSpecificSpriteScaleStyle(url?: string | null): any {
   return {
-    '--sprite-scale': String(getGameSpecificSpriteScaleFactor(url) * multiplier),
+    '--sprite-scale': String(getGameSpecificSpriteScaleFactor(url)),
   };
 }
 

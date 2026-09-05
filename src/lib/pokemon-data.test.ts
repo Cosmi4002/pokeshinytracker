@@ -1,14 +1,36 @@
 import { describe, expect, it } from 'vitest';
-import { HUNTING_METHODS, calculateShinyStats, formatOdds, getArchiveShinySpriteUrl, getCaughtShinySpriteUrl, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, getSelectedGameSpriteUrl, isBreedingMethod, toLocalPokemonSpriteUrl } from './pokemon-data';
+import { HUNTING_METHODS, calculateShinyStats, formatOdds, getArchiveShinySpriteUrl, getCaughtShinySpriteUrl, getGameGeneration, getHuntingMethodsForGame, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, getSelectedGameSpriteUrl, isBreedingMethod, toLocalPokemonSpriteUrl } from './pokemon-data';
 
 describe('pokemon sprite helpers', () => {
+  it('suggests generation-appropriate methods for the selected game', () => {
+    expect(getGameGeneration('pearl')).toBe(4);
+    expect(getHuntingMethodsForGame('pearl')).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'gen4-random', generation: 4 }),
+        expect.objectContaining({ id: 'gen4-pokeradar', generation: 4 }),
+      ]),
+    );
+    expect(getHuntingMethodsForGame('pearl')).not.toContainEqual(
+      expect.objectContaining({ generation: 5 }),
+    );
+  });
+
+  it('uses the unified Fishing method for Generation V games', () => {
+    const gen5Methods = getHuntingMethodsForGame('black2');
+
+    expect(gen5Methods).toContainEqual(expect.objectContaining({ id: 'gen5-fishing', name: 'Fishing' }));
+    expect(gen5Methods.map((method) => method.id)).not.toEqual(
+      expect.arrayContaining(['gen5-old-rod', 'gen5-good-rod', 'gen5-super-rod']),
+    );
+  });
+
   it('returns a stable fallback asset for missing sprite images', () => {
     expect(getPokemonSpriteFallbackUrl()).toBe('/placeholder.svg');
   });
 
   it('builds the expected HOME sprite URL for a base shiny Pokémon', () => {
     expect(getPokemonSpriteUrl(25, { shiny: true })).toBe(
-      'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/25.png'
+      '/img/pokemon-sprites/remote/raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/25.png'
     );
   });
 
@@ -29,7 +51,7 @@ describe('pokemon sprite helpers', () => {
       '/img/game-sprites/bw/Spr_5b_585W_s.webp'
     );
     expect(getArchiveShinySpriteUrl(10020, { shiny: true, name: 'thundurus-therian', form: 'thundurus-therian' })).toBe(
-      'https://archives.bulbagarden.net/media/upload/2/21/Spr_5b2_642T_s.png'
+      '/img/pokemon-sprites/remote/archives.bulbagarden.net/media/upload/2/21/Spr_5b2_642T_s.png'
     );
   });
 
@@ -66,6 +88,19 @@ describe('pokemon sprite helpers', () => {
         spriteUrl: 'https://legacy.example/old.png',
       })
     ).toBe('/img/pokemon-sprites/remote/archives.bulbagarden.net/media/upload/f/f5/Spr_4p_445_f_s.png');
+  });
+
+  it('uses the HOME sprite when the selected game has no game-specific sprite set', () => {
+    expect(
+      getSelectedGameSpriteUrl({
+        pokemonId: 515,
+        pokemonName: 'panpour',
+        game: 'y',
+        spriteUrl: '/img/game-sprites/bw/Spr_5b_515_s.webp',
+      })
+    ).toBe(
+      '/img/pokemon-sprites/remote/raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/515.png'
+    );
   });
 
   it('remaps archive sprite URLs to a local cached path instead of depending on the browser cache', () => {

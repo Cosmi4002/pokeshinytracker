@@ -113,6 +113,8 @@ export function EvolveDialog({ open, onOpenChange, entry, onSuccess }: EvolveDia
         throw new Error('Pokemon evolution not found');
       }
 
+      const nextForm = evolutionPokemon.id !== evolutionPokemon.baseId ? evolutionPokemon.name : null;
+
       // Generate the new sprite URL
       const newSpriteUrl = getSelectedGameSpriteUrl({
         pokemonId: selectedEvolution,
@@ -122,7 +124,6 @@ export function EvolveDialog({ open, onOpenChange, entry, onSuccess }: EvolveDia
         game: entry.game,
         secondaryGame: (entry as any).secondary_game || undefined,
       });
-      const nextForm = evolutionPokemon.id !== evolutionPokemon.baseId ? evolutionPokemon.name : null;
       const nextEntityKey = resolveEntityKeyForSelectedPokemon({
         pokemonId: selectedEvolution,
         pokemonName: evolutionPokemon.displayName,
