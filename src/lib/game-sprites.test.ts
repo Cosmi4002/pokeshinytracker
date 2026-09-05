@@ -101,6 +101,15 @@ describe('game-specific shiny sprites', () => {
     }
   });
 
+  it.each([
+    ['/img/game-sprites/xy/Spr_6x_001_s.webp'],
+    ['/img/game-sprites/oras/Spr_6o_001_s.webp'],
+    ['/img/game-sprites/sm/Spr_7s_001_s.webp'],
+    ['/img/game-sprites/usum/Spr_7u_001_s.webp'],
+  ])('reduces newer game sprites by 15%%: %s', (url) => {
+    expect(getGameSpecificSpriteScaleFactor(url)).toBe(0.85);
+  });
+
   it('keeps Gen V sprites smaller than the shared HGSS sprite footprint', () => {
     const samples = [
       ['hgss/Spr_4h_001_s.png', '/img/game-sprites/hgss/Spr_4h_001_s.png', 88],

@@ -394,7 +394,10 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                     isGameSpecificSprite && spriteScaleClass
                   )}
                   style={{
-                    imageRendering: 'auto',
+                    // The newer game WebPs are still compact sprite canvases. Keep
+                    // their edges crisp when the card enlarges them, matching the
+                    // "Evoluto da" preview above.
+                    imageRendering: isGameSpecificSprite ? 'pixelated' : 'auto',
                     filter: mainSpriteFilter,
                     ...(isGameSpecificSprite ? getGameSpecificSpriteScaleStyle(spriteUrl) : {}),
                   }}

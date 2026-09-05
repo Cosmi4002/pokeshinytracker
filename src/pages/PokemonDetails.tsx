@@ -528,6 +528,30 @@ export default function PokemonDetails() {
                 description: 'Original animated shiny sprite shared by Black 2 and White 2.',
                 games: ['black2', 'white2'],
             },
+            {
+                id: 'xy',
+                label: 'X / Y',
+                description: 'Original shiny sprite shared by Pokémon X and Pokémon Y.',
+                games: ['x', 'y'],
+            },
+            {
+                id: 'oras',
+                label: 'Omega Ruby / Alpha Sapphire',
+                description: 'Original shiny sprite shared by Pokémon Omega Ruby and Alpha Sapphire.',
+                games: ['omegaruby', 'alphasapphire'],
+            },
+            {
+                id: 'sm',
+                label: 'Sun / Moon',
+                description: 'Original shiny sprite shared by Pokémon Sun and Moon.',
+                games: ['sun', 'moon'],
+            },
+            {
+                id: 'usum',
+                label: 'Ultra Sun / Ultra Moon',
+                description: 'Original shiny sprite shared by Pokémon Ultra Sun and Ultra Moon.',
+                games: ['ultrasun', 'ultramoon'],
+            },
         ].map(group => {
             const maleCaughtGamesForGroup = group.games.filter(gameId => {
                 if (!details.hasGenderDifference) return caughtGames.has(gameId);

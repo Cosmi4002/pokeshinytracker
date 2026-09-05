@@ -554,6 +554,7 @@ export default function UserCollectionsSearch() {
                 entry.is_fail && !isGameSpecificSprite && 'drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]'
               )}
               style={{
+                imageRendering: isGameSpecificSprite ? 'pixelated' : 'auto',
                 ...(isGameSpecificSprite ? getGameSpecificSpriteScaleStyle(sprite) : {}),
                 ...(isGameSpecificSprite && !entry.is_fail && !entry.is_unobtainable ? {} : getSpriteStyle(entry.is_fail, entry.is_unobtainable)),
               }}

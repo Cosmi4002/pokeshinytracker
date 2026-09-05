@@ -232,6 +232,13 @@ const HGSS_SPRITE_MEDIAN_LONG_SIDE = (() => {
 const GAME_SPRITE_SET_FIXED_SCALE: Readonly<Record<string, number>> = {
   bw: 0.75,
   bw2: 0.75,
+  // Gen VI and VII WebPs have a tighter transparent canvas than the older
+  // archive PNGs. Reserve a little more breathing room in every view so they
+  // do not overpower the card while still using crisp pixel rendering.
+  xy: 0.85,
+  oras: 0.85,
+  sm: 0.85,
+  usum: 0.85,
 };
 
 const getGameSpecificSpriteFilePath = (url?: string | null) => {
@@ -271,6 +278,9 @@ const getGameSpecificSpriteFilePath = (url?: string | null) => {
 
 const getGameSpecificSpriteScaleFactorFromFile = (filePath?: string | null) => {
   if (!filePath) return null;
+  const set = filePath.split('/')[0];
+  const fixedScale = GAME_SPRITE_SET_FIXED_SCALE[set];
+  if (fixedScale !== undefined) return fixedScale;
   const longSide = GAME_SPRITE_LONG_SIDE_BY_FILE[filePath];
   if (!longSide) return null;
   if (!HGSS_SPRITE_MEDIAN_LONG_SIDE) return null;
@@ -279,9 +289,6 @@ const getGameSpecificSpriteScaleFactorFromFile = (filePath?: string | null) => {
   // site, so DP and Pt sprites are normalized to the same footprint rather
   // than to a median that differs for each game set. Gen V uses its fixed
   // scale below because its animated WebP canvases are not consistent.
-  const set = filePath.split('/')[0];
-  const fixedScale = GAME_SPRITE_SET_FIXED_SCALE[set];
-  if (fixedScale !== undefined) return fixedScale;
   return (HGSS_SPRITE_MEDIAN_LONG_SIDE / longSide) * 1.1;
 };
 
