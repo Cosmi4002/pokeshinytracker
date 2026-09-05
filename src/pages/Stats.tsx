@@ -13,7 +13,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useRandomColor } from '@/lib/random-color-context';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleStyle, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
+import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteImageRendering, getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleStyle, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
 import { usePokemonList } from '@/hooks/use-pokemon';
 import { findHuntingMethod, GAMES, getCaughtShinySpriteUrl, getDynamicOdds } from '@/lib/pokemon-data';
 import type { Tables } from '@/integrations/supabase/types';
@@ -194,7 +194,7 @@ function RecordHunt({
               isGameSpecificSprite ? spriteScaleClass : "drop-shadow"
             )}
             style={isGameSpecificSprite
-              ? { imageRendering: 'pixelated', ...getGameSpecificSpriteScaleStyle(sprite) }
+              ? { imageRendering: getGameSpecificSpriteImageRendering(sprite), ...getGameSpecificSpriteScaleStyle(sprite) }
               : undefined}
             loading="lazy"
             onError={(event) => {

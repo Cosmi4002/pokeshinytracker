@@ -95,7 +95,7 @@ describe('pokemon sprite helpers', () => {
       getSelectedGameSpriteUrl({
         pokemonId: 515,
         pokemonName: 'panpour',
-        game: 'y',
+        game: 'violet',
         spriteUrl: '/img/game-sprites/bw/Spr_5b_515_s.webp',
       })
     ).toBe(

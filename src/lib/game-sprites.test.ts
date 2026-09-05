@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleFactor, getGameSpecificSpriteScaleStyle } from './game-sprites';
+import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteImageRendering, getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleFactor, getGameSpecificSpriteScaleStyle } from './game-sprites';
 import { toLocalPokemonSpriteUrl } from './pokemon-data';
 import { GAME_SPRITE_LONG_SIDE_BY_FILE } from '@/data/game-sprite-long-sides.generated';
 import { BW_SHINY_SPRITE_FILES } from '@/data/bw-shiny-sprite-manifest';
@@ -125,8 +125,14 @@ describe('game-specific shiny sprites', () => {
     ['/img/game-sprites/oras/Spr_6o_001_s.webp'],
     ['/img/game-sprites/sm/Spr_7s_001_s.webp'],
     ['/img/game-sprites/usum/Spr_7u_001_s.webp'],
+    ['/img/game-sprites/gen6-7/bulbasaur.webp'],
   ])('reduces newer game sprites by 15%%: %s', (url) => {
     expect(getGameSpecificSpriteScaleFactor(url)).toBe(0.85);
+  });
+
+  it('uses smoother rendering for the shared Gen VI/VII sprite set only', () => {
+    expect(getGameSpecificSpriteImageRendering('/img/game-sprites/gen6-7/bulbasaur.webp')).toBe('auto');
+    expect(getGameSpecificSpriteImageRendering('/img/game-sprites/bw/Spr_5b_001_s.webp')).toBe('pixelated');
   });
 
   it('keeps Gen V sprites smaller than the shared HGSS sprite footprint', () => {

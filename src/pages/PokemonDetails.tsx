@@ -35,7 +35,7 @@ import {
     getCuratedShinyOriginGameIds
 } from "@/lib/pokemon-game-availability";
 import { resolveEntityKeyForSelectedPokemon, resolvePokemonEntityKey } from "@/lib/pokemon-entity-resolver-v2";
-import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleStyle } from "@/lib/game-sprites";
+import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteImageRendering, getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleStyle } from "@/lib/game-sprites";
 
 interface FormVariant {
     id: number;
@@ -970,11 +970,11 @@ export default function PokemonDetails() {
                                                 loading="lazy"
                                                 decoding="async"
                                                 className={cn(
-                                                    "h-32 w-32 object-contain pokemon-sprite [image-rendering:pixelated]",
+                                                    "h-32 w-32 object-contain pokemon-sprite",
                                                     getGameSpecificSpriteScaleClass(group.maleSpriteUrl),
                                                     group.caughtGames.length === 0 && "opacity-35 grayscale"
                                                 )}
-                                                style={getGameSpecificSpriteScaleStyle(group.maleSpriteUrl)}
+                                                style={{ imageRendering: getGameSpecificSpriteImageRendering(group.maleSpriteUrl), ...getGameSpecificSpriteScaleStyle(group.maleSpriteUrl) }}
                                             />
                                             {details.hasGenderDifference && group.femaleSpriteUrl && (
                                                 <img
@@ -983,11 +983,11 @@ export default function PokemonDetails() {
                                                     loading="lazy"
                                                     decoding="async"
                                                     className={cn(
-                                                        "h-32 w-32 object-contain pokemon-sprite [image-rendering:pixelated]",
+                                                        "h-32 w-32 object-contain pokemon-sprite",
                                                         getGameSpecificSpriteScaleClass(group.femaleSpriteUrl),
                                                         (group.femaleCaughtGames ?? []).length === 0 && "opacity-35 grayscale"
                                                     )}
-                                                    style={getGameSpecificSpriteScaleStyle(group.femaleSpriteUrl)}
+                                                style={{ imageRendering: getGameSpecificSpriteImageRendering(group.femaleSpriteUrl), ...getGameSpecificSpriteScaleStyle(group.femaleSpriteUrl) }}
                                                 />
                                             )}
                                         </div>
