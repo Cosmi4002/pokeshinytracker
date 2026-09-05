@@ -6,6 +6,7 @@ import { PT_SHINY_SPRITE_URL_BY_FILE } from '@/data/pt-shiny-sprite-url-map.gene
 import { BW_SHINY_SPRITE_FILES } from '@/data/bw-shiny-sprite-manifest';
 import { BW2_SHINY_SPRITE_FILES } from '@/data/bw2-shiny-sprite-manifest';
 import { GEN6_7_SHINY_SPRITE_ENTRIES } from '@/data/gen6-7-shiny-sprite-manifest';
+import { GEN7_ADDITIONAL_SHINY_SPRITE_ENTRIES } from '@/data/gen7-additional-shiny-sprite-manifest';
 import { GAME_SPRITE_LONG_SIDE_BY_FILE } from '@/data/game-sprite-long-sides.generated';
 import { LOCAL_SPRITE_URLS } from './local-sprite-map.generated';
 
@@ -54,6 +55,18 @@ type ParsedGameSpriteFile = {
   gender: 'female' | 'male' | null;
 };
 
+type Gen67Candidate = {
+  file: string;
+  canonicalName: string;
+  gender?: 'female' | 'male';
+};
+
+const toLocalSpriteUrl = (url: string) => {
+  if (!url || !url.startsWith('http')) return url;
+  if (LOCAL_SPRITE_URLS[url]) return LOCAL_SPRITE_URLS[url];
+  return url;
+};
+
 const parseGameSpriteFilename = (filename: string): ParsedGameSpriteFile | null => {
   const match = filename.match(/^Spr_[^_]+_(\d{3})(.*?)\.(?:png|webp)$/i);
   if (!match) return null;
@@ -97,6 +110,14 @@ const GEN6_7_SPRITES_BY_SPECIES = new Map<number, typeof GEN6_7_SHINY_SPRITE_ENT
 for (const entry of GEN6_7_SHINY_SPRITE_ENTRIES) {
   GEN6_7_SPRITES_BY_SPECIES.set(entry.speciesId, [
     ...(GEN6_7_SPRITES_BY_SPECIES.get(entry.speciesId) || []),
+    entry,
+  ]);
+}
+
+const GEN7_ADDITIONAL_SPRITES_BY_SPECIES = new Map<number, typeof GEN7_ADDITIONAL_SHINY_SPRITE_ENTRIES[number][]>();
+for (const entry of GEN7_ADDITIONAL_SHINY_SPRITE_ENTRIES) {
+  GEN7_ADDITIONAL_SPRITES_BY_SPECIES.set(entry.speciesId, [
+    ...(GEN7_ADDITIONAL_SPRITES_BY_SPECIES.get(entry.speciesId) || []),
     entry,
   ]);
 }
@@ -325,16 +346,18 @@ export function getGameSpecificShinySpriteUrl(
   const slug = normalize(options.form || options.name);
   const archiveTherianOverride = slug ? ARCHIVE_THERIAN_SHINY_OVERRIDE_BY_FORM[slug] : undefined;
   if (archiveTherianOverride && ['black', 'white', 'black2', 'white2'].includes(gameId ?? '')) {
-    return archiveTherianOverride;
+    return toLocalSpriteUrl(archiveTherianOverride);
   }
 
-  const speciesId = set === 'gen6-7' && pokemonId >= 1 && pokemonId <= 718
+  const speciesId = set === 'gen6-7' && pokemonId >= 1 && pokemonId <= 1025
     ? pokemonId
     : resolveSpeciesId(pokemonId, slug);
   if (!speciesId) return null;
 
   if (set === 'gen6-7') {
-    const candidates = GEN6_7_SPRITES_BY_SPECIES.get(speciesId) || [];
+    const candidates: Gen67Candidate[] = GEN6_7_SPRITES_BY_SPECIES.get(speciesId) || [];
+    const additionalCandidates = (GEN7_ADDITIONAL_SPRITES_BY_SPECIES.get(speciesId) || [])
+      .filter((entry) => (entry.games as readonly string[]).includes(gameId)) as Gen67Candidate[];
     let wantedSlug = slug;
     if (speciesId === 550 && (!slug || slug === 'basculin' || slug === 'basculin-red-striped')) {
       wantedSlug = 'basculin-red-striped';
@@ -357,17 +380,20 @@ export function getGameSpecificShinySpriteUrl(
     } else if (speciesId === 586 && slug === 'sawsbuck') {
       wantedSlug = 'sawsbuck-spring';
     }
-    const formCandidates = candidates.filter((entry) => {
+    const matchesForm = (entry: Gen67Candidate) => {
       if (speciesId === 550 && wantedSlug.includes('blue')) return entry.canonicalName === 'basculin-blue-striped';
       if (wantedSlug && normalize(entry.canonicalName) !== wantedSlug) return false;
       return true;
-    });
+    };
+    const formCandidates = candidates.filter(matchesForm);
+    const additionalFormCandidates = additionalCandidates.filter(matchesForm);
+    const preferredCandidates = additionalFormCandidates.length > 0 ? additionalFormCandidates : formCandidates;
     const requestedGender = normalizeGender(options.gender);
     const genderMatch = requestedGender
-      ? formCandidates.find((entry) => entry.gender === requestedGender)
+      ? preferredCandidates.find((entry) => 'gender' in entry && entry.gender === requestedGender)
       : null;
-    const maleMatch = formCandidates.find((entry) => entry.gender === 'male');
-    const entry = genderMatch || maleMatch || formCandidates[0];
+    const maleMatch = preferredCandidates.find((entry) => 'gender' in entry && entry.gender === 'male');
+    const entry = genderMatch || maleMatch || preferredCandidates[0];
     return entry ? `/img/game-sprites/gen6-7/${entry.file}` : null;
   }
 
@@ -408,7 +434,7 @@ export function getGameSpecificShinySpriteUrl(
   }
 
   if (!resolvedUrl) return null;
-  return resolvedUrl;
+  return toLocalSpriteUrl(resolvedUrl);
 }
 
 export function getArchiveShinySpriteUrl(

@@ -87,6 +87,15 @@ describe('game-specific shiny sprites', () => {
       .toBe('/img/game-sprites/gen6-7/meowstic-male-f.webp');
   });
 
+  it('uses Gen 7 additions for Sun/Moon and keeps USUM-only sprites exclusive', () => {
+    expect(getGameSpecificShinySpriteUrl(752, 'sun', { name: 'araquanid' }))
+      .toBe('/img/game-sprites/gen6-7/araquanid.webp');
+    expect(getGameSpecificShinySpriteUrl(806, 'sun', { name: 'blacephalon' }))
+      .toBeNull();
+    expect(getGameSpecificShinySpriteUrl(806, 'ultrasun', { name: 'blacephalon' }))
+      .toBe('/img/game-sprites/gen6-7/blacephalon-usum.webp');
+  });
+
   it.each([
     ['https://archives.bulbagarden.net/media/upload/7/7c/Spr_4d_001_s.png', 'scale-[var(--sprite-scale)]'],
     ['/img/pokemon-sprites/remote/archives.bulbagarden.net/media/upload/5/54/Spr_4d_200_s.png', 'scale-[var(--sprite-scale)]'],
