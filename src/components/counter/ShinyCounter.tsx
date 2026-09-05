@@ -796,7 +796,9 @@ export function ShinyCounter({
                                 isGameSpecificSprite && spriteScaleClass
                               )}
                               style={{
-                                imageRendering: 'auto',
+                                // Game-specific WebPs look substantially clearer at
+                                // this enlarged size with nearest-neighbour scaling.
+                                imageRendering: isGameSpecificSprite ? 'pixelated' : 'auto',
                                 filter: isGameSpecificSprite ? 'none' : COUNTER_SPRITE_EDGE_SHADOW,
                                 ...(isGameSpecificSprite ? getGameSpecificSpriteScaleStyle(displaySpriteUrl) : {}),
                               }}

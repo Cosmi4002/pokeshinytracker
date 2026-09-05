@@ -193,7 +193,9 @@ function RecordHunt({
               "h-20 w-20 object-contain",
               isGameSpecificSprite ? spriteScaleClass : "drop-shadow"
             )}
-            style={isGameSpecificSprite ? getGameSpecificSpriteScaleStyle(sprite) : undefined}
+            style={isGameSpecificSprite
+              ? { imageRendering: 'pixelated', ...getGameSpecificSpriteScaleStyle(sprite) }
+              : undefined}
             loading="lazy"
             onError={(event) => {
               event.currentTarget.src = '/placeholder.svg';
