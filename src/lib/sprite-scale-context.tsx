@@ -4,10 +4,13 @@ import { useAuth } from '@/lib/auth-context';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 
 const SPRITE_MANAGER_EMAIL = 'chritel04@gmail.com';
 const EDITOR_STORAGE_KEY = 'sprite-scale-editor-enabled';
+const MIN_SPRITE_SCALE = 0.25;
+const MAX_SPRITE_SCALE = 2.5;
 
 type SelectedSprite = { key: string; url: string; alt: string; isScoped: boolean };
 
@@ -18,6 +21,11 @@ type SpriteScaleContextValue = {
 };
 
 const SpriteScaleContext = createContext<SpriteScaleContextValue | undefined>(undefined);
+
+export const clampSpriteScale = (scale: number) => Math.min(MAX_SPRITE_SCALE, Math.max(MIN_SPRITE_SCALE, scale));
+
+export const isSpriteScaleManager = (email?: string | null) =>
+  email?.toLowerCase() === SPRITE_MANAGER_EMAIL;
 
 const getSpriteKey = (url: string) => {
   const parsed = new URL(url, window.location.origin);
@@ -43,9 +51,9 @@ const applyScalesToDocument = (overrides: Record<string, number>) => {
 };
 
 export function SpriteScaleProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
-  const isManager = user?.email?.toLowerCase() === SPRITE_MANAGER_EMAIL;
+  const isManager = isSpriteScaleManager(user?.email);
   const [editorEnabled, setEditorEnabledState] = useState(() => localStorage.getItem(EDITOR_STORAGE_KEY) === 'true');
   const [overrides, setOverrides] = useState<Record<string, number>>({});
   const [selectedSprite, setSelectedSprite] = useState<SelectedSprite | null>(null);
@@ -59,11 +67,14 @@ export function SpriteScaleProvider({ children }: { children: ReactNode }) {
   }, [isManager]);
 
   useEffect(() => {
+    // Authentication is restored asynchronously on application startup. Do not
+    // clear a manager's saved preference during that brief unauthenticated state.
+    if (authLoading) return;
     if (!isManager) {
       setEditorEnabledState(false);
       localStorage.removeItem(EDITOR_STORAGE_KEY);
     }
-  }, [isManager]);
+  }, [authLoading, isManager]);
 
   useEffect(() => {
     let active = true;
@@ -112,7 +123,7 @@ export function SpriteScaleProvider({ children }: { children: ReactNode }) {
     setSaving(true);
     const { error } = await supabase.from('sprite_scale_overrides').upsert({
       sprite_url: selectedSprite.key,
-      scale: Number(draftScale.toFixed(2)),
+      scale: Number(clampSpriteScale(draftScale).toFixed(2)),
       updated_at: new Date().toISOString(),
     });
     setSaving(false);
@@ -120,7 +131,7 @@ export function SpriteScaleProvider({ children }: { children: ReactNode }) {
       toast({ variant: 'destructive', title: 'Unable to save sprite size', description: error.message });
       return;
     }
-    setOverrides((current) => ({ ...current, [selectedSprite.key]: Number(draftScale.toFixed(2)) }));
+    setOverrides((current) => ({ ...current, [selectedSprite.key]: Number(clampSpriteScale(draftScale).toFixed(2)) }));
     toast(selectedSprite.isScoped
       ? { title: 'Dimensione salvata per questo “Evoluto da”', description: 'La correzione resta solo su questa card.' }
       : { title: 'Sprite size saved globally', description: 'The correction is now visible to every visitor.' });
@@ -166,7 +177,32 @@ export function SpriteScaleProvider({ children }: { children: ReactNode }) {
               </div>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm font-medium"><span>Scale</span><span>{Math.round(draftScale * 100)}%</span></div>
-                <Slider value={[draftScale]} min={0.25} max={2.5} step={0.01} onValueChange={([value]) => setDraftScale(value)} />
+                <Slider
+                  value={[draftScale]}
+                  min={MIN_SPRITE_SCALE}
+                  max={MAX_SPRITE_SCALE}
+                  step={0.01}
+                  onValueChange={([value]) => setDraftScale(clampSpriteScale(value))}
+                />
+                <div className="flex items-center gap-3">
+                  <label htmlFor="sprite-scale-value" className="shrink-0 text-sm font-medium">Scala manuale</label>
+                  <Input
+                    id="sprite-scale-value"
+                    type="number"
+                    inputMode="decimal"
+                    min={MIN_SPRITE_SCALE}
+                    max={MAX_SPRITE_SCALE}
+                    step={0.01}
+                    value={draftScale}
+                    onChange={(event) => {
+                      const value = event.currentTarget.valueAsNumber;
+                      if (Number.isFinite(value)) setDraftScale(clampSpriteScale(value));
+                    }}
+                    aria-describedby="sprite-scale-value-help"
+                  />
+                  <span className="text-sm text-muted-foreground">×</span>
+                </div>
+                <p id="sprite-scale-value-help" className="text-xs text-muted-foreground">Inserisci un valore da {MIN_SPRITE_SCALE} a {MAX_SPRITE_SCALE}; funziona anche da mobile.</p>
               </div>
             </div>
           )}

@@ -122,6 +122,17 @@ for (const entry of GEN7_ADDITIONAL_SHINY_SPRITE_ENTRIES) {
   ]);
 }
 
+// Form entries use their own PokéAPI IDs (for example, Alolan Vulpix is
+// 10103), while the Gen VI/VII manifests are indexed by National Dex species
+// ID. Keep a canonical-name lookup so a form can still resolve its game sprite.
+const GEN6_7_SPECIES_BY_CANONICAL_NAME = new Map<string, number>();
+for (const entry of GEN6_7_SHINY_SPRITE_ENTRIES) {
+  GEN6_7_SPECIES_BY_CANONICAL_NAME.set(entry.canonicalName, entry.speciesId);
+}
+for (const entry of GEN7_ADDITIONAL_SHINY_SPRITE_ENTRIES) {
+  GEN6_7_SPECIES_BY_CANONICAL_NAME.set(entry.canonicalName, entry.speciesId);
+}
+
 const LEGACY_FORM_SPECIES: ReadonlyArray<[RegExp, number]> = [
   [/^unown(?:-|$)/, 201],
   [/^castform(?:-|$)/, 351],
@@ -178,6 +189,10 @@ const resolveSpeciesId = (pokemonId: number, slug: string) => {
   if (pokemonId >= 1 && pokemonId <= 649) return pokemonId;
   return LEGACY_FORM_SPECIES.find(([pattern]) => pattern.test(slug))?.[1] ?? null;
 };
+
+const resolveGen67SpeciesId = (pokemonId: number, slug: string) =>
+  GEN6_7_SPECIES_BY_CANONICAL_NAME.get(slug)
+  ?? (pokemonId >= 1 && pokemonId <= 1025 ? pokemonId : resolveSpeciesId(pokemonId, slug));
 
 const getFormSuffix = (speciesId: number, slug: string) => {
   if (speciesId === 201) {
@@ -349,8 +364,8 @@ export function getGameSpecificShinySpriteUrl(
     return toLocalSpriteUrl(archiveTherianOverride);
   }
 
-  const speciesId = set === 'gen6-7' && pokemonId >= 1 && pokemonId <= 1025
-    ? pokemonId
+  const speciesId = set === 'gen6-7'
+    ? resolveGen67SpeciesId(pokemonId, slug)
     : resolveSpeciesId(pokemonId, slug);
   if (!speciesId) return null;
 

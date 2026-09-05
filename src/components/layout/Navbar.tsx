@@ -437,7 +437,18 @@ export function Navbar() {
             const isActive = location.pathname === link.to;
 
             return (
-              <Link key={link.to} to={link.to}>
+              <Link
+                key={link.to}
+                to={link.to}
+                onClick={() => {
+                  // Selecting the active Pokédex tab is an intentional "back to
+                  // the beginning" action, even though React Router does not
+                  // navigate when the destination is the current route.
+                  if (link.to === '/pokedex' && isActive) {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }
+                }}
+              >
                 <Button
                   variant={isActive ? 'default' : 'ghost'}
                   size="sm"

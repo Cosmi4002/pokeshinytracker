@@ -69,6 +69,26 @@ export const POKEMON_WITH_GENDER_DIFF = [
   592, 593, 667, 668, 678, 876, 902, 916
 ];
 
+const GENDER_DIFF_EXCLUDED_FORMS = new Set([
+  'pikachu-partner-cap',
+]);
+
+/**
+ * A gender difference belongs to a particular form, not automatically to every
+ * form of a species. Regional forms and Partner Cap Pikachu reuse a species
+ * with a gender-different base form, but do not have their own gender sprites.
+ */
+export function hasPokemonGenderDifference(baseId: number, formName?: string | null): boolean {
+  const normalizedFormName = formName?.toLowerCase() || '';
+  const isRegionalForm = /-(alola|galar|hisui|paldea)(?:-|$)/.test(normalizedFormName);
+
+  return POKEMON_WITH_GENDER_DIFF.includes(baseId)
+    && !isRegionalForm
+    && !GENDER_DIFF_EXCLUDED_FORMS.has(normalizedFormName)
+    // Litleo's sprite assets do not have a visible gender variant.
+    && baseId !== 667;
+}
+
 // Manual Varieties to force inclusion for specific species that aren't fully listed in pokedex.json
 const RAW_MANUAL_VARIETIES: Record<number, { id: number, name: string, generation?: number }[]> = {
   201: [ // Unown
@@ -775,15 +795,7 @@ export function usePokemonDetails(pokemonId: number | null) {
           relatives = relatives.filter((r: any) => !/^alcremie-(strawberry|berry|love|star|clover|flower|ribbon)$/i.test(r.name));
         }
 
-        const isRegionalForm = name && (
-          name.includes('-alola') || name.includes('-galar') ||
-          name.includes('-hisui') || name.includes('-paldea')
-        );
-        // Exclude specific forms that do not actually have distinct female sprites
-        const excludedGenderDiffNames = ['pikachu-partner-cap'];
-        const excludedGenderDiffBaseIds = [667]; // Litleo
-        const isExcludedGenderForm = (name && excludedGenderDiffNames.includes(name.toLowerCase())) || excludedGenderDiffBaseIds.includes(baseId);
-        const hasGenderDiff = !isRegionalForm && POKEMON_WITH_GENDER_DIFF.includes(baseId) && !isExcludedGenderForm;
+        const hasGenderDiff = hasPokemonGenderDifference(baseId, name);
 
         const sprites = {
           default: getArchiveShinySpriteUrl(pokemonId!, { name, form: name }) || getPokemonSpriteUrl(pokemonId!, { name: name, animated: true }),

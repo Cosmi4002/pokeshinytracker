@@ -30,7 +30,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { Tables } from '@/integrations/supabase/types';
 import { FinishHuntDialog } from './FinishHuntDialog';
 import { useRandomColor } from '@/lib/random-color-context';
-import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
+import { hasPokemonGenderDifference, usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
 import { cn } from '@/lib/utils';
 import { resolveEntityKeysForCounterSlots } from '@/lib/pokemon-entity-resolver-v2';
 import { useOnlineStatus } from '@/hooks/use-online-status';
@@ -778,6 +778,10 @@ export function ShinyCounter({
                           : slot.slot === 2
                             ? setSelectedPokemon2Gender
                             : setSelectedPokemon3Gender;
+                        const hasGenderDifference = hasPokemonGenderDifference(
+                          slot.details?.baseId || slot.id,
+                          slot.form || slot.details?.name,
+                        );
 
                         return (
                           <div
@@ -807,7 +811,10 @@ export function ShinyCounter({
                               }}
                             />
                             {slotFormOptions.length > 0 && (
-                              <Select value={slot.form || 'default'} onValueChange={(v) => setSlotForm(v === 'default' ? '' : v)}>
+                              <Select value={slot.form || 'default'} onValueChange={(v) => {
+                                setSlotForm(v === 'default' ? '' : v);
+                                setSlotGender('');
+                              }}>
                                 <SelectTrigger
                                   className="h-8 w-full px-2 rounded-full text-xs"
                                   style={{ borderColor: accentColor }}
@@ -827,7 +834,7 @@ export function ShinyCounter({
                                 </SelectContent>
                               </Select>
                             )}
-                            {slot.details?.hasGenderDifference && (
+                            {hasGenderDifference && (
                               <div className="flex w-full justify-center gap-2">
                                 <Button
                                   type="button"

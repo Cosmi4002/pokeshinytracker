@@ -25,7 +25,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
 import { POKEBALLS, GAMES, GIGAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, canHideEncountersForMethod, findHuntingMethod, getPokemonSpriteUrl, supportsGigamaxMark } from '@/lib/pokemon-data';
-import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
+import { hasPokemonGenderDifference, usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
 import { MethodSelector } from '@/components/counter/MethodSelector';
 import { Checkbox } from '@/components/ui/checkbox';
 import { getPokemonSpriteFallbackUrl } from '@/lib/pokemon-data';
@@ -166,13 +166,15 @@ export function FinishHuntDialog({
     return items.sort((a, b) => a.displayName.localeCompare(b.displayName));
   }, [pokemonDetails]);
 
+  const hasGenderDifference = hasPokemonGenderDifference(pokemonDetails?.baseId || pokemonId, form || pokemonDetails?.name);
+
   const spriteUrl = useMemo(() => {
     const currentVariant = formOptions.find(f => f.name === form);
     const displayId = currentVariant ? currentVariant.id : pokemonId;
 
     // Gender Fallback: Only try to load female sprite if the Pokemon actually has gender differences.
     // Otherwise, always use default (male) sprite to avoid 404/white square.
-    const showFemaleSprite = gender === 'female' && pokemonDetails?.hasGenderDifference;
+    const showFemaleSprite = gender === 'female' && hasGenderDifference;
 
     return getGameSpecificShinySpriteUrl(displayId, game, {
       shiny: true,
@@ -186,7 +188,7 @@ export function FinishHuntDialog({
       form: form || undefined,
       name: pokemonName,
     });
-  }, [game, pokemonId, gender, form, pokemonName, formOptions, pokemonDetails]);
+  }, [game, pokemonId, gender, form, pokemonName, formOptions, hasGenderDifference]);
 
   const selectedDisplayName = useMemo(() => {
     if (form) {
@@ -319,7 +321,10 @@ export function FinishHuntDialog({
           {formOptions.length > 0 && (
             <div className="space-y-2">
               <Label>Forma / variante</Label>
-              <Select value={form || 'default'} onValueChange={(v) => setForm(v === 'default' ? '' : v)}>
+              <Select value={form || 'default'} onValueChange={(v) => {
+                setForm(v === 'default' ? '' : v);
+                setGender('');
+              }}>
                 <SelectTrigger className="h-8 rounded-full text-xs">
                   <div className="flex items-center gap-2 truncate">
                     <Sparkles className="h-3 w-3" />
@@ -340,7 +345,7 @@ export function FinishHuntDialog({
 
           <div className="space-y-2">
             <Label>Genere</Label>
-            {pokemonDetails?.hasGenderDifference ? (
+            {hasGenderDifference ? (
               <Select value={gender || 'male'} onValueChange={(v) => setGender(v === 'female' ? 'female' : '')}>
                 <SelectTrigger className="h-8 rounded-full text-xs">
                   <SelectValue />

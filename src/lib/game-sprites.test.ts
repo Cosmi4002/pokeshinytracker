@@ -96,6 +96,14 @@ describe('game-specific shiny sprites', () => {
       .toBe('/img/game-sprites/gen6-7/blacephalon-usum.webp');
   });
 
+  it.each(['sun', 'moon', 'ultrasun', 'ultramoon'])(
+    'resolves Alolan Vulpix by its form ID for %s',
+    (gameId) => {
+      expect(getGameSpecificShinySpriteUrl(10103, gameId, { name: 'vulpix-alola', form: 'vulpix-alola' }))
+        .toBe('/img/game-sprites/gen6-7/vulpix-alola.webp');
+    },
+  );
+
   it.each([
     ['https://archives.bulbagarden.net/media/upload/7/7c/Spr_4d_001_s.png', 'scale-[var(--sprite-scale)]'],
     ['/img/pokemon-sprites/remote/archives.bulbagarden.net/media/upload/5/54/Spr_4d_200_s.png', 'scale-[var(--sprite-scale)]'],

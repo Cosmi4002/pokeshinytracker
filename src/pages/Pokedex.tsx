@@ -4,7 +4,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { usePokemonList, getPokemonSpriteUrl, GENERATION_RANGES, POKEMON_WITH_GENDER_DIFF, PokemonBasic } from '@/hooks/use-pokemon';
+import { usePokemonList, getPokemonSpriteUrl, GENERATION_RANGES, hasPokemonGenderDifference, PokemonBasic } from '@/hooks/use-pokemon';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PokedexCard } from '@/components/pokedex/PokedexCard';
 import { useRandomColor } from '@/lib/random-color-context';
@@ -25,9 +25,6 @@ type RegionalFormRegion = 'Alola' | 'Galar' | 'Hisui' | 'Paldea';
 
 type PokedexViewState = {
     scrollY: number;
-    search: string;
-    generationFilter: string;
-    layoutMode: PokedexLayoutMode;
 };
 
 type PokedexSection = {
@@ -61,27 +58,15 @@ export default function Pokedex() {
     const navigate = useNavigate();
     const { pathname } = useLocation();
 
-    const [search, setSearch] = useState(() => {
-        try {
-            const saved = sessionStorage.getItem(POKEDEX_VIEW_STATE_KEY);
-            return saved ? (JSON.parse(saved) as Partial<PokedexViewState>).search || '' : '';
-        } catch {
-            return '';
-        }
-    });
-    const [generationFilter, setGenerationFilter] = useState(() => {
-        try {
-            const saved = sessionStorage.getItem(POKEDEX_VIEW_STATE_KEY);
-            return saved ? (JSON.parse(saved) as Partial<PokedexViewState>).generationFilter || 'all' : 'all';
-        } catch {
-            return 'all';
-        }
-    });
+    // Search and generation filters intentionally begin clean on every visit.
+    // They used to be restored from session storage after opening a detail page,
+    // leaving the Pokédex apparently stuck on a previous search after navigation
+    // or a browser session restore.
+    const [search, setSearch] = useState('');
+    const [generationFilter, setGenerationFilter] = useState('all');
     const [layoutMode, setLayoutMode] = useState<PokedexLayoutMode>(() => {
         try {
-            const saved = sessionStorage.getItem(POKEDEX_VIEW_STATE_KEY);
-            const sessionMode = saved ? (JSON.parse(saved) as Partial<PokedexViewState>).layoutMode : undefined;
-            const storedMode = sessionMode || localStorage.getItem(POKEDEX_LAYOUT_MODE_KEY);
+            const storedMode = localStorage.getItem(POKEDEX_LAYOUT_MODE_KEY);
             return storedMode === 'catalogued' ? 'catalogued' : 'species';
         } catch {
             return 'species';
@@ -163,6 +148,9 @@ export default function Pokedex() {
             try {
                 const savedState = sessionStorage.getItem(POKEDEX_VIEW_STATE_KEY);
                 if (savedState) savedScroll = Number((JSON.parse(savedState) as Partial<PokedexViewState>).scrollY) || 0;
+                // The scroll position is a one-time return hint, not persistent
+                // page state. Consuming it prevents stale state on future visits.
+                sessionStorage.removeItem(POKEDEX_VIEW_STATE_KEY);
             } catch {
                 savedScroll = 0;
             }
@@ -410,12 +398,7 @@ export default function Pokedex() {
         const group = [...unsortedGroup].sort((a, b) => a.id - b.id);
         const p = group[0];
 
-        const isRegional = Boolean(getRegionalFormRegion(p.name));
-
-        // Gender diff logic
-        let hasGenderDiff = !isRegional && (p.id < 10000) && POKEMON_WITH_GENDER_DIFF.includes(p.baseId);
-        // Litleo must never have a double sprite.
-        if (p.baseId === 667) hasGenderDiff = false;
+        const hasGenderDiff = hasPokemonGenderDifference(p.baseId, p.name);
         const femaleVariant = group.find(v => v.name.endsWith('-female') && v.id !== p.id);
         const femaleId = femaleVariant ? femaleVariant.id : undefined;
 
@@ -515,9 +498,6 @@ export default function Pokedex() {
                     try {
                         sessionStorage.setItem(POKEDEX_VIEW_STATE_KEY, JSON.stringify({
                             scrollY: window.scrollY,
-                            search,
-                            generationFilter,
-                            layoutMode,
                         } satisfies PokedexViewState));
                     } catch {
                         // Ignore storage failures in private browsing modes.
