@@ -256,6 +256,11 @@ const GAME_SPRITE_SET_FIXED_SCALE: Readonly<Record<string, number>> = {
   oras: 0.85,
   sm: 0.85,
   usum: 0.85,
+  // The imported Gen VI/VII assets use one shared directory, rather than the
+  // source-game directory names above. Apply the same modest reduction to the
+  // actual URLs so the browser is not asked to over-enlarge these small GIF
+  // source frames.
+  'gen6-7': 0.85,
 };
 
 const getGameSpecificSpriteFilePath = (url?: string | null) => {
@@ -439,6 +444,15 @@ export function getGameSpecificSpriteScaleStyle(url?: string | null): any {
   return {
     '--sprite-scale': String(getGameSpecificSpriteScaleFactor(url)),
   };
+}
+
+/**
+ * Gen VI/VII sprites are higher-detail assets than the earlier pixel-art
+ * sprites. Let the browser smooth their enlargement slightly, while retaining
+ * crisp nearest-neighbour rendering for the older game sets.
+ */
+export function getGameSpecificSpriteImageRendering(url?: string | null): 'auto' | 'pixelated' {
+  return getGameSpecificSpriteFilePath(url)?.startsWith('gen6-7/') ? 'auto' : 'pixelated';
 }
 
 export const isGameSpecificShinySpriteUrl = (url?: string | null) =>

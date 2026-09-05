@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { PokemonSelector } from './PokemonSelector';
 import { MethodSelector } from './MethodSelector';
-import { calculateShinyStats, findHuntingMethod, GAMES, HUNTING_METHODS, HuntingMethod, POKEMON_EGG_ICON, SHINY_CHARM_ICON, formatOdds, isBreedingMethod, getArchiveShinySpriteUrl, getPokemonSpriteUrl } from '@/lib/pokemon-data';
+import { calculateShinyStats, findHuntingMethod, GAMES, HUNTING_METHODS, HuntingMethod, POKEMON_EGG_ICON, SHINY_CHARM_ICON, formatOdds, isBreedingMethod, getPokemonSpriteUrl } from '@/lib/pokemon-data';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
 import type { Tables } from '@/integrations/supabase/types';
@@ -34,7 +34,7 @@ import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
 import { cn } from '@/lib/utils';
 import { resolveEntityKeysForCounterSlots } from '@/lib/pokemon-entity-resolver-v2';
 import { useOnlineStatus } from '@/hooks/use-online-status';
-import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleStyle, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
+import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteImageRendering, getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleStyle, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
 import {
   migrateCounterSnapshot,
   OFFLINE_HUNT_PREFIX,
@@ -752,16 +752,13 @@ export function ShinyCounter({
                         const spriteId = currentVariant ? currentVariant.id : slot.id;
                         const eggMethod = isBreedingMethod(safeSelectedMethod.id);
                         const spriteGameId = selectedGame?.id || '';
+                        // A game without a dedicated sprite set (for example
+                        // Scarlet/Violet) must fall back directly to HOME, not an
+                        // archive sprite from another game.
                         const spriteUrl = getGameSpecificShinySpriteUrl(spriteId || slot.id, spriteGameId, {
                           name: slot.name,
                           form: slot.form,
                           gender: slot.gender,
-                        }) || getArchiveShinySpriteUrl(spriteId || slot.id, {
-                          shiny: true,
-                          name: slot.name,
-                          form: slot.form,
-                          gender: slot.gender,
-                          preferredGameIds: [spriteGameId],
                         }) || getPokemonSpriteUrl(spriteId || slot.id, {
                           shiny: true,
                           name: slot.name,
@@ -796,9 +793,7 @@ export function ShinyCounter({
                                 isGameSpecificSprite && spriteScaleClass
                               )}
                               style={{
-                                // Game-specific WebPs look substantially clearer at
-                                // this enlarged size with nearest-neighbour scaling.
-                                imageRendering: isGameSpecificSprite ? 'pixelated' : 'auto',
+                                imageRendering: isGameSpecificSprite ? getGameSpecificSpriteImageRendering(displaySpriteUrl) : 'auto',
                                 filter: isGameSpecificSprite ? 'none' : COUNTER_SPRITE_EDGE_SHADOW,
                                 ...(isGameSpecificSprite ? getGameSpecificSpriteScaleStyle(displaySpriteUrl) : {}),
                               }}

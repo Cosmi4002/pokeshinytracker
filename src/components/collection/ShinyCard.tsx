@@ -6,7 +6,7 @@ import type { Tables } from '@/integrations/supabase/types';
 import { useMemo, useCallback, useEffect, useId, useState } from 'react';
 import { cn } from '@/lib/utils';
 import type { CardFilterId } from '@/lib/card-effects';
-import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleStyle, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
+import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteImageRendering, getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleStyle, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -345,7 +345,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                       height: getEvolvedFromSpriteSize(evolvedFromName, !showEncounters, evolvedFromSpriteDisplayScale),
                       display: 'block',
                       filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.85))',
-                      imageRendering: 'pixelated',
+                      imageRendering: getGameSpecificSpriteImageRendering(evolvedFromSpriteUrl),
                       backgroundColor: 'transparent',
                       margin: 0,
                       padding: 0,
@@ -394,10 +394,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
                     isGameSpecificSprite && spriteScaleClass
                   )}
                   style={{
-                    // The newer game WebPs are still compact sprite canvases. Keep
-                    // their edges crisp when the card enlarges them, matching the
-                    // "Evoluto da" preview above.
-                    imageRendering: isGameSpecificSprite ? 'pixelated' : 'auto',
+                    imageRendering: isGameSpecificSprite ? getGameSpecificSpriteImageRendering(spriteUrl) : 'auto',
                     filter: mainSpriteFilter,
                     ...(isGameSpecificSprite ? getGameSpecificSpriteScaleStyle(spriteUrl) : {}),
                   }}

@@ -12,7 +12,7 @@ import { GAME_LOGOS } from '@/lib/game-themes';
 import { useRandomColor } from '@/lib/random-color-context';
 import { cn } from '@/lib/utils';
 import { resolvePokemonEntity } from '@/lib/pokemon-entity-resolver-v2';
-import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleStyle, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
+import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteImageRendering, getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleStyle, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
 
 type ProfileRow = Pick<Tables<'profiles'>, 'user_id' | 'username'>;
 type PublicCaughtRow = Pick<
@@ -554,7 +554,7 @@ export default function UserCollectionsSearch() {
                 entry.is_fail && !isGameSpecificSprite && 'drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]'
               )}
               style={{
-                imageRendering: isGameSpecificSprite ? 'pixelated' : 'auto',
+                imageRendering: isGameSpecificSprite ? getGameSpecificSpriteImageRendering(sprite) : 'auto',
                 ...(isGameSpecificSprite ? getGameSpecificSpriteScaleStyle(sprite) : {}),
                 ...(isGameSpecificSprite && !entry.is_fail && !entry.is_unobtainable ? {} : getSpriteStyle(entry.is_fail, entry.is_unobtainable)),
               }}
