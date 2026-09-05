@@ -54,6 +54,25 @@ describe('game-specific shiny sprites', () => {
     expect(getGameSpecificShinySpriteUrl(3, gameId, { name: 'venusaur', gender })).toBe(expected);
   });
 
+  it.each(['x', 'y', 'omegaruby', 'alphasapphire', 'sun', 'moon', 'ultrasun', 'ultramoon'])
+    ('uses the shared Gen 6/7 set for %s', (gameId) => {
+      expect(getGameSpecificShinySpriteUrl(1, gameId, { name: 'bulbasaur' }))
+        .toBe('/img/game-sprites/gen6-7/bulbasaur.webp');
+    });
+
+  it('resolves shared Gen 6/7 aliases and female variants', () => {
+    expect(getGameSpecificShinySpriteUrl(550, 'x', { name: 'basculin-red-striped' }))
+      .toBe('/img/game-sprites/gen6-7/basculin-red-striped.webp');
+    expect(getGameSpecificShinySpriteUrl(550, 'x', { name: 'basculin-blue-striped' }))
+      .toBe('/img/game-sprites/gen6-7/basculin-blue-striped.webp');
+    expect(getGameSpecificShinySpriteUrl(718, 'sun', { name: 'zygarde-50' }))
+      .toBe('/img/game-sprites/gen6-7/zygarde-50.webp');
+    expect(getGameSpecificShinySpriteUrl(669, 'moon', { name: 'flabebe' }))
+      .toBe('/img/game-sprites/gen6-7/flabebe.webp');
+    expect(getGameSpecificShinySpriteUrl(678, 'ultrasun', { name: 'meowstic-male', gender: 'female' }))
+      .toBe('/img/game-sprites/gen6-7/meowstic-male-f.webp');
+  });
+
   it.each([
     ['https://archives.bulbagarden.net/media/upload/7/7c/Spr_4d_001_s.png', 'scale-[var(--sprite-scale)]'],
     ['/img/game-sprites/hgss/Spr_4h_001_s.png', 'scale-[var(--sprite-scale)]'],

@@ -5,6 +5,7 @@ import { PT_SHINY_SPRITE_FILES } from '@/data/pt-shiny-sprite-manifest';
 import { PT_SHINY_SPRITE_URL_BY_FILE } from '@/data/pt-shiny-sprite-url-map.generated';
 import { BW_SHINY_SPRITE_FILES } from '@/data/bw-shiny-sprite-manifest';
 import { BW2_SHINY_SPRITE_FILES } from '@/data/bw2-shiny-sprite-manifest';
+import { GEN6_7_SHINY_SPRITE_ENTRIES } from '@/data/gen6-7-shiny-sprite-manifest';
 import { GAME_SPRITE_LONG_SIDE_BY_FILE } from '@/data/game-sprite-long-sides.generated';
 
 export type GameSpriteOptions = {
@@ -27,6 +28,14 @@ export const GAME_SPRITE_SET_BY_GAME: Readonly<Record<string, string>> = {
   white: 'bw',
   black2: 'bw2',
   white2: 'bw2',
+  x: 'gen6-7',
+  y: 'gen6-7',
+  omegaruby: 'gen6-7',
+  alphasapphire: 'gen6-7',
+  sun: 'gen6-7',
+  moon: 'gen6-7',
+  ultrasun: 'gen6-7',
+  ultramoon: 'gen6-7',
 };
 
 const filesBySet = {
@@ -82,6 +91,14 @@ const DP_SHINY_SPRITE_FILE_BY_URL = new Map(
 const PT_SHINY_SPRITE_FILE_BY_URL = new Map(
   Object.entries(PT_SHINY_SPRITE_URL_BY_FILE).map(([filename, url]) => [url, filename]),
 );
+
+const GEN6_7_SPRITES_BY_SPECIES = new Map<number, typeof GEN6_7_SHINY_SPRITE_ENTRIES[number][]>();
+for (const entry of GEN6_7_SHINY_SPRITE_ENTRIES) {
+  GEN6_7_SPRITES_BY_SPECIES.set(entry.speciesId, [
+    ...(GEN6_7_SPRITES_BY_SPECIES.get(entry.speciesId) || []),
+    entry,
+  ]);
+}
 
 const LEGACY_FORM_SPECIES: ReadonlyArray<[RegExp, number]> = [
   [/^unown(?:-|$)/, 201],
@@ -259,11 +276,52 @@ export function getGameSpecificShinySpriteUrl(
   const slug = normalize(options.form || options.name);
   const archiveTherianOverride = slug ? ARCHIVE_THERIAN_SHINY_OVERRIDE_BY_FORM[slug] : undefined;
   if (archiveTherianOverride && ['black', 'white', 'black2', 'white2'].includes(gameId ?? '')) {
-    return toLocalPokemonSpriteUrl(archiveTherianOverride) || archiveTherianOverride;
+    return archiveTherianOverride;
   }
 
-  const speciesId = resolveSpeciesId(pokemonId, slug);
+  const speciesId = set === 'gen6-7' && pokemonId >= 1 && pokemonId <= 718
+    ? pokemonId
+    : resolveSpeciesId(pokemonId, slug);
   if (!speciesId) return null;
+
+  if (set === 'gen6-7') {
+    const candidates = GEN6_7_SPRITES_BY_SPECIES.get(speciesId) || [];
+    let wantedSlug = slug;
+    if (speciesId === 550 && (!slug || slug === 'basculin' || slug === 'basculin-red-striped')) {
+      wantedSlug = 'basculin-red-striped';
+    } else if (speciesId === 718 && (!slug || slug === 'zygarde')) {
+      wantedSlug = 'zygarde-50';
+    } else if (speciesId === 669 && slug === 'flabebe-red') {
+      wantedSlug = 'flabebe';
+    } else if (speciesId === 670 && slug === 'floette-red') {
+      wantedSlug = 'floette';
+    } else if (speciesId === 671 && slug === 'florges-red') {
+      wantedSlug = 'florges';
+    } else if (speciesId === 678 && slug === 'meowstic') {
+      wantedSlug = 'meowstic-male';
+    } else if (speciesId === 710 && slug === 'pumpkaboo') {
+      wantedSlug = 'pumpkaboo-average';
+    } else if (speciesId === 711 && slug === 'gourgeist') {
+      wantedSlug = 'gourgeist-average';
+    } else if (speciesId === 585 && slug === 'deerling') {
+      wantedSlug = 'deerling-spring';
+    } else if (speciesId === 586 && slug === 'sawsbuck') {
+      wantedSlug = 'sawsbuck-spring';
+    }
+    const formCandidates = candidates.filter((entry) => {
+      if (speciesId === 550 && wantedSlug.includes('blue')) return entry.canonicalName === 'basculin-blue-striped';
+      if (wantedSlug && normalize(entry.canonicalName) !== wantedSlug) return false;
+      return true;
+    });
+    const requestedGender = normalizeGender(options.gender);
+    const genderMatch = requestedGender
+      ? formCandidates.find((entry) => entry.gender === requestedGender)
+      : null;
+    const maleMatch = formCandidates.find((entry) => entry.gender === 'male');
+    const entry = genderMatch || maleMatch || formCandidates[0];
+    return entry ? `/img/game-sprites/gen6-7/${entry.file}` : null;
+  }
+
   let resolvedSet = set;
   let spriteSet = mapsBySet[resolvedSet];
   let candidates = spriteSet.bySpecies.get(speciesId) || [];
@@ -300,7 +358,7 @@ export function getGameSpecificShinySpriteUrl(
   }
 
   if (!resolvedUrl) return null;
-  return toLocalPokemonSpriteUrl(resolvedUrl) || resolvedUrl;
+  return resolvedUrl;
 }
 
 export function getArchiveShinySpriteUrl(
