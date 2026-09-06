@@ -26,7 +26,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { PokemonSelector } from '@/components/counter/PokemonSelector';
 import { MethodSelector } from '@/components/counter/MethodSelector';
 import { Checkbox } from '@/components/ui/checkbox';
-import { POKEBALLS, GAMES, GIGANTAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, canHideEncountersForMethod, supportsGigantamaxMark, supportsPokemonMarks, POKEMON_MARKS, getPokemonMarkIconUrl, ALPHA_POKEMON_ICON, getSelectedGameSpriteUrl } from '@/lib/pokemon-data';
+import { POKEBALLS, GAMES, GIGANTAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, canHideEncountersForMethod, supportsGigantamaxMark, supportsPokemonMarks, getPokemonMarksForGame, getPokemonMarkIconUrl, ALPHA_POKEMON_ICON, getSelectedGameSpriteUrl } from '@/lib/pokemon-data';
 import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
 import { todayLocalISODate } from '@/lib/date';
 import { resolveEntityKeyForSelectedPokemon } from '@/lib/pokemon-entity-resolver-v2';
@@ -428,7 +428,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
                 <SelectTrigger id="pokemon-mark"><SelectValue placeholder="No Mark" /></SelectTrigger>
                 <SelectContent className="max-h-72 overflow-y-auto">
                   <SelectItem value="none">No Mark</SelectItem>
-                  {POKEMON_MARKS.map((mark) => (
+                  {getPokemonMarksForGame(game).map((mark) => (
                     <SelectItem key={mark} value={mark}>
                       <span className="flex items-center gap-2"><img src={getPokemonMarkIconUrl(mark)} alt="" className="h-5 w-5 object-contain" />{mark}</span>
                     </SelectItem>

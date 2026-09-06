@@ -829,32 +829,27 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, onEvolvedI
                 </>
               )}
               {isGigantamax && (
-                <div className="inline-flex items-center rounded-full bg-black/20 px-1.5 py-1" title="Gigantamax">
-                  <img
-                    src={GIGANTAMAX_ICON}
-                    loading="lazy"
-                    decoding="async"
-                    className="h-7 w-7 object-contain drop-shadow-[0_0_8px_rgba(244,114,182,0.5)]"
-                    alt="Gigantamax"
-                  />
-                </div>
+                <img
+                  src={GIGANTAMAX_ICON}
+                  loading="lazy"
+                  decoding="async"
+                  title="Gigantamax"
+                  className="h-7 w-7 object-contain drop-shadow-[0_0_8px_rgba(244,114,182,0.5)]"
+                  alt="Gigantamax"
+                />
               )}
               {isLegendsArceus && (
-                <div className="inline-flex items-center rounded-full bg-black/20 px-1.5 py-1" title="Alpha Pokemon">
-                  <img
-                    src={ALPHA_POKEMON_ICON}
-                    loading="lazy"
-                    decoding="async"
-                    className="h-7 w-7 object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.35)]"
-                    alt="Alpha Pokemon"
-                  />
-                </div>
+                <img
+                  src={ALPHA_POKEMON_ICON}
+                  loading="lazy"
+                  decoding="async"
+                  title="Alpha Pokemon"
+                  className="h-7 w-7 object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.35)]"
+                  alt="Alpha Pokemon"
+                />
               )}
               {pokemonMark && (
-                <div className="inline-flex items-center gap-1 rounded-full bg-black/20 px-1.5 py-1" title={pokemonMark}>
-                  <img src={getPokemonMarkIconUrl(pokemonMark)} loading="lazy" decoding="async" className="h-7 w-7 object-contain" alt={pokemonMark} />
-                  <span className="text-[9px] font-bold text-white/90">{pokemonMark}</span>
-                </div>
+                <img src={getPokemonMarkIconUrl(pokemonMark)} loading="lazy" decoding="async" title={pokemonMark} className="h-7 w-7 object-contain" alt={pokemonMark} />
               )}
             </div>
           )}
