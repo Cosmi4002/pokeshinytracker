@@ -9,6 +9,7 @@ import { useMemo, useCallback, useEffect, useId, useState } from 'react';
 import { cn } from '@/lib/utils';
 import type { CardFilterId } from '@/lib/card-effects';
 import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteImageRendering, getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleStyle, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
+import { getFossilRestoreIcons } from '@/lib/fossil-restore';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,7 +29,8 @@ interface ShinyCardProps {
   onEdit: () => void;
   onDelete: () => void;
   onToggleEvolved: () => void;
-  onEvolvedIconColorChange: (backgroundColor: string, arrowColor: string) => void;
+  onEvolvedIconColorChange: (backgroundColor: string, arrowColor: string, outlineColor: string) => void;
+  onSaveEvolvedIconDefaults: (backgroundColor: string, arrowColor: string, outlineColor: string) => Promise<void>;
   userId?: string;
   themeOverride?: GameTheme;
   secondaryThemeOverride?: GameTheme;
@@ -51,8 +53,9 @@ const getEvolvedFromSpriteSize = (_name?: string | null, compact = false, fitSca
 
 const DEFAULT_EVOLUTION_ICON_BACKGROUND = '#047857';
 const DEFAULT_EVOLUTION_ICON_ARROW = '#ffffff';
+const DEFAULT_EVOLUTION_ICON_OUTLINE = '#ffffff';
 
-type EvolutionIconColors = { backgroundColor: string; arrowColor: string };
+type EvolutionIconColors = { backgroundColor: string; arrowColor: string; outlineColor: string };
 
 const getEvolutionIconDefaultsKey = (userId: string | undefined, game: string) =>
   `evolution-icon-colors:${userId || 'guest'}:${game}`;
@@ -63,14 +66,14 @@ const readEvolutionIconDefaults = (userId: string | undefined, game: string): Ev
     if (!value) return null;
     const colors = JSON.parse(value) as Partial<EvolutionIconColors>;
     return typeof colors.backgroundColor === 'string' && typeof colors.arrowColor === 'string'
-      ? { backgroundColor: colors.backgroundColor, arrowColor: colors.arrowColor }
+      ? { backgroundColor: colors.backgroundColor, arrowColor: colors.arrowColor, outlineColor: typeof colors.outlineColor === 'string' ? colors.outlineColor : DEFAULT_EVOLUTION_ICON_OUTLINE }
       : null;
   } catch {
     return null;
   }
 };
 
-export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, onEvolvedIconColorChange, userId, themeOverride, secondaryThemeOverride, applyBlackEffect = false, cardFilter = 'none', spriteName }: ShinyCardProps) {
+export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, onEvolvedIconColorChange, onSaveEvolvedIconDefaults, userId, themeOverride, secondaryThemeOverride, applyBlackEffect = false, cardFilter = 'none', spriteName }: ShinyCardProps) {
   const spriteOutlineSeed = useId().replace(/:/g, '');
   const mainSpriteOutlineId = `main-sprite-outline-${spriteOutlineSeed}`;
   const [evolvedFromSpriteDimensions, setEvolvedFromSpriteDimensions] = useState<{ width: number; height: number } | null>(null);
@@ -86,9 +89,11 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, onEvolvedI
   const evolvedFromName = (entry as any).evolved_from_name as string | null | undefined;
   const evolvedIconColor = (entry as any).evolved_icon_color as string | null | undefined;
   const evolvedIconArrowColor = (entry as any).evolved_icon_arrow_color as string | null | undefined;
+  const evolvedIconOutlineColor = (entry as any).evolved_icon_outline_color as string | null | undefined;
   const [isEvolutionIconDialogOpen, setIsEvolutionIconDialogOpen] = useState(false);
   const [iconBackgroundColor, setIconBackgroundColor] = useState(evolvedIconColor || DEFAULT_EVOLUTION_ICON_BACKGROUND);
   const [iconArrowColor, setIconArrowColor] = useState(evolvedIconArrowColor || DEFAULT_EVOLUTION_ICON_ARROW);
+  const [iconOutlineColor, setIconOutlineColor] = useState(evolvedIconOutlineColor || DEFAULT_EVOLUTION_ICON_OUTLINE);
 
   const theme = useMemo(() => themeOverride || getGameTheme(entry.game), [entry.game, themeOverride]);
   const secondaryTheme = useMemo(() => {
@@ -103,6 +108,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, onEvolvedI
     const savedDefaults = readEvolutionIconDefaults(userId, entry.game);
     setIconBackgroundColor(evolvedIconColor || savedDefaults?.backgroundColor || DEFAULT_EVOLUTION_ICON_BACKGROUND);
     setIconArrowColor(evolvedIconArrowColor || savedDefaults?.arrowColor || DEFAULT_EVOLUTION_ICON_ARROW);
+    setIconOutlineColor(evolvedIconOutlineColor || savedDefaults?.outlineColor || DEFAULT_EVOLUTION_ICON_OUTLINE);
     setIsEvolutionIconDialogOpen(true);
   };
 
@@ -110,7 +116,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, onEvolvedI
     try {
       window.localStorage.setItem(
         getEvolutionIconDefaultsKey(userId, entry.game),
-        JSON.stringify({ backgroundColor: iconBackgroundColor, arrowColor: iconArrowColor }),
+        JSON.stringify({ backgroundColor: iconBackgroundColor, arrowColor: iconArrowColor, outlineColor: iconOutlineColor }),
       );
     } catch {
       // The selected colours can still be applied even if browser storage is unavailable.
@@ -119,7 +125,24 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, onEvolvedI
   const isGameCorner = normalizedMethod.includes('game corner') || normalizedMethod.includes('game-corner') || method?.name.toLowerCase() === 'game corner';
   const isPokeRadar = normalizedMethod.includes('pokeradar') || normalizedMethod.includes('poke radar') || method?.name.toLowerCase().includes('poke radar');
   const isChainFishing = normalizedMethod.includes('chain fishing') || method?.name.toLowerCase().includes('chain fishing');
-  const encountersLabel = isPokeRadar || isChainFishing ? 'Chain' : (isGameCorner ? 'Seen' : (isBreeding ? 'Hatched' : 'Encounters'));
+  const isFossilRestore = normalizedMethod.includes('fossil restore') || normalizedMethod.includes('fossil-restore') || method?.name.toLowerCase() === 'fossil restore';
+  const isDoubleEncounter = normalizedMethod.includes('double') || method?.name.toLowerCase().includes('double') === true;
+  const isHordeEncounter = normalizedMethod.includes('horde') || method?.name.toLowerCase().includes('horde') === true;
+  const isGiftPokemon = method?.name.toLowerCase() === 'gift pokémon' || normalizedMethod.endsWith('-gift');
+  const fossilRestoreIcons = useMemo(() => isFossilRestore ? getFossilRestoreIcons(entry.pokemon_id) : [], [entry.pokemon_id, isFossilRestore]);
+  const encountersLabel = isFossilRestore
+    ? 'Fossil Revived'
+    : isDoubleEncounter
+      ? 'Double Encounter'
+      : isHordeEncounter
+        ? 'Horde Encounter'
+        : isPokeRadar || isChainFishing
+          ? 'Chain'
+          : isGameCorner || isGiftPokemon
+            ? 'Seen'
+            : isBreeding
+              ? 'Hatched'
+              : 'Encounters';
   const showEncounters = useMemo(() => {
     if (entry.attempts === null) return false;
     if (!showEncountersPreference) return false;
@@ -377,8 +400,8 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, onEvolvedI
                 <button
                   type="button"
                   onClick={openEvolutionIconDialog}
-                  className="relative flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border border-white/55 shadow-[0_3px_12px_rgba(0,0,0,0.6),0_0_0_1px_rgba(0,0,0,0.45)] ring-1 ring-white/45 backdrop-blur-md self-center"
-                  style={{ backgroundColor: evolvedIconColor || '#047857' }}
+                  className="relative flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border shadow-[0_3px_12px_rgba(0,0,0,0.6),0_0_0_1px_rgba(0,0,0,0.45)] backdrop-blur-md self-center"
+                  style={{ backgroundColor: evolvedIconColor || DEFAULT_EVOLUTION_ICON_BACKGROUND, borderColor: evolvedIconOutlineColor || DEFAULT_EVOLUTION_ICON_OUTLINE, boxShadow: `0 3px 12px rgba(0,0,0,0.6), 0 0 0 1px ${evolvedIconOutlineColor || DEFAULT_EVOLUTION_ICON_OUTLINE}` }}
                   title="Clicca per scegliere il colore dell'icona evoluto da"
                 >
                   <ArrowUpCircle
@@ -630,6 +653,17 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, onEvolvedI
                           onError={(e) => ((e.currentTarget as HTMLImageElement).src = '/placeholder.svg')}
                         />
                       )}
+                      {isFossilRestore && fossilRestoreIcons.map((fossil, index) => (
+                        <img
+                          key={fossil.id}
+                          src={fossil.url}
+                          alt={fossil.name}
+                          title={fossil.name}
+                          className="pointer-events-none absolute top-1/2 h-[4.25rem] w-[4.25rem] -translate-y-1/2 object-contain opacity-95 drop-shadow-[0_2px_6px_rgba(0,0,0,0.55)]"
+                          style={{ left: `${0.25 + index * 1.85}rem` }}
+                          onError={(e) => ((e.currentTarget as HTMLImageElement).src = '/placeholder.svg')}
+                        />
+                      ))}
                       <div className="relative z-10 flex max-w-full items-baseline justify-center text-center">
                         <span
                           className="min-w-0 truncate text-[2rem] font-black leading-none text-white tabular-nums sm:text-[1.86rem]"
@@ -819,25 +853,26 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, onEvolvedI
         </div>
       </div>
       <Dialog open={isEvolutionIconDialogOpen} onOpenChange={setIsEvolutionIconDialogOpen}>
-        <DialogContent className="max-h-[90dvh] max-w-xl overflow-y-auto">
+        <DialogContent className="max-h-[calc(100dvh-1rem)] max-w-xl overflow-y-auto p-4 sm:max-h-[90dvh] sm:p-6">
           <DialogHeader>
             <DialogTitle>Colori icona “Evoluto da”</DialogTitle>
             <DialogDescription>
-              Personalizza separatamente lo sfondo e il cerchio con la freccia. I colori predefiniti sono salvati per il gioco {entry.game} su questo dispositivo.
+              Personalizza sfondo, cerchio con freccia e bordo esterno. Salvando il predefinito, i colori vengono applicati a tutte le card di {entry.game} nella collezione.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4">
-            <div className="flex items-center justify-center rounded-2xl border border-border bg-muted/35 p-6">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="sticky top-0 z-10 flex items-center justify-center rounded-2xl border border-border bg-muted/95 p-3 backdrop-blur sm:p-6">
               <span
-                className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-white/60 shadow-lg"
-                style={{ backgroundColor: iconBackgroundColor }}
+                className="flex h-14 w-14 items-center justify-center rounded-full border-2 shadow-lg sm:h-16 sm:w-16"
+                style={{ backgroundColor: iconBackgroundColor, borderColor: iconOutlineColor, boxShadow: `0 0 0 2px ${iconOutlineColor}66` }}
               >
                 <ArrowUpCircle className="h-9 w-9 drop-shadow-[0_2px_3px_rgba(0,0,0,0.75)]" style={{ color: iconArrowColor }} />
               </span>
             </div>
-            <ColorPicker label="Sfondo del badge" value={iconBackgroundColor} onChange={setIconBackgroundColor} />
-            <ColorPicker label="Cerchio e freccia" value={iconArrowColor} onChange={setIconArrowColor} />
+            <ColorPicker compact hideAdvancedPicker label="Sfondo del badge" value={iconBackgroundColor} onChange={setIconBackgroundColor} />
+            <ColorPicker compact hideAdvancedPicker label="Cerchio e freccia" value={iconArrowColor} onChange={setIconArrowColor} />
+            <ColorPicker compact hideAdvancedPicker label="Bordo esterno" value={iconOutlineColor} onChange={setIconOutlineColor} />
           </div>
 
           <DialogFooter className="gap-2 sm:gap-0">
@@ -846,6 +881,8 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, onEvolvedI
               variant="outline"
               onClick={() => {
                 saveEvolutionIconDefaults();
+                void onSaveEvolvedIconDefaults(iconBackgroundColor, iconArrowColor, iconOutlineColor);
+                setIsEvolutionIconDialogOpen(false);
               }}
             >
               <Save className="mr-2 h-4 w-4" />
@@ -854,7 +891,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, onEvolvedI
             <Button
               type="button"
               onClick={() => {
-                onEvolvedIconColorChange(iconBackgroundColor, iconArrowColor);
+                onEvolvedIconColorChange(iconBackgroundColor, iconArrowColor, iconOutlineColor);
                 setIsEvolutionIconDialogOpen(false);
               }}
             >

@@ -10,6 +10,8 @@ interface ColorPickerProps {
     onChange: (color: string) => void;
     presets?: string[];
     hideDesktopAdvancedPicker?: boolean;
+    hideAdvancedPicker?: boolean;
+    compact?: boolean;
 }
 
 const DEFAULT_PRESETS = [
@@ -90,7 +92,7 @@ const hsvToHex = (h: number, s: number, v: number) => {
     return rgbToHex((r + m) * 255, (g + m) * 255, (b + m) * 255);
 };
 
-export function ColorPicker({ label, value, onChange, presets = DEFAULT_PRESETS, hideDesktopAdvancedPicker = false }: ColorPickerProps) {
+export function ColorPicker({ label, value, onChange, presets = DEFAULT_PRESETS, hideDesktopAdvancedPicker = false, hideAdvancedPicker = false, compact = false }: ColorPickerProps) {
     const [customColor, setCustomColor] = useState(value);
     const pickerColor = isHexColor(customColor) ? customColor : value;
     const shadeRef = useRef<HTMLButtonElement | null>(null);
@@ -146,11 +148,11 @@ export function ColorPicker({ label, value, onChange, presets = DEFAULT_PRESETS,
     const pickerLayoutClass = hideDesktopAdvancedPicker
         ? 'grid gap-3'
         : 'grid gap-3 sm:grid-cols-[minmax(0,1fr)_8.5rem]';
-    const advancedPickerClass = hideDesktopAdvancedPicker ? 'grid gap-2 md:hidden' : 'grid gap-2';
+    const advancedPickerClass = hideAdvancedPicker ? 'hidden' : (hideDesktopAdvancedPicker ? 'grid gap-2 md:hidden' : 'grid gap-2');
     const inputPanelClass = hideDesktopAdvancedPicker ? 'grid gap-2 md:grid-cols-[minmax(0,1fr)_9rem]' : 'grid gap-2';
 
     return (
-        <div className="space-y-2.5 rounded-lg border border-border/70 bg-background/70 p-3">
+        <div className={compact ? 'space-y-2 rounded-lg border border-border/70 bg-background/70 p-2.5' : 'space-y-2.5 rounded-lg border border-border/70 bg-background/70 p-3'}>
             <div className="flex items-center justify-between gap-3">
                 <Label>{label}</Label>
                 <span className="rounded-full border border-border/70 bg-background px-2.5 py-1 font-mono text-xs uppercase text-muted-foreground">
@@ -159,13 +161,13 @@ export function ColorPicker({ label, value, onChange, presets = DEFAULT_PRESETS,
             </div>
 
             {/* Preset Colors */}
-            <div className="grid grid-cols-6 gap-1.5 sm:grid-cols-8">
+            <div className={compact ? 'grid grid-cols-6 gap-1 sm:grid-cols-8' : 'grid grid-cols-6 gap-1.5 sm:grid-cols-8'}>
                 {presets.map((preset, index) => (
                     <button
                         key={`${preset}-${index}`}
                         type="button"
                         onClick={() => handlePresetClick(preset)}
-                        className="relative h-8 rounded-full border transition-all hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+                        className={`${compact ? 'h-6' : 'h-8'} relative rounded-full border transition-all hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background`}
                         style={{
                             backgroundColor: preset,
                             borderColor: value === preset ? 'hsl(var(--foreground))' : 'hsl(var(--border))',

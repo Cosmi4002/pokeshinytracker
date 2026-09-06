@@ -204,10 +204,10 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
     setIsEvolveDialogOpen(true);
   };
 
-  const handleEvolvedIconColorChange = async (id: string, evolvedIconColor: string, evolvedIconArrowColor: string) => {
+  const handleEvolvedIconColorChange = async (id: string, evolvedIconColor: string, evolvedIconArrowColor: string, evolvedIconOutlineColor: string) => {
     const { error } = await supabase
       .from('caught_shinies')
-      .update({ evolved_icon_color: evolvedIconColor, evolved_icon_arrow_color: evolvedIconArrowColor })
+      .update({ evolved_icon_color: evolvedIconColor, evolved_icon_arrow_color: evolvedIconArrowColor, evolved_icon_outline_color: evolvedIconOutlineColor })
       .eq('id', id)
       .eq('user_id', user!.id);
     if (error) {
@@ -216,9 +216,26 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
     }
     setEntries((current) => current.map((entry) => (
       entry.id === id
-        ? { ...entry, evolved_icon_color: evolvedIconColor, evolved_icon_arrow_color: evolvedIconArrowColor }
+        ? { ...entry, evolved_icon_color: evolvedIconColor, evolved_icon_arrow_color: evolvedIconArrowColor, evolved_icon_outline_color: evolvedIconOutlineColor }
         : entry
     )));
+  };
+
+  const handleSaveEvolvedIconDefaults = async (game: string, evolvedIconColor: string, evolvedIconArrowColor: string, evolvedIconOutlineColor: string) => {
+    const { error } = await supabase
+      .from('caught_shinies')
+      .update({ evolved_icon_color: evolvedIconColor, evolved_icon_arrow_color: evolvedIconArrowColor, evolved_icon_outline_color: evolvedIconOutlineColor })
+      .eq('game', game)
+      .eq('user_id', user!.id);
+    if (error) {
+      toast({ variant: 'destructive', title: 'Errore', description: error.message });
+      return;
+    }
+    setEntries((current) => current.map((entry) => entry.game === game
+      ? { ...entry, evolved_icon_color: evolvedIconColor, evolved_icon_arrow_color: evolvedIconArrowColor, evolved_icon_outline_color: evolvedIconOutlineColor }
+      : entry
+    ));
+    toast({ title: 'Colori predefiniti salvati', description: `Applicati a tutte le card di ${game}.` });
   };
 
   const playlistMap = useMemo(() => {
@@ -711,7 +728,8 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
                     }}
                     onDelete={() => handleDelete(entry.id)}
                     onToggleEvolved={() => handleOpenEvolveDialog(entry)}
-                    onEvolvedIconColorChange={(backgroundColor, arrowColor) => void handleEvolvedIconColorChange(entry.id, backgroundColor, arrowColor)}
+                    onEvolvedIconColorChange={(backgroundColor, arrowColor, outlineColor) => void handleEvolvedIconColorChange(entry.id, backgroundColor, arrowColor, outlineColor)}
+                    onSaveEvolvedIconDefaults={(backgroundColor, arrowColor, outlineColor) => handleSaveEvolvedIconDefaults(entry.game, backgroundColor, arrowColor, outlineColor)}
                   />
                 );
               })}
