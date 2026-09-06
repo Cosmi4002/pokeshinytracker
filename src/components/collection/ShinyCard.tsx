@@ -81,7 +81,8 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, onEvolvedI
   const isEvolved = entry.is_evolved === true;
   const isGigantamax = entry.is_gigamax === true && supportsGigantamaxMark(entry.game);
   const isLegendsArceus = entry.is_legends_arceus === true;
-  const pokemonMark = entry.pokemon_mark;
+  // Normalize persisted values so whitespace-only marks do not create an empty badge.
+  const pokemonMark = entry.pokemon_mark?.trim() || null;
   const isEvent = (entry.method || '').toString().trim().toLowerCase() === 'distribution/event';
   const normalizedMethod = (entry.method || '').toString().trim().toLowerCase();
   const isBreeding = isBreedingMethod(normalizedMethod);
