@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import type { Tables } from '@/integrations/supabase/types';
-import { SHINY_CHARM_ICON, findHuntingMethod, getCaughtShinySpriteUrl, getDynamicOdds, getPokemonSpriteUrl, isBreedingMethod, GAMES } from '@/lib/pokemon-data';
+import { ALPHA_POKEMON_ICON, GIGANTAMAX_ICON, SHINY_CHARM_ICON, findHuntingMethod, getPokemonMarkIconUrl, getCaughtShinySpriteUrl, getDynamicOdds, getPokemonSpriteUrl, isBreedingMethod, GAMES } from '@/lib/pokemon-data';
 import { GAME_LOGOS } from '@/lib/game-themes';
 import { useRandomColor } from '@/lib/random-color-context';
 import { cn } from '@/lib/utils';
@@ -17,7 +17,7 @@ import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteImageRendering, get
 type ProfileRow = Pick<Tables<'profiles'>, 'user_id' | 'username'>;
 type PublicCaughtRow = Pick<
   Tables<'caught_shinies'>,
-  'id' | 'pokemon_id' | 'entity_key' | 'pokemon_name' | 'form' | 'gender' | 'caught_date' | 'created_at' | 'sprite_url' | 'game' | 'secondary_game' | 'is_fail' | 'is_unobtainable' | 'hunt_start_date' | 'method' | 'attempts' | 'has_shiny_charm' | 'is_evolved' | 'evolved_from_id' | 'evolved_from_name' | 'show_encounters'
+  'id' | 'pokemon_id' | 'entity_key' | 'pokemon_name' | 'form' | 'gender' | 'caught_date' | 'created_at' | 'sprite_url' | 'game' | 'secondary_game' | 'is_fail' | 'is_unobtainable' | 'is_gigamax' | 'is_legends_arceus' | 'pokemon_mark' | 'hunt_start_date' | 'method' | 'attempts' | 'has_shiny_charm' | 'is_evolved' | 'evolved_from_id' | 'evolved_from_name' | 'show_encounters'
 >;
 type PublicRecentRow = PublicCaughtRow & { user_id: string; username: string | null };
 
@@ -276,7 +276,7 @@ export default function UserCollectionsSearch() {
     try {
       const { data, error } = await supabase
         .from('caught_shinies')
-        .select('id, pokemon_id, entity_key, pokemon_name, form, gender, caught_date, created_at, sprite_url, game, secondary_game, is_fail, is_unobtainable, hunt_start_date, method, attempts, has_shiny_charm, is_evolved, evolved_from_id, evolved_from_name, show_encounters')
+        .select('id, pokemon_id, entity_key, pokemon_name, form, gender, caught_date, created_at, sprite_url, game, secondary_game, is_fail, is_unobtainable, is_gigamax, is_legends_arceus, pokemon_mark, hunt_start_date, method, attempts, has_shiny_charm, is_evolved, evolved_from_id, evolved_from_name, show_encounters')
         .eq('user_id', profile.user_id)
         .order('caught_date', { ascending: false })
         .order('created_at', { ascending: false })
@@ -302,7 +302,7 @@ export default function UserCollectionsSearch() {
     try {
       const { data, error } = await supabase
         .from('caught_shinies')
-        .select('id, user_id, pokemon_id, entity_key, pokemon_name, form, gender, caught_date, created_at, sprite_url, game, secondary_game, is_fail, is_unobtainable, hunt_start_date, method, attempts, has_shiny_charm, is_evolved, evolved_from_id, evolved_from_name, show_encounters')
+        .select('id, user_id, pokemon_id, entity_key, pokemon_name, form, gender, caught_date, created_at, sprite_url, game, secondary_game, is_fail, is_unobtainable, is_gigamax, is_legends_arceus, pokemon_mark, hunt_start_date, method, attempts, has_shiny_charm, is_evolved, evolved_from_id, evolved_from_name, show_encounters')
         .or('is_fail.is.false,is_fail.is.null')
         .or('is_unobtainable.is.false,is_unobtainable.is.null')
         // "Ultimi catturati" is based on when the Pokémon was obtained, not
@@ -721,13 +721,22 @@ export default function UserCollectionsSearch() {
             )}
 
             {showEntryEncounters && (
-              <div className="flex items-center justify-between rounded-xl bg-muted/60 px-3 py-2">
-                <span className="text-[10px] font-black uppercase tracking-[0.12em] text-muted-foreground">
-                  {getEncounterLabel(entry.method)}
-                </span>
-                <span className="text-lg font-black tabular-nums">
-                  {entry.attempts ? entry.attempts.toLocaleString() : '-'}
-                </span>
+              <div className="rounded-xl bg-muted/60 px-3 py-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-black uppercase tracking-[0.12em] text-muted-foreground">
+                    {getEncounterLabel(entry.method)}
+                  </span>
+                  <span className="text-lg font-black tabular-nums">
+                    {entry.attempts ? entry.attempts.toLocaleString() : '-'}
+                  </span>
+                </div>
+                {(entry.is_gigamax || entry.is_legends_arceus || entry.pokemon_mark) && (
+                  <div className="mt-1.5 flex items-center justify-center gap-1.5">
+                    {entry.is_gigamax && <img src={GIGANTAMAX_ICON} alt="Gigantamax" title="Gigantamax" className="h-6 w-6 object-contain" />}
+                    {entry.is_legends_arceus && <img src={ALPHA_POKEMON_ICON} alt="Alpha Pokémon" title="Alpha Pokémon" className="h-6 w-6 object-contain" />}
+                    {entry.pokemon_mark && <img src={getPokemonMarkIconUrl(entry.pokemon_mark)} alt={entry.pokemon_mark} title={entry.pokemon_mark} className="h-6 w-6 object-contain" />}
+                  </div>
+                )}
               </div>
             )}
           </div>

@@ -143,6 +143,7 @@ export type Database = {
           phase_number: number | null
           playlist_id: string | null
           pokeball: string
+          pokemon_mark: string | null
           pokemon_id: number
           pokemon_name: string
           show_encounters: boolean
@@ -182,6 +183,7 @@ export type Database = {
           phase_number?: number | null
           playlist_id?: string | null
           pokeball?: string
+          pokemon_mark?: string | null
           pokemon_id: number
           pokemon_name: string
           show_encounters?: boolean

@@ -24,7 +24,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
-import { POKEBALLS, GAMES, GIGAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, canHideEncountersForMethod, findHuntingMethod, getPokemonSpriteUrl, supportsGigamaxMark } from '@/lib/pokemon-data';
+import { POKEBALLS, GAMES, GIGANTAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, canHideEncountersForMethod, findHuntingMethod, getPokemonSpriteUrl, supportsGigantamaxMark, supportsPokemonMarks, POKEMON_MARKS, getPokemonMarkIconUrl } from '@/lib/pokemon-data';
 import { hasPokemonGenderDifference, usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
 import { MethodSelector } from '@/components/counter/MethodSelector';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -85,7 +85,8 @@ export function FinishHuntDialog({
   const [huntStartDate, setHuntStartDate] = useState(startDate ? startDate.split('T')[0] : '');
   const [caughtDate, setCaughtDate] = useState(todayLocalISODate());
   const [isFail, setIsFail] = useState(false);
-  const [isGigamax, setIsGigamax] = useState(false);
+  const [isGigantamax, setIsGigantamax] = useState(false);
+  const [pokemonMark, setPokemonMark] = useState('');
   const [isUnobtainable, setIsUnobtainable] = useState(false);
     const [phaseNumber, setPhaseNumber] = useState<number | null>(null);
   const [showTotal, setShowTotal] = useState(false);
@@ -98,7 +99,8 @@ export function FinishHuntDialog({
   const [notes, setNotes] = useState('');
 
   const { pokemon: pokemonDetails } = usePokemonDetails(pokemonId);
-  const canMarkGigamax = supportsGigamaxMark(game);
+  const canMarkGigantamax = supportsGigantamaxMark(game);
+  const canMarkPokemon = supportsPokemonMarks(game);
   const canHideCounterEncounters = canHideEncountersForMethod(method.id);
   const shouldShowAttempts = useMemo(() => {
     const id = method.id;
@@ -107,10 +109,14 @@ export function FinishHuntDialog({
   const shouldShowEncountersBox = useMemo(() => showEncounters && shouldShowAttempts, [showEncounters, shouldShowAttempts]);
 
   useEffect(() => {
-    if (!canMarkGigamax) {
-      setIsGigamax(false);
+    if (!canMarkGigantamax) {
+      setIsGigantamax(false);
     }
-  }, [canMarkGigamax]);
+  }, [canMarkGigantamax]);
+
+  useEffect(() => {
+    if (!canMarkPokemon) setPokemonMark('');
+  }, [canMarkPokemon]);
 
   useEffect(() => {
     if (!canHideCounterEncounters) {
@@ -250,7 +256,8 @@ export function FinishHuntDialog({
         hunt_start_date: huntStartDate || null,
         caught_date: caughtDate,
         is_fail: isFail,
-        is_gigamax: isGigamax,
+        is_gigamax: isGigantamax,
+        pokemon_mark: pokemonMark || null,
         is_unobtainable: isUnobtainable,
         phase_number: phaseNumber,
                 show_total: showTotal,
@@ -403,13 +410,26 @@ export function FinishHuntDialog({
             </Select>
           </div>
 
-          {canMarkGigamax && (
+          {canMarkGigantamax && (
             <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
               <div className="flex items-center gap-2">
-                <img src={GIGAMAX_ICON} alt="Gigamax" className="h-6 w-6 object-contain" />
-                <Label>Gigamax</Label>
+                <img src={GIGANTAMAX_ICON} alt="Gigantamax" className="h-6 w-6 object-contain" />
+                <Label>Gigantamax</Label>
               </div>
-              <Switch checked={isGigamax} onCheckedChange={setIsGigamax} />
+              <Switch checked={isGigantamax} onCheckedChange={setIsGigantamax} />
+            </div>
+          )}
+
+          {canMarkPokemon && (
+            <div className="space-y-2 rounded-lg bg-muted p-3">
+              <Label htmlFor="finish-pokemon-mark">Pokémon Mark</Label>
+              <Select value={pokemonMark || 'none'} onValueChange={(value) => setPokemonMark(value === 'none' ? '' : value)}>
+                <SelectTrigger id="finish-pokemon-mark"><SelectValue placeholder="No Mark" /></SelectTrigger>
+                <SelectContent className="max-h-72 overflow-y-auto">
+                  <SelectItem value="none">No Mark</SelectItem>
+                  {POKEMON_MARKS.map((mark) => <SelectItem key={mark} value={mark}><span className="flex items-center gap-2"><img src={getPokemonMarkIconUrl(mark)} alt="" className="h-5 w-5 object-contain" />{mark}</span></SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
           )}
 

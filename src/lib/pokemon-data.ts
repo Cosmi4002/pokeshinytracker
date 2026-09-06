@@ -504,9 +504,33 @@ export function calculateShinyStats(encounters: number, methodId: string, hasShi
 }
 
 export const SHINY_CHARM_ICON = '/img/items/shiny-charm.png';
-export const GIGAMAX_ICON = '/img/items/dynamax-icon.png';
+// Retain the established Gigantamax artwork while using the corrected label.
+export const GIGANTAMAX_ICON = '/img/items/dynamax-icon.png';
+export const ALPHA_POKEMON_ICON = '/img/pokemon-sprites/remote/archives.bulbagarden.net/media/upload/4/4b/Alpha_icon.png';
+
+export type PokemonMark = typeof POKEMON_MARKS[number];
+export const POKEMON_MARKS = [
+  'Lunchtime Mark', 'Sleepy-Time Mark', 'Dusk Mark', 'Dawn Mark', 'Cloudy Mark',
+  'Rainy Mark', 'Stormy Mark', 'Snowy Mark', 'Blizzard Mark', 'Dry Mark',
+  'Sandstorm Mark', 'Misty Mark', 'Destiny Mark', 'Fishing Mark', 'Curry Mark',
+  'Uncommon Mark', 'Rare Mark', 'Rowdy Mark', 'Absent-Minded Mark', 'Jittery Mark',
+  'Excited Mark', 'Charismatic Mark', 'Calmness Mark', 'Intense Mark', 'Zoned-Out Mark',
+  'Joyful Mark', 'Angry Mark', 'Smiley Mark', 'Teary Mark', 'Upbeat Mark', 'Peeved Mark',
+  'Intellectual Mark', 'Ferocious Mark', 'Crafty Mark', 'Scowling Mark', 'Kindly Mark',
+  'Flustered Mark', 'Pumped-Up Mark', 'Zero Energy Mark', 'Prideful Mark', 'Unsure Mark',
+  'Humble Mark', 'Thorny Mark', 'Vigor Mark', 'Slump Mark', 'Itemfinder Mark',
+  'Partner Mark', 'Mini Mark', 'Jumbo Mark', 'Mightiest Mark', 'Titan Mark',
+] as const;
+
+// The PokeSprite inventory ships one Mark Charm artwork, rather than one file for
+// every Mark name. Use that verified inventory asset for each selected Mark.
+export const POKEMON_MARK_ICON = 'https://raw.githubusercontent.com/msikma/pokesprite/master/items/regular/mark-charm.png';
+export const getPokemonMarkIconUrl = (_mark: string) => POKEMON_MARK_ICON;
+
+export const supportsPokemonMarks = (game: string) =>
+  game === 'sword' || game === 'shield' || game === 'scarlet' || game === 'violet';
 export const POKEMON_EGG_ICON = '/img/items/pokemon-egg.png';
-export const supportsGigamaxMark = (game: string) => game === 'sword' || game === 'shield';
+export const supportsGigantamaxMark = (game: string) => game === 'sword' || game === 'shield';
 
 
 // Helper to get generation from method ID
