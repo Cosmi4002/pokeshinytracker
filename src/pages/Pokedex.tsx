@@ -25,6 +25,7 @@ type RegionalFormRegion = 'Alola' | 'Galar' | 'Hisui' | 'Paldea';
 
 type PokedexViewState = {
     scrollY: number;
+    pokemonId?: number;
 };
 
 type PokedexSection = {
@@ -141,13 +142,24 @@ export default function Pokedex() {
         return names;
     }, [caughtData]);
 
-    // Restore the exact view after returning from a Pokémon detail page.
+    // Restore the card that opened the detail page. A raw scroll coordinate can
+    // land between cards after responsive layout, image, or collection-status
+    // changes, so prefer the card identity and retain the coordinate as a
+    // fallback for older saved return states.
     useEffect(() => {
         if (!pokemonLoading && !caughtLoading) {
             let savedScroll = 0;
+            let savedPokemonId: number | undefined;
             try {
                 const savedState = sessionStorage.getItem(POKEDEX_VIEW_STATE_KEY);
-                if (savedState) savedScroll = Number((JSON.parse(savedState) as Partial<PokedexViewState>).scrollY) || 0;
+                if (savedState) {
+                    const parsedState = JSON.parse(savedState) as Partial<PokedexViewState>;
+                    savedScroll = Number(parsedState.scrollY) || 0;
+                    const parsedPokemonId = Number(parsedState.pokemonId);
+                    if (Number.isInteger(parsedPokemonId) && parsedPokemonId > 0) {
+                        savedPokemonId = parsedPokemonId;
+                    }
+                }
                 // The scroll position is a one-time return hint, not persistent
                 // page state. Consuming it prevents stale state on future visits.
                 sessionStorage.removeItem(POKEDEX_VIEW_STATE_KEY);
@@ -160,7 +172,15 @@ export default function Pokedex() {
             let frame = 0;
             let frameId: number;
             const restore = () => {
-                window.scrollTo(0, savedScroll);
+                const selectedCard = savedPokemonId === undefined
+                    ? null
+                    : document.querySelector<HTMLElement>(`[data-pokedex-card-id="${savedPokemonId}"]`);
+
+                if (selectedCard) {
+                    selectedCard.scrollIntoView({ block: 'center' });
+                } else {
+                    window.scrollTo(0, savedScroll);
+                }
                 frame += 1;
                 if (frame < 8) frameId = window.requestAnimationFrame(restore);
             };
@@ -473,38 +493,43 @@ export default function Pokedex() {
             : p.displayName;
 
         return (
-            <PokedexCard
+            <div
                 key={`${p.baseId}-${p.id}-${p.name}`}
-                pokemonId={p.id}
-                baseId={p.baseId}
-                displayName={cardDisplayName}
-                shinyAvailability={p.shinyAvailability}
-                spriteUrl={getPokemonSpriteUrl(p.id, { shiny: true, name: p.name })}
-                secondarySprite={hasMultipleSprites
-                    ? getPokemonSpriteUrl(secondaryForm?.id || femaleId || p.id, {
-                        shiny: true,
-                        female: hasGenderDiff && !femaleId,
-                        name: secondaryForm?.name || p.name
-                    })
-                    : undefined
-                }
-                hasMultipleSprites={hasMultipleSprites}
-                isPrimaryCaught={isPrimaryCaught}
-                isSecondaryCaught={isSecondaryCaught}
-                caughtPercentage={pct}
-                hasCaughtAny={isCaught}
-                cardFilter={effects.pokedexCardFilter}
-                onClick={() => {
-                    try {
-                        sessionStorage.setItem(POKEDEX_VIEW_STATE_KEY, JSON.stringify({
-                            scrollY: window.scrollY,
-                        } satisfies PokedexViewState));
-                    } catch {
-                        // Ignore storage failures in private browsing modes.
+                data-pokedex-card-id={p.id}
+            >
+                <PokedexCard
+                    pokemonId={p.id}
+                    baseId={p.baseId}
+                    displayName={cardDisplayName}
+                    shinyAvailability={p.shinyAvailability}
+                    spriteUrl={getPokemonSpriteUrl(p.id, { shiny: true, name: p.name })}
+                    secondarySprite={hasMultipleSprites
+                        ? getPokemonSpriteUrl(secondaryForm?.id || femaleId || p.id, {
+                            shiny: true,
+                            female: hasGenderDiff && !femaleId,
+                            name: secondaryForm?.name || p.name
+                        })
+                        : undefined
                     }
-                    navigate(`/pokedex/${p.id}`, { state: { fromPokedex: true } });
-                }}
-            />
+                    hasMultipleSprites={hasMultipleSprites}
+                    isPrimaryCaught={isPrimaryCaught}
+                    isSecondaryCaught={isSecondaryCaught}
+                    caughtPercentage={pct}
+                    hasCaughtAny={isCaught}
+                    cardFilter={effects.pokedexCardFilter}
+                    onClick={() => {
+                        try {
+                            sessionStorage.setItem(POKEDEX_VIEW_STATE_KEY, JSON.stringify({
+                                scrollY: window.scrollY,
+                                pokemonId: p.id,
+                            } satisfies PokedexViewState));
+                        } catch {
+                            // Ignore storage failures in private browsing modes.
+                        }
+                        navigate(`/pokedex/${p.id}`, { state: { fromPokedex: true } });
+                    }}
+                />
+            </div>
         );
     };
 

@@ -26,6 +26,7 @@ interface ShinyCardProps {
   onEdit: () => void;
   onDelete: () => void;
   onToggleEvolved: () => void;
+  onEvolvedIconColorChange: (color: string) => void;
   themeOverride?: GameTheme;
   secondaryThemeOverride?: GameTheme;
   applyBlackEffect?: boolean;
@@ -45,7 +46,7 @@ const getEvolvedFromSpriteBoost = (name?: string | null) => {
 const getEvolvedFromSpriteSize = (_name?: string | null, compact = false, fitScale = 1) =>
   `${2.58 * fitScale * (compact ? 0.82 : 1)}rem`;
 
-export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverride, secondaryThemeOverride, applyBlackEffect = false, cardFilter = 'none', spriteName }: ShinyCardProps) {
+export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, onEvolvedIconColorChange, themeOverride, secondaryThemeOverride, applyBlackEffect = false, cardFilter = 'none', spriteName }: ShinyCardProps) {
   const spriteOutlineSeed = useId().replace(/:/g, '');
   const mainSpriteOutlineId = `main-sprite-outline-${spriteOutlineSeed}`;
   const [evolvedFromSpriteDimensions, setEvolvedFromSpriteDimensions] = useState<{ width: number; height: number } | null>(null);
@@ -59,6 +60,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
   const showEncountersPreference = (entry as any).show_encounters !== false;
   const evolvedFromId = (entry as any).evolved_from_id as number | null | undefined;
   const evolvedFromName = (entry as any).evolved_from_name as string | null | undefined;
+  const evolvedIconColor = (entry as any).evolved_icon_color as string | null | undefined;
 
   const theme = useMemo(() => themeOverride || getGameTheme(entry.game), [entry.game, themeOverride]);
   const secondaryTheme = useMemo(() => {
@@ -326,12 +328,20 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, themeOverr
             </div>
             {isEvolved && (
               <div className="absolute right-2 top-2 z-30 flex w-14 flex-col items-center gap-1">
-                <div
-                  className="flex h-7 w-7 items-center justify-center rounded-full border border-white/55 bg-emerald-700 text-white shadow-[0_3px_12px_rgba(0,0,0,0.6),0_0_0_1px_rgba(0,0,0,0.45)] ring-1 ring-emerald-200/45 backdrop-blur-md self-center"
-                  title="Pokemon evoluto"
+                <label
+                  className="relative flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border border-white/55 text-white shadow-[0_3px_12px_rgba(0,0,0,0.6),0_0_0_1px_rgba(0,0,0,0.45)] ring-1 ring-white/45 backdrop-blur-md self-center"
+                  style={{ backgroundColor: evolvedIconColor || '#047857' }}
+                  title="Clicca per scegliere il colore dell'icona evoluto da"
                 >
                   <ArrowUpCircle className="h-3.5 w-3.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]" />
-                </div>
+                  <input
+                    type="color"
+                    value={evolvedIconColor || '#047857'}
+                    onChange={(event) => onEvolvedIconColorChange(event.target.value)}
+                    className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                    aria-label="Colore icona evoluto da"
+                  />
+                </label>
                 {evolvedFromSpriteUrl && (
                   <img
                     src={toLocalPokemonSpriteUrl(evolvedFromSpriteUrl)}
