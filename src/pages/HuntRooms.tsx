@@ -42,8 +42,10 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { GenderSelector } from '@/components/ui/GenderSelector';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getPokemonSpriteUrl, usePokemonList } from '@/hooks/use-pokemon';
+import { getPokemonSpriteUrl, hasPokemonGenderDifference, usePokemonDetails, usePokemonList } from '@/hooks/use-pokemon';
 import { useToast } from '@/hooks/use-toast';
 import { useOnlineStatus } from '@/hooks/use-online-status';
 import { supabase } from '@/integrations/supabase/client';
@@ -51,7 +53,8 @@ import type { Tables } from '@/integrations/supabase/types';
 import { useAuth } from '@/lib/auth-context';
 import { useRandomColor } from '@/lib/random-color-context';
 import { cn } from '@/lib/utils';
-import { getArchiveShinySpriteUrl } from '@/lib/pokemon-data';
+import { GAMES, getArchiveShinySpriteUrl } from '@/lib/pokemon-data';
+import { getGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
 
 type HuntRoom = Tables<'hunt_rooms'>;
 type HuntRoomMember = Tables<'hunt_room_members'>;
@@ -70,14 +73,14 @@ const statusStyle: Record<string, string> = {
 };
 
 const getHuntRoomSpriteUrl = (room: Pick<HuntRoom, 'pokemon_id' | 'pokemon_name' | 'sprite_url'>) =>
-  getArchiveShinySpriteUrl(room.pokemon_id, {
+  room.sprite_url || getArchiveShinySpriteUrl(room.pokemon_id, {
     shiny: true,
     name: room.pokemon_name,
     form: room.pokemon_name,
   }) || getPokemonSpriteUrl(room.pokemon_id, {
     shiny: true,
     name: room.pokemon_name,
-  }) || room.sprite_url || '/placeholder.svg';
+  }) || '/placeholder.svg';
 
 export default function HuntRooms() {
   const { roomId } = useParams<{ roomId?: string }>();
@@ -99,6 +102,9 @@ export default function HuntRooms() {
   const [roomName, setRoomName] = useState('Shiny Hunt');
   const [selectedPokemonId, setSelectedPokemonId] = useState<number | null>(null);
   const [selectedPokemonName, setSelectedPokemonName] = useState('');
+  const [selectedForm, setSelectedForm] = useState('');
+  const [selectedGender, setSelectedGender] = useState('');
+  const [selectedGame, setSelectedGame] = useState('');
   const [joinCode, setJoinCode] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [confirmAction, setConfirmAction] = useState<ConfirmAction>(null);
@@ -108,6 +114,30 @@ export default function HuntRooms() {
   const selectedPokemon = useMemo(() => pokemon.find((entry) => (
     entry.id === selectedPokemonId && entry.name === selectedPokemonName
   )), [pokemon, selectedPokemonId, selectedPokemonName]);
+  const { pokemon: selectedPokemonDetails } = usePokemonDetails(selectedPokemonId || 0);
+
+  const formOptions = useMemo(() => {
+    if (!selectedPokemonDetails) return [];
+    const options = new Map<string, { id: number; displayName: string }>();
+    selectedPokemonDetails.forms.forEach((form) => {
+      if (form.formName !== selectedPokemonDetails.name) options.set(form.formName, { id: form.id, displayName: form.displayName });
+    });
+    selectedPokemonDetails.varieties.forEach((variety) => {
+      if (!variety.isDefault) options.set(variety.pokemon.name, { id: variety.pokemon.id, displayName: formatPokemonName(variety.pokemon.name) });
+    });
+    return Array.from(options, ([name, value]) => ({ name, ...value })).sort((a, b) => a.displayName.localeCompare(b.displayName));
+  }, [selectedPokemonDetails]);
+
+  const selectedVariant = formOptions.find((form) => form.name === selectedForm);
+  const displayPokemonId = selectedVariant?.id || selectedPokemonId || 0;
+  const hasGenderDifference = hasPokemonGenderDifference(selectedPokemonDetails?.baseId || selectedPokemonId || 0, selectedForm || selectedPokemonName);
+  const selectedSpriteUrl = useMemo(() => {
+    if (!displayPokemonId) return '';
+    const female = selectedGender === 'female' && hasGenderDifference;
+    return getGameSpecificShinySpriteUrl(displayPokemonId, selectedGame, { shiny: true, female, name: selectedPokemonName, form: selectedForm || undefined, gender: selectedGender })
+      || getArchiveShinySpriteUrl(displayPokemonId, { shiny: true, female, name: selectedForm || selectedPokemonName, form: selectedForm || selectedPokemonName })
+      || getPokemonSpriteUrl(displayPokemonId, { shiny: true, female, name: selectedForm || selectedPokemonName, form: selectedForm || undefined });
+  }, [displayPokemonId, hasGenderDifference, selectedForm, selectedGame, selectedGender, selectedPokemonName]);
 
   const currentMember = useMemo(
     () => members.find((member) => member.user_id === user?.id) || null,
@@ -244,20 +274,14 @@ export default function HuntRooms() {
   const handleCreate = async () => {
     if (!selectedPokemonId || !selectedPokemonName || !roomName.trim()) return;
     setSubmitting(true);
-    const spriteUrl = getArchiveShinySpriteUrl(selectedPokemonId, {
-      shiny: true,
-      name: selectedPokemonName,
-      form: selectedPokemonName,
-    }) || getPokemonSpriteUrl(selectedPokemonId, {
-      shiny: true,
-      name: selectedPokemonName,
-    });
     const { data, error } = await supabase.rpc('create_hunt_room', {
       room_name: roomName.trim(),
-      target_pokemon_id: selectedPokemonId,
+      target_pokemon_id: displayPokemonId,
       target_pokemon_name: selectedPokemonName,
-      target_pokemon_form: selectedPokemon?.displayName || null,
-      target_sprite_url: spriteUrl,
+      target_pokemon_form: selectedVariant?.displayName || selectedPokemon?.displayName || null,
+      target_pokemon_gender: selectedGender || null,
+      target_pokemon_game: selectedGame || null,
+      target_sprite_url: selectedSpriteUrl || null,
     });
 
     if (error) {
@@ -267,6 +291,9 @@ export default function HuntRooms() {
       setRoomName('Shiny Hunt');
       setSelectedPokemonId(null);
       setSelectedPokemonName('');
+      setSelectedForm('');
+      setSelectedGender('');
+      setSelectedGame('');
       await loadRooms();
       navigate(`/rooms/${data}`);
     }
@@ -645,9 +672,54 @@ export default function HuntRooms() {
                 onChange={(pokemonId, pokemonName) => {
                   setSelectedPokemonId(pokemonId);
                   setSelectedPokemonName(pokemonName);
+                  setSelectedForm('');
+                  setSelectedGender('');
                 }}
               />
             </div>
+            {selectedPokemonId && (
+              <>
+                {formOptions.length > 0 && (
+                  <div className="space-y-2">
+                    <Label>Forma / variante</Label>
+                    <Select value={selectedForm || 'default'} onValueChange={(value) => {
+                      setSelectedForm(value === 'default' ? '' : value);
+                      setSelectedGender('');
+                    }}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="default">Forma base</SelectItem>
+                        {formOptions.map((form) => <SelectItem key={form.name} value={form.name}>{form.displayName}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+                <div className="space-y-2">
+                  <Label>Genere</Label>
+                  {hasGenderDifference ? (
+                    <Select value={selectedGender || 'male'} onValueChange={(value) => setSelectedGender(value === 'female' ? 'female' : '')}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent><SelectItem value="male">Maschio</SelectItem><SelectItem value="female">Femmina</SelectItem></SelectContent>
+                    </Select>
+                  ) : <GenderSelector value={selectedGender} onChange={setSelectedGender} />}
+                </div>
+                <div className="space-y-2">
+                  <Label>Gioco</Label>
+                  <Select value={selectedGame} onValueChange={setSelectedGame}>
+                    <SelectTrigger><SelectValue placeholder="Seleziona il gioco" /></SelectTrigger>
+                    <SelectContent className="max-h-72 overflow-y-auto">
+                      {GAMES.map((game) => <SelectItem key={game.id} value={game.id}>{game.name}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                {selectedSpriteUrl && (
+                  <div className="flex items-center gap-3 rounded-lg border bg-muted/40 p-3">
+                    <img src={selectedSpriteUrl} alt={selectedPokemonName} className="h-16 w-16 object-contain [image-rendering:pixelated]" onError={(event) => { event.currentTarget.src = '/placeholder.svg'; }} />
+                    <span className="text-sm text-muted-foreground">L'anteprima cambia in base a forma, genere e gioco.</span>
+                  </div>
+                )}
+              </>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setCreateOpen(false)} disabled={submitting}>Cancel</Button>

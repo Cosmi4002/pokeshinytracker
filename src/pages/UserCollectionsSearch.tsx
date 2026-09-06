@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import type { Tables } from '@/integrations/supabase/types';
-import { SHINY_CHARM_ICON, findHuntingMethod, getCaughtShinySpriteUrl, getDynamicOdds, isBreedingMethod, GAMES } from '@/lib/pokemon-data';
+import { SHINY_CHARM_ICON, findHuntingMethod, getCaughtShinySpriteUrl, getDynamicOdds, getPokemonSpriteUrl, isBreedingMethod, GAMES } from '@/lib/pokemon-data';
 import { GAME_LOGOS } from '@/lib/game-themes';
 import { useRandomColor } from '@/lib/random-color-context';
 import { cn } from '@/lib/utils';
@@ -17,7 +17,7 @@ import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteImageRendering, get
 type ProfileRow = Pick<Tables<'profiles'>, 'user_id' | 'username'>;
 type PublicCaughtRow = Pick<
   Tables<'caught_shinies'>,
-  'id' | 'pokemon_id' | 'entity_key' | 'pokemon_name' | 'form' | 'gender' | 'caught_date' | 'created_at' | 'sprite_url' | 'game' | 'secondary_game' | 'is_fail' | 'is_unobtainable' | 'hunt_start_date' | 'method' | 'attempts' | 'has_shiny_charm' | 'is_evolved' | 'show_encounters'
+  'id' | 'pokemon_id' | 'entity_key' | 'pokemon_name' | 'form' | 'gender' | 'caught_date' | 'created_at' | 'sprite_url' | 'game' | 'secondary_game' | 'is_fail' | 'is_unobtainable' | 'hunt_start_date' | 'method' | 'attempts' | 'has_shiny_charm' | 'is_evolved' | 'evolved_from_id' | 'evolved_from_name' | 'show_encounters'
 >;
 type PublicRecentRow = PublicCaughtRow & { user_id: string; username: string | null };
 
@@ -204,7 +204,7 @@ export default function UserCollectionsSearch() {
     try {
       const { data, error } = await supabase
         .from('caught_shinies')
-        .select('id, pokemon_id, entity_key, pokemon_name, form, gender, caught_date, created_at, sprite_url, game, secondary_game, is_fail, is_unobtainable, hunt_start_date, method, attempts, has_shiny_charm, is_evolved, show_encounters')
+        .select('id, pokemon_id, entity_key, pokemon_name, form, gender, caught_date, created_at, sprite_url, game, secondary_game, is_fail, is_unobtainable, hunt_start_date, method, attempts, has_shiny_charm, is_evolved, evolved_from_id, evolved_from_name, show_encounters')
         .eq('user_id', profile.user_id)
         .order('caught_date', { ascending: false })
         .order('created_at', { ascending: false })
@@ -230,7 +230,7 @@ export default function UserCollectionsSearch() {
     try {
       const { data, error } = await supabase
         .from('caught_shinies')
-        .select('id, user_id, pokemon_id, entity_key, pokemon_name, form, gender, caught_date, created_at, sprite_url, game, secondary_game, is_fail, is_unobtainable, hunt_start_date, method, attempts, has_shiny_charm, is_evolved, show_encounters')
+        .select('id, user_id, pokemon_id, entity_key, pokemon_name, form, gender, caught_date, created_at, sprite_url, game, secondary_game, is_fail, is_unobtainable, hunt_start_date, method, attempts, has_shiny_charm, is_evolved, evolved_from_id, evolved_from_name, show_encounters')
         .or('is_fail.is.false,is_fail.is.null')
         .or('is_unobtainable.is.false,is_unobtainable.is.null')
         // "Ultimi catturati" is based on when the Pokémon was obtained, not
@@ -474,18 +474,25 @@ export default function UserCollectionsSearch() {
     return null;
   };
 
-  const renderEvolutionBadge = (isEvolved: boolean | null) => {
-    if (!isEvolved) return null;
+  const renderEvolutionBadge = (entry: PublicCaughtRow | PublicRecentRow) => {
+    if (!entry.is_evolved) return null;
+    const sourceSprite = entry.evolved_from_id
+      ? getGameSpecificShinySpriteUrl(entry.evolved_from_id, entry.game || entry.secondary_game, { shiny: true, name: entry.evolved_from_name })
+        || getPokemonSpriteUrl(entry.evolved_from_id, { shiny: true, name: entry.evolved_from_name })
+      : null;
     return (
-      <div
-        className="absolute top-2 right-2 z-20 flex h-6 w-6 items-center justify-center rounded-full border border-white/55 text-white shadow-[0_3px_12px_rgba(0,0,0,0.6),0_0_0_1px_rgba(0,0,0,0.45)] ring-1 ring-white/30 backdrop-blur-sm"
+      <div className="absolute right-2 top-2 z-20 flex flex-col items-center gap-0.5">
+        <div
+          className="flex h-6 w-6 items-center justify-center rounded-full border border-white/55 text-white shadow-[0_3px_12px_rgba(0,0,0,0.6),0_0_0_1px_rgba(0,0,0,0.45)] ring-1 ring-white/30 backdrop-blur-sm"
         style={{
           background: `linear-gradient(145deg, ${accentColor}, color-mix(in srgb, ${accentColor} 72%, #111))`,
           boxShadow: `0 3px 12px color-mix(in srgb, ${accentColor} 36%, rgba(0,0,0,0.55)), 0 0 0 1px rgba(0,0,0,0.45)`,
         }}
         title="Pokemon evoluto"
-      >
-        <ArrowUpCircle className="h-3.5 w-3.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]" />
+        >
+          <ArrowUpCircle className="h-3.5 w-3.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]" />
+        </div>
+        {sourceSprite && <img src={sourceSprite} alt={`Evolved from ${entry.evolved_from_name || 'previous Pokémon'}`} title={`Evolved from ${entry.evolved_from_name || 'previous Pokémon'}`} className="h-8 w-8 object-contain [image-rendering:pixelated]" />}
       </div>
     );
   };
@@ -539,10 +546,9 @@ export default function UserCollectionsSearch() {
         className="group relative overflow-hidden rounded-[1.4rem] border border-border bg-card text-card-foreground shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
       >
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.12),transparent_42%)] opacity-70" />
-        {renderEvolutionBadge(entry.is_evolved)}
-
         <div className="relative p-3">
           <div className="relative flex min-h-[118px] items-center justify-center overflow-hidden rounded-[1.05rem] border border-border bg-muted/55">
+            {renderEvolutionBadge(entry)}
             {!isGameSpecificSprite && <div className="absolute inset-x-6 bottom-4 h-6 rounded-full bg-black/20 blur-xl" />}
             <img
               src={sprite}

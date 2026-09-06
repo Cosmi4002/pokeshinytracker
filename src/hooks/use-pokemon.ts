@@ -407,8 +407,8 @@ export function formatPokemonName(name: string, id: number, baseId?: number): st
 
   // Giratina, Dialga, Palkia naming
   if (name.toLowerCase().includes('giratina') || name.toLowerCase().includes('dialga') || name.toLowerCase().includes('palkia')) {
-    if (name.toLowerCase().includes('origin')) return `${name.split('-')[0].charAt(0).toUpperCase() + name.split('-')[0].slice(1)} (Origin)`;
-    if (name.toLowerCase().includes('altered')) return 'Giratina (Altera)';
+    if (name.toLowerCase().includes('origin')) return `${name.split('-')[0].charAt(0).toUpperCase() + name.split('-')[0].slice(1)} (Origin Forme)`;
+    if (name.toLowerCase().includes('altered')) return 'Giratina (Altered Forme)';
     return name.charAt(0).toUpperCase() + name.slice(1);
   }
 
@@ -417,13 +417,7 @@ export function formatPokemonName(name: string, id: number, baseId?: number): st
     const parts = name.split('-');
     if (parts.length > 1) {
       const type = parts[1].toLowerCase();
-      const typeTranslations: Record<string, string> = {
-        'fighting': 'Lotta', 'flying': 'Volante', 'poison': 'Veleno', 'ground': 'Terra',
-        'rock': 'Roccia', 'bug': 'Coleottero', 'ghost': 'Spettro', 'steel': 'Acciaio',
-        'fire': 'Fuoco', 'water': 'Acqua', 'grass': 'Erba', 'electric': 'Elettro',
-        'psychic': 'Psico', 'ice': 'Ghiaccio', 'dragon': 'Drago', 'dark': 'Buio', 'fairy': 'Folletto'
-      };
-      return `Silvally (${typeTranslations[type] || parts[1].charAt(0).toUpperCase() + parts[1].slice(1)})`;
+      return `Silvally (${type.charAt(0).toUpperCase() + type.slice(1)}-type)`;
     }
     return 'Silvally';
   }
@@ -433,13 +427,7 @@ export function formatPokemonName(name: string, id: number, baseId?: number): st
     const parts = name.split('-');
     if (parts.length > 1) {
       const type = parts[1].toLowerCase();
-      const typeTranslations: Record<string, string> = {
-        'fighting': 'Lotta', 'flying': 'Volante', 'poison': 'Veleno', 'ground': 'Terra',
-        'rock': 'Roccia', 'bug': 'Coleottero', 'ghost': 'Spettro', 'steel': 'Acciaio',
-        'fire': 'Fuoco', 'water': 'Acqua', 'grass': 'Erba', 'electric': 'Elettro',
-        'psychic': 'Psico', 'ice': 'Ghiaccio', 'dragon': 'Drago', 'dark': 'Buio', 'fairy': 'Folletto'
-      };
-      return `Arceus (${typeTranslations[type] || parts[1].charAt(0).toUpperCase() + parts[1].slice(1)})`;
+      return `Arceus (${type.charAt(0).toUpperCase() + type.slice(1)}-type)`;
     }
     return 'Arceus';
   }
@@ -465,29 +453,29 @@ export function formatPokemonName(name: string, id: number, baseId?: number): st
   // Shellos & Gastrodon naming
   if (name.toLowerCase().includes('shellos') || name.toLowerCase().includes('gastrodon')) {
     const base = name.split('-')[0].charAt(0).toUpperCase() + name.split('-')[0].slice(1);
-    if (name.includes('east')) return `${base} (Mare Est)`;
-    if (name.includes('west')) return `${base} (Mare Ovest)`;
+    if (name.includes('east')) return `${base} (East Sea)`;
+    if (name.includes('west')) return `${base} (West Sea)`;
     return base;
   }
 
   // Deerling & Sawsbuck naming
   if (name.toLowerCase().includes('deerling') || name.toLowerCase().includes('sawsbuck')) {
     const base = name.split('-')[0].charAt(0).toUpperCase() + name.split('-')[0].slice(1);
-    if (name.includes('summer')) return `${base} (Estate)`;
-    if (name.includes('autumn')) return `${base} (Autunno)`;
-    if (name.includes('winter')) return `${base} (Inverno)`;
-    if (name.includes('spring')) return `${base} (Primavera)`;
+    if (name.includes('summer')) return `${base} (Summer Form)`;
+    if (name.includes('autumn')) return `${base} (Autumn Form)`;
+    if (name.includes('winter')) return `${base} (Winter Form)`;
+    if (name.includes('spring')) return `${base} (Spring Form)`;
     return base;
   }
 
   // Flabébé line naming
   if (name.toLowerCase().includes('flabebe') || name.toLowerCase().includes('floette') || name.toLowerCase().includes('florges')) {
     const base = name.toLowerCase().includes('flabebe') ? 'Flabébé' : (name.toLowerCase().includes('floette') ? 'Floette' : 'Florges');
-    if (name.includes('yellow')) return `${base} (Fiore Giallo)`;
-    if (name.includes('orange')) return `${base} (Fiore Arancione)`;
-    if (name.includes('blue')) return `${base} (Fiore Blu)`;
-    if (name.includes('white')) return `${base} (Fiore Bianco)`;
-    if (name.includes('red')) return `${base} (Fiore Rosso)`;
+    if (name.includes('yellow')) return `${base} (Yellow Flower)`;
+    if (name.includes('orange')) return `${base} (Orange Flower)`;
+    if (name.includes('blue')) return `${base} (Blue Flower)`;
+    if (name.includes('white')) return `${base} (White Flower)`;
+    if (name.includes('red')) return `${base} (Red Flower)`;
     if (name.toLowerCase() === 'floette') return 'Floette (Red)';
     return base;
   }
@@ -496,8 +484,8 @@ export function formatPokemonName(name: string, id: number, baseId?: number): st
   if (name.toLowerCase().includes('furfrou-')) {
     const trim = name.split('-')[1].toLowerCase();
     const trims: Record<string, string> = {
-      'heart': 'Cuore', 'star': 'Stella', 'diamond': 'Diamante', 'debutante': 'Demoiselle',
-      'matron': 'Matrona', 'dandy': 'Dandy', 'la-reine': 'Regina', 'kabuki': 'Kabuki', 'pharaoh': 'Faraone'
+      'heart': 'Heart Trim', 'star': 'Star Trim', 'diamond': 'Diamond Trim', 'debutante': 'Debutante Trim',
+      'matron': 'Matron Trim', 'dandy': 'Dandy Trim', 'la-reine': 'La Reine Trim', 'kabuki': 'Kabuki Trim', 'pharaoh': 'Pharaoh Trim'
     };
     return `Furfrou (${trims[trim] || trim.charAt(0).toUpperCase() + trim.slice(1)})`;
   }
@@ -505,10 +493,10 @@ export function formatPokemonName(name: string, id: number, baseId?: number): st
   // Pumpkaboo & Gourgeist naming
   if (name.toLowerCase().includes('pumpkaboo') || name.toLowerCase().includes('gourgeist')) {
     const base = name.split('-')[0].charAt(0).toUpperCase() + name.split('-')[0].slice(1);
-    if (name.includes('small')) return `${base} (Piccolo)`;
-    if (name.includes('large')) return `${base} (Grande)`;
-    if (name.includes('super')) return `${base} (Maxi)`;
-    if (name.includes('average')) return `${base} (Medio)`;
+    if (name.includes('small')) return `${base} (Small Size)`;
+    if (name.includes('large')) return `${base} (Large Size)`;
+    if (name.includes('super')) return `${base} (Super Size)`;
+    if (name.includes('average')) return `${base} (Average Size)`;
     return base;
   }
 
@@ -535,53 +523,53 @@ export function formatPokemonName(name: string, id: number, baseId?: number): st
 
   // Toxtricity naming
   if (name.toLowerCase().includes('toxtricity')) {
-    if (name.includes('low-key')) return 'Toxtricity (Basso)';
-    if (name.includes('amped')) return 'Toxtricity (Melodia)';
+    if (name.includes('low-key')) return 'Toxtricity (Low Key Form)';
+    if (name.includes('amped')) return 'Toxtricity (Amped Form)';
     return 'Toxtricity';
   }
 
   // Enamorus naming
   if (name.toLowerCase().includes('enamorus')) {
-    if (name.includes('therian')) return 'Enamorus (Totem)';
-    return 'Enamorus (Incarnazione)';
+    if (name.includes('therian')) return 'Enamorus (Therian Forme)';
+    return 'Enamorus (Incarnate Forme)';
   }
 
   // Maushold naming
   if (name.toLowerCase().includes('maushold')) {
-    if (name.includes('family-of-three')) return 'Maushold (Famiglia da tre)';
-    return 'Maushold (Famiglia da quattro)';
+    if (name.includes('family-of-three')) return 'Maushold (Family of Three)';
+    return 'Maushold (Family of Four)';
   }
 
   // Squawkabilly naming
   if (name.toLowerCase().includes('squawkabilly')) {
-    if (name.includes('blue')) return 'Squawkabilly (Blu)';
-    if (name.includes('yellow')) return 'Squawkabilly (Giallo)';
-    if (name.includes('white')) return 'Squawkabilly (Bianco)';
-    return 'Squawkabilly (Verde)';
+    if (name.includes('blue')) return 'Squawkabilly (Blue Plumage)';
+    if (name.includes('yellow')) return 'Squawkabilly (Yellow Plumage)';
+    if (name.includes('white')) return 'Squawkabilly (White Plumage)';
+    return 'Squawkabilly (Green Plumage)';
   }
 
   // Tatsugiri naming
   if (name.toLowerCase().includes('tatsugiri')) {
-    if (name.includes('droopy')) return 'Tatsugiri (Adagiata)';
-    if (name.includes('stretchy')) return 'Tatsugiri (Tesa)';
-    return 'Tatsugiri (Arcurata)';
+    if (name.includes('droopy')) return 'Tatsugiri (Droopy Form)';
+    if (name.includes('stretchy')) return 'Tatsugiri (Stretchy Form)';
+    return 'Tatsugiri (Curly Form)';
   }
 
   // Dudunsparce naming
   if (name.toLowerCase().includes('dudunsparce')) {
-    if (name.includes('three-segment')) return 'Dudunsparce (Trisegmento)';
-    return 'Dudunsparce (Bisegmento)';
+    if (name.includes('three-segment')) return 'Dudunsparce (Three-Segment Form)';
+    return 'Dudunsparce (Two-Segment Form)';
   }
 
   // Minior naming
   if (name.toLowerCase().includes('minior')) {
-    if (name.includes('meteor')) return 'Minior (Meteora)';
+    if (name.includes('meteor')) return 'Minior (Meteor Form)';
     const colors: Record<string, string> = {
-      'red': 'Rosso', 'orange': 'Arancione', 'yellow': 'Giallo',
-      'green': 'Verde', 'blue': 'Blu', 'indigo': 'Indaco', 'violet': 'Violetto'
+      'red': 'Red Core', 'orange': 'Orange Core', 'yellow': 'Yellow Core',
+      'green': 'Green Core', 'blue': 'Blue Core', 'indigo': 'Indigo Core', 'violet': 'Violet Core'
     };
     const color = name.split('-').find(p => colors[p]);
-    return `Minior (${colors[color || ''] || 'Nucleo'})`;
+    return `Minior (${colors[color || ''] || 'Meteor Form'})`;
   }
 
 // Vivillon pattern naming

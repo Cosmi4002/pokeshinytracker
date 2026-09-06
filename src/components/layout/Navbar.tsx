@@ -58,6 +58,15 @@ const readAvatarPreferencesFromMetadata = (metadata: Record<string, unknown> | n
     : null,
 });
 
+const getCachedAvatarId = (userId: string | undefined) => {
+  if (!userId) return null;
+  try {
+    return getValidAvatarId(window.localStorage.getItem(`trainer-avatar-${userId}`));
+  } catch {
+    return null;
+  }
+};
+
 export function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -100,6 +109,11 @@ export function Navbar() {
     return getSafeAvatarOrder(metadata.trainer_avatar_order);
   }, [user?.user_metadata]);
 
+  // Read the local avatar cache during render while the remote preferences are
+  // loading. This avoids briefly painting the default Red avatar on refreshes
+  // and route changes for users who already chose a different trainer.
+  const cachedAvatarId = useMemo(() => getCachedAvatarId(user?.id), [user?.id]);
+
   const displayUsername = profileUsername || metadataUsername;
   const orderedTrainerAvatars = useMemo(() => {
     const avatarById = new Map(trainerAvatars.map((avatar) => [avatar.id, avatar]));
@@ -112,8 +126,13 @@ export function Navbar() {
       ...trainerAvatars.filter((avatar) => !orderedIds.has(avatar.id)),
     ];
   }, [avatarOrderIds]);
+  const displayAvatarId = !user
+    ? 'red'
+    : avatarPreferencesUserId === user.id
+      ? selectedAvatarId
+      : metadataAvatarId || cachedAvatarId || 'red';
   const selectedAvatar =
-    trainerAvatars.find((avatar) => avatar.id === selectedAvatarId) ?? trainerAvatars[0];
+    trainerAvatars.find((avatar) => avatar.id === displayAvatarId) ?? trainerAvatars[0];
   const getAvatarImageStyle = (avatar: (typeof trainerAvatars)[number]) => ({
     transform: 'imageTransform' in avatar ? avatar.imageTransform : 'scale(1.72)',
     transformOrigin: 'imageTransformOrigin' in avatar ? avatar.imageTransformOrigin : 'top center',

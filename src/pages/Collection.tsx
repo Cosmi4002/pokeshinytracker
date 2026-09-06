@@ -204,6 +204,21 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
     setIsEvolveDialogOpen(true);
   };
 
+  const handleEvolvedIconColorChange = async (id: string, evolvedIconColor: string) => {
+    const { error } = await supabase
+      .from('caught_shinies')
+      .update({ evolved_icon_color: evolvedIconColor })
+      .eq('id', id)
+      .eq('user_id', user!.id);
+    if (error) {
+      toast({ variant: 'destructive', title: 'Error', description: error.message });
+      return;
+    }
+    setEntries((current) => current.map((entry) => (
+      entry.id === id ? { ...entry, evolved_icon_color: evolvedIconColor } : entry
+    )));
+  };
+
   const playlistMap = useMemo(() => {
     const m: Record<string, string> = {};
     playlists.forEach((p) => (m[p.id] = p.name));
@@ -692,6 +707,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
                     }}
                     onDelete={() => handleDelete(entry.id)}
                     onToggleEvolved={() => handleOpenEvolveDialog(entry)}
+                    onEvolvedIconColorChange={(color) => void handleEvolvedIconColorChange(entry.id, color)}
                   />
                 );
               })}

@@ -122,6 +122,7 @@ export type Database = {
           evolved_from_id: number | null
           evolved_from_entity_key: string | null
           evolved_from_name: string | null
+          evolved_icon_color: string | null
           entity_key: string | null
           form: string | null
           game: string
@@ -172,6 +173,7 @@ export type Database = {
           evolved_from_id?: number | null
           evolved_from_entity_key?: string | null
           evolved_from_name?: string | null
+          evolved_icon_color?: string | null
           entity_key?: string | null
           phase_number?: number | null
           playlist_id?: string | null
@@ -208,6 +210,7 @@ export type Database = {
           evolved_from_id?: number | null
           evolved_from_entity_key?: string | null
           evolved_from_name?: string | null
+          evolved_icon_color?: string | null
           entity_key?: string | null
           phase_number?: number | null
           playlist_id?: string | null
@@ -322,6 +325,8 @@ export type Database = {
           max_members: number
           name: string
           pokemon_form: string | null
+          pokemon_game: string | null
+          pokemon_gender: string | null
           pokemon_id: number
           pokemon_name: string
           sprite_url: string | null
@@ -338,6 +343,8 @@ export type Database = {
           max_members?: number
           name: string
           pokemon_form?: string | null
+          pokemon_game?: string | null
+          pokemon_gender?: string | null
           pokemon_id: number
           pokemon_name: string
           sprite_url?: string | null
@@ -354,6 +361,8 @@ export type Database = {
           max_members?: number
           name?: string
           pokemon_form?: string | null
+          pokemon_game?: string | null
+          pokemon_gender?: string | null
           pokemon_id?: number
           pokemon_name?: string
           sprite_url?: string | null
@@ -523,6 +532,8 @@ export type Database = {
         Args: {
           room_name: string
           target_pokemon_form: string | null
+          target_pokemon_game: string | null
+          target_pokemon_gender: string | null
           target_pokemon_id: number
           target_pokemon_name: string
           target_sprite_url: string | null
