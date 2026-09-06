@@ -26,7 +26,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { PokemonSelector } from '@/components/counter/PokemonSelector';
 import { MethodSelector } from '@/components/counter/MethodSelector';
 import { Checkbox } from '@/components/ui/checkbox';
-import { POKEBALLS, GAMES, GIGAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, canHideEncountersForMethod, supportsGigamaxMark, getSelectedGameSpriteUrl } from '@/lib/pokemon-data';
+import { POKEBALLS, GAMES, GIGANTAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, canHideEncountersForMethod, supportsGigantamaxMark, supportsPokemonMarks, POKEMON_MARKS, getPokemonMarkIconUrl, ALPHA_POKEMON_ICON, getSelectedGameSpriteUrl } from '@/lib/pokemon-data';
 import { usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
 import { todayLocalISODate } from '@/lib/date';
 import { resolveEntityKeyForSelectedPokemon } from '@/lib/pokemon-entity-resolver-v2';
@@ -58,8 +58,9 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
   const [huntStartDate, setHuntStartDate] = useState('');
   const [caughtDate, setCaughtDate] = useState(todayLocalISODate());
   const [isFail, setIsFail] = useState(false);
-  const [isGigamax, setIsGigamax] = useState(false);
+  const [isGigantamax, setIsGigantamax] = useState(false);
   const [isLegendsArceus, setIsLegendsArceus] = useState(false);
+  const [pokemonMark, setPokemonMark] = useState('');
   const [isUnobtainable, setIsUnobtainable] = useState(false);
   const [phaseNumber, setPhaseNumber] = useState<number | null>(null);
     const [showTotal, setShowTotal] = useState(false);
@@ -72,7 +73,8 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
   const [notes, setNotes] = useState('');
 
   const { pokemon: pokemonDetails } = usePokemonDetails(pokemonId);
-  const canMarkGigamax = supportsGigamaxMark(game);
+  const canMarkGigantamax = supportsGigantamaxMark(game);
+  const canMarkPokemon = supportsPokemonMarks(game);
   const canHideCounterEncounters = canHideEncountersForMethod(method.id);
   const shouldShowAttempts = useMemo(() => {
     const id = method.id;
@@ -81,10 +83,14 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
   const shouldShowEncountersBox = useMemo(() => showEncounters && shouldShowAttempts, [showEncounters, shouldShowAttempts]);
 
   useEffect(() => {
-    if (!canMarkGigamax) {
-      setIsGigamax(false);
+    if (!canMarkGigantamax) {
+      setIsGigantamax(false);
     }
-  }, [canMarkGigamax]);
+  }, [canMarkGigantamax]);
+
+  useEffect(() => {
+    if (!canMarkPokemon) setPokemonMark('');
+  }, [canMarkPokemon]);
 
   useEffect(() => {
     if (game !== 'pla' && game !== 'za' && isLegendsArceus) {
@@ -154,8 +160,9 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
     setHuntStartDate('');
     setCaughtDate(todayLocalISODate());
     setIsFail(false);
-    setIsGigamax(false);
+    setIsGigantamax(false);
     setIsLegendsArceus(false);
+    setPokemonMark('');
         setIsUnobtainable(false);
     setPhaseNumber(null);
     setShowTotal(false);
@@ -222,8 +229,9 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
         hunt_start_date: huntStartDate || null,
         caught_date: caughtDate,
         is_fail: isFail,
-        is_gigamax: isGigamax,
+        is_gigamax: isGigantamax,
         is_legends_arceus: isLegendsArceus,
+        pokemon_mark: pokemonMark || null,
                 is_unobtainable: isUnobtainable,
         phase_number: phaseNumber,
         show_total: showTotal,
@@ -403,13 +411,30 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
             </Select>
           </div>
 
-          {canMarkGigamax && (
+          {canMarkGigantamax && (
             <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
               <div className="flex items-center gap-2">
-                <img src={GIGAMAX_ICON} alt="Gigamax" className="h-6 w-6 object-contain" />
-                <Label>Gigamax</Label>
+                <img src={GIGANTAMAX_ICON} alt="Gigantamax" className="h-6 w-6 object-contain" />
+                <Label>Gigantamax</Label>
               </div>
-              <Switch checked={isGigamax} onCheckedChange={setIsGigamax} />
+              <Switch checked={isGigantamax} onCheckedChange={setIsGigantamax} />
+            </div>
+          )}
+
+          {canMarkPokemon && (
+            <div className="space-y-2 rounded-lg bg-muted p-3">
+              <Label htmlFor="pokemon-mark">Pokémon Mark</Label>
+              <Select value={pokemonMark || 'none'} onValueChange={(value) => setPokemonMark(value === 'none' ? '' : value)}>
+                <SelectTrigger id="pokemon-mark"><SelectValue placeholder="No Mark" /></SelectTrigger>
+                <SelectContent className="max-h-72 overflow-y-auto">
+                  <SelectItem value="none">No Mark</SelectItem>
+                  {POKEMON_MARKS.map((mark) => (
+                    <SelectItem key={mark} value={mark}>
+                      <span className="flex items-center gap-2"><img src={getPokemonMarkIconUrl(mark)} alt="" className="h-5 w-5 object-contain" />{mark}</span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           )}
 
@@ -417,7 +442,7 @@ export function AddShinyDialog({ open, onOpenChange, playlists, onSuccess }: Add
             <div className="flex items-center justify-between p-3 rounded-lg bg-muted">
               <div className="flex items-center gap-2">
                 <img
-                  src="https://archives.bulbagarden.net/media/upload/4/4b/Alpha_icon.png"
+                  src={ALPHA_POKEMON_ICON}
                   alt="Alpha Pokemon"
                   className="h-5 w-5 object-contain"
                 />
