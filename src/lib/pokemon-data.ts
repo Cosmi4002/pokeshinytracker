@@ -523,7 +523,7 @@ export const POKEMON_MARKS = [
 
 // Mark sprites are provided by the PokeSprite inventory project.
 export const getPokemonMarkIconUrl = (mark: string) =>
-  `https://raw.githubusercontent.com/msikma/pokesprite/master/items/regular/${mark
+  `https://raw.githubusercontent.com/msikma/pokesprite/master/items/regular/${mark.trim()
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/-$/g, '')}.png`;
