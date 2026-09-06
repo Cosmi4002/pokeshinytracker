@@ -1,13 +1,20 @@
 import { describe, expect, it } from 'vitest';
-import { HUNTING_METHODS, calculateShinyStats, formatOdds, getArchiveShinySpriteUrl, getCaughtShinySpriteUrl, getGameGeneration, getHuntingMethodsForGame, getPokemonMarkIconUrl, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, getSelectedGameSpriteUrl, isBreedingMethod, supportsGigantamaxMark, toLocalPokemonSpriteUrl } from './pokemon-data';
+import { HUNTING_METHODS, calculateShinyStats, formatOdds, getArchiveShinySpriteUrl, getCaughtShinySpriteUrl, getGameGeneration, getHuntingMethodsForGame, getPokemonMarkIconUrl, getPokemonMarksForGame, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, getSelectedGameSpriteUrl, isBreedingMethod, supportsGigantamaxMark, toLocalPokemonSpriteUrl } from './pokemon-data';
 
 describe('card badge helpers', () => {
   it('keeps the resolved Gigantamax and Pokémon Mark helpers available together', () => {
     expect(supportsGigantamaxMark('sword')).toBe(true);
     expect(supportsGigantamaxMark('scarlet')).toBe(false);
     expect(getPokemonMarkIconUrl('  Sleepy-Time Mark  ')).toBe(
-      'https://raw.githubusercontent.com/msikma/pokesprite/master/items/regular/sleepy-time-mark.png',
+      'https://raw.githubusercontent.com/msikma/pokesprite/master/items/regular/mark-sleepy-time.png',
     );
+  });
+
+  it('only offers marks obtainable in the selected game', () => {
+    expect(getPokemonMarksForGame('sword')).toEqual(expect.arrayContaining(['Fishing Mark', 'Curry Mark', 'Itemfinder Mark']));
+    expect(getPokemonMarksForGame('sword')).not.toEqual(expect.arrayContaining(['Destiny Mark', 'Mightiest Mark', 'Titan Mark']));
+    expect(getPokemonMarksForGame('scarlet')).toEqual(expect.arrayContaining(['Destiny Mark', 'Mightiest Mark', 'Titan Mark']));
+    expect(getPokemonMarksForGame('scarlet')).not.toEqual(expect.arrayContaining(['Fishing Mark', 'Curry Mark', 'Itemfinder Mark']));
   });
 });
 

@@ -23,7 +23,7 @@ import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
 import { PokemonSelector } from '@/components/counter/PokemonSelector';
 import { MethodSelector } from '@/components/counter/MethodSelector';
-import { POKEBALLS, GAMES, GIGANTAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, canHideEncountersForMethod, findHuntingMethod, supportsGigantamaxMark, supportsPokemonMarks, POKEMON_MARKS, getPokemonMarkIconUrl, ALPHA_POKEMON_ICON, getSelectedGameSpriteUrl } from '@/lib/pokemon-data';
+import { POKEBALLS, GAMES, GIGANTAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, canHideEncountersForMethod, findHuntingMethod, supportsGigantamaxMark, supportsPokemonMarks, getPokemonMarksForGame, getPokemonMarkIconUrl, ALPHA_POKEMON_ICON, getSelectedGameSpriteUrl } from '@/lib/pokemon-data';
 import { usePokemonDetails, usePokemonList, formatPokemonName, MANUAL_VARIETIES } from '@/hooks/use-pokemon';
 import { GenderSelector } from '@/components/ui/GenderSelector';
 import { Sparkles } from 'lucide-react';
@@ -481,7 +481,7 @@ export function EditShinyDialog({ open, onOpenChange, entry, playlists, onSucces
                 <SelectTrigger id="pokemon-mark"><SelectValue placeholder="No Mark" /></SelectTrigger>
                 <SelectContent className="max-h-72 overflow-y-auto">
                   <SelectItem value="none">No Mark</SelectItem>
-                  {POKEMON_MARKS.map((mark) => (
+                  {getPokemonMarksForGame(game).map((mark) => (
                     <SelectItem key={mark} value={mark}>
                       <span className="flex items-center gap-2"><img src={getPokemonMarkIconUrl(mark)} alt="" className="h-5 w-5 object-contain" />{mark}</span>
                     </SelectItem>

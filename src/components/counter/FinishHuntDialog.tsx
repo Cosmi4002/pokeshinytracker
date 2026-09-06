@@ -24,7 +24,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/integrations/supabase/client';
-import { POKEBALLS, GAMES, GIGANTAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, canHideEncountersForMethod, findHuntingMethod, getPokemonSpriteUrl, supportsGigantamaxMark, supportsPokemonMarks, POKEMON_MARKS, getPokemonMarkIconUrl } from '@/lib/pokemon-data';
+import { POKEBALLS, GAMES, GIGANTAMAX_ICON, HUNTING_METHODS, HuntingMethod, SHINY_CHARM_ICON, canHideEncountersForMethod, findHuntingMethod, getPokemonSpriteUrl, supportsGigantamaxMark, supportsPokemonMarks, getPokemonMarksForGame, getPokemonMarkIconUrl } from '@/lib/pokemon-data';
 import { hasPokemonGenderDifference, usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
 import { MethodSelector } from '@/components/counter/MethodSelector';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -427,7 +427,7 @@ export function FinishHuntDialog({
                 <SelectTrigger id="finish-pokemon-mark"><SelectValue placeholder="No Mark" /></SelectTrigger>
                 <SelectContent className="max-h-72 overflow-y-auto">
                   <SelectItem value="none">No Mark</SelectItem>
-                  {POKEMON_MARKS.map((mark) => <SelectItem key={mark} value={mark}><span className="flex items-center gap-2"><img src={getPokemonMarkIconUrl(mark)} alt="" className="h-5 w-5 object-contain" />{mark}</span></SelectItem>)}
+                  {getPokemonMarksForGame(game).map((mark) => <SelectItem key={mark} value={mark}><span className="flex items-center gap-2"><img src={getPokemonMarkIconUrl(mark)} alt="" className="h-5 w-5 object-contain" />{mark}</span></SelectItem>)}
                 </SelectContent>
               </Select>
             </div>

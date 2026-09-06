@@ -521,12 +521,42 @@ export const POKEMON_MARKS = [
   'Partner Mark', 'Mini Mark', 'Jumbo Mark', 'Mightiest Mark', 'Titan Mark',
 ] as const;
 
-// Mark sprites are provided by the PokeSprite inventory project.
-export const getPokemonMarkIconUrl = (mark: string) =>
-  `https://raw.githubusercontent.com/msikma/pokesprite/master/items/regular/${mark.trim()
+const SWORD_SHIELD_ONLY_MARKS = new Set<PokemonMark>([
+  'Fishing Mark',
+  'Curry Mark',
+  'Itemfinder Mark',
+]);
+
+const SCARLET_VIOLET_ONLY_MARKS = new Set<PokemonMark>([
+  'Destiny Mark',
+  'Mightiest Mark',
+  'Titan Mark',
+]);
+
+/**
+ * Marks can be displayed on transferred Pokémon in other games, but this list
+ * intentionally contains only marks that can be obtained in the selected game.
+ */
+export const getPokemonMarksForGame = (game: string): readonly PokemonMark[] => {
+  if (game === 'sword' || game === 'shield') {
+    return POKEMON_MARKS.filter((mark) => !SCARLET_VIOLET_ONLY_MARKS.has(mark));
+  }
+  if (game === 'scarlet' || game === 'violet') {
+    return POKEMON_MARKS.filter((mark) => !SWORD_SHIELD_ONLY_MARKS.has(mark));
+  }
+  return [];
+};
+
+// PokeSprite prefixes the item files with "mark-"; the display name is not
+// the filename (for example, Lunchtime Mark is mark-lunchtime.png).
+export const getPokemonMarkIconUrl = (mark: string) => {
+  const markName = mark.trim()
+    .replace(/\s+mark$/i, '')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
-    .replace(/-$/g, '')}.png`;
+    .replace(/-$/g, '');
+  return `https://raw.githubusercontent.com/msikma/pokesprite/master/items/regular/mark-${markName}.png`;
+};
 
 export const supportsPokemonMarks = (game: string) =>
   game === 'sword' || game === 'shield' || game === 'scarlet' || game === 'violet';

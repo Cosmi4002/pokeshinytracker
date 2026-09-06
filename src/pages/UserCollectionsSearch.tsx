@@ -618,13 +618,6 @@ export default function UserCollectionsSearch() {
                 (e.target as HTMLImageElement).src = '/placeholder.svg';
               }}
             />
-            {(entry.is_gigamax || entry.is_legends_arceus || entry.pokemon_mark) && (
-              <div className="absolute bottom-2 right-2 z-20 flex items-center gap-1 rounded-full bg-black/65 p-1.5 shadow-lg">
-                {entry.is_gigamax && <img src={GIGANTAMAX_ICON} alt="Gigantamax" title="Gigantamax" className="h-6 w-6 object-contain" />}
-                {entry.is_legends_arceus && <img src={ALPHA_POKEMON_ICON} alt="Alpha Pokémon" title="Alpha Pokémon" className="h-6 w-6 object-contain" />}
-                {entry.pokemon_mark && <img src={getPokemonMarkIconUrl(entry.pokemon_mark)} alt={entry.pokemon_mark} title={entry.pokemon_mark} className="h-6 w-6 object-contain" />}
-              </div>
-            )}
           </div>
 
           <div className="mt-3 space-y-2">
@@ -728,13 +721,22 @@ export default function UserCollectionsSearch() {
             )}
 
             {showEntryEncounters && (
-              <div className="flex items-center justify-between rounded-xl bg-muted/60 px-3 py-2">
-                <span className="text-[10px] font-black uppercase tracking-[0.12em] text-muted-foreground">
-                  {getEncounterLabel(entry.method)}
-                </span>
-                <span className="text-lg font-black tabular-nums">
-                  {entry.attempts ? entry.attempts.toLocaleString() : '-'}
-                </span>
+              <div className="rounded-xl bg-muted/60 px-3 py-2">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-[10px] font-black uppercase tracking-[0.12em] text-muted-foreground">
+                    {getEncounterLabel(entry.method)}
+                  </span>
+                  <span className="text-lg font-black tabular-nums">
+                    {entry.attempts ? entry.attempts.toLocaleString() : '-'}
+                  </span>
+                </div>
+                {(entry.is_gigamax || entry.is_legends_arceus || entry.pokemon_mark) && (
+                  <div className="mt-1.5 grid grid-cols-3 justify-items-center gap-x-2 gap-y-1.5 border-t border-border/70 pt-1.5">
+                    {entry.is_gigamax && <img src={GIGANTAMAX_ICON} alt="Gigantamax" title="Gigantamax" className="h-6 w-6 object-contain" />}
+                    {entry.is_legends_arceus && <img src={ALPHA_POKEMON_ICON} alt="Alpha Pokémon" title="Alpha Pokémon" className="h-6 w-6 object-contain" />}
+                    {entry.pokemon_mark && <img src={getPokemonMarkIconUrl(entry.pokemon_mark)} alt={entry.pokemon_mark} title={entry.pokemon_mark} className="h-6 w-6 object-contain" />}
+                  </div>
+                )}
               </div>
             )}
           </div>
