@@ -504,9 +504,34 @@ export function calculateShinyStats(encounters: number, methodId: string, hasShi
 }
 
 export const SHINY_CHARM_ICON = '/img/items/shiny-charm.png';
-export const GIGAMAX_ICON = '/img/items/dynamax-icon.png';
+export const GIGANTAMAX_ICON = '/img/items/gigamax-mark.svg';
+export const ALPHA_POKEMON_ICON = '/img/pokemon-sprites/remote/archives.bulbagarden.net/media/upload/4/4b/Alpha_icon.png';
+
+export type PokemonMark = typeof POKEMON_MARKS[number];
+export const POKEMON_MARKS = [
+  'Lunchtime Mark', 'Sleepy-Time Mark', 'Dusk Mark', 'Dawn Mark', 'Cloudy Mark',
+  'Rainy Mark', 'Stormy Mark', 'Snowy Mark', 'Blizzard Mark', 'Dry Mark',
+  'Sandstorm Mark', 'Misty Mark', 'Destiny Mark', 'Fishing Mark', 'Curry Mark',
+  'Uncommon Mark', 'Rare Mark', 'Rowdy Mark', 'Absent-Minded Mark', 'Jittery Mark',
+  'Excited Mark', 'Charismatic Mark', 'Calmness Mark', 'Intense Mark', 'Zoned-Out Mark',
+  'Joyful Mark', 'Angry Mark', 'Smiley Mark', 'Teary Mark', 'Upbeat Mark', 'Peeved Mark',
+  'Intellectual Mark', 'Ferocious Mark', 'Crafty Mark', 'Scowling Mark', 'Kindly Mark',
+  'Flustered Mark', 'Pumped-Up Mark', 'Zero Energy Mark', 'Prideful Mark', 'Unsure Mark',
+  'Humble Mark', 'Thorny Mark', 'Vigor Mark', 'Slump Mark', 'Itemfinder Mark',
+  'Partner Mark', 'Mini Mark', 'Jumbo Mark', 'Mightiest Mark', 'Titan Mark',
+] as const;
+
+// Mark sprites are provided by the PokeSprite inventory project.
+export const getPokemonMarkIconUrl = (mark: string) =>
+  `https://raw.githubusercontent.com/msikma/pokesprite/master/items/regular/${mark
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/-$/g, '')}.png`;
+
+export const supportsPokemonMarks = (game: string) =>
+  game === 'sword' || game === 'shield' || game === 'scarlet' || game === 'violet';
 export const POKEMON_EGG_ICON = '/img/items/pokemon-egg.png';
-export const supportsGigamaxMark = (game: string) => game === 'sword' || game === 'shield';
+export const supportsGigantamaxMark = (game: string) => game === 'sword' || game === 'shield';
 
 
 // Helper to get generation from method ID
