@@ -204,10 +204,10 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
     setIsEvolveDialogOpen(true);
   };
 
-  const handleEvolvedIconColorChange = async (id: string, evolvedIconColor: string) => {
+  const handleEvolvedIconColorChange = async (id: string, evolvedIconColor: string, evolvedIconArrowColor: string) => {
     const { error } = await supabase
       .from('caught_shinies')
-      .update({ evolved_icon_color: evolvedIconColor })
+      .update({ evolved_icon_color: evolvedIconColor, evolved_icon_arrow_color: evolvedIconArrowColor })
       .eq('id', id)
       .eq('user_id', user!.id);
     if (error) {
@@ -215,7 +215,9 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
       return;
     }
     setEntries((current) => current.map((entry) => (
-      entry.id === id ? { ...entry, evolved_icon_color: evolvedIconColor } : entry
+      entry.id === id
+        ? { ...entry, evolved_icon_color: evolvedIconColor, evolved_icon_arrow_color: evolvedIconArrowColor }
+        : entry
     )));
   };
 
@@ -464,6 +466,8 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
   }
 
   return (
+    <>
+      <Navbar />
     <div
       className="min-h-screen bg-background transition-colors duration-1000 relative overflow-hidden"
       style={{
@@ -481,7 +485,6 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
         }}
       />
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:56px_56px] [mask-image:radial-gradient(circle_at_center,black,transparent_82%)]" />
-      <Navbar />
       <main className="relative z-10 container mx-auto py-8 px-4">
         <div className="space-y-6">
           {/* Login banner */}
@@ -693,6 +696,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
                   <ShinyCard
                     key={entry.id}
                     entry={entry}
+                    userId={user?.id}
                     themeOverride={mergedThemes[entry.game]}
                     secondaryThemeOverride={
                       (entry as any).secondary_game
@@ -707,7 +711,7 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
                     }}
                     onDelete={() => handleDelete(entry.id)}
                     onToggleEvolved={() => handleOpenEvolveDialog(entry)}
-                    onEvolvedIconColorChange={(color) => void handleEvolvedIconColorChange(entry.id, color)}
+                    onEvolvedIconColorChange={(backgroundColor, arrowColor) => void handleEvolvedIconColorChange(entry.id, backgroundColor, arrowColor)}
                   />
                 );
               })}
@@ -716,5 +720,6 @@ export default function Collection({ mode = 'obtained' }: CollectionProps) {
         </div>
       </main>
     </div>
+    </>
   );
 }

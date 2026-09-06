@@ -1,5 +1,7 @@
-import { Pencil, Trash2, Calendar, ArrowUpCircle, Crosshair, Sparkles, ArrowRight } from 'lucide-react';
+import { Pencil, Trash2, Calendar, ArrowUpCircle, Crosshair, Sparkles, ArrowRight, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ColorPicker } from '@/components/settings/ColorPicker';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { getGameTheme, GAME_LOGOS, type GameTheme } from '@/lib/game-themes';
 import { GIGAMAX_ICON, POKEBALLS, POKEMON_EGG_ICON, findHuntingMethod, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, handlePokemonSpriteError, isBreedingMethod, supportsGigamaxMark, toLocalPokemonSpriteUrl } from '@/lib/pokemon-data';
 import type { Tables } from '@/integrations/supabase/types';
@@ -26,7 +28,8 @@ interface ShinyCardProps {
   onEdit: () => void;
   onDelete: () => void;
   onToggleEvolved: () => void;
-  onEvolvedIconColorChange: (color: string) => void;
+  onEvolvedIconColorChange: (backgroundColor: string, arrowColor: string) => void;
+  userId?: string;
   themeOverride?: GameTheme;
   secondaryThemeOverride?: GameTheme;
   applyBlackEffect?: boolean;
@@ -46,7 +49,28 @@ const getEvolvedFromSpriteBoost = (name?: string | null) => {
 const getEvolvedFromSpriteSize = (_name?: string | null, compact = false, fitScale = 1) =>
   `${2.58 * fitScale * (compact ? 0.82 : 1)}rem`;
 
-export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, onEvolvedIconColorChange, themeOverride, secondaryThemeOverride, applyBlackEffect = false, cardFilter = 'none', spriteName }: ShinyCardProps) {
+const DEFAULT_EVOLUTION_ICON_BACKGROUND = '#047857';
+const DEFAULT_EVOLUTION_ICON_ARROW = '#ffffff';
+
+type EvolutionIconColors = { backgroundColor: string; arrowColor: string };
+
+const getEvolutionIconDefaultsKey = (userId: string | undefined, game: string) =>
+  `evolution-icon-colors:${userId || 'guest'}:${game}`;
+
+const readEvolutionIconDefaults = (userId: string | undefined, game: string): EvolutionIconColors | null => {
+  try {
+    const value = window.localStorage.getItem(getEvolutionIconDefaultsKey(userId, game));
+    if (!value) return null;
+    const colors = JSON.parse(value) as Partial<EvolutionIconColors>;
+    return typeof colors.backgroundColor === 'string' && typeof colors.arrowColor === 'string'
+      ? { backgroundColor: colors.backgroundColor, arrowColor: colors.arrowColor }
+      : null;
+  } catch {
+    return null;
+  }
+};
+
+export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, onEvolvedIconColorChange, userId, themeOverride, secondaryThemeOverride, applyBlackEffect = false, cardFilter = 'none', spriteName }: ShinyCardProps) {
   const spriteOutlineSeed = useId().replace(/:/g, '');
   const mainSpriteOutlineId = `main-sprite-outline-${spriteOutlineSeed}`;
   const [evolvedFromSpriteDimensions, setEvolvedFromSpriteDimensions] = useState<{ width: number; height: number } | null>(null);
@@ -61,6 +85,10 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, onEvolvedI
   const evolvedFromId = (entry as any).evolved_from_id as number | null | undefined;
   const evolvedFromName = (entry as any).evolved_from_name as string | null | undefined;
   const evolvedIconColor = (entry as any).evolved_icon_color as string | null | undefined;
+  const evolvedIconArrowColor = (entry as any).evolved_icon_arrow_color as string | null | undefined;
+  const [isEvolutionIconDialogOpen, setIsEvolutionIconDialogOpen] = useState(false);
+  const [iconBackgroundColor, setIconBackgroundColor] = useState(evolvedIconColor || DEFAULT_EVOLUTION_ICON_BACKGROUND);
+  const [iconArrowColor, setIconArrowColor] = useState(evolvedIconArrowColor || DEFAULT_EVOLUTION_ICON_ARROW);
 
   const theme = useMemo(() => themeOverride || getGameTheme(entry.game), [entry.game, themeOverride]);
   const secondaryTheme = useMemo(() => {
@@ -70,6 +98,24 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, onEvolvedI
   const pokeball = useMemo(() => POKEBALLS.find((b) => b.id === entry.pokeball), [entry.pokeball]);
   const method = useMemo(() => findHuntingMethod(entry.method), [entry.method]);
   const hasBottomMeta = isGigamax || isLegendsArceus || entry.is_fail || entry.is_unobtainable;
+
+  const openEvolutionIconDialog = () => {
+    const savedDefaults = readEvolutionIconDefaults(userId, entry.game);
+    setIconBackgroundColor(evolvedIconColor || savedDefaults?.backgroundColor || DEFAULT_EVOLUTION_ICON_BACKGROUND);
+    setIconArrowColor(evolvedIconArrowColor || savedDefaults?.arrowColor || DEFAULT_EVOLUTION_ICON_ARROW);
+    setIsEvolutionIconDialogOpen(true);
+  };
+
+  const saveEvolutionIconDefaults = () => {
+    try {
+      window.localStorage.setItem(
+        getEvolutionIconDefaultsKey(userId, entry.game),
+        JSON.stringify({ backgroundColor: iconBackgroundColor, arrowColor: iconArrowColor }),
+      );
+    } catch {
+      // The selected colours can still be applied even if browser storage is unavailable.
+    }
+  };
   const isGameCorner = normalizedMethod.includes('game corner') || normalizedMethod.includes('game-corner') || method?.name.toLowerCase() === 'game corner';
   const isPokeRadar = normalizedMethod.includes('pokeradar') || normalizedMethod.includes('poke radar') || method?.name.toLowerCase().includes('poke radar');
   const isChainFishing = normalizedMethod.includes('chain fishing') || method?.name.toLowerCase().includes('chain fishing');
@@ -328,20 +374,18 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, onEvolvedI
             </div>
             {isEvolved && (
               <div className="absolute right-2 top-2 z-30 flex w-14 flex-col items-center gap-1">
-                <label
-                  className="relative flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border border-white/55 text-white shadow-[0_3px_12px_rgba(0,0,0,0.6),0_0_0_1px_rgba(0,0,0,0.45)] ring-1 ring-white/45 backdrop-blur-md self-center"
+                <button
+                  type="button"
+                  onClick={openEvolutionIconDialog}
+                  className="relative flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border border-white/55 shadow-[0_3px_12px_rgba(0,0,0,0.6),0_0_0_1px_rgba(0,0,0,0.45)] ring-1 ring-white/45 backdrop-blur-md self-center"
                   style={{ backgroundColor: evolvedIconColor || '#047857' }}
                   title="Clicca per scegliere il colore dell'icona evoluto da"
                 >
-                  <ArrowUpCircle className="h-3.5 w-3.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]" />
-                  <input
-                    type="color"
-                    value={evolvedIconColor || '#047857'}
-                    onChange={(event) => onEvolvedIconColorChange(event.target.value)}
-                    className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                    aria-label="Colore icona evoluto da"
+                  <ArrowUpCircle
+                    className="h-3.5 w-3.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
+                    style={{ color: evolvedIconArrowColor || DEFAULT_EVOLUTION_ICON_ARROW }}
                   />
-                </label>
+                </button>
                 {evolvedFromSpriteUrl && (
                   <img
                     src={toLocalPokemonSpriteUrl(evolvedFromSpriteUrl)}
@@ -774,6 +818,51 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, onEvolvedI
           )}
         </div>
       </div>
+      <Dialog open={isEvolutionIconDialogOpen} onOpenChange={setIsEvolutionIconDialogOpen}>
+        <DialogContent className="max-h-[90dvh] max-w-xl overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Colori icona “Evoluto da”</DialogTitle>
+            <DialogDescription>
+              Personalizza separatamente lo sfondo e il cerchio con la freccia. I colori predefiniti sono salvati per il gioco {entry.game} su questo dispositivo.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-center rounded-2xl border border-border bg-muted/35 p-6">
+              <span
+                className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-white/60 shadow-lg"
+                style={{ backgroundColor: iconBackgroundColor }}
+              >
+                <ArrowUpCircle className="h-9 w-9 drop-shadow-[0_2px_3px_rgba(0,0,0,0.75)]" style={{ color: iconArrowColor }} />
+              </span>
+            </div>
+            <ColorPicker label="Sfondo del badge" value={iconBackgroundColor} onChange={setIconBackgroundColor} />
+            <ColorPicker label="Cerchio e freccia" value={iconArrowColor} onChange={setIconArrowColor} />
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                saveEvolutionIconDefaults();
+              }}
+            >
+              <Save className="mr-2 h-4 w-4" />
+              Salva predefinito per {entry.game}
+            </Button>
+            <Button
+              type="button"
+              onClick={() => {
+                onEvolvedIconColorChange(iconBackgroundColor, iconArrowColor);
+                setIsEvolutionIconDialogOpen(false);
+              }}
+            >
+              Applica colori
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

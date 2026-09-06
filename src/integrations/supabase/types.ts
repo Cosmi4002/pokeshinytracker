@@ -122,6 +122,7 @@ export type Database = {
           evolved_from_id: number | null
           evolved_from_entity_key: string | null
           evolved_from_name: string | null
+          evolved_icon_arrow_color: string | null
           evolved_icon_color: string | null
           entity_key: string | null
           form: string | null
@@ -173,6 +174,7 @@ export type Database = {
           evolved_from_id?: number | null
           evolved_from_entity_key?: string | null
           evolved_from_name?: string | null
+          evolved_icon_arrow_color?: string | null
           evolved_icon_color?: string | null
           entity_key?: string | null
           phase_number?: number | null
@@ -210,6 +212,7 @@ export type Database = {
           evolved_from_id?: number | null
           evolved_from_entity_key?: string | null
           evolved_from_name?: string | null
+          evolved_icon_arrow_color?: string | null
           evolved_icon_color?: string | null
           entity_key?: string | null
           phase_number?: number | null
