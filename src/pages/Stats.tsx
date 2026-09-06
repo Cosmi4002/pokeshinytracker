@@ -28,6 +28,11 @@ type RankedItem = {
   value: number;
 };
 
+type GameEncounterItem = RankedItem & {
+  average: number;
+  hunts: number;
+};
+
 const numberFormatter = new Intl.NumberFormat('it-IT');
 const dateFormatter = new Intl.DateTimeFormat('it-IT', { month: 'short', year: 'numeric' });
 
@@ -268,6 +273,35 @@ function RankedList({
   );
 }
 
+function AverageEncountersByGame({ items }: { items: GameEncounterItem[] }) {
+  return (
+    <Card className={`overflow-hidden border ${statsPanelClass}`}>
+      <CardHeader>
+        <CardTitle className="text-base">Average encounters by game</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {items.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No tracked encounters recorded.</p>
+        ) : (
+          items.map((item) => (
+            <div key={item.id} className="rounded-lg border border-border/70 bg-muted/30 px-3 py-2.5">
+              <div className="flex items-center justify-between gap-3">
+                <span className="min-w-0 truncate font-medium">{item.label}</span>
+                <span className="shrink-0 font-mono text-sm font-bold tabular-nums">
+                  {numberFormatter.format(item.average)} avg.
+                </span>
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {numberFormatter.format(item.value)} total encounters · {numberFormatter.format(item.hunts)} hunts
+              </p>
+            </div>
+          ))
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function Stats() {
   const { user, loading: authLoading } = useAuth();
   const { pokemon } = usePokemonList();
@@ -305,7 +339,27 @@ export default function Stats() {
       setLoading(false);
     };
 
-    fetchStats();
+    void fetchStats();
+
+    if (!user) return;
+
+    const channel = supabase
+      .channel(`stats-caught-shinies-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'caught_shinies',
+          filter: `user_id=eq.${user.id}`,
+        },
+        () => { void fetchStats(); },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
   }, [toast, user]);
 
   const pokemonById = useMemo(() => {
@@ -325,6 +379,8 @@ export default function Stats() {
     const evolved = new Set<string>();
     const methodCounts = new Map<string, RankedItem>();
     const gameCounts = new Map<string, RankedItem>();
+    const gameEncounterCounts = new Map<string, RankedItem>();
+    const gameEncounterHuntCounts = new Map<string, number>();
     const generationCounts = new Map<string, RankedItem>();
     const monthlyCounts = new Map<string, RankedItem>();
     let totalAttempts = 0;
@@ -368,8 +424,11 @@ export default function Stats() {
 
       const attempts = Number(entry.attempts || 0);
       if (hasTrackedAttempts(entry)) {
+        const gameId = normalize(entry.game) || 'unknown';
         totalAttempts += attempts;
         attemptsRows += 1;
+        addCount(gameEncounterCounts, gameId, getGameLabel(entry.game), attempts);
+        gameEncounterHuntCounts.set(gameId, (gameEncounterHuntCounts.get(gameId) || 0) + 1);
         if (!longestHunt || attempts > Number(longestHunt.attempts || 0)) longestHunt = entry;
         if (!luckiestHunt || getLuckScore(entry) < getLuckScore(luckiestHunt)) luckiestHunt = entry;
       }
@@ -393,6 +452,11 @@ export default function Stats() {
       shinyCharmCount,
       methodTop: mapToRanked(methodCounts, 6),
       gameTop: mapToRanked(gameCounts, 6),
+      gameEncounters: mapToRanked(gameEncounterCounts).map((item) => ({
+        ...item,
+        average: Math.round(item.value / (gameEncounterHuntCounts.get(item.id) || 1)),
+        hunts: gameEncounterHuntCounts.get(item.id) || 0,
+      })),
       generationTop: mapToRanked(generationCounts),
       monthly,
       bestMonth,
@@ -490,6 +554,7 @@ export default function Stats() {
         <div className="grid gap-4 lg:grid-cols-2">
           <RankedList title="Most-used methods" items={stats.methodTop} total={obtainedTotal} empty="No methods recorded." accentColor={accentColor} />
           <RankedList title="Most-used games" items={stats.gameTop} total={obtainedTotal} empty="No games recorded." accentColor={accentColor} />
+          <AverageEncountersByGame items={stats.gameEncounters} />
           <RankedList title="Distribution by generation" items={stats.generationTop} total={obtainedTotal} empty="No generation data available." accentColor={accentColor} />
           <Card className={`self-start border ${statsPanelClass}`}>
             <CardHeader>

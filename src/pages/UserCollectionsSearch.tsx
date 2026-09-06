@@ -22,6 +22,17 @@ type PublicCaughtRow = Pick<
 type PublicRecentRow = PublicCaughtRow & { user_id: string; username: string | null };
 
 const numberFormatter = new Intl.NumberFormat('it-IT');
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+
+const getEvolvedFromSpriteBoost = (name?: string | null) => {
+  const normalized = (name || '').trim().toLowerCase();
+  if (normalized.includes('bidoof')) return 1.28;
+  if (normalized.includes('misdreavus')) return 1.2;
+  return 1;
+};
+
+const getEvolvedFromSpriteSize = (compact: boolean, fitScale: number) =>
+  `${2.58 * fitScale * (compact ? 0.82 : 1)}rem`;
 
 type StatTileProps = {
   label: string;
@@ -29,6 +40,67 @@ type StatTileProps = {
   note: string;
   icon: ComponentType<{ className?: string }>;
 };
+
+function PublicEvolutionBadge({ entry, accentColor, showEncounters }: {
+  entry: PublicCaughtRow | PublicRecentRow;
+  accentColor: string;
+  showEncounters: boolean;
+}) {
+  const [spriteDimensions, setSpriteDimensions] = useState<{ width: number; height: number } | null>(null);
+  const sourceSprite = useMemo(() => {
+    if (!entry.is_evolved || !entry.evolved_from_id) return '';
+    const spriteGame = entry.secondary_game || entry.game;
+    return getGameSpecificShinySpriteUrl(entry.evolved_from_id, spriteGame, { name: entry.evolved_from_name || undefined })
+      || getPokemonSpriteUrl(entry.evolved_from_id, { shiny: true, name: entry.evolved_from_name || undefined })
+      || getPokemonSpriteUrl(entry.evolved_from_id, { shiny: true });
+  }, [entry.evolved_from_id, entry.evolved_from_name, entry.game, entry.is_evolved, entry.secondary_game]);
+  const fitScale = useMemo(() => {
+    if (!spriteDimensions) return 1;
+    const longestSide = Math.max(spriteDimensions.width, spriteDimensions.height);
+    if (!longestSide) return 1;
+    return clamp((showEncounters ? 54 : 48) / longestSide, 0.82, 1.18);
+  }, [showEncounters, spriteDimensions]);
+  const displayScale = fitScale * getEvolvedFromSpriteBoost(entry.evolved_from_name);
+
+  useEffect(() => {
+    setSpriteDimensions(null);
+  }, [sourceSprite]);
+
+  if (!entry.is_evolved) return null;
+
+  return (
+    <div className="absolute right-2 top-2 z-20 flex w-14 flex-col items-center gap-1">
+      <div
+        className="flex h-6 w-6 items-center justify-center rounded-full border border-white/55 text-white shadow-[0_3px_12px_rgba(0,0,0,0.6),0_0_0_1px_rgba(0,0,0,0.45)] ring-1 ring-white/30 backdrop-blur-sm"
+        style={{
+          background: `linear-gradient(145deg, ${accentColor}, color-mix(in srgb, ${accentColor} 72%, #111))`,
+          boxShadow: `0 3px 12px color-mix(in srgb, ${accentColor} 36%, rgba(0,0,0,0.55)), 0 0 0 1px rgba(0,0,0,0.45)`,
+        }}
+        title="Pokemon evoluto"
+      >
+        <ArrowUpCircle className="h-3.5 w-3.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]" />
+      </div>
+      {sourceSprite && (
+        <img
+          src={sourceSprite}
+          alt={`Evolved from ${entry.evolved_from_name || 'previous Pokémon'}`}
+          title={`Evolved from ${entry.evolved_from_name || 'previous Pokémon'}`}
+          className={cn('block max-w-none object-contain pokemon-sprite self-center', getGameSpecificSpriteScaleClass(sourceSprite))}
+          style={{
+            width: getEvolvedFromSpriteSize(!showEncounters, displayScale),
+            height: getEvolvedFromSpriteSize(!showEncounters, displayScale),
+            filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.85))',
+            imageRendering: getGameSpecificSpriteImageRendering(sourceSprite),
+            ...(isGameSpecificShinySpriteUrl(sourceSprite) ? getGameSpecificSpriteScaleStyle(sourceSprite) : {}),
+          }}
+          loading="lazy"
+          onLoad={(event) => setSpriteDimensions({ width: event.currentTarget.naturalWidth, height: event.currentTarget.naturalHeight })}
+          onError={(event) => { event.currentTarget.src = '/placeholder.svg'; }}
+        />
+      )}
+    </div>
+  );
+}
 
 function StatTile({ label, value, note, icon: Icon }: StatTileProps) {
   return (
@@ -474,29 +546,6 @@ export default function UserCollectionsSearch() {
     return null;
   };
 
-  const renderEvolutionBadge = (entry: PublicCaughtRow | PublicRecentRow) => {
-    if (!entry.is_evolved) return null;
-    const sourceSprite = entry.evolved_from_id
-      ? getGameSpecificShinySpriteUrl(entry.evolved_from_id, entry.game || entry.secondary_game, { shiny: true, name: entry.evolved_from_name })
-        || getPokemonSpriteUrl(entry.evolved_from_id, { shiny: true, name: entry.evolved_from_name })
-      : null;
-    return (
-      <div className="absolute right-2 top-2 z-20 flex flex-col items-center gap-0.5">
-        <div
-          className="flex h-6 w-6 items-center justify-center rounded-full border border-white/55 text-white shadow-[0_3px_12px_rgba(0,0,0,0.6),0_0_0_1px_rgba(0,0,0,0.45)] ring-1 ring-white/30 backdrop-blur-sm"
-        style={{
-          background: `linear-gradient(145deg, ${accentColor}, color-mix(in srgb, ${accentColor} 72%, #111))`,
-          boxShadow: `0 3px 12px color-mix(in srgb, ${accentColor} 36%, rgba(0,0,0,0.55)), 0 0 0 1px rgba(0,0,0,0.45)`,
-        }}
-        title="Pokemon evoluto"
-        >
-          <ArrowUpCircle className="h-3.5 w-3.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]" />
-        </div>
-        {sourceSprite && <img src={sourceSprite} alt={`Evolved from ${entry.evolved_from_name || 'previous Pokémon'}`} title={`Evolved from ${entry.evolved_from_name || 'previous Pokémon'}`} className="h-8 w-8 object-contain [image-rendering:pixelated]" />}
-      </div>
-    );
-  };
-
   const getSpriteStyle = (isFail: boolean | null, isUnobtainable: boolean | null) => {
     if (isFail) {
       return {
@@ -548,7 +597,7 @@ export default function UserCollectionsSearch() {
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.12),transparent_42%)] opacity-70" />
         <div className="relative p-3">
           <div className="relative flex min-h-[118px] items-center justify-center overflow-hidden rounded-[1.05rem] border border-border bg-muted/55">
-            {renderEvolutionBadge(entry)}
+            <PublicEvolutionBadge entry={entry} accentColor={accentColor} showEncounters={showEntryEncounters} />
             {!isGameSpecificSprite && <div className="absolute inset-x-6 bottom-4 h-6 rounded-full bg-black/20 blur-xl" />}
             <img
               src={sprite}

@@ -124,6 +124,7 @@ export type Database = {
           evolved_from_name: string | null
           evolved_icon_arrow_color: string | null
           evolved_icon_color: string | null
+          evolved_icon_outline_color: string | null
           entity_key: string | null
           form: string | null
           game: string
@@ -176,6 +177,7 @@ export type Database = {
           evolved_from_name?: string | null
           evolved_icon_arrow_color?: string | null
           evolved_icon_color?: string | null
+          evolved_icon_outline_color?: string | null
           entity_key?: string | null
           phase_number?: number | null
           playlist_id?: string | null
@@ -214,6 +216,7 @@ export type Database = {
           evolved_from_name?: string | null
           evolved_icon_arrow_color?: string | null
           evolved_icon_color?: string | null
+          evolved_icon_outline_color?: string | null
           entity_key?: string | null
           phase_number?: number | null
           playlist_id?: string | null
