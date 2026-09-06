@@ -82,6 +82,8 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, onEvolvedI
   const isGigantamax = entry.is_gigamax === true && supportsGigantamaxMark(entry.game);
   const isLegendsArceus = entry.is_legends_arceus === true;
   const pokemonMark = entry.pokemon_mark;
+  // Normalize persisted values so whitespace-only marks do not create an empty badge.
+  const pokemonMark = entry.pokemon_mark?.trim() || null;
   const isEvent = (entry.method || '').toString().trim().toLowerCase() === 'distribution/event';
   const normalizedMethod = (entry.method || '').toString().trim().toLowerCase();
   const isBreeding = isBreedingMethod(normalizedMethod);
@@ -663,6 +665,7 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, onEvolvedI
                           className="pointer-events-none absolute top-1/2 h-[4.25rem] w-[4.25rem] -translate-y-1/2 object-contain opacity-95 drop-shadow-[0_2px_6px_rgba(0,0,0,0.55)]"
                           style={{ left: `${0.25 + index * 1.85}rem` }}
                           onError={(event) => { event.currentTarget.src = '/placeholder.svg'; }}
+                          onError={(e) => ((e.currentTarget as HTMLImageElement).src = '/placeholder.svg')}
                         />
                       ))}
                       <div className="relative z-10 flex max-w-full items-baseline justify-center text-center">

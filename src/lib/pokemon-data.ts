@@ -506,6 +506,7 @@ export function calculateShinyStats(encounters: number, methodId: string, hasShi
 export const SHINY_CHARM_ICON = '/img/items/shiny-charm.png';
 // Retain the established Gigantamax artwork while using the corrected label.
 export const GIGANTAMAX_ICON = '/img/items/dynamax-icon.png';
+export const GIGANTAMAX_ICON = '/img/items/gigamax-mark.svg';
 export const ALPHA_POKEMON_ICON = '/img/pokemon-sprites/remote/archives.bulbagarden.net/media/upload/4/4b/Alpha_icon.png';
 
 export type PokemonMark = typeof POKEMON_MARKS[number];
@@ -526,6 +527,12 @@ export const POKEMON_MARKS = [
 // every Mark name. Use that verified inventory asset for each selected Mark.
 export const POKEMON_MARK_ICON = 'https://raw.githubusercontent.com/msikma/pokesprite/master/items/regular/mark-charm.png';
 export const getPokemonMarkIconUrl = (_mark: string) => POKEMON_MARK_ICON;
+// Mark sprites are provided by the PokeSprite inventory project.
+export const getPokemonMarkIconUrl = (mark: string) =>
+  `https://raw.githubusercontent.com/msikma/pokesprite/master/items/regular/${mark.trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/-$/g, '')}.png`;
 
 export const supportsPokemonMarks = (game: string) =>
   game === 'sword' || game === 'shield' || game === 'scarlet' || game === 'violet';
