@@ -1,4 +1,4 @@
-const POKESPRITE_ITEM_BASE_URL = 'https://raw.githubusercontent.com/msikma/pokesprite/master/items/regular';
+const POKESPRITE_ITEM_BASE_URL = 'https://raw.githubusercontent.com/msikma/pokesprite/master/items/fossil';
 
 type FossilRestoreIcon = {
   id: string;
