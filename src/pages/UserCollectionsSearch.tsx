@@ -159,11 +159,14 @@ export default function UserCollectionsSearch() {
 
   const getEncounterLabel = (method?: string | null) => {
     const raw = normalizeMethod(method);
-    const huntingMethod = findHuntingMethod(method);
-    const methodName = huntingMethod?.name.toLowerCase() || '';
-    if (raw.includes('pokeradar') || raw.includes('poke radar') || methodName.includes('poke radar')) return 'Chain';
-    if (raw.includes('chain fishing') || methodName.includes('chain fishing')) return 'Chain';
-    if (raw.includes('game corner') || raw.includes('game-corner') || methodName === 'game corner') return 'Seen';
+    const methodName = findHuntingMethod(method)?.name.toLowerCase() || '';
+    const isMethod = (term: string) => raw.includes(term) || methodName.includes(term);
+
+    if (isMethod('fossil restore')) return 'Fossil Revived';
+    if (isMethod('double')) return 'Double Encounter';
+    if (isMethod('horde')) return 'Horde Encounter';
+    if (isMethod('poke radar') || raw.includes('pokeradar') || isMethod('chain fishing')) return 'Chain';
+    if (isMethod('game corner') || isMethod('gift')) return 'Seen';
     if (isBreedingMethod(raw)) return 'Hatched';
     return 'Encounters';
   };
@@ -499,6 +502,7 @@ export default function UserCollectionsSearch() {
       formsCount: forms.size,
       averageAttempts: trackedRows > 0 ? Math.round(trackedAttempts / trackedRows) : 0,
       trackedRows,
+      trackedAttempts,
       charmPercent: obtained.length > 0 ? Math.round((charmCount / obtained.length) * 100) : 0,
       failCount: entries.filter((entry) => entry.is_fail).length,
       topGame: topGame ? { label: getGameLabel(topGame[0]), count: topGame[1] } : null,
@@ -981,7 +985,7 @@ export default function UserCollectionsSearch() {
                   </Card>
 
                   <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                    <StatTile label="Average" value={userStats.averageAttempts ? numberFormatter.format(userStats.averageAttempts) : '-'} note={`${numberFormatter.format(userStats.trackedRows)} with encounters`} icon={TrendingUp} />
+                    <StatTile label="Average encounters" value={userStats.averageAttempts ? numberFormatter.format(userStats.averageAttempts) : '-'} note={`${numberFormatter.format(userStats.trackedAttempts)} counter encounters`} icon={TrendingUp} />
                     <StatTile label="Charm" value={`${userStats.charmPercent}%`} note="Catches with the Shiny Charm" icon={Crown} />
                     <StatTile label="Top game" value={userStats.topGame?.label || '-'} note={userStats.topGame ? `${userStats.topGame.count} catches` : 'No data'} icon={Gamepad2} />
                     <StatTile label="Top method" value={userStats.topMethod?.label || '-'} note={userStats.topMethod ? `${userStats.topMethod.count} catches` : 'No data'} icon={Target} />
