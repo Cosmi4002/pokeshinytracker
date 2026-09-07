@@ -41,6 +41,7 @@ import {
   OFFLINE_HUNT_SYNCED_EVENT,
   patchCachedActiveHunt,
   readCounterSnapshot,
+  shouldUsePendingCounterSnapshot,
   replaceCachedActiveHunt,
   writeCounterSnapshot,
   type OfflineActiveHunt,
@@ -171,6 +172,9 @@ export function ShinyCounter({
   const [customOdds, setCustomOdds] = useState(4096);
   const [loading, setLoading] = useState(!!user);
   const activeHuntIdRef = useRef<string | null>(null);
+  // The server version observed during load. It prevents an old device snapshot
+  // from silently overwriting fields changed on another device.
+  const remoteUpdatedAtRef = useRef<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'offline' | 'error'>('saved');
   const [isEditingCounter, setIsEditingCounter] = useState(false);
   const [tempCounterValue, setTempCounterValue] = useState('');
@@ -285,6 +289,7 @@ export function ShinyCounter({
   // Load the device snapshot first, then reconcile it with Supabase when online.
   useEffect(() => {
     isInitialLoadRef.current = true;
+    remoteUpdatedAtRef.current = null;
     setInitialLoadComplete(false);
     const localSnapshot = readCounterSnapshot(ownerId, storageHuntId);
     if (localSnapshot) {
@@ -347,7 +352,11 @@ export function ShinyCounter({
           const data = huntRes.data as ActiveHuntWithVariant;
           activeHuntIdRef.current = data.id;
           const pendingSnapshot = readCounterSnapshot(user.id, data.id);
-          if (pendingSnapshot?.pendingSync) {
+          const remoteUpdatedAt = data.updated_at || new Date(0).toISOString();
+          remoteUpdatedAtRef.current = data.updated_at;
+          const localPendingChangesAreNewer = shouldUsePendingCounterSnapshot(pendingSnapshot, data.updated_at);
+
+          if (localPendingChangesAreNewer) {
             applyCounterSnapshot(pendingSnapshot);
             setSaveStatus('saving');
           } else {
@@ -357,7 +366,7 @@ export function ShinyCounter({
               version: 1,
               ownerId: user.id,
               huntId: data.id,
-              updatedAt: data.updated_at || new Date().toISOString(),
+              updatedAt: remoteUpdatedAt,
               pendingSync: false,
               counter: data.counter ?? 0,
               incrementAmount: data.increment_amount ?? 1,
@@ -503,11 +512,15 @@ export function ShinyCounter({
         let remoteHunt: OfflineActiveHunt | null = null;
 
         if (currentHuntId && !currentHuntId.startsWith(OFFLINE_HUNT_PREFIX)) {
-          const { data, error } = await supabase
+          let updateQuery = supabase
             .from('active_hunts')
             .update(payload)
             .eq('id', currentHuntId)
-            .eq('user_id', user.id)
+            .eq('user_id', user.id);
+          if (remoteUpdatedAtRef.current) {
+            updateQuery = updateQuery.eq('updated_at', remoteUpdatedAtRef.current);
+          }
+          const { data, error } = await updateQuery
             .select('*')
             .maybeSingle();
           if (error || !data) throw error || new Error('Active hunt was not found');
@@ -526,6 +539,7 @@ export function ShinyCounter({
 
         const previousHuntId = currentHuntId || snapshotHuntId;
         activeHuntIdRef.current = remoteHunt.id;
+        remoteUpdatedAtRef.current = remoteHunt.updated_at || snapshot.updatedAt;
         const syncedSnapshot: OfflineCounterSnapshot = {
           ...snapshot,
           huntId: remoteHunt.id,

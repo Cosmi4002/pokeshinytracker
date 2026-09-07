@@ -11,16 +11,16 @@ describe('card badge helpers', () => {
   });
 
   it('only offers marks obtainable in the selected game', () => {
-    expect(getPokemonMarksForGame('sword')).toEqual(expect.arrayContaining(['Fishing Mark', 'Curry Mark', 'Itemfinder Mark']));
-    expect(getPokemonMarksForGame('sword')).not.toEqual(expect.arrayContaining(['Mini Mark', 'Jumbo Mark', 'Mightiest Mark', 'Titan Mark']));
-    expect(getPokemonMarksForGame('scarlet')).toEqual(expect.arrayContaining(['Destiny Mark', 'Mini Mark', 'Jumbo Mark', 'Mightiest Mark', 'Titan Mark']));
-    expect(getPokemonMarksForGame('scarlet')).not.toEqual(expect.arrayContaining(['Fishing Mark', 'Curry Mark', 'Itemfinder Mark']));
+    expect(getPokemonMarksForGame('sword')).toEqual(expect.arrayContaining(['Fishing Mark', 'Curry Mark']));
+    expect(getPokemonMarksForGame('sword')).not.toEqual(expect.arrayContaining(['Itemfinder Mark', 'Partner Mark', 'Mini Mark', 'Jumbo Mark', 'Mightiest Mark', 'Titan Mark', 'Alpha Mark']));
+    expect(getPokemonMarksForGame('scarlet')).toEqual(expect.arrayContaining(['Destiny Mark', 'Itemfinder Mark', 'Alpha Mark', 'Partner Mark', 'Mini Mark', 'Jumbo Mark', 'Mightiest Mark', 'Titan Mark']));
+    expect(getPokemonMarksForGame('scarlet')).not.toEqual(expect.arrayContaining(['Fishing Mark', 'Curry Mark']));
   });
 
   it('uses a declared icon source and safely falls back for legacy unknown marks', () => {
-    expect(getPokemonMarkIconUrl('Mini Mark')).toBe(
-      '/img/mini-mark.png',
-    );
+    expect(getPokemonMarkIconUrl('Mini Mark')).toBe('/img/mini-mark.png');
+    expect(getPokemonMarkIconUrl('Alpha Mark')).toBe('/img/alpha-mark.png');
+    expect(getPokemonMarkIconUrl('Partner Mark')).toBe('/img/partner-mark.png');
     expect(getPokemonMarkIconUrl('Unknown Mark')).toBe('/placeholder.svg');
   });
 });
