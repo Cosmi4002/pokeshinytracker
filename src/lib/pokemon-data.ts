@@ -504,58 +504,58 @@ export function calculateShinyStats(encounters: number, methodId: string, hasShi
 }
 
 export const SHINY_CHARM_ICON = '/img/items/shiny-charm.png';
-export const GIGANTAMAX_ICON = '/img/items/gigamax-mark.svg';
+// This is the original in-game Gigantamax symbol. Keep its legacy filename so
+// renaming the UI label cannot accidentally swap the image asset again.
+export const GIGANTAMAX_ICON = '/img/items/dynamax-icon.png';
 export const ALPHA_POKEMON_ICON = '/img/pokemon-sprites/remote/archives.bulbagarden.net/media/upload/4/4b/Alpha_icon.png';
 
-export type PokemonMark = typeof POKEMON_MARKS[number];
-export const POKEMON_MARKS = [
-  'Lunchtime Mark', 'Sleepy-Time Mark', 'Dusk Mark', 'Dawn Mark', 'Cloudy Mark',
-  'Rainy Mark', 'Stormy Mark', 'Snowy Mark', 'Blizzard Mark', 'Dry Mark',
-  'Sandstorm Mark', 'Misty Mark', 'Destiny Mark', 'Fishing Mark', 'Curry Mark',
-  'Uncommon Mark', 'Rare Mark', 'Rowdy Mark', 'Absent-Minded Mark', 'Jittery Mark',
-  'Excited Mark', 'Charismatic Mark', 'Calmness Mark', 'Intense Mark', 'Zoned-Out Mark',
-  'Joyful Mark', 'Angry Mark', 'Smiley Mark', 'Teary Mark', 'Upbeat Mark', 'Peeved Mark',
-  'Intellectual Mark', 'Ferocious Mark', 'Crafty Mark', 'Scowling Mark', 'Kindly Mark',
-  'Flustered Mark', 'Pumped-Up Mark', 'Zero Energy Mark', 'Prideful Mark', 'Unsure Mark',
-  'Humble Mark', 'Thorny Mark', 'Vigor Mark', 'Slump Mark', 'Itemfinder Mark',
-  'Partner Mark', 'Mini Mark', 'Jumbo Mark', 'Mightiest Mark', 'Titan Mark',
-] as const;
-
-const SWORD_SHIELD_ONLY_MARKS = new Set<PokemonMark>([
-  'Fishing Mark',
-  'Curry Mark',
-  'Itemfinder Mark',
-]);
-
-const SCARLET_VIOLET_ONLY_MARKS = new Set<PokemonMark>([
-  'Destiny Mark',
-  'Mightiest Mark',
-  'Titan Mark',
-]);
+type MarkGame = 'sword' | 'shield' | 'scarlet' | 'violet';
 
 /**
- * Marks can be displayed on transferred Pokémon in other games, but this list
- * intentionally contains only marks that can be obtained in the selected game.
+ * Canonical Mark catalog, rebuilt from the Sword/Shield and Scarlet/Violet
+ * Mark lists (https://www.serebii.net/swordshield/marks.shtml and
+ * https://www.serebii.net/scarletviolet/marks.shtml). A Mark is shown only
+ * for a game in which it can be obtained.
  */
-export const getPokemonMarksForGame = (game: string): readonly PokemonMark[] => {
-  if (game === 'sword' || game === 'shield') {
-    return POKEMON_MARKS.filter((mark) => !SCARLET_VIOLET_ONLY_MARKS.has(mark));
-  }
-  if (game === 'scarlet' || game === 'violet') {
-    return POKEMON_MARKS.filter((mark) => !SWORD_SHIELD_ONLY_MARKS.has(mark));
-  }
-  return [];
-};
+type PokemonMarkDefinition = readonly [name: string, icon: string, games?: readonly MarkGame[]];
 
-// PokeSprite prefixes the item files with "mark-"; the display name is not
-// the filename (for example, Lunchtime Mark is mark-lunchtime.png).
+const POKEMON_MARK_CATALOG: readonly PokemonMarkDefinition[] = [
+  ['Lunchtime Mark', 'lunchtime'], ['Sleepy-Time Mark', 'sleepy-time'], ['Dusk Mark', 'dusk'], ['Dawn Mark', 'dawn'],
+  ['Cloudy Mark', 'cloudy'], ['Rainy Mark', 'rainy'], ['Stormy Mark', 'stormy'], ['Snowy Mark', 'snowy'],
+  ['Blizzard Mark', 'blizzard'], ['Dry Mark', 'dry'], ['Sandstorm Mark', 'sandstorm'], ['Misty Mark', 'misty'],
+  ['Destiny Mark', 'destiny'],
+  ['Fishing Mark', 'fishing', ['sword', 'shield']], ['Curry Mark', 'curry', ['sword', 'shield']],
+  ['Uncommon Mark', 'uncommon'], ['Rare Mark', 'rare'], ['Rowdy Mark', 'rowdy'], ['Absent-Minded Mark', 'absent-minded'],
+  ['Jittery Mark', 'jittery'], ['Excited Mark', 'excited'], ['Charismatic Mark', 'charismatic'], ['Calmness Mark', 'calmness'],
+  ['Intense Mark', 'intense'], ['Zoned-Out Mark', 'zoned-out'], ['Joyful Mark', 'joyful'], ['Angry Mark', 'angry'],
+  ['Smiley Mark', 'smiley'], ['Teary Mark', 'teary'], ['Upbeat Mark', 'upbeat'], ['Peeved Mark', 'peeved'],
+  ['Intellectual Mark', 'intellectual'], ['Ferocious Mark', 'ferocious'], ['Crafty Mark', 'crafty'], ['Scowling Mark', 'scowling'],
+  ['Kindly Mark', 'kindly'], ['Flustered Mark', 'flustered'], ['Pumped-Up Mark', 'pumped-up'], ['Zero Energy Mark', 'zero-energy'],
+  ['Prideful Mark', 'prideful'], ['Unsure Mark', 'unsure'], ['Humble Mark', 'humble'], ['Thorny Mark', 'thorny'],
+  ['Vigor Mark', 'vigor'], ['Slump Mark', 'slump'], ['Itemfinder Mark', 'itemfinder', ['sword', 'shield']],
+  ['Partner Mark', 'partner'],
+  ['Mini Mark', 'mini', ['scarlet', 'violet']], ['Jumbo Mark', 'jumbo', ['scarlet', 'violet']],
+  ['Mightiest Mark', 'mightiest', ['scarlet', 'violet']], ['Titan Mark', 'titan', ['scarlet', 'violet']],
+];
+
+export type PokemonMark = string;
+export const POKEMON_MARKS = POKEMON_MARK_CATALOG.map(([name]) => name) as readonly PokemonMark[];
+
+const POKEMON_MARK_BY_NAME = new Map(POKEMON_MARK_CATALOG.map(([name, icon]) => [name, icon]));
+
+export const getPokemonMarksForGame = (game: string): readonly PokemonMark[] =>
+  POKEMON_MARK_CATALOG
+    .filter(([, , games]) => !games || games.includes(game as MarkGame))
+    .map(([name]) => name);
+
+/**
+ * Mark PNGs are bundled in public/img using the `<mark-slug>-mark.png`
+ * convention (for example, `absent-minded-mark.png`). Keeping the source
+ * local prevents third-party icon URLs from changing or failing at runtime.
+ */
 export const getPokemonMarkIconUrl = (mark: string) => {
-  const markName = mark.trim()
-    .replace(/\s+mark$/i, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/-$/g, '');
-  return `https://raw.githubusercontent.com/msikma/pokesprite/master/items/regular/mark-${markName}.png`;
+  const icon = POKEMON_MARK_BY_NAME.get(mark.trim());
+  return icon ? `/img/${icon}-mark.png` : '/placeholder.svg';
 };
 
 export const supportsPokemonMarks = (game: string) =>
