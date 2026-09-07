@@ -17,6 +17,15 @@ describe('game-specific shiny sprites', () => {
     expect(getGameSpecificShinySpriteUrl(1, gameId, { name: 'bulbasaur' })).toBe(expectedSpriteUrl(expected));
   });
 
+  it.each([
+    [641, 'tornadus-therian', 'https://archives.bulbagarden.net/media/upload/3/3c/Spr_5b2_641T_s.png'],
+    [642, 'thundurus-therian', 'https://archives.bulbagarden.net/media/upload/2/21/Spr_5b2_642T_s.png'],
+    [645, 'landorus-therian', 'https://archives.bulbagarden.net/media/upload/3/36/Spr_5b2_645T_s.png'],
+  ])('uses the B2W2 archive sprite for %s (%s)', (pokemonId, form, expected) => {
+    expect(getGameSpecificShinySpriteUrl(pokemonId, 'black2', { name: form, form })).toBe(expected);
+    expect(getGameSpecificShinySpriteUrl(pokemonId, 'white2', { name: form, form })).toBe(expected);
+  });
+
   it('resolves Giratina Origin in Platinum through the archive media URL', () => {
     expect(getGameSpecificShinySpriteUrl(487, 'platinum', { name: 'giratina-origin', form: 'giratina-origin' }))
       .toBe(expectedSpriteUrl('https://archives.bulbagarden.net/media/upload/2/2f/Spr_4p_487O_s.png'));

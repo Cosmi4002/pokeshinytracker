@@ -361,7 +361,9 @@ export function getGameSpecificShinySpriteUrl(
   const slug = normalize(options.form || options.name);
   const archiveTherianOverride = slug ? ARCHIVE_THERIAN_SHINY_OVERRIDE_BY_FORM[slug] : undefined;
   if (archiveTherianOverride && ['black', 'white', 'black2', 'white2'].includes(gameId ?? '')) {
-    return toLocalSpriteUrl(archiveTherianOverride);
+    // These B2W2 Therian sprites are intentionally loaded from their archive
+    // sources: no equivalent generated BW/B2W2 asset exists locally.
+    return archiveTherianOverride;
   }
 
   const speciesId = set === 'gen6-7'

@@ -7,7 +7,7 @@ import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
 import { PokemonSelector } from '@/components/counter/PokemonSelector';
 import { usePokemonList, getPokemonSpriteUrl, PokemonBasic } from '@/hooks/use-pokemon';
-import { getArchiveShinySpriteUrl } from '@/lib/pokemon-data';
+import { getPokemonCatalogShinySpriteUrl } from '@/lib/pokemon-data';
 import { useRandomColor } from '@/lib/random-color-context';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth-context';
@@ -1161,14 +1161,10 @@ export default function Games() {
                               src={
                                 isGame
                                   ? (cell as GameCell).logo
-                                  : (getArchiveShinySpriteUrl((cell as PokemonBasic).id, {
-                                      shiny: true,
+                                  : getPokemonCatalogShinySpriteUrl((cell as PokemonBasic).id, {
                                       name: (cell as PokemonBasic).name,
                                       form: (cell as PokemonBasic).name,
-                                    }) || getPokemonSpriteUrl((cell as PokemonBasic).id, {
-                                      shiny: true,
-                                      name: (cell as PokemonBasic).name,
-                                    }))
+                                    })
                               }
                               alt={label}
                               className={cn(
