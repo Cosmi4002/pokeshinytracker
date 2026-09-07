@@ -108,7 +108,7 @@ function StatTile({ label, value, note, icon: Icon }: StatTileProps) {
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="text-[11px] font-black uppercase tracking-[0.12em] text-muted-foreground">{label}</div>
-          <div className="mt-1 truncate text-2xl font-black tabular-nums">{value}</div>
+          <div className="mt-1 truncate text-xl font-black tabular-nums">{value}</div>
           <div className="mt-1 truncate text-xs text-muted-foreground">{note}</div>
         </div>
         <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md bg-muted">
@@ -184,6 +184,28 @@ export default function UserCollectionsSearch() {
       raw !== 'sandwich (sparkling power)' &&
       raw !== 'gen9-outbreak-sandwich' &&
       raw !== 'outbreak + sandwich lv3'
+    );
+  };
+
+  // Keep public-profile records in sync with the Statistics page: only real,
+  // visible counter attempts contribute to averages and hunt records.
+  const hasTrackedAttempts = (entry: PublicCaughtRow) => {
+    const attempts = Number(entry.attempts || 0);
+    if (entry.attempts === null || attempts <= 0 || entry.show_encounters === false) return false;
+
+    const method = normalizeMethod(entry.method);
+    const game = normalizeMethod(entry.game);
+    const compactMethod = method.replace(/[/-]/g, '');
+    if (method === 'distribution/event' || method === 'event') return false;
+    if (method === 'unknown' || game === 'unknown') {
+      const form = normalizeMethod(entry.form);
+      return form === 'dudunsparce-three-segment' || form === 'maushold-family-of-three';
+    }
+
+    return (
+      !(method === 'gen9-random' && (game === 'scarlet' || game === 'violet')) &&
+      !['gen9-tera-raid', 'tera-raid', 'gen9-outbreak', 'mass-outbreak', 'gen9-sandwich-lv3', 'sandwich-sparkling-power', 'gen9-outbreak-sandwich', 'outbreak-sandwich-lv3', 'static-overworld-game-gift', 'static/overworld/game-gift'].includes(method) &&
+      compactMethod !== 'staticoverworldgamegift'
     );
   };
 
@@ -453,10 +475,7 @@ export default function UserCollectionsSearch() {
       methodCounts.set(entry.method || 'unknown', (methodCounts.get(entry.method || 'unknown') || 0) + 1);
       if (entry.has_shiny_charm) charmCount += 1;
 
-      if (
-        Number(entry.attempts || 0) > 0 &&
-        shouldShowEncounters(entry.method, entry.game, entry.attempts, entry.show_encounters ?? true)
-      ) {
+      if (hasTrackedAttempts(entry)) {
         const attempts = Number(entry.attempts || 0);
         trackedAttempts += attempts;
         trackedRows += 1;
@@ -796,7 +815,7 @@ export default function UserCollectionsSearch() {
             <img
               src={sprite}
               alt={entry.pokemon_name}
-              className="h-20 w-20 object-contain drop-shadow"
+              className="h-20 w-20 object-contain pokemon-sprite drop-shadow"
               loading="lazy"
               onError={(event) => {
                 event.currentTarget.src = '/placeholder.svg';
@@ -805,7 +824,7 @@ export default function UserCollectionsSearch() {
           </div>
           <div className="min-w-0">
             <div className="text-xs font-black uppercase tracking-[0.14em] text-muted-foreground">{label}</div>
-            <div className="mt-1 truncate text-lg font-black leading-tight">{entry.pokemon_name}</div>
+            <div className="mt-1 truncate text-base font-black leading-tight">{entry.pokemon_name}</div>
             <div className="mt-3 grid gap-x-4 gap-y-2 text-xs sm:grid-cols-2">
               <div className="min-w-0">
                 <div className="font-black uppercase tracking-[0.12em] text-muted-foreground">Game</div>
@@ -940,7 +959,7 @@ export default function UserCollectionsSearch() {
                       <div className="space-y-2">
                         <div className="text-sm font-medium text-muted-foreground">Collection overview</div>
                         <div className="flex flex-wrap items-end gap-x-4 gap-y-2">
-                          <div className="text-5xl font-black tabular-nums tracking-tight">
+                          <div className="text-3xl font-black tabular-nums tracking-tight sm:text-4xl">
                             {numberFormatter.format(userStats.obtainedCount)}
                           </div>
                           <div className="pb-1 text-sm text-muted-foreground">

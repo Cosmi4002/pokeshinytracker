@@ -14,8 +14,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { usePokemonList, getPokemonSpriteUrl } from '@/hooks/use-pokemon';
-import { getArchiveShinySpriteUrl, handlePokemonSpriteError, toLocalPokemonSpriteUrl } from '@/lib/pokemon-data';
+import { usePokemonList } from '@/hooks/use-pokemon';
+import { getPokemonCatalogShinySpriteUrl, handlePokemonSpriteError, toLocalPokemonSpriteUrl } from '@/lib/pokemon-data';
 
 interface PokemonSelectorProps {
   value: number | null;
@@ -32,6 +32,11 @@ export function PokemonSelector({ value, valueName, onChange }: PokemonSelectorP
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [isXboxBrowser, setIsXboxBrowser] = useState(false);
   const { pokemon, loading } = usePokemonList();
+
+  const getSpriteUrl = (pokemonId: number, name: string) => getPokemonCatalogShinySpriteUrl(pokemonId, {
+    name,
+    form: name,
+  });
 
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return;
@@ -102,12 +107,12 @@ export function PokemonSelector({ value, valueName, onChange }: PokemonSelectorP
           {selectedPokemon ? (
             <div className="flex items-center gap-2">
               <img
-                key={getArchiveShinySpriteUrl(selectedPokemon.id, { shiny: true, name: selectedPokemon.name, form: selectedPokemon.name }) || getPokemonSpriteUrl(selectedPokemon.id, { shiny: true, name: selectedPokemon.name })}
-                src={toLocalPokemonSpriteUrl(getArchiveShinySpriteUrl(selectedPokemon.id, { shiny: true, name: selectedPokemon.name, form: selectedPokemon.name }) || getPokemonSpriteUrl(selectedPokemon.id, { shiny: true, name: selectedPokemon.name }))}
+                key={getSpriteUrl(selectedPokemon.id, selectedPokemon.name)}
+                src={toLocalPokemonSpriteUrl(getSpriteUrl(selectedPokemon.id, selectedPokemon.name))}
                 alt={selectedPokemon.displayName}
                 className="h-8 w-8 pokemon-sprite object-contain"
-                loading={getArchiveShinySpriteUrl(selectedPokemon.id, { shiny: true, name: selectedPokemon.name, form: selectedPokemon.name })?.startsWith('/img/game-sprites/') ? 'eager' : 'lazy'}
-                fetchPriority={getArchiveShinySpriteUrl(selectedPokemon.id, { shiny: true, name: selectedPokemon.name, form: selectedPokemon.name })?.startsWith('/img/game-sprites/') ? 'high' : 'auto'}
+                loading={getSpriteUrl(selectedPokemon.id, selectedPokemon.name).startsWith('/img/game-sprites/') ? 'eager' : 'lazy'}
+                fetchPriority={getSpriteUrl(selectedPokemon.id, selectedPokemon.name).startsWith('/img/game-sprites/') ? 'high' : 'auto'}
                 decoding="async"
                 referrerPolicy="no-referrer"
                 onError={(e) => {
@@ -167,8 +172,8 @@ export function PokemonSelector({ value, valueName, onChange }: PokemonSelectorP
                 >
                   {!isXboxBrowser && (
                     <img
-                      key={getArchiveShinySpriteUrl(p.id, { shiny: true, name: p.name, form: p.name }) || getPokemonSpriteUrl(p.id, { shiny: true, name: p.name })}
-                      src={toLocalPokemonSpriteUrl(getArchiveShinySpriteUrl(p.id, { shiny: true, name: p.name, form: p.name }) || getPokemonSpriteUrl(p.id, { shiny: true, name: p.name }))}
+                      key={getSpriteUrl(p.id, p.name)}
+                      src={toLocalPokemonSpriteUrl(getSpriteUrl(p.id, p.name))}
                       alt={p.displayName}
                       className="h-8 w-8 pokemon-sprite object-contain"
                       loading="lazy"

@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { HUNTING_METHODS, calculateShinyStats, formatOdds, getArchiveShinySpriteUrl, getCaughtShinySpriteUrl, getGameGeneration, getHuntingMethodsForGame, getPokemonMarkIconUrl, getPokemonMarksForGame, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, getSelectedGameSpriteUrl, isBreedingMethod, supportsGigantamaxMark, toLocalPokemonSpriteUrl } from './pokemon-data';
+import { HUNTING_METHODS, calculateShinyStats, formatOdds, getArchiveShinySpriteUrl, getCaughtShinySpriteUrl, getGameGeneration, getPokemonCatalogShinySpriteUrl, getHuntingMethodsForGame, getPokemonMarkIconUrl, getPokemonMarksForGame, getPokemonSpriteFallbackUrl, getPokemonSpriteUrl, getSelectedGameSpriteUrl, isBreedingMethod, supportsGigantamaxMark, toLocalPokemonSpriteUrl } from './pokemon-data';
 
 describe('card badge helpers', () => {
   it('keeps the resolved Gigantamax and Pokémon Mark helpers available together', () => {
     expect(supportsGigantamaxMark('sword')).toBe(true);
     expect(supportsGigantamaxMark('scarlet')).toBe(false);
     expect(getPokemonMarkIconUrl('  Sleepy-Time Mark  ')).toBe(
-      '/img/sleepy-time-mark.png',
+      '/img/sleepy-time-mark.png?v=2',
     );
   });
 
@@ -18,9 +18,13 @@ describe('card badge helpers', () => {
   });
 
   it('uses a declared icon source and safely falls back for legacy unknown marks', () => {
-    expect(getPokemonMarkIconUrl('Mini Mark')).toBe('/img/mini-mark.png');
-    expect(getPokemonMarkIconUrl('Alpha Mark')).toBe('/img/alpha-mark.png');
-    expect(getPokemonMarkIconUrl('Partner Mark')).toBe('/img/partner-mark.png');
+    expect(getPokemonMarkIconUrl('Itemfinder Mark')).toBe('/img/itemfinder-mark.png?v=2');
+    expect(getPokemonMarkIconUrl('Partner Mark')).toBe('/img/partner-mark.png?v=2');
+    expect(getPokemonMarkIconUrl('Mini Mark')).toBe('/img/mini-mark.png?v=2');
+    expect(getPokemonMarkIconUrl('Jumbo Mark')).toBe('/img/jumbo-mark.png?v=2');
+    expect(getPokemonMarkIconUrl('Mightiest Mark')).toBe('/img/mightiest-mark.png?v=2');
+    expect(getPokemonMarkIconUrl('Titan Mark')).toBe('/img/titan-mark.png?v=2');
+    expect(getPokemonMarkIconUrl('Alpha Mark')).toBe('/img/alpha-mark.png?v=2');
     expect(getPokemonMarkIconUrl('Unknown Mark')).toBe('/placeholder.svg');
   });
 });
@@ -61,6 +65,24 @@ describe('pokemon sprite helpers', () => {
   it('uses Meloetta Pirouette shiny sprite instead of the colliding Meowstic sprite', () => {
     expect(getPokemonSpriteUrl(10025, { shiny: true, name: 'meloetta-pirouette' })).toBe(
       '/img/pokemon-sprites/remote/raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10018.png'
+    );
+  });
+
+  it('uses Gen VI and VII game sprites in Pokémon pickers before HOME fallbacks', () => {
+    expect(getPokemonCatalogShinySpriteUrl(667, { name: 'litleo', form: 'litleo' })).toBe(
+      '/img/game-sprites/gen6-7/litleo.webp',
+    );
+    expect(getPokemonCatalogShinySpriteUrl(641, { name: 'tornadus-therian', form: 'tornadus-therian' })).toBe(
+      '/img/game-sprites/gen6-7/tornadus-therian.webp',
+    );
+    expect(getPokemonCatalogShinySpriteUrl(10020, { name: 'thundurus-therian', form: 'thundurus-therian' })).toBe(
+      '/img/game-sprites/gen6-7/thundurus-therian.webp',
+    );
+    expect(getPokemonCatalogShinySpriteUrl(807, { name: 'zeraora', form: 'zeraora' })).toBe(
+      '/img/game-sprites/gen6-7/zeraora-usum.webp',
+    );
+    expect(getPokemonCatalogShinySpriteUrl(882, { name: 'dracovish', form: 'dracovish' })).toBe(
+      '/img/pokemon-sprites/remote/raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/882.png',
     );
   });
 

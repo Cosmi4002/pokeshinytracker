@@ -195,7 +195,7 @@ function RecordHunt({
             src={sprite}
             alt={entry.pokemon_name}
             className={cn(
-              "h-20 w-20 object-contain",
+              "h-20 w-20 object-contain pokemon-sprite",
               isGameSpecificSprite ? spriteScaleClass : "drop-shadow"
             )}
             style={isGameSpecificSprite
@@ -274,6 +274,8 @@ function RankedList({
 }
 
 function AverageEncountersByGame({ items }: { items: GameEncounterItem[] }) {
+  const highestAverage = Math.max(...items.map((item) => item.average), 1);
+
   return (
     <Card className={`overflow-hidden border ${statsPanelClass}`}>
       <CardHeader>
@@ -294,6 +296,12 @@ function AverageEncountersByGame({ items }: { items: GameEncounterItem[] }) {
               <p className="mt-1 text-xs text-muted-foreground">
                 {numberFormatter.format(item.value)} total encounters · {numberFormatter.format(item.hunts)} hunts
               </p>
+              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted">
+                <div
+                  className="h-full rounded-full bg-primary/80"
+                  style={{ width: `${Math.max(4, (item.average / highestAverage) * 100)}%` }}
+                />
+              </div>
             </div>
           ))
         )}
@@ -551,20 +559,24 @@ export default function Stats() {
           <StatCard title="Evolved" value={numberFormatter.format(stats.evolvedCount)} note="Pokémon with a recorded evolution" accentColor={accentColor} />
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-2">
-          <RankedList title="Most-used methods" items={stats.methodTop} total={obtainedTotal} empty="No methods recorded." accentColor={accentColor} />
-          <RankedList title="Most-used games" items={stats.gameTop} total={obtainedTotal} empty="No games recorded." accentColor={accentColor} />
-          <AverageEncountersByGame items={stats.gameEncounters} />
-          <RankedList title="Distribution by generation" items={stats.generationTop} total={obtainedTotal} empty="No generation data available." accentColor={accentColor} />
-          <Card className={`self-start border ${statsPanelClass}`}>
-            <CardHeader>
-              <CardTitle className="text-base">Record</CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-3">
-              <RecordHunt label="Luckiest hunt" entry={stats.luckiestHunt} accentColor={accentColor} />
-              <RecordHunt label="Longest hunt" entry={stats.longestHunt} accentColor={accentColor} />
-            </CardContent>
-          </Card>
+        <div className="grid items-start gap-4 lg:grid-cols-2">
+          <div className="grid gap-4">
+            <RankedList title="Most-used methods" items={stats.methodTop} total={obtainedTotal} empty="No methods recorded." accentColor={accentColor} />
+            <AverageEncountersByGame items={stats.gameEncounters} />
+          </div>
+          <div className="grid gap-4">
+            <RankedList title="Most-used games" items={stats.gameTop} total={obtainedTotal} empty="No games recorded." accentColor={accentColor} />
+            <RankedList title="Distribution by generation" items={stats.generationTop} total={obtainedTotal} empty="No generation data available." accentColor={accentColor} />
+            <Card className={`border ${statsPanelClass}`}>
+              <CardHeader>
+                <CardTitle className="text-base">Record</CardTitle>
+              </CardHeader>
+              <CardContent className="grid gap-3">
+                <RecordHunt label="Luckiest hunt" entry={stats.luckiestHunt} accentColor={accentColor} />
+                <RecordHunt label="Longest hunt" entry={stats.longestHunt} accentColor={accentColor} />
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         <div className="grid gap-4">
