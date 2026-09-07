@@ -556,7 +556,10 @@ export const getPokemonMarksForGame = (game: string): readonly PokemonMark[] =>
  */
 export const getPokemonMarkIconUrl = (mark: string) => {
   const icon = POKEMON_MARK_BY_NAME.get(mark.trim());
-  return icon ? `/img/${icon}-mark.png` : '/placeholder.svg';
+  // The mark files were added after the initial PWA release. Version their
+  // URLs so a device with the previous service-worker image cache fetches the
+  // newly bundled PNG instead of retaining a cached failed response.
+  return icon ? `/img/${icon}-mark.png?v=2` : '/placeholder.svg';
 };
 
 export const supportsPokemonMarks = (game: string) =>
@@ -1308,6 +1311,36 @@ export function getSelectedGameSpriteUrl(options: {
   if (spriteUrl) return toLocalPokemonSpriteUrl(spriteUrl);
 
   return getPokemonSpriteFallbackUrl();
+}
+
+/**
+ * Resolves sprites for Pokémon pickers, where no game has been selected yet.
+ * Prefer the imported Gen VI/VII game sprite catalogue (including form and
+ * gender variants), then retain the archive and HOME fallbacks for anything
+ * without a matching game asset.
+ */
+export function getPokemonCatalogShinySpriteUrl(
+  pokemonId: number,
+  options: { name?: string | null; form?: string | null; gender?: string | null } = {},
+): string {
+  const spriteOptions = {
+    shiny: true,
+    name: options.name || undefined,
+    form: options.form || undefined,
+    gender: options.gender || undefined,
+  };
+  const gameSprite = ['x', 'y', 'omegaruby', 'alphasapphire', 'sun', 'moon', 'ultrasun', 'ultramoon']
+    .map((gameId) => getGameSpecificShinySpriteUrl(pokemonId, gameId, spriteOptions))
+    .find(Boolean);
+
+  return gameSprite
+    || getArchiveShinySpriteUrl(pokemonId, spriteOptions)
+    || getPokemonSpriteUrl(pokemonId, {
+      shiny: true,
+      name: options.form || options.name || undefined,
+      form: options.form || undefined,
+      female: options.gender === 'female',
+    });
 }
 
 export function getCaughtShinySpriteUrl(options: {

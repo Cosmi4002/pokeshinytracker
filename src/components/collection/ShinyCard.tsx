@@ -661,8 +661,8 @@ export function ShinyCard({ entry, onEdit, onDelete, onToggleEvolved, onEvolvedI
                           src={fossil.url}
                           alt={fossil.name}
                           title={fossil.name}
-                          className="pointer-events-none absolute top-1/2 h-[4.25rem] w-[4.25rem] -translate-y-1/2 object-contain opacity-95 drop-shadow-[0_2px_6px_rgba(0,0,0,0.55)]"
-                          style={{ left: `${0.25 + index * 1.85}rem` }}
+                          className="pointer-events-none absolute top-1/2 h-11 w-11 -translate-y-1/2 object-contain opacity-95 drop-shadow-[0_2px_6px_rgba(0,0,0,0.55)]"
+                          style={{ left: `${0.5 + index * 1.4}rem` }}
                           onError={(e) => ((e.currentTarget as HTMLImageElement).src = '/placeholder.svg')}
                         />
                       ))}
