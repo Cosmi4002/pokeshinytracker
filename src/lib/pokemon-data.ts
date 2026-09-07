@@ -532,10 +532,11 @@ const POKEMON_MARK_CATALOG: readonly PokemonMarkDefinition[] = [
   ['Intellectual Mark', 'intellectual'], ['Ferocious Mark', 'ferocious'], ['Crafty Mark', 'crafty'], ['Scowling Mark', 'scowling'],
   ['Kindly Mark', 'kindly'], ['Flustered Mark', 'flustered'], ['Pumped-Up Mark', 'pumped-up'], ['Zero Energy Mark', 'zero-energy'],
   ['Prideful Mark', 'prideful'], ['Unsure Mark', 'unsure'], ['Humble Mark', 'humble'], ['Thorny Mark', 'thorny'],
-  ['Vigor Mark', 'vigor'], ['Slump Mark', 'slump'], ['Itemfinder Mark', 'itemfinder', ['sword', 'shield']],
-  ['Partner Mark', 'partner'],
-  ['Mini Mark', 'mini', ['scarlet', 'violet']], ['Jumbo Mark', 'jumbo', ['scarlet', 'violet']],
-  ['Mightiest Mark', 'mightiest', ['scarlet', 'violet']], ['Titan Mark', 'titan', ['scarlet', 'violet']],
+  ['Vigor Mark', 'vigor'], ['Slump Mark', 'slump'],
+  ['Itemfinder Mark', 'itemfinder', ['scarlet', 'violet']], ['Alpha Mark', 'alpha', ['scarlet', 'violet']],
+  ['Partner Mark', 'partner', ['scarlet', 'violet']], ['Mini Mark', 'mini', ['scarlet', 'violet']],
+  ['Jumbo Mark', 'jumbo', ['scarlet', 'violet']], ['Mightiest Mark', 'mightiest', ['scarlet', 'violet']],
+  ['Titan Mark', 'titan', ['scarlet', 'violet']],
 ];
 
 export type PokemonMark = string;

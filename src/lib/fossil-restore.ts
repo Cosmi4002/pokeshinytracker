@@ -1,29 +1,31 @@
-const POKESPRITE_ITEM_BASE_URL = 'https://raw.githubusercontent.com/msikma/pokesprite/master/items/fossil';
-
 type FossilRestoreIcon = {
   id: string;
   name: string;
   url: string;
 };
 
-type FossilDefinition = Omit<FossilRestoreIcon, 'url'>;
+type FossilDefinition = Omit<FossilRestoreIcon, 'url'> & {
+  asset: string;
+};
+
+const FOSSIL_IMAGE_BASE_URL = '/img/Fossil png';
 
 const FOSSILS: Record<string, FossilDefinition> = {
-  helix: { id: 'helix-fossil', name: 'Helix Fossil' },
-  dome: { id: 'dome-fossil', name: 'Dome Fossil' },
-  amber: { id: 'old-amber', name: 'Old Amber' },
-  root: { id: 'root-fossil', name: 'Root Fossil' },
-  claw: { id: 'claw-fossil', name: 'Claw Fossil' },
-  skull: { id: 'skull-fossil', name: 'Skull Fossil' },
-  armor: { id: 'armor-fossil', name: 'Armor Fossil' },
-  cover: { id: 'cover-fossil', name: 'Cover Fossil' },
-  plume: { id: 'plume-fossil', name: 'Plume Fossil' },
-  jaw: { id: 'jaw-fossil', name: 'Jaw Fossil' },
-  sail: { id: 'sail-fossil', name: 'Sail Fossil' },
-  bird: { id: 'fossilized-bird', name: 'Fossilized Bird' },
-  dino: { id: 'fossilized-dino', name: 'Fossilized Dino' },
-  drake: { id: 'fossilized-drake', name: 'Fossilized Drake' },
-  fish: { id: 'fossilized-fish', name: 'Fossilized Fish' },
+  helix: { id: 'helix-fossil', name: 'Helix Fossil', asset: 'helix' },
+  dome: { id: 'dome-fossil', name: 'Dome Fossil', asset: 'dome' },
+  amber: { id: 'old-amber', name: 'Old Amber', asset: 'old-amber' },
+  root: { id: 'root-fossil', name: 'Root Fossil', asset: 'root' },
+  claw: { id: 'claw-fossil', name: 'Claw Fossil', asset: 'claw' },
+  skull: { id: 'skull-fossil', name: 'Skull Fossil', asset: 'skull' },
+  armor: { id: 'armor-fossil', name: 'Armor Fossil', asset: 'armor' },
+  cover: { id: 'cover-fossil', name: 'Cover Fossil', asset: 'cover' },
+  plume: { id: 'plume-fossil', name: 'Plume Fossil', asset: 'plume' },
+  jaw: { id: 'jaw-fossil', name: 'Jaw Fossil', asset: 'jaw' },
+  sail: { id: 'sail-fossil', name: 'Sail Fossil', asset: 'sail' },
+  bird: { id: 'fossilized-bird', name: 'Fossilized Bird', asset: 'bird' },
+  dino: { id: 'fossilized-dino', name: 'Fossilized Dino', asset: 'dino' },
+  drake: { id: 'fossilized-drake', name: 'Fossilized Drake', asset: 'drake' },
+  fish: { id: 'fossilized-fish', name: 'Fossilized Fish', asset: 'fish' },
 };
 
 const FOSSILS_BY_POKEMON_ID: Record<number, FossilDefinition[]> = {
@@ -44,9 +46,9 @@ const FOSSILS_BY_POKEMON_ID: Record<number, FossilDefinition[]> = {
   883: [FOSSILS.drake, FOSSILS.fish],
 };
 
-/** Returns the PokeSprite inventory fossils used to revive the selected Pokémon. */
+/** Returns the bundled fossil images used to revive the selected Pokémon. */
 export const getFossilRestoreIcons = (pokemonId: number): FossilRestoreIcon[] =>
-  (FOSSILS_BY_POKEMON_ID[pokemonId] || []).map((fossil) => ({
+  (FOSSILS_BY_POKEMON_ID[pokemonId] || []).map(({ asset, ...fossil }) => ({
     ...fossil,
-    url: `${POKESPRITE_ITEM_BASE_URL}/${fossil.id}.png`,
+    url: `${FOSSIL_IMAGE_BASE_URL}/${asset}.png`,
   }));

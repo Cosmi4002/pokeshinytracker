@@ -70,6 +70,18 @@ export function readCounterSnapshot(ownerId: string, huntId: string): OfflineCou
   return value;
 }
 
+/**
+ * A pending local snapshot wins only when it was changed after the server copy.
+ * This keeps an old device cache from restoring stale counter settings.
+ */
+export function shouldUsePendingCounterSnapshot(snapshot: OfflineCounterSnapshot | null, remoteUpdatedAt: string | null | undefined) {
+  if (!snapshot?.pendingSync) return false;
+  const localUpdatedAt = Date.parse(snapshot.updatedAt);
+  const remoteUpdatedAtMs = Date.parse(remoteUpdatedAt || '');
+  return Number.isFinite(localUpdatedAt)
+    && (!Number.isFinite(remoteUpdatedAtMs) || localUpdatedAt > remoteUpdatedAtMs);
+}
+
 export function writeCounterSnapshot(snapshot: OfflineCounterSnapshot) {
   if (!canUseStorage()) return;
   try {

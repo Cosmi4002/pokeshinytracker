@@ -7,6 +7,7 @@ import {
   queueHiddenHunt,
   readCachedActiveHunts,
   readCounterSnapshot,
+  shouldUsePendingCounterSnapshot,
   readPendingHiddenHunts,
   replaceCachedActiveHunt,
   writeCachedActiveHunts,
@@ -69,6 +70,15 @@ describe('offline counter storage', () => {
       counter: 42,
       pendingSync: true,
     });
+  });
+
+  it('uses a pending device snapshot only when it is newer than the server copy', () => {
+    const snapshot = makeSnapshot('remote-1');
+    snapshot.updatedAt = '2026-08-30T00:01:00.000Z';
+
+    expect(shouldUsePendingCounterSnapshot(snapshot, '2026-08-30T00:00:00.000Z')).toBe(true);
+    expect(shouldUsePendingCounterSnapshot(snapshot, '2026-08-30T00:02:00.000Z')).toBe(false);
+    expect(shouldUsePendingCounterSnapshot({ ...snapshot, pendingSync: false }, '2026-08-30T00:00:00.000Z')).toBe(false);
   });
 
   it('keeps an offline-created hunt when fresh remote hunts are cached', () => {
