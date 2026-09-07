@@ -32,6 +32,7 @@ import { FinishHuntDialog } from './FinishHuntDialog';
 import { useRandomColor } from '@/lib/random-color-context';
 import { hasPokemonGenderDifference, usePokemonDetails, formatPokemonName } from '@/hooks/use-pokemon';
 import { cn } from '@/lib/utils';
+import { classifyPokemonForm } from '@/lib/pokemon-form-classification-v2';
 import { resolveEntityKeysForCounterSlots } from '@/lib/pokemon-entity-resolver-v2';
 import { useOnlineStatus } from '@/hooks/use-online-status';
 import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteImageRendering, getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleStyle, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
@@ -792,9 +793,25 @@ export function ShinyCounter({
                           : slot.slot === 2
                             ? setSelectedPokemon2Gender
                             : setSelectedPokemon3Gender;
+                        // A picker selection can be a standalone catalog entry
+                        // while its detail data is intentionally loaded from the
+                        // base species. Use the selected variant, not that base
+                        // detail name, for gender and form controls.
+                        const selectedVariantName = slot.form || slot.name || slot.details?.name || '';
+                        const isGenderVariant = /-(male|female)$/i.test(selectedVariantName);
+                        const selectedVariantClassification = selectedVariantName
+                          ? classifyPokemonForm(
+                            slot.details?.baseId || slot.id || 0,
+                            selectedVariantName,
+                            selectedVariantName,
+                          )
+                          : null;
+                        const isStandaloneVariant = !isGenderVariant
+                          && selectedVariantName !== slot.details?.name
+                          && selectedVariantClassification?.cardPolicy === 'separate-card';
                         const hasGenderDifference = hasPokemonGenderDifference(
                           slot.details?.baseId || slot.id,
-                          slot.form || slot.details?.name,
+                          selectedVariantName,
                         );
 
                         return (
@@ -824,7 +841,7 @@ export function ShinyCounter({
                                   : '/placeholder.svg';
                               }}
                             />
-                            {slotFormOptions.length > 0 && (
+                            {slotFormOptions.length > 0 && !isStandaloneVariant && (
                               <Select value={slot.form || 'default'} onValueChange={(v) => {
                                 setSlotForm(v === 'default' ? '' : v);
                                 setSlotGender('');
