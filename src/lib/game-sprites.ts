@@ -1,4 +1,10 @@
 import { HGSS_SHINY_SPRITE_FILES } from '@/data/hgss-shiny-sprite-manifest';
+import { CRYSTAL_SHINY_SPRITE_FILES } from '@/data/crystal-shiny-sprite-manifest';
+import { GOLD_SHINY_SPRITE_FILES } from '@/data/gold-shiny-sprite-manifest';
+import { SILVER_SHINY_SPRITE_FILES } from '@/data/silver-shiny-sprite-manifest';
+import { RUBY_SAPPHIRE_SHINY_SPRITE_FILES } from '@/data/ruby-sapphire-shiny-sprite-manifest';
+import { FIRERED_LEAFGREEN_SHINY_SPRITE_FILES } from '@/data/firered-leafgreen-shiny-sprite-manifest';
+import { EMERALD_SHINY_SPRITE_FILES } from '@/data/emerald-shiny-sprite-manifest';
 import { DP_SHINY_SPRITE_FILES } from '@/data/dp-shiny-sprite-manifest';
 import { DP_SHINY_SPRITE_URL_BY_FILE } from '@/data/dp-shiny-sprite-url-map.generated';
 import { PT_SHINY_SPRITE_FILES } from '@/data/pt-shiny-sprite-manifest';
@@ -24,6 +30,14 @@ export const GAME_SPRITE_SET_BY_GAME: Readonly<Record<string, string>> = {
   diamond: 'dp',
   pearl: 'dp',
   platinum: 'pt',
+  gold: 'gold',
+  silver: 'silver',
+  crystal: 'crystal',
+  ruby: 'ruby-sapphire',
+  sapphire: 'ruby-sapphire',
+  firered: 'firered-leafgreen',
+  leafgreen: 'firered-leafgreen',
+  emerald: 'emerald',
   heartgold: 'hgss',
   soulsilver: 'hgss',
   black: 'bw',
@@ -42,6 +56,12 @@ export const GAME_SPRITE_SET_BY_GAME: Readonly<Record<string, string>> = {
 
 const filesBySet = {
   dp: DP_SHINY_SPRITE_FILES,
+  gold: GOLD_SHINY_SPRITE_FILES,
+  silver: SILVER_SHINY_SPRITE_FILES,
+  crystal: CRYSTAL_SHINY_SPRITE_FILES,
+  'ruby-sapphire': RUBY_SAPPHIRE_SHINY_SPRITE_FILES,
+  'firered-leafgreen': FIRERED_LEAFGREEN_SHINY_SPRITE_FILES,
+  emerald: EMERALD_SHINY_SPRITE_FILES,
   hgss: HGSS_SHINY_SPRITE_FILES,
   pt: PT_SHINY_SPRITE_FILES,
   bw: BW_SHINY_SPRITE_FILES,
@@ -327,6 +347,10 @@ const getGameSpecificSpriteFilePath = (url?: string | null) => {
   const archiveMatch = url.match(/\/Special:Redirect\/file\/([^?]+)/i);
   if (archiveMatch) {
     const filename = decodeURIComponent(archiveMatch[1]);
+    const gen2Set = { g: 'gold', s: 'silver', c: 'crystal' }[filename.match(/^Spr_2([gsc])_/i)?.[1]?.toLowerCase() || ''];
+    if (gen2Set) return `${gen2Set}/${filename}`;
+    const gen3Set = { r: 'ruby-sapphire', f: 'firered-leafgreen', e: 'emerald' }[filename.match(/^Spr_3([rfe])_/i)?.[1]?.toLowerCase() || ''];
+    if (gen3Set) return `${gen3Set}/${filename}`;
     if (filename.startsWith('Spr_4d_') || filename.startsWith('Spr_4p_')) {
       return `${filename.startsWith('Spr_4d_') ? 'dp' : 'pt'}/${filename}`;
     }
@@ -446,6 +470,10 @@ export function getGameSpecificShinySpriteUrl(
     resolvedUrl = DP_SHINY_SPRITE_URL_BY_FILE[filename] || null;
   } else if (resolvedSet === 'pt') {
     resolvedUrl = PT_SHINY_SPRITE_URL_BY_FILE[filename] || null;
+  } else if (['gold', 'silver', 'crystal', 'ruby-sapphire', 'firered-leafgreen', 'emerald'].includes(resolvedSet)) {
+    // Gen II/III assets are loaded from their Bulbagarden Archive categories.
+    // The redirect keeps each source URL stable without hard-coding its upload hash.
+    resolvedUrl = `https://archives.bulbagarden.net/wiki/Special:Redirect/file/${encodeURIComponent(filename)}`;
   } else {
     resolvedUrl = `/img/game-sprites/${resolvedSet}/${filename}`;
   }
