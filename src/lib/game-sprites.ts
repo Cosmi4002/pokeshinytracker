@@ -271,6 +271,11 @@ const normalizeGender = (gender?: string | null): 'female' | 'male' | null => {
   return null;
 };
 
+// Regional forms were introduced after the Gen II–V games represented by the
+// archive sets. Do not substitute their original regional base species sprite
+// (for example, Crystal Raticate) when an Alolan/Galarian/etc. form is selected.
+const hasRegionalFormMarker = (slug: string) => /-(?:alola|galar|hisui|paldea)(?:-|$)/i.test(slug);
+
 const ARCHIVE_THERIAN_SHINY_OVERRIDE_BY_FORM: Readonly<Record<string, string>> = {
   'tornadus-therian': 'https://archives.bulbagarden.net/media/upload/3/3c/Spr_5b2_641T_s.png',
   'thundurus-therian': 'https://archives.bulbagarden.net/media/upload/2/21/Spr_5b2_642T_s.png',
@@ -388,6 +393,10 @@ export function getGameSpecificShinySpriteUrl(
     // These B2W2 Therian sprites are intentionally loaded from their archive
     // sources: no equivalent generated BW/B2W2 asset exists locally.
     return archiveTherianOverride;
+  }
+
+  if (set !== 'gen6-7' && hasRegionalFormMarker(slug)) {
+    return null;
   }
 
   const speciesId = set === 'gen6-7'
