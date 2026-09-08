@@ -480,9 +480,10 @@ export function getGameSpecificShinySpriteUrl(
   } else if (resolvedSet === 'pt') {
     resolvedUrl = PT_SHINY_SPRITE_URL_BY_FILE[filename] || null;
   } else if (['gold', 'silver', 'crystal', 'ruby-sapphire', 'firered-leafgreen', 'emerald'].includes(resolvedSet)) {
-    // Gen II/III assets are loaded from their Bulbagarden Archive categories.
-    // The redirect keeps each source URL stable without hard-coding its upload hash.
-    resolvedUrl = `https://archives.bulbagarden.net/wiki/Special:Redirect/file/${encodeURIComponent(filename)}`;
+    // Serve legacy game sprites through our origin.  Loading the Archive's
+    // redirect directly is unreliable on some mobile browsers, while the
+    // proxy preserves the original game sprite and lets Vercel cache it.
+    resolvedUrl = `/api/game-sprite?file=${encodeURIComponent(filename)}`;
   } else {
     resolvedUrl = `/img/game-sprites/${resolvedSet}/${filename}`;
   }

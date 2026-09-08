@@ -109,6 +109,16 @@ describe('pokemon sprite helpers', () => {
     })).toBe('/img/pokemon-sprites/remote/raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10092.png');
   });
 
+  it('keeps the Crystal Poliwhirl sprite game-specific', () => {
+    expect(
+      getSelectedGameSpriteUrl({
+        pokemonId: 61,
+        pokemonName: 'poliwhirl',
+        game: 'crystal',
+      })
+    ).toBe('/api/game-sprite?file=Spr_2c_061_s.png');
+  });
+
   it('recomputes caught shiny sprite URLs from pokemon data instead of trusting stale saved urls', () => {
     expect(
       getCaughtShinySpriteUrl({

@@ -591,29 +591,53 @@ export default function PokemonDetails() {
                 if (!details.hasGenderDifference) return false;
                 return caughtGameGenders[gameId]?.includes('female') ?? false;
             });
-            const gameId = group.games[0];
+            const spriteEntries = group.games
+                .map(gameId => {
+                    const maleSpriteUrl = getGameSpecificShinySpriteUrl(heroVariant.id, gameId, {
+                        name: heroVariant.name,
+                        form: heroVariant.name,
+                        gender: 'male',
+                    }) || getGameSpecificShinySpriteUrl(heroVariant.id, gameId, {
+                        name: heroVariant.name,
+                        form: heroVariant.name,
+                    });
+                    const requestedFemaleSpriteUrl = details.hasGenderDifference
+                        ? getGameSpecificShinySpriteUrl(heroVariant.id, gameId, {
+                            name: details.name,
+                            form: details.name,
+                            gender: 'female',
+                        })
+                        : null;
+
+                    return {
+                        gameId,
+                        maleSpriteUrl,
+                        // Older games often have no gender-specific artwork.
+                        // Do not render the same neutral sprite twice.
+                        femaleSpriteUrl: requestedFemaleSpriteUrl !== maleSpriteUrl
+                            ? requestedFemaleSpriteUrl
+                            : null,
+                    };
+                })
+                .filter((entry): entry is { gameId: string; maleSpriteUrl: string; femaleSpriteUrl: string | null } => Boolean(entry.maleSpriteUrl));
+
+            // Most grouped game pairs share one asset, but Gold and Silver do
+            // not. Retain different artwork and only collapse truly identical
+            // sprite pairs.
+            const uniqueSpriteEntries = spriteEntries.filter((entry, index, entries) =>
+                entries.findIndex(candidate => (
+                    candidate.maleSpriteUrl === entry.maleSpriteUrl
+                    && candidate.femaleSpriteUrl === entry.femaleSpriteUrl
+                )) === index
+            );
 
             return {
                 ...group,
-                maleSpriteUrl: getGameSpecificShinySpriteUrl(heroVariant.id, gameId, {
-                    name: heroVariant.name,
-                    form: heroVariant.name,
-                    gender: 'male',
-                }) || getGameSpecificShinySpriteUrl(heroVariant.id, gameId, {
-                    name: heroVariant.name,
-                    form: heroVariant.name,
-                }),
-                femaleSpriteUrl: details.hasGenderDifference
-                    ? getGameSpecificShinySpriteUrl(heroVariant.id, gameId, {
-                        name: details.name,
-                        form: details.name,
-                        gender: 'female',
-                    })
-                    : null,
+                spriteEntries: uniqueSpriteEntries,
                 caughtGames: maleCaughtGamesForGroup,
                 femaleCaughtGames: femaleCaughtGamesForGroup,
             };
-        }).filter(group => Boolean(group.maleSpriteUrl))
+        }).filter(group => group.spriteEntries.length > 0)
         : [];
     const collectibleVariants = variants.filter(variant => variant.category !== 'gender');
     const hasMultipleForms = collectibleVariants.length > 1;
@@ -990,36 +1014,47 @@ export default function PokemonDetails() {
                                     >
                                         <p className="text-center text-sm font-black">{group.label}</p>
                                         <p className="mt-1 min-h-10 text-center text-xs text-muted-foreground">{group.description}</p>
-                                        <div className={cn(
-                                            "mt-2 flex items-center justify-center gap-2",
-                                            details.hasGenderDifference ? "w-full" : "w-auto"
-                                        )}>
-                                            <img
-                                                src={group.maleSpriteUrl!}
-                                                alt={`${heroVariant?.displayName || details.displayName} male shiny in ${group.label}`}
-                                                loading="lazy"
-                                                decoding="async"
-                                                className={cn(
-                                                    "h-32 w-32 object-contain pokemon-sprite",
-                                                    getGameSpecificSpriteScaleClass(group.maleSpriteUrl),
-                                                    group.caughtGames.length === 0 && "opacity-35 grayscale"
-                                                )}
-                                                style={{ imageRendering: getGameSpecificSpriteImageRendering(group.maleSpriteUrl), ...getGameSpecificSpriteScaleStyle(group.maleSpriteUrl) }}
-                                            />
-                                            {details.hasGenderDifference && group.femaleSpriteUrl && (
-                                                <img
-                                                    src={group.femaleSpriteUrl}
-                                                    alt={`${details.displayName} female shiny in ${group.label}`}
-                                                    loading="lazy"
-                                                    decoding="async"
-                                                    className={cn(
-                                                        "h-32 w-32 object-contain pokemon-sprite",
-                                                        getGameSpecificSpriteScaleClass(group.femaleSpriteUrl),
-                                                        (group.femaleCaughtGames ?? []).length === 0 && "opacity-35 grayscale"
-                                                    )}
-                                                style={{ imageRendering: getGameSpecificSpriteImageRendering(group.femaleSpriteUrl), ...getGameSpecificSpriteScaleStyle(group.femaleSpriteUrl) }}
-                                                />
-                                            )}
+                                        <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
+                                            {group.spriteEntries.map(sprite => {
+                                                const spriteGame = GAMES.find(game => game.id === sprite.gameId)!;
+                                                return (
+                                                    <div key={`${sprite.maleSpriteUrl}-${sprite.femaleSpriteUrl || ''}`} className="flex flex-col items-center">
+                                                        {group.spriteEntries.length > 1 && (
+                                                            <span className="mb-1 text-[10px] font-black uppercase tracking-wide text-muted-foreground">
+                                                                {spriteGame.name}
+                                                            </span>
+                                                        )}
+                                                        <div className="flex items-center justify-center gap-2">
+                                                            <img
+                                                                src={sprite.maleSpriteUrl}
+                                                                alt={`${heroVariant?.displayName || details.displayName} male shiny in ${spriteGame.name}`}
+                                                                loading="lazy"
+                                                                decoding="async"
+                                                                className={cn(
+                                                                    "h-32 w-32 object-contain pokemon-sprite",
+                                                                    getGameSpecificSpriteScaleClass(sprite.maleSpriteUrl),
+                                                                    group.caughtGames.length === 0 && "opacity-35 grayscale"
+                                                                )}
+                                                                style={{ imageRendering: getGameSpecificSpriteImageRendering(sprite.maleSpriteUrl), ...getGameSpecificSpriteScaleStyle(sprite.maleSpriteUrl) }}
+                                                            />
+                                                            {sprite.femaleSpriteUrl && (
+                                                                <img
+                                                                    src={sprite.femaleSpriteUrl}
+                                                                    alt={`${details.displayName} female shiny in ${spriteGame.name}`}
+                                                                    loading="lazy"
+                                                                    decoding="async"
+                                                                    className={cn(
+                                                                        "h-32 w-32 object-contain pokemon-sprite",
+                                                                        getGameSpecificSpriteScaleClass(sprite.femaleSpriteUrl),
+                                                                        (group.femaleCaughtGames ?? []).length === 0 && "opacity-35 grayscale"
+                                                                    )}
+                                                                    style={{ imageRendering: getGameSpecificSpriteImageRendering(sprite.femaleSpriteUrl), ...getGameSpecificSpriteScaleStyle(sprite.femaleSpriteUrl) }}
+                                                                />
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                         <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
                                             {group.games.map(gameId => {
