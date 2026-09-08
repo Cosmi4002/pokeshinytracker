@@ -79,6 +79,53 @@ interface GameCell {
 
 type BingoCell = PokemonBasic | GameCell;
 
+/**
+ * The random picker changes its image source several times per second. Firefox
+ * can render an image's alt text while the new remote sprite is still loading,
+ * which makes the Pokémon name briefly appear a second time in the sprite area.
+ * Keep that area reserved and show a loader until the current source is ready.
+ */
+function RandomPokemonSprite({ pokemon, outlineFilterId }: { pokemon: PokemonBasic; outlineFilterId: string }) {
+  const spriteUrl = getPokemonSpriteUrl(pokemon.id, {
+    shiny: true,
+    name: pokemon.name,
+    form: pokemon.name,
+  });
+  const [loadedUrl, setLoadedUrl] = useState<string | null>(null);
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+  const isReady = loadedUrl === spriteUrl || failedUrl === spriteUrl;
+
+  return (
+    <div className="relative h-40 w-40" aria-hidden="true">
+      {!isReady && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <RefreshCcw className="h-7 w-7 animate-spin text-muted-foreground/50" />
+        </div>
+      )}
+      <img
+        key={spriteUrl}
+        src={spriteUrl}
+        alt=""
+        className={cn(
+          'absolute inset-0 h-40 w-40 object-contain transition-opacity duration-100',
+          isReady ? 'opacity-100' : 'opacity-0',
+        )}
+        style={{
+          imageRendering: 'auto',
+          filter: `url(#${outlineFilterId}) drop-shadow(0 2px 3px rgba(0,0,0,0.08))`,
+        }}
+        decoding="async"
+        onLoad={() => setLoadedUrl(spriteUrl)}
+        onError={(event) => {
+          if (event.currentTarget.src.endsWith('/placeholder.svg')) return;
+          setFailedUrl(spriteUrl);
+          event.currentTarget.src = '/placeholder.svg';
+        }}
+      />
+    </div>
+  );
+}
+
 const GAMES: Pick<GameCell, 'id' | 'name' | 'generation' | 'logo'>[] = [
   // Gen 3
   { id: GAME_ID_BASE + 0, name: 'Ruby', generation: 3, logo: '/img/game-logos/ruby.png' },
@@ -971,20 +1018,7 @@ export default function Games() {
                       </feMerge>
                     </filter>
                   </svg>
-                  <img
-                    key={`${displayedRandomPokemon.id}-${displayedRandomPokemon.name}`}
-                    src={getPokemonSpriteUrl(displayedRandomPokemon.id, { shiny: true, name: displayedRandomPokemon.name, form: displayedRandomPokemon.name })}
-                    alt={displayedRandomPokemon.displayName}
-                    className="h-40 w-40 object-contain"
-                    style={{
-                      imageRendering: 'auto',
-                      filter: `url(#${randomSpriteOutlineId}) drop-shadow(0 2px 3px rgba(0,0,0,0.08))`,
-                    }}
-                    decoding="async"
-                    onError={(event) => {
-                      event.currentTarget.src = '/placeholder.svg';
-                    }}
-                  />
+                  <RandomPokemonSprite pokemon={displayedRandomPokemon} outlineFilterId={randomSpriteOutlineId} />
                   <div className="mt-2 flex items-center justify-center gap-2 text-xl font-black">
                     <span>{displayedRandomPokemon.displayName}</span>
                     <a
@@ -1169,6 +1203,10 @@ export default function Games() {
                               alt={label}
                               className={cn(
                                 'h-[44%] max-h-16 min-h-8 w-[60%] object-contain drop-shadow-sm transition-transform group-hover:scale-105',
+                                // Keep Pokémon entries in sync with the global sprite-size
+                                // corrections managed from the Pokédex. Game logos are not
+                                // Pokémon sprites and must retain their native sizing.
+                                !isGame && 'pokemon-sprite',
                                 isMarked ? 'saturate-125' : 'saturate-95'
                               )}
                               loading="lazy"
