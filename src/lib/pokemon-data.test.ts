@@ -101,6 +101,14 @@ describe('pokemon sprite helpers', () => {
     );
   });
 
+  it('falls back to the selected regional form instead of an unavailable old-game base sprite', () => {
+    expect(getSelectedGameSpriteUrl({
+      pokemonId: 20,
+      pokemonName: 'raticate-alola',
+      game: 'crystal',
+    })).toBe('/img/pokemon-sprites/remote/raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10092.png');
+  });
+
   it('recomputes caught shiny sprite URLs from pokemon data instead of trusting stale saved urls', () => {
     expect(
       getCaughtShinySpriteUrl({

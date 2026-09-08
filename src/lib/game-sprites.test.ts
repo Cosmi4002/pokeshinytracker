@@ -11,6 +11,14 @@ describe('game-specific shiny sprites', () => {
   it.each([
     ['diamond', 'https://archives.bulbagarden.net/media/upload/7/7c/Spr_4d_001_s.png'],
     ['platinum', 'https://archives.bulbagarden.net/media/upload/7/7c/Spr_4d_001_s.png'],
+    ['gold', 'https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_2g_001_s.png'],
+    ['silver', 'https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_2s_001_s.png'],
+    ['crystal', 'https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_2c_001_s.png'],
+    ['ruby', 'https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_3r_001_s.png'],
+    ['sapphire', 'https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_3r_001_s.png'],
+    ['firered', 'https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_3f_001_s.png'],
+    ['leafgreen', 'https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_3f_001_s.png'],
+    ['emerald', 'https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_3e_001_s.png'],
     ['heartgold', '/img/game-sprites/hgss/Spr_4h_001_s.png'],
     ['black2', '/img/game-sprites/bw/Spr_5b_001_s.webp'],
   ])('resolves Bulbasaur for %s', (gameId, expected) => {
@@ -71,6 +79,55 @@ describe('game-specific shiny sprites', () => {
   });
 
   it.each([
+    ['gold', 'Spr_2g_003_s.png'],
+    ['silver', 'Spr_2s_003_s.png'],
+    ['crystal', 'Spr_2c_003_s.png'],
+  ])('uses the same Gen II sprite for every gender selection in %s', (gameId, filename) => {
+    const expected = `https://archives.bulbagarden.net/wiki/Special:Redirect/file/${filename}`;
+
+    expect(getGameSpecificShinySpriteUrl(3, gameId, { name: 'venusaur', gender: 'male' })).toBe(expected);
+    expect(getGameSpecificShinySpriteUrl(3, gameId, { name: 'venusaur', gender: 'female' })).toBe(expected);
+  });
+
+  it.each(['ruby', 'sapphire'])('uses a gender-neutral shared Ruby/Sapphire sprite for %s', (gameId) => {
+    const expected = 'https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_3r_003_s.png';
+
+    expect(getGameSpecificShinySpriteUrl(3, gameId, { name: 'venusaur', gender: 'male' })).toBe(expected);
+    expect(getGameSpecificShinySpriteUrl(3, gameId, { name: 'venusaur', gender: 'female' })).toBe(expected);
+  });
+
+  it.each([
+    ['firered', 'Spr_3f_003_s.png'],
+    ['leafgreen', 'Spr_3f_003_s.png'],
+    ['emerald', 'Spr_3e_003_s.png'],
+  ])('uses a gender-neutral Gen III sprite for %s', (gameId, filename) => {
+    const expected = `https://archives.bulbagarden.net/wiki/Special:Redirect/file/${filename}`;
+
+    expect(getGameSpecificShinySpriteUrl(3, gameId, { name: 'venusaur', gender: 'male' })).toBe(expected);
+    expect(getGameSpecificShinySpriteUrl(3, gameId, { name: 'venusaur', gender: 'female' })).toBe(expected);
+  });
+
+  it.each(['ruby', 'sapphire', 'firered', 'leafgreen', 'emerald'])(
+    'does not resolve Castform weather transformations in %s',
+    (gameId) => {
+      expect(getGameSpecificShinySpriteUrl(351, gameId, { name: 'castform-sunny', form: 'castform-sunny' }))
+        .toBeNull();
+    },
+  );
+  it.each(['gold', 'silver', 'crystal', 'ruby', 'sapphire', 'firered', 'leafgreen', 'emerald'])(
+    'does not substitute a regional form with the base sprite in %s',
+    (gameId) => {
+      expect(getGameSpecificShinySpriteUrl(20, gameId, { name: 'raticate-alola', form: 'raticate-alola' }))
+        .toBeNull();
+    },
+  );
+
+  it('resolves Crystal Unown forms', () => {
+    expect(getGameSpecificShinySpriteUrl(201, 'crystal', { name: 'unown-b', form: 'unown-b' }))
+      .toBe('https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_2c_201B_s.png');
+  });
+
+  it.each([
     ['heartgold', 'Female', '/img/game-sprites/hgss/Spr_4h_003_f_s.png'],
     ['black2', 'f', '/img/game-sprites/bw/Spr_5b_003_f_s.webp'],
   ])('resolves gender-specific variants for %s', (gameId, gender, expected) => {
@@ -118,6 +175,12 @@ describe('game-specific shiny sprites', () => {
     ['/img/pokemon-sprites/remote/archives.bulbagarden.net/media/upload/5/54/Spr_4d_200_s.png', 'scale-[var(--sprite-scale)]'],
     ['/img/pokemon-sprites/remote/archives.bulbagarden.net/media/upload/6/6d/Spr_4d_399_m_s.png', 'scale-[var(--sprite-scale)]'],
     ['/img/game-sprites/hgss/Spr_4h_001_s.png', 'scale-[var(--sprite-scale)]'],
+    ['https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_2g_001_s.png', 'scale-[var(--sprite-scale)]'],
+    ['https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_2s_001_s.png', 'scale-[var(--sprite-scale)]'],
+    ['https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_2c_001_s.png', 'scale-[var(--sprite-scale)]'],
+    ['https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_3r_001_s.png', 'scale-[var(--sprite-scale)]'],
+    ['https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_3f_001_s.png', 'scale-[var(--sprite-scale)]'],
+    ['https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_3e_001_s.png', 'scale-[var(--sprite-scale)]'],
     ['/img/pokemon-sprites/remote/raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/1.png', ''],
   ])('uses the right display scale for %s', (url, expected) => {
     expect(getGameSpecificSpriteScaleClass(url)).toBe(expected);
