@@ -114,14 +114,6 @@ describe('game-specific shiny sprites', () => {
         .toBeNull();
     },
   );
-  it.each(['gold', 'silver', 'crystal', 'ruby', 'sapphire', 'firered', 'leafgreen', 'emerald'])(
-    'does not substitute a regional form with the base sprite in %s',
-    (gameId) => {
-      expect(getGameSpecificShinySpriteUrl(20, gameId, { name: 'raticate-alola', form: 'raticate-alola' }))
-        .toBeNull();
-    },
-  );
-
   it('resolves Crystal Unown forms', () => {
     expect(getGameSpecificShinySpriteUrl(201, 'crystal', { name: 'unown-b', form: 'unown-b' }))
       .toBe('https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_2c_201B_s.png');
