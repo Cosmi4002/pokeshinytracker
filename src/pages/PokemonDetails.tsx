@@ -499,6 +499,36 @@ export default function PokemonDetails() {
     const gameSpriteGroups = heroVariant
         ? [
             {
+                id: 'gold-silver',
+                label: 'Gold / Silver',
+                description: 'Original shiny sprite from Pokémon Gold and Pokémon Silver.',
+                games: ['gold', 'silver'],
+            },
+            {
+                id: 'crystal',
+                label: 'Crystal',
+                description: 'Original shiny sprite from Pokémon Crystal.',
+                games: ['crystal'],
+            },
+            {
+                id: 'ruby-sapphire',
+                label: 'Ruby / Sapphire',
+                description: 'Original shiny sprite shared by Pokémon Ruby and Pokémon Sapphire.',
+                games: ['ruby', 'sapphire'],
+            },
+            {
+                id: 'firered-leafgreen',
+                label: 'FireRed / LeafGreen',
+                description: 'Original shiny sprite shared by Pokémon FireRed and Pokémon LeafGreen.',
+                games: ['firered', 'leafgreen'],
+            },
+            {
+                id: 'emerald',
+                label: 'Emerald',
+                description: 'Original shiny sprite from Pokémon Emerald.',
+                games: ['emerald'],
+            },
+            {
                 id: 'dp',
                 label: 'Diamond / Pearl',
                 description: 'Original shiny sprite shared by Diamond and Pearl.',
