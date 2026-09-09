@@ -4,6 +4,8 @@ import { toLocalPokemonSpriteUrl } from './pokemon-data';
 import { GAME_SPRITE_LONG_SIDE_BY_FILE } from '@/data/game-sprite-long-sides.generated';
 import { BW_SHINY_SPRITE_FILES } from '@/data/bw-shiny-sprite-manifest';
 import { BW2_SHINY_SPRITE_FILES } from '@/data/bw2-shiny-sprite-manifest';
+import { SWORD_SHIELD_SHINY_MODEL_ENTRIES } from '@/data/sword-shield-shiny-model-manifest';
+import { getCuratedShinyOriginGameIds } from './pokemon-game-availability';
 
 const expectedSpriteUrl = (url: string) => toLocalPokemonSpriteUrl(url);
 
@@ -196,6 +198,30 @@ describe('game-specific shiny sprites', () => {
       .toBe('/api/game-sprite?file=Spr_8s_445_f_s.png');
     expect(getGameSpecificShinySpriteUrl(52, 'sword', { name: 'meowth-alola', form: 'meowth-alola' }))
       .toBe('/api/game-sprite?file=Spr_8s_052-A_s.png');
+  });
+
+  it('does not resolve Sword/Shield models for Pokémon absent from their Obtained in list', () => {
+    expect(getGameSpecificShinySpriteUrl(15, 'sword', { name: 'beedrill' })).toBeNull();
+    expect(getGameSpecificShinySpriteUrl(19, 'shield', { name: 'rattata', gender: 'female' })).toBeNull();
+  });
+
+  it('applies the Obtained in availability list to every Sword/Shield archive model', () => {
+    for (const entry of SWORD_SHIELD_SHINY_MODEL_ENTRIES) {
+      const availableGames = getCuratedShinyOriginGameIds(entry.speciesId, entry.canonicalName) || [];
+
+      for (const gameId of ['sword', 'shield'] as const) {
+        const actual = getGameSpecificShinySpriteUrl(entry.speciesId, gameId, {
+          name: entry.canonicalName,
+          form: entry.canonicalName,
+          gender: entry.gender || undefined,
+        });
+        const expected = availableGames.includes(gameId)
+          ? `/api/game-sprite?file=${entry.filename}`
+          : null;
+
+        expect(actual, `${entry.canonicalName} in ${gameId}`).toBe(expected);
+      }
+    }
   });
 
   it.each([
