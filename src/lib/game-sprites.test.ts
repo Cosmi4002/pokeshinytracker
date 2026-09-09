@@ -180,18 +180,18 @@ describe('game-specific shiny sprites', () => {
     },
   );
 
-  it.each(['sword', 'shield'])('loads base Sword/Shield models from Bulbagarden for %s', (gameId) => {
+  it.each(['sword', 'shield'])('proxies base Sword/Shield models through the app origin for %s', (gameId) => {
     expect(getGameSpecificShinySpriteUrl(1, gameId, { name: 'bulbasaur' }))
-      .toBe('https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_8s_001_s.png');
+      .toBe('/api/game-sprite?file=Spr_8s_001_s.png');
     expect(getGameSpecificShinySpriteUrl(810, gameId, { name: 'grookey' }))
-      .toBe('https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_8s_810_s.png');
+      .toBe('/api/game-sprite?file=Spr_8s_810_s.png');
   });
 
   it('maps verified Sword/Shield forms and female models without base-form fallback', () => {
     expect(getGameSpecificShinySpriteUrl(52, 'sword', { name: 'meowth-galar', form: 'meowth-galar' }))
-      .toBe('https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_8s_052-G_s.png');
+      .toBe('/api/game-sprite?file=Spr_8s_052-G_s.png');
     expect(getGameSpecificShinySpriteUrl(445, 'shield', { name: 'garchomp', gender: 'female' }))
-      .toBe('https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_8s_445_f_s.png');
+      .toBe('/api/game-sprite?file=Spr_8s_445_f_s.png');
     expect(getGameSpecificShinySpriteUrl(52, 'sword', { name: 'meowth-alola', form: 'meowth-alola' }))
       .toBeNull();
   });
@@ -241,14 +241,14 @@ describe('game-specific shiny sprites', () => {
     ['/img/game-sprites/sm/Spr_7s_001_s.webp'],
     ['/img/game-sprites/usum/Spr_7u_001_s.webp'],
     ['/img/game-sprites/gen6-7/bulbasaur.webp'],
-    ['https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_8s_001_s.png'],
+    ['/api/game-sprite?file=Spr_8s_001_s.png'],
   ])('reduces newer game sprites by 15%%: %s', (url) => {
     expect(getGameSpecificSpriteScaleFactor(url)).toBe(0.85);
   });
 
   it('uses smoother rendering for the shared Gen VI/VII sprite set only', () => {
     expect(getGameSpecificSpriteImageRendering('/img/game-sprites/gen6-7/bulbasaur.webp')).toBe('auto');
-    expect(getGameSpecificSpriteImageRendering('https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_8s_001_s.png')).toBe('auto');
+    expect(getGameSpecificSpriteImageRendering('/api/game-sprite?file=Spr_8s_001_s.png')).toBe('auto');
     expect(getGameSpecificSpriteImageRendering('/img/game-sprites/bw/Spr_5b_001_s.webp')).toBe('pixelated');
   });
 
