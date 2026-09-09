@@ -16,6 +16,7 @@ import { GEN7_ADDITIONAL_SHINY_SPRITE_ENTRIES } from '@/data/gen7-additional-shi
 import { SWORD_SHIELD_SHINY_MODEL_ENTRIES } from '@/data/sword-shield-shiny-model-manifest';
 import { GAME_SPRITE_LONG_SIDE_BY_FILE } from '@/data/game-sprite-long-sides.generated';
 import { LOCAL_SPRITE_URLS } from './local-sprite-map.generated';
+import { getCuratedShinyOriginGameIds } from './pokemon-game-availability';
 import furfrouDandySpriteUrl from '../../missing sprite/Furfrou(dandy trim).png';
 import furfrouDebutanteSpriteUrl from '../../missing sprite/Furfrou(debutante).png';
 import furfrouDiamondSpriteUrl from '../../missing sprite/Furfrou(diamond).png';
@@ -475,6 +476,15 @@ export function getGameSpecificShinySpriteUrl(
       ? resolveGen67SpeciesId(pokemonId, slug)
       : resolveSpeciesId(pokemonId, slug);
   if (!speciesId) return null;
+
+  // Sword/Shield archive models also include Pokémon that can only be
+  // transferred into the games. Keep every screen consistent with the
+  // Pokédex's "Obtained in" list: do not present a Sword/Shield model when
+  // that form has no valid shiny origin in the selected game.
+  if (set === 'swsh-archive') {
+    const availableGameIds = getCuratedShinyOriginGameIds(speciesId, slug);
+    if (!availableGameIds?.includes(gameId as 'sword' | 'shield')) return null;
+  }
 
   if (set === 'swsh-archive') {
     return getSwordShieldArchiveSpriteUrl(speciesId, slug, options.gender);
