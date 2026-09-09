@@ -582,6 +582,12 @@ export default function PokemonDetails() {
                 description: 'Original shiny sprite shared by Pokémon Ultra Sun and Ultra Moon.',
                 games: ['ultrasun', 'ultramoon'],
             },
+            {
+                id: 'swsh',
+                label: 'Sword / Shield',
+                description: 'Original shiny model shared by Pokémon Sword and Pokémon Shield.',
+                games: ['sword', 'shield'],
+            },
         ].map(group => {
             const maleCaughtGamesForGroup = group.games.filter(gameId => {
                 if (!details.hasGenderDifference) return caughtGames.has(gameId);

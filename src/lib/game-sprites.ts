@@ -62,8 +62,9 @@ export const GAME_SPRITE_SET_BY_GAME: Readonly<Record<string, string>> = {
   moon: 'gen6-7',
   ultrasun: 'gen6-7',
   ultramoon: 'gen6-7',
-  // Keep Gen VIII's large animated models off the deployment: the browser
-  // loads them directly from their Archive source instead.
+  // Sword/Shield models are served through our same-origin proxy. Direct
+  // Archive redirects fail to resolve on some mobile browsers and left the
+  // image fallback visible throughout the app.
   sword: 'swsh-archive',
   shield: 'swsh-archive',
 };
@@ -308,11 +309,13 @@ const hasRegionalFormMarker = (slug: string) => /-(?:alola|galar|hisui|paldea)(?
 type SwordShieldCandidate = typeof SWORD_SHIELD_SHINY_MODEL_ENTRIES[number];
 
 const SWORD_SHIELD_SPRITES_BY_SPECIES = new Map<number, SwordShieldCandidate[]>();
+const SWORD_SHIELD_SPECIES_BY_CANONICAL_NAME = new Map<string, number>();
 for (const entry of SWORD_SHIELD_SHINY_MODEL_ENTRIES) {
   SWORD_SHIELD_SPRITES_BY_SPECIES.set(entry.speciesId, [
     ...(SWORD_SHIELD_SPRITES_BY_SPECIES.get(entry.speciesId) || []),
     entry,
   ]);
+  SWORD_SHIELD_SPECIES_BY_CANONICAL_NAME.set(entry.canonicalName, entry.speciesId);
 }
 
 const getSwordShieldArchiveSpriteUrl = (speciesId: number, slug: string, gender?: string | null) => {
@@ -327,7 +330,7 @@ const getSwordShieldArchiveSpriteUrl = (speciesId: number, slug: string, gender?
     : null;
   const neutralMatch = formCandidates.find((entry) => entry.gender === null);
   const entry = genderMatch || neutralMatch || formCandidates[0];
-  return `https://archives.bulbagarden.net/wiki/Special:Redirect/file/${entry.filename}`;
+  return `/api/game-sprite?file=${encodeURIComponent(entry.filename)}`;
 };
 
 const ARCHIVE_THERIAN_SHINY_OVERRIDE_BY_FORM: Readonly<Record<string, string>> = {
@@ -381,6 +384,11 @@ const GAME_SPRITE_SET_FIXED_SCALE: Readonly<Record<string, number>> = {
 
 const getGameSpecificSpriteFilePath = (url?: string | null) => {
   if (!url) return null;
+  const proxiedGameSpriteMatch = url.match(/^\/api\/game-sprite\?file=(Spr_[^&#]+)/i);
+  if (proxiedGameSpriteMatch) {
+    const filename = decodeURIComponent(proxiedGameSpriteMatch[1]);
+    if (/^Spr_8s_\d{3}(?:-[A-Z]+)?(?:_[mf])?_s\.png$/i.test(filename)) return `swsh-archive/${filename}`;
+  }
   if (url.startsWith('/img/game-sprites/')) {
     const parts = url.split('/');
     if (parts.length < 5) return null;
@@ -455,9 +463,11 @@ export function getGameSpecificShinySpriteUrl(
     return null;
   }
 
-  const speciesId = set === 'gen6-7' || set === 'swsh-archive'
-    ? resolveGen67SpeciesId(pokemonId, slug)
-    : resolveSpeciesId(pokemonId, slug);
+  const speciesId = set === 'swsh-archive'
+    ? SWORD_SHIELD_SPECIES_BY_CANONICAL_NAME.get(slug) ?? resolveGen67SpeciesId(pokemonId, slug)
+    : set === 'gen6-7'
+      ? resolveGen67SpeciesId(pokemonId, slug)
+      : resolveSpeciesId(pokemonId, slug);
   if (!speciesId) return null;
 
   if (set === 'swsh-archive') {
