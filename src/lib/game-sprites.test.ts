@@ -187,8 +187,12 @@ describe('game-specific shiny sprites', () => {
       .toBe('https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_8s_810_s.png');
   });
 
-  it('does not replace a Sword/Shield form with its base model', () => {
+  it('maps verified Sword/Shield forms and female models without base-form fallback', () => {
     expect(getGameSpecificShinySpriteUrl(52, 'sword', { name: 'meowth-galar', form: 'meowth-galar' }))
+      .toBe('https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_8s_052-G_s.png');
+    expect(getGameSpecificShinySpriteUrl(445, 'shield', { name: 'garchomp', gender: 'female' }))
+      .toBe('https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_8s_445_f_s.png');
+    expect(getGameSpecificShinySpriteUrl(52, 'sword', { name: 'meowth-alola', form: 'meowth-alola' }))
       .toBeNull();
   });
 

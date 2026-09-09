@@ -13,6 +13,7 @@ import { BW_SHINY_SPRITE_FILES } from '@/data/bw-shiny-sprite-manifest';
 import { BW2_SHINY_SPRITE_FILES } from '@/data/bw2-shiny-sprite-manifest';
 import { GEN6_7_SHINY_SPRITE_ENTRIES } from '@/data/gen6-7-shiny-sprite-manifest';
 import { GEN7_ADDITIONAL_SHINY_SPRITE_ENTRIES } from '@/data/gen7-additional-shiny-sprite-manifest';
+import { SWORD_SHIELD_SHINY_MODEL_ENTRIES } from '@/data/sword-shield-shiny-model-manifest';
 import { GAME_SPRITE_LONG_SIDE_BY_FILE } from '@/data/game-sprite-long-sides.generated';
 import { LOCAL_SPRITE_URLS } from './local-sprite-map.generated';
 import furfrouDandySpriteUrl from '../../missing sprite/Furfrou(dandy trim).png';
@@ -304,24 +305,29 @@ const normalizeGender = (gender?: string | null): 'female' | 'male' | null => {
 // (for example, Crystal Raticate) when an Alolan/Galarian/etc. form is selected.
 const hasRegionalFormMarker = (slug: string) => /-(?:alola|galar|hisui|paldea)(?:-|$)/i.test(slug);
 
-// SWSH filenames use a suffix for a few regional forms. Keep these explicit:
-// falling back to Spr_8s_078_s.png for Rapidash-Galar would silently show the
-// wrong Pokémon, which is worse than showing no sprite at all.
-const SWORD_SHIELD_FORM_SPRITE_BY_SLUG: Readonly<Record<string, { speciesId: number; filename: string }>> = {
-  'rapidash-galar': { speciesId: 78, filename: 'Spr_8s_078-G_s.png' },
-};
+type SwordShieldCandidate = typeof SWORD_SHIELD_SHINY_MODEL_ENTRIES[number];
 
-const getSwordShieldArchiveSpriteUrl = (speciesId: number, slug: string) => {
-  const formSprite = SWORD_SHIELD_FORM_SPRITE_BY_SLUG[slug];
-  if (formSprite) {
-    return `https://archives.bulbagarden.net/wiki/Special:Redirect/file/${formSprite.filename}`;
-  }
+const SWORD_SHIELD_SPRITES_BY_SPECIES = new Map<number, SwordShieldCandidate[]>();
+for (const entry of SWORD_SHIELD_SHINY_MODEL_ENTRIES) {
+  SWORD_SHIELD_SPRITES_BY_SPECIES.set(entry.speciesId, [
+    ...(SWORD_SHIELD_SPRITES_BY_SPECIES.get(entry.speciesId) || []),
+    entry,
+  ]);
+}
 
-  // Form models have separate Archive names. Do not incorrectly substitute a
-  // base model; forms can later be added in the explicit manifest above.
-  if (slug.includes('-')) return null;
-  const filename = `Spr_8s_${String(speciesId).padStart(3, '0')}_s.png`;
-  return `https://archives.bulbagarden.net/wiki/Special:Redirect/file/${filename}`;
+const getSwordShieldArchiveSpriteUrl = (speciesId: number, slug: string, gender?: string | null) => {
+  const candidates = SWORD_SHIELD_SPRITES_BY_SPECIES.get(speciesId) || [];
+  const formCandidates = candidates.filter((entry) => entry.canonicalName === slug);
+  // Never show a base model for a form or gender that has no verified category
+  // entry. This avoids silently presenting the wrong Pokémon.
+  if (formCandidates.length === 0) return null;
+  const requestedGender = normalizeGender(gender);
+  const genderMatch = requestedGender
+    ? formCandidates.find((entry) => entry.gender === requestedGender)
+    : null;
+  const neutralMatch = formCandidates.find((entry) => entry.gender === null);
+  const entry = genderMatch || neutralMatch || formCandidates[0];
+  return `https://archives.bulbagarden.net/wiki/Special:Redirect/file/${entry.filename}`;
 };
 
 const ARCHIVE_THERIAN_SHINY_OVERRIDE_BY_FORM: Readonly<Record<string, string>> = {
@@ -401,7 +407,7 @@ const getGameSpecificSpriteFilePath = (url?: string | null) => {
   const archiveMatch = url.match(/\/Special:Redirect\/file\/([^?]+)/i);
   if (archiveMatch) {
     const filename = decodeURIComponent(archiveMatch[1]);
-    if (/^Spr_8s_\d{3}_s\.png$/i.test(filename)) return `swsh-archive/${filename}`;
+    if (/^Spr_8s_\d{3}(?:-[A-Z]+)?(?:_[mf])?_s\.png$/i.test(filename)) return `swsh-archive/${filename}`;
     const gen2Set = { g: 'gold', s: 'silver', c: 'crystal' }[filename.match(/^Spr_2([gsc])_/i)?.[1]?.toLowerCase() || ''];
     if (gen2Set) return `${gen2Set}/${filename}`;
     const gen3Set = { r: 'ruby-sapphire', f: 'firered-leafgreen', e: 'emerald' }[filename.match(/^Spr_3([rfe])_/i)?.[1]?.toLowerCase() || ''];
@@ -449,23 +455,13 @@ export function getGameSpecificShinySpriteUrl(
     return null;
   }
 
-  // Form-only PokéAPI IDs (such as Rapidash-Galar's 10163) cannot be reduced
-  // to a National Dex ID by the generic resolver. Resolve known SWSH models
-  // before that reduction so the form's own archive filename is retained.
-  if (set === 'swsh-archive' && SWORD_SHIELD_FORM_SPRITE_BY_SLUG[slug]) {
-    return getSwordShieldArchiveSpriteUrl(
-      SWORD_SHIELD_FORM_SPRITE_BY_SLUG[slug].speciesId,
-      slug,
-    );
-  }
-
   const speciesId = set === 'gen6-7' || set === 'swsh-archive'
     ? resolveGen67SpeciesId(pokemonId, slug)
     : resolveSpeciesId(pokemonId, slug);
   if (!speciesId) return null;
 
   if (set === 'swsh-archive') {
-    return getSwordShieldArchiveSpriteUrl(speciesId, slug);
+    return getSwordShieldArchiveSpriteUrl(speciesId, slug, options.gender);
   }
 
   if (set === 'gen6-7') {
