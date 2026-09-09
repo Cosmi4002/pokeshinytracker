@@ -306,11 +306,17 @@ const normalizeGender = (gender?: string | null): 'female' | 'male' | null => {
 // (for example, Crystal Raticate) when an Alolan/Galarian/etc. form is selected.
 const hasRegionalFormMarker = (slug: string) => /-(?:alola|galar|hisui|paldea)(?:-|$)/i.test(slug);
 
-type SwordShieldCandidate = typeof SWORD_SHIELD_SHINY_MODEL_ENTRIES[number];
+type SwordShieldCandidate = {
+  filename: string;
+  speciesId: number;
+  suffix: string;
+  gender: 'female' | 'male' | null;
+  canonicalName: string;
+};
 
 const SWORD_SHIELD_SPRITES_BY_SPECIES = new Map<number, SwordShieldCandidate[]>();
 const SWORD_SHIELD_SPECIES_BY_CANONICAL_NAME = new Map<string, number>();
-for (const entry of SWORD_SHIELD_SHINY_MODEL_ENTRIES) {
+for (const entry of SWORD_SHIELD_SHINY_MODEL_ENTRIES as readonly SwordShieldCandidate[]) {
   SWORD_SHIELD_SPRITES_BY_SPECIES.set(entry.speciesId, [
     ...(SWORD_SHIELD_SPRITES_BY_SPECIES.get(entry.speciesId) || []),
     entry,
