@@ -336,7 +336,12 @@ const getSwordShieldArchiveSpriteUrl = (speciesId: number, slug: string, gender?
     ? formCandidates.find((entry) => entry.gender === requestedGender)
     : null;
   const neutralMatch = formCandidates.find((entry) => entry.gender === null);
-  const entry = genderMatch || neutralMatch || formCandidates[0];
+  // The generated manifest is sorted alphabetically by gender, which can put
+  // a female entry before the male entry. For Sword/Shield gender-different
+  // models, use the explicit male redirect whenever gender is absent or
+  // unrecognized instead of relying on that incidental array order.
+  const maleMatch = formCandidates.find((entry) => entry.gender === 'male');
+  const entry = genderMatch || neutralMatch || maleMatch || formCandidates[0];
   return `/api/game-sprite?file=${encodeURIComponent(entry.filename)}`;
 };
 
@@ -394,7 +399,7 @@ const getGameSpecificSpriteFilePath = (url?: string | null) => {
   const proxiedGameSpriteMatch = url.match(/^\/api\/game-sprite\?file=(Spr_[^&#]+)/i);
   if (proxiedGameSpriteMatch) {
     const filename = decodeURIComponent(proxiedGameSpriteMatch[1]);
-    if (/^Spr_8s_\d{3}(?:-[A-Z]+)?(?:_[mf])?_s\.png$/i.test(filename)) return `swsh-archive/${filename}`;
+    if (/^Spr_8s_\d{3}(?:-?[A-Z]+)?(?:_[mf])?_s\.png$/i.test(filename)) return `swsh-archive/${filename}`;
   }
   if (url.startsWith('/img/game-sprites/')) {
     const parts = url.split('/');
@@ -422,7 +427,7 @@ const getGameSpecificSpriteFilePath = (url?: string | null) => {
   const archiveMatch = url.match(/\/Special:Redirect\/file\/([^?]+)/i);
   if (archiveMatch) {
     const filename = decodeURIComponent(archiveMatch[1]);
-    if (/^Spr_8s_\d{3}(?:-[A-Z]+)?(?:_[mf])?_s\.png$/i.test(filename)) return `swsh-archive/${filename}`;
+    if (/^Spr_8s_\d{3}(?:-?[A-Z]+)?(?:_[mf])?_s\.png$/i.test(filename)) return `swsh-archive/${filename}`;
     const gen2Set = { g: 'gold', s: 'silver', c: 'crystal' }[filename.match(/^Spr_2([gsc])_/i)?.[1]?.toLowerCase() || ''];
     if (gen2Set) return `${gen2Set}/${filename}`;
     const gen3Set = { r: 'ruby-sapphire', f: 'firered-leafgreen', e: 'emerald' }[filename.match(/^Spr_3([rfe])_/i)?.[1]?.toLowerCase() || ''];

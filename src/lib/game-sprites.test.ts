@@ -191,13 +191,225 @@ describe('game-specific shiny sprites', () => {
       .toBe('/api/game-sprite?file=Spr_8s_006_s.png');
   });
 
-  it('maps verified Sword/Shield forms and female models without base-form fallback', () => {
-    expect(getGameSpecificShinySpriteUrl(52, 'sword', { name: 'meowth-galar', form: 'meowth-galar' }))
-      .toBe('/api/game-sprite?file=Spr_8s_052-G_s.png');
+  it.each([
+    ['raichu-alola', 26, 'Spr_8s_026A_s.png'],
+    ['sandshrew-alola', 27, 'Spr_8s_027A_s.png'],
+    ['sandslash-alola', 28, 'Spr_8s_028A_s.png'],
+    ['vulpix-alola', 37, 'Spr_8s_037A_s.png'],
+    ['ninetales-alola', 38, 'Spr_8s_038A_s.png'],
+    ['diglett-alola', 50, 'Spr_8s_050A_s.png'],
+    ['dugtrio-alola', 51, 'Spr_8s_051A_s.png'],
+    ['meowth-alola', 52, 'Spr_8s_052A_s.png'],
+    ['persian-alola', 53, 'Spr_8s_053A_s.png'],
+    ['exeggutor-alola', 103, 'Spr_8s_103A_s.png'],
+    ['marowak-alola', 105, 'Spr_8s_105A_s.png'],
+    ['meowth-galar', 52, 'Spr_8s_052G_s.png'],
+    ['ponyta-galar', 77, 'Spr_8s_077G_s.png'],
+    ['rapidash-galar', 78, 'Spr_8s_078G_s.png'],
+    ['slowpoke-galar', 79, 'Spr_8s_079G_s.png'],
+    ['slowbro-galar', 80, 'Spr_8s_080G_s.png'],
+    ['farfetchd-galar', 83, 'Spr_8s_083G_s.png'],
+    ['weezing-galar', 110, 'Spr_8s_110G_s.png'],
+    ['mr-mime-galar', 122, 'Spr_8s_122G_s.png'],
+    ['articuno-galar', 144, 'Spr_8s_144G_s.png'],
+    ['zapdos-galar', 145, 'Spr_8s_145G_s.png'],
+    ['moltres-galar', 146, 'Spr_8s_146G_s.png'],
+    ['slowking-galar', 199, 'Spr_8s_199G_s.png'],
+    ['corsola-galar', 222, 'Spr_8s_222G_s.png'],
+    ['zigzagoon-galar', 263, 'Spr_8s_263G_s.png'],
+    ['linoone-galar', 264, 'Spr_8s_264G_s.png'],
+    ['darumaka-galar', 554, 'Spr_8s_554G_s.png'],
+    ['darmanitan-galar', 555, 'Spr_8s_555G_s.png'],
+    ['yamask-galar', 562, 'Spr_8s_562G_s.png'],
+    ['stunfisk-galar', 618, 'Spr_8s_618G_s.png'],
+  ])('records the verified redirect filename for %s', (canonicalName, speciesId, filename) => {
+    expect(SWORD_SHIELD_SHINY_MODEL_ENTRIES.find((entry) => (
+      entry.speciesId === speciesId && entry.canonicalName === canonicalName
+    ))?.filename).toBe(filename);
+  });
+
+  it.each([
+    [3, 'Spr_8s_003_m_s.png'],
+    [12, 'Spr_8s_012_m_s.png'],
+    [25, 'Spr_8s_025_m_s.png'],
+    [26, 'Spr_8s_026_m_s.png'],
+    [41, 'Spr_8s_041_m_s.png'],
+    [42, 'Spr_8s_042_m_s.png'],
+    [44, 'Spr_8s_044_m_s.png'],
+    [45, 'Spr_8s_045_m_s.png'],
+    [64, 'Spr_8s_064_m_s.png'],
+    [65, 'Spr_8s_065_m_s.png'],
+    [111, 'Spr_8s_111_m_s.png'],
+    [112, 'Spr_8s_112_m_s.png'],
+    [118, 'Spr_8s_118_m_s.png'],
+    [119, 'Spr_8s_119_m_s.png'],
+    [123, 'Spr_8s_123_m_s.png'],
+    [129, 'Spr_8s_129_m_s.png'],
+    [130, 'Spr_8s_130_m_s.png'],
+    [133, 'Spr_8s_133_m_s.png'],
+    [185, 'Spr_8s_185_m_s.png'],
+    [186, 'Spr_8s_186_m_s.png'],
+    [194, 'Spr_8s_194_m_s.png'],
+    [195, 'Spr_8s_195_m_s.png'],
+    [202, 'Spr_8s_202_m_s.png'],
+    [208, 'Spr_8s_208_m_s.png'],
+    [212, 'Spr_8s_212_m_s.png'],
+    [214, 'Spr_8s_214_m_s.png'],
+    [215, 'Spr_8s_215_m_s.png'],
+    [221, 'Spr_8s_221_m_s.png'],
+    [224, 'Spr_8s_224_m_s.png'],
+    [272, 'Spr_8s_272_m_s.png'],
+    [274, 'Spr_8s_274_m_s.png'],
+    [275, 'Spr_8s_275_m_s.png'],
+    [307, 'Spr_8s_307_m_s.png'],
+    [308, 'Spr_8s_308_m_s.png'],
+    [315, 'Spr_8s_315_m_s.png'],
+    [316, 'Spr_8s_316_m_s.png'],
+    [317, 'Spr_8s_317_m_s.png'],
+    [322, 'Spr_8s_322_m_s.png'],
+    [323, 'Spr_8s_323_m_s.png'],
+    [332, 'Spr_8s_332_m_s.png'],
+    [350, 'Spr_8s_350_m_s.png'],
+    [369, 'Spr_8s_369_m_s.png'],
+    [403, 'Spr_8s_403_m_s.png'],
+    [404, 'Spr_8s_404_m_s.png'],
+    [405, 'Spr_8s_405_m_s.png'],
+    [407, 'Spr_8s_407_m_s.png'],
+    [415, 'Spr_8s_415_m_s.png'],
+    [417, 'Spr_8s_417_m_s.png'],
+    [418, 'Spr_8s_418_m_s.png'],
+    [419, 'Spr_8s_419_m_s.png'],
+    [443, 'Spr_8s_443_m_s.png'],
+    [444, 'Spr_8s_444_m_s.png'],
+    [445, 'Spr_8s_445_m_s.png'],
+    [449, 'Spr_8s_449_m_s.png'],
+    [450, 'Spr_8s_450_m_s.png'],
+    [453, 'Spr_8s_453_m_s.png'],
+    [454, 'Spr_8s_454_m_s.png'],
+    [456, 'Spr_8s_456_m_s.png'],
+    [457, 'Spr_8s_457_m_s.png'],
+    [459, 'Spr_8s_459_m_s.png'],
+    [460, 'Spr_8s_460_m_s.png'],
+    [461, 'Spr_8s_461_m_s.png'],
+    [464, 'Spr_8s_464_m_s.png'],
+    [465, 'Spr_8s_465_m_s.png'],
+    [473, 'Spr_8s_473_m_s.png'],
+    [521, 'Spr_8s_521_m_s.png'],
+    [592, 'Spr_8s_592_m_s.png'],
+    [593, 'Spr_8s_593_m_s.png'],
+    [668, 'Spr_8s_668_m_s.png'],
+    [678, 'Spr_8s_678_m_s.png'],
+    [876, 'Spr_8s_876_m_s.png'],
+  ])('records the verified male redirect filename for species %s', (speciesId, filename) => {
+    expect(SWORD_SHIELD_SHINY_MODEL_ENTRIES.find((entry) => (
+      entry.speciesId === speciesId && entry.gender === 'male'
+    ))?.filename).toBe(filename);
+  });
+
+  it.each([
+    3,
+    12,
+    25,
+    26,
+    44,
+    45,
+    64,
+    65,
+    111,
+    112,
+    118,
+    119,
+    123,
+    129,
+    130,
+    133,
+    185,
+    186,
+    202,
+    208,
+    212,
+    214,
+    215,
+    217,
+    221,
+    224,
+    229,
+    232,
+    255,
+    256,
+    257,
+    267,
+    269,
+    272,
+    274,
+    275,
+    307,
+    308,
+    315,
+    316,
+    317,
+    322,
+    323,
+    332,
+    350,
+    369,
+    403,
+    404,
+    405,
+    407,
+    415,
+    417,
+    418,
+    419,
+    424,
+    443,
+    444,
+    445,
+    449,
+    450,
+    453,
+    454,
+    456,
+    457,
+    459,
+    460,
+    461,
+    464,
+    465,
+    473,
+    521,
+    592,
+    593,
+    678,
+    876,
+  ])('records the verified female redirect filename for species %s', (speciesId) => {
+    expect(SWORD_SHIELD_SHINY_MODEL_ENTRIES.find((entry) => (
+      entry.speciesId === speciesId && entry.gender === 'female'
+    ))?.filename).toBe(`Spr_8s_${String(speciesId).padStart(3, '0')}_f_s.png`);
+  });
+
+  it('maps Sword/Shield male and female models without base-form fallback', () => {
+    expect(getGameSpecificShinySpriteUrl(445, 'shield', { name: 'garchomp' }))
+      .toBe('/api/game-sprite?file=Spr_8s_445_m_s.png');
+    expect(getGameSpecificShinySpriteUrl(445, 'shield', { name: 'garchomp', gender: 'male' }))
+      .toBe('/api/game-sprite?file=Spr_8s_445_m_s.png');
     expect(getGameSpecificShinySpriteUrl(445, 'shield', { name: 'garchomp', gender: 'female' }))
       .toBe('/api/game-sprite?file=Spr_8s_445_f_s.png');
-    expect(getGameSpecificShinySpriteUrl(52, 'sword', { name: 'meowth-alola', form: 'meowth-alola' }))
-      .toBe('/api/game-sprite?file=Spr_8s_052-A_s.png');
+  });
+
+  it.each([
+    ['rotom-heat', 'Spr_8s_479O_s.png'], ['giratina-origin', 'Spr_8s_487O_s.png'],
+    ['shellos-east', 'Spr_8s_422E_s.png'], ['basculin-blue-striped', 'Spr_8s_550B_s.png'],
+    ['tornadus-therian', 'Spr_8s_641T_s.png'], ['kyurem-black', 'Spr_8s_646B_s.png'],
+    ['pumpkaboo-small', 'Spr_8s_710Sm_s.png'], ['gourgeist-super', 'Spr_8s_711Su_s.png'],
+    ['zygarde-10', 'Spr_8s_718T_s.png'], ['lycanroc-midnight', 'Spr_8s_745Mn_s.png'],
+    ['silvally-fire', 'Spr_8s_773Fire_s.png'], ['necrozma-dawn', 'Spr_8s_800DW_s.png'],
+    ['toxtricity-low-key', 'Spr_8s_849L_s.png'], ['alcremie-vanilla-cream-berry-sweet', 'Spr_8s_869B_s.png'],
+    ['urshifu-rapid-strike', 'Spr_8s_892R_s.png'], ['zacian-crowned', 'Spr_8s_888C_s.png'],
+    ['zarude-dada', 'Spr_8s_893D_s.png'], ['calyrex-shadow', 'Spr_8s_898S_s.png'],
+  ])('records the verified Sword/Shield form sprite for %s', (canonicalName, filename) => {
+    expect(SWORD_SHIELD_SHINY_MODEL_ENTRIES.find((entry) => entry.canonicalName === canonicalName)?.filename)
+      .toBe(filename);
   });
 
   it('does not resolve Sword/Shield models for Pokémon absent from their Obtained in list', () => {
