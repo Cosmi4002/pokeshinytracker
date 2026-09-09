@@ -29,7 +29,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { todayLocalISODate } from "@/lib/date";
 import { getGameTheme, GAME_LOGOS } from "@/lib/game-themes";
-import { GAMES } from "@/lib/pokemon-data";
+import { GAMES, handlePokemonSpriteError } from "@/lib/pokemon-data";
 import {
     getAvailabilitySourceLinks,
     getCuratedShinyOriginGameIds
@@ -1042,6 +1042,14 @@ export default function PokemonDetails() {
                                                                     group.caughtGames.length === 0 && "opacity-35 grayscale"
                                                                 )}
                                                                 style={{ imageRendering: getGameSpecificSpriteImageRendering(sprite.maleSpriteUrl), ...getGameSpecificSpriteScaleStyle(sprite.maleSpriteUrl) }}
+                                                                onError={(event) => handlePokemonSpriteError(
+                                                                    event.currentTarget,
+                                                                    getPokemonSpriteUrl(heroVariant.id, {
+                                                                        shiny: true,
+                                                                        name: heroVariant.name,
+                                                                        form: heroVariant.name,
+                                                                    })
+                                                                )}
                                                             />
                                                             {sprite.femaleSpriteUrl && (
                                                                 <img
@@ -1055,6 +1063,15 @@ export default function PokemonDetails() {
                                                                         (group.femaleCaughtGames ?? []).length === 0 && "opacity-35 grayscale"
                                                                     )}
                                                                     style={{ imageRendering: getGameSpecificSpriteImageRendering(sprite.femaleSpriteUrl), ...getGameSpecificSpriteScaleStyle(sprite.femaleSpriteUrl) }}
+                                                                    onError={(event) => handlePokemonSpriteError(
+                                                                        event.currentTarget,
+                                                                        getPokemonSpriteUrl(heroVariant.id, {
+                                                                            shiny: true,
+                                                                            name: heroVariant.name,
+                                                                            form: heroVariant.name,
+                                                                            female: true,
+                                                                        })
+                                                                    )}
                                                                 />
                                                             )}
                                                         </div>
