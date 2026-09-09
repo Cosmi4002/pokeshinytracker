@@ -62,6 +62,14 @@ const parse = (filename) => {
 
 const catalog = JSON.parse(await readFile(CATALOG, 'utf8'));
 const baseNameBySpecies = new Map(catalog.filter((entry) => entry.formKey === 'base').map((entry) => [entry.speciesId, entry.canonicalName]));
+const regionalNameBySpeciesAndSuffix = new Map(
+  catalog
+    .filter((entry) => /-(?:alola|galar)$/.test(entry.canonicalName))
+    .map((entry) => [
+      `${entry.speciesId}:${entry.canonicalName.endsWith('-alola') ? 'A' : 'G'}`,
+      entry.canonicalName,
+    ]),
+);
 const files = await fetchCategoryFiles();
 const entries = [];
 const unparsed = [];
@@ -69,7 +77,14 @@ const unmapped = [];
 for (const filename of files) {
   const parsed = parse(filename);
   if (!parsed) { unparsed.push(filename); continue; }
-  const canonicalName = parsed.suffix ? FORM_BY_SPECIES_AND_SUFFIX[`${parsed.speciesId}:${parsed.suffix}`] : baseNameBySpecies.get(parsed.speciesId);
+  // The archive uses the National Dex number, then `A`/`G` for the
+  // regional variant and `m`/`f` for a gender-different model. Gigantamax
+  // (`Gi`) is deliberately not a selectable Pokémon form in this manifest.
+  if (parsed.suffix === 'GI') continue;
+  const canonicalName = parsed.suffix
+    ? regionalNameBySpeciesAndSuffix.get(`${parsed.speciesId}:${parsed.suffix}`)
+      ?? FORM_BY_SPECIES_AND_SUFFIX[`${parsed.speciesId}:${parsed.suffix}`]
+    : baseNameBySpecies.get(parsed.speciesId);
   if (!canonicalName) { unmapped.push({ filename, speciesId: parsed.speciesId, suffix: parsed.suffix || null }); continue; }
   entries.push({ ...parsed, canonicalName: normalize(canonicalName) });
 }

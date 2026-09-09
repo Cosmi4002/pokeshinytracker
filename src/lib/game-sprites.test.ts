@@ -185,6 +185,8 @@ describe('game-specific shiny sprites', () => {
       .toBe('/api/game-sprite?file=Spr_8s_001_s.png');
     expect(getGameSpecificShinySpriteUrl(810, gameId, { name: 'grookey' }))
       .toBe('/api/game-sprite?file=Spr_8s_810_s.png');
+    expect(getGameSpecificShinySpriteUrl(6, gameId, { name: 'charizard' }))
+      .toBe('/api/game-sprite?file=Spr_8s_006_s.png');
   });
 
   it('maps verified Sword/Shield forms and female models without base-form fallback', () => {
@@ -193,7 +195,7 @@ describe('game-specific shiny sprites', () => {
     expect(getGameSpecificShinySpriteUrl(445, 'shield', { name: 'garchomp', gender: 'female' }))
       .toBe('/api/game-sprite?file=Spr_8s_445_f_s.png');
     expect(getGameSpecificShinySpriteUrl(52, 'sword', { name: 'meowth-alola', form: 'meowth-alola' }))
-      .toBeNull();
+      .toBe('/api/game-sprite?file=Spr_8s_052-A_s.png');
   });
 
   it.each([
