@@ -30,7 +30,8 @@
     "backfill:entity-keys-v2": "node --experimental-strip-types scripts/backfill-pokemon-entity-keys-v2.mjs",
     "generate:catalog-v2": "node scripts/generate-pokemon-catalog-v2.mjs",
     "generate:legacy-map-v2": "node scripts/generate-pokemon-legacy-map-v2.mjs",
-    "cache:sprites": "node scripts/cache-pokemon-sprites.mjs"
+    "cache:sprites": "node scripts/cache-pokemon-sprites.mjs",
+    "generate:swsh-sprites": "node scripts/generate-swsh-shiny-model-manifest.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

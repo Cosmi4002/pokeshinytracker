@@ -1,44 +1,36 @@
-# Modelli shiny di Pokémon Spada e Scudo senza costi aggiuntivi
+# Modelli shiny di Pokémon Spada e Scudo
 
-## Decisione adottata
+I modelli non sono più dedotti dal numero del Pokédex. Ogni URL usato
+nell'app deve comparire nel manifest generato dalla categoria ufficiale
+[**Sword and Shield Shiny models**](https://archives.bulbagarden.net/wiki/Category:Sword_and_Shield_Shiny_models).
+Questo impedisce di mostrare un modello base al posto di una forma regionale,
+di una forma alternativa o della variante femminile.
 
-I modelli shiny base di **Pokémon Spada** e **Pokémon Scudo** vengono richiesti
-direttamente dal redirect del Bulbagarden Archives. Non vengono scaricati nella
-repository, caricati in Supabase Storage, né passano dall'API `/api/game-sprite`.
+## Rigenerazione del manifest
 
-Questa è la scelta più adatta al piano gratuito:
+```bash
+node scripts/generate-swsh-shiny-model-manifest.mjs
+```
 
-- non aumenta i circa 523 MB di asset già presenti nella cartella `public`;
-- non consuma spazio o banda di Supabase;
-- non crea invocazioni serverless o banda di immagini su Vercel: il browser
-  dell'utente scarica il modello dall'archivio sorgente;
-- non richiede elaborazione sul PC durante deploy o build.
+Lo script interroga tutte le pagine della categoria, conserva solo PNG, collega
+ogni file al nome canonico del catalogo e scrive:
 
-Il resolver costruisce URL come
-`https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_8s_001_s.png`.
-Il redirect è preferibile a un URL `media/upload/...` con hash: l'hash può
-cambiare quando il file viene aggiornato, mentre il nome del file resta stabile.
+- `src/data/sword-shield-shiny-model-manifest.ts`, che è l'unica lista letta dal
+  resolver a runtime;
+- `reports/sword-shield-shiny-model-import.json`, con ogni file non interpretabile
+  o non mappato.
 
-## Limite intenzionale: forme
+Il comando termina con codice diverso da zero finché la lista `unparsed` o
+`unmapped` non è vuota: il report è quindi la lista esplicita dei Pokémon/forme
+che richiedono una mappatura, non un fallback silenzioso. I suffissi non
+univoci del repository (per esempio `-G`) sono mantenuti nella tabella
+`FORM_BY_SPECIES_AND_SUFFIX` nello script e vanno aggiunti lì dopo la verifica
+nel category listing.
 
-Il fallback automatico copre solo i Pokémon in forma base. Forme di Galar,
-Gigamax e altre forme non vengono sostituite con un modello base sbagliato.
-Le eccezioni verificate vengono aggiunte al manifest esplicito in
-`src/lib/game-sprites.ts`, con il loro esatto nome file di Bulbagarden. Per
-esempio, Galarian Rapidash usa `Spr_8s_078-G_s.png`. Questa aggiunta è minuscola
-perché contiene testo, non asset binari.
+## Hosting gratuito
 
-## Quando scaricarli davvero
-
-Non scaricare tutta la categoria come prima soluzione. Farlo conviene soltanto
-se il sito deve funzionare anche quando Bulbagarden non è raggiungibile oppure
-se l'archivio impedisce il caricamento diretto. In quel caso:
-
-1. prova prima con un piccolo gruppo di modelli realmente usati;
-2. converti ciascun file in WebP e conserva una sola dimensione ragionevole;
-3. misura il totale con `du -sh public` prima del commit;
-4. evita Supabase Storage per asset pubblici: introdurrebbe quote e una seconda
-   infrastruttura da mantenere.
-
-Non implementare una cache "al primo accesso" su Vercel: il filesystem delle
-funzioni è effimero, quindi non offrirebbe una cache persistente gratuita.
+I file binari non vengono scaricati, duplicati in `public`, caricati in
+Supabase Storage o passati da una funzione Vercel. Il browser chiede soltanto
+il redirect stabile del file nell'archivio (`Special:Redirect/file/...`), mentre
+l'app conserva un piccolo manifest di testo. Questo non aggiunge storage o
+banda a Supabase e non crea invocazioni serverless Vercel.
