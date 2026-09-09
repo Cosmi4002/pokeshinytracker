@@ -15,6 +15,15 @@ import { GEN6_7_SHINY_SPRITE_ENTRIES } from '@/data/gen6-7-shiny-sprite-manifest
 import { GEN7_ADDITIONAL_SHINY_SPRITE_ENTRIES } from '@/data/gen7-additional-shiny-sprite-manifest';
 import { GAME_SPRITE_LONG_SIDE_BY_FILE } from '@/data/game-sprite-long-sides.generated';
 import { LOCAL_SPRITE_URLS } from './local-sprite-map.generated';
+import furfrouDandySpriteUrl from '../../missing sprite/Furfrou(dandy trim).png';
+import furfrouDebutanteSpriteUrl from '../../missing sprite/Furfrou(debutante).png';
+import furfrouDiamondSpriteUrl from '../../missing sprite/Furfrou(diamond).png';
+import furfrouHeartSpriteUrl from '../../missing sprite/Furfrou(heart).png';
+import furfrouKabukiSpriteUrl from '../../missing sprite/Furfrou(kabuki trim).png';
+import furfrouLaReineSpriteUrl from '../../missing sprite/Furfrou(La Reine).png';
+import furfrouMatronSpriteUrl from '../../missing sprite/Furfrou(matron).png';
+import furfrouPharaohSpriteUrl from '../../missing sprite/Furfrou(pharaoh).png';
+import furfrouStarSpriteUrl from '../../missing sprite/Furfrou(star).png';
 
 export type GameSpriteOptions = {
   shiny?: boolean;
@@ -83,6 +92,21 @@ type Gen67Candidate = {
   file: string;
   canonicalName: string;
   gender?: 'female' | 'male';
+};
+
+// These source sprites were supplied directly in the repository. Importing
+// them lets Vite publish hashed production assets without duplicating binary
+// files in the PR's public directory.
+const FURFROU_TRIM_SPRITE_URL_BY_FILE: Readonly<Record<string, string>> = {
+  'furfrou-dandy.png': furfrouDandySpriteUrl,
+  'furfrou-debutante.png': furfrouDebutanteSpriteUrl,
+  'furfrou-diamond.png': furfrouDiamondSpriteUrl,
+  'furfrou-heart.png': furfrouHeartSpriteUrl,
+  'furfrou-kabuki.png': furfrouKabukiSpriteUrl,
+  'furfrou-la-reine.png': furfrouLaReineSpriteUrl,
+  'furfrou-matron.png': furfrouMatronSpriteUrl,
+  'furfrou-pharaoh.png': furfrouPharaohSpriteUrl,
+  'furfrou-star.png': furfrouStarSpriteUrl,
 };
 
 const toLocalSpriteUrl = (url: string) => {
@@ -462,7 +486,7 @@ export function getGameSpecificShinySpriteUrl(
       : null;
     const maleMatch = preferredCandidates.find((entry) => 'gender' in entry && entry.gender === 'male');
     const entry = genderMatch || maleMatch || preferredCandidates[0];
-    return entry ? `/img/game-sprites/gen6-7/${entry.file}` : null;
+    return entry ? FURFROU_TRIM_SPRITE_URL_BY_FILE[entry.file] ?? `/img/game-sprites/gen6-7/${entry.file}` : null;
   }
 
   let resolvedSet = set;

@@ -1800,6 +1800,69 @@ export const GEN6_7_SHINY_SPRITE_ENTRIES = [
     "gender": "male"
   },
   {
+    "file": "furfrou-dandy.png",
+    "source": "Furfrou(dandy trim).png",
+    "speciesId": 676,
+    "canonicalName": "furfrou-dandy",
+    "gender": "male"
+  },
+  {
+    "file": "furfrou-debutante.png",
+    "source": "Furfrou(debutante).png",
+    "speciesId": 676,
+    "canonicalName": "furfrou-debutante",
+    "gender": "male"
+  },
+  {
+    "file": "furfrou-diamond.png",
+    "source": "Furfrou(diamond).png",
+    "speciesId": 676,
+    "canonicalName": "furfrou-diamond",
+    "gender": "male"
+  },
+  {
+    "file": "furfrou-heart.png",
+    "source": "Furfrou(heart).png",
+    "speciesId": 676,
+    "canonicalName": "furfrou-heart",
+    "gender": "male"
+  },
+  {
+    "file": "furfrou-kabuki.png",
+    "source": "Furfrou(kabuki trim).png",
+    "speciesId": 676,
+    "canonicalName": "furfrou-kabuki",
+    "gender": "male"
+  },
+  {
+    "file": "furfrou-la-reine.png",
+    "source": "Furfrou(La Reine).png",
+    "speciesId": 676,
+    "canonicalName": "furfrou-la-reine",
+    "gender": "male"
+  },
+  {
+    "file": "furfrou-matron.png",
+    "source": "Furfrou(matron).png",
+    "speciesId": 676,
+    "canonicalName": "furfrou-matron",
+    "gender": "male"
+  },
+  {
+    "file": "furfrou-pharaoh.png",
+    "source": "Furfrou(pharaoh).png",
+    "speciesId": 676,
+    "canonicalName": "furfrou-pharaoh",
+    "gender": "male"
+  },
+  {
+    "file": "furfrou-star.png",
+    "source": "Furfrou(star).png",
+    "speciesId": 676,
+    "canonicalName": "furfrou-star",
+    "gender": "male"
+  },
+  {
     "file": "furret.webp",
     "source": "furret.gif",
     "speciesId": 162,

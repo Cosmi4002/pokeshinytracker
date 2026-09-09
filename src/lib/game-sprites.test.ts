@@ -135,8 +135,7 @@ describe('game-specific shiny sprites', () => {
     expect(getGameSpecificShinySpriteUrl(3, gameId, { name: 'venusaur', gender })).toBe(expected);
   });
 
-  it.each(['x', 'y', 'omegaruby', 'alphasapphire', 'sun', 'moon', 'ultrasun', 'ultramoon'])
-    ('uses the shared Gen 6/7 set for %s', (gameId) => {
+  it.each(['x', 'y', 'omegaruby', 'alphasapphire', 'sun', 'moon', 'ultrasun', 'ultramoon'])('uses the shared Gen 6/7 set for %s', (gameId) => {
       expect(getGameSpecificShinySpriteUrl(1, gameId, { name: 'bulbasaur' }))
         .toBe('/img/game-sprites/gen6-7/bulbasaur.webp');
     });
@@ -153,6 +152,16 @@ describe('game-specific shiny sprites', () => {
     expect(getGameSpecificShinySpriteUrl(678, 'ultrasun', { name: 'meowstic-male', gender: 'female' }))
       .toBe('/img/game-sprites/gen6-7/meowstic-male-f.webp');
   });
+
+  it.each(['x', 'y', 'omegaruby', 'alphasapphire', 'sun', 'moon', 'ultrasun', 'ultramoon'])(
+    'resolves Furfrou alternate trims for %s',
+    (gameId) => {
+      expect(getGameSpecificShinySpriteUrl(10083, gameId, { name: 'furfrou-la-reine', form: 'furfrou-la-reine' }))
+        .toMatch(/Furfrou.*La.*Reine.*\.png$/);
+      expect(getGameSpecificShinySpriteUrl(10085, gameId, { name: 'furfrou-pharaoh', form: 'furfrou-pharaoh' }))
+        .toMatch(/Furfrou.*pharaoh.*\.png$/);
+    },
+  );
 
   it('uses Gen 7 additions for Sun/Moon and keeps USUM-only sprites exclusive', () => {
     expect(getGameSpecificShinySpriteUrl(752, 'sun', { name: 'araquanid' }))
