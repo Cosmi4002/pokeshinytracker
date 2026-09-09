@@ -109,6 +109,17 @@ describe('pokemon sprite helpers', () => {
     })).toBe('/img/pokemon-sprites/remote/raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/10092.png');
   });
 
+  it('uses the dedicated Sword and Shield sprite for Galarian Rapidash', () => {
+    expect(getSelectedGameSpriteUrl({
+      pokemonId: 10163,
+      pokemonName: 'rapidash-galar',
+      form: 'rapidash-galar',
+      game: 'shield',
+    })).toBe(
+      'https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_8s_078-G_s.png',
+    );
+  });
+
   it('keeps the Crystal Poliwhirl sprite game-specific', () => {
     expect(
       getSelectedGameSpriteUrl({

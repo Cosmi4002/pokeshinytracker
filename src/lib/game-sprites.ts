@@ -304,9 +304,21 @@ const normalizeGender = (gender?: string | null): 'female' | 'male' | null => {
 // (for example, Crystal Raticate) when an Alolan/Galarian/etc. form is selected.
 const hasRegionalFormMarker = (slug: string) => /-(?:alola|galar|hisui|paldea)(?:-|$)/i.test(slug);
 
+// SWSH filenames use a suffix for a few regional forms. Keep these explicit:
+// falling back to Spr_8s_078_s.png for Rapidash-Galar would silently show the
+// wrong Pokémon, which is worse than showing no sprite at all.
+const SWORD_SHIELD_FORM_SPRITE_BY_SLUG: Readonly<Record<string, { speciesId: number; filename: string }>> = {
+  'rapidash-galar': { speciesId: 78, filename: 'Spr_8s_078-G_s.png' },
+};
+
 const getSwordShieldArchiveSpriteUrl = (speciesId: number, slug: string) => {
+  const formSprite = SWORD_SHIELD_FORM_SPRITE_BY_SLUG[slug];
+  if (formSprite) {
+    return `https://archives.bulbagarden.net/wiki/Special:Redirect/file/${formSprite.filename}`;
+  }
+
   // Form models have separate Archive names. Do not incorrectly substitute a
-  // base model; forms can later be added in a small explicit manifest.
+  // base model; forms can later be added in the explicit manifest above.
   if (slug.includes('-')) return null;
   const filename = `Spr_8s_${String(speciesId).padStart(3, '0')}_s.png`;
   return `https://archives.bulbagarden.net/wiki/Special:Redirect/file/${filename}`;
@@ -435,6 +447,16 @@ export function getGameSpecificShinySpriteUrl(
 
   if (set !== 'gen6-7' && set !== 'swsh-archive' && hasRegionalFormMarker(slug)) {
     return null;
+  }
+
+  // Form-only PokéAPI IDs (such as Rapidash-Galar's 10163) cannot be reduced
+  // to a National Dex ID by the generic resolver. Resolve known SWSH models
+  // before that reduction so the form's own archive filename is retained.
+  if (set === 'swsh-archive' && SWORD_SHIELD_FORM_SPRITE_BY_SLUG[slug]) {
+    return getSwordShieldArchiveSpriteUrl(
+      SWORD_SHIELD_FORM_SPRITE_BY_SLUG[slug].speciesId,
+      slug,
+    );
   }
 
   const speciesId = set === 'gen6-7' || set === 'swsh-archive'
