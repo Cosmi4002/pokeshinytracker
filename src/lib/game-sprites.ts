@@ -52,6 +52,10 @@ export const GAME_SPRITE_SET_BY_GAME: Readonly<Record<string, string>> = {
   moon: 'gen6-7',
   ultrasun: 'gen6-7',
   ultramoon: 'gen6-7',
+  // Keep Gen VIII's large animated models off the deployment: the browser
+  // loads them directly from their Archive source instead.
+  sword: 'swsh-archive',
+  shield: 'swsh-archive',
 };
 
 const filesBySet = {
@@ -276,6 +280,14 @@ const normalizeGender = (gender?: string | null): 'female' | 'male' | null => {
 // (for example, Crystal Raticate) when an Alolan/Galarian/etc. form is selected.
 const hasRegionalFormMarker = (slug: string) => /-(?:alola|galar|hisui|paldea)(?:-|$)/i.test(slug);
 
+const getSwordShieldArchiveSpriteUrl = (speciesId: number, slug: string) => {
+  // Form models have separate Archive names. Do not incorrectly substitute a
+  // base model; forms can later be added in a small explicit manifest.
+  if (slug.includes('-')) return null;
+  const filename = `Spr_8s_${String(speciesId).padStart(3, '0')}_s.png`;
+  return `https://archives.bulbagarden.net/wiki/Special:Redirect/file/${filename}`;
+};
+
 const ARCHIVE_THERIAN_SHINY_OVERRIDE_BY_FORM: Readonly<Record<string, string>> = {
   'tornadus-therian': 'https://archives.bulbagarden.net/media/upload/3/3c/Spr_5b2_641T_s.png',
   'thundurus-therian': 'https://archives.bulbagarden.net/media/upload/2/21/Spr_5b2_642T_s.png',
@@ -322,6 +334,7 @@ const GAME_SPRITE_SET_FIXED_SCALE: Readonly<Record<string, number>> = {
   // actual URLs so the browser is not asked to over-enlarge these small GIF
   // source frames.
   'gen6-7': 0.85,
+  'swsh-archive': 0.85,
 };
 
 const getGameSpecificSpriteFilePath = (url?: string | null) => {
@@ -352,6 +365,7 @@ const getGameSpecificSpriteFilePath = (url?: string | null) => {
   const archiveMatch = url.match(/\/Special:Redirect\/file\/([^?]+)/i);
   if (archiveMatch) {
     const filename = decodeURIComponent(archiveMatch[1]);
+    if (/^Spr_8s_\d{3}_s\.png$/i.test(filename)) return `swsh-archive/${filename}`;
     const gen2Set = { g: 'gold', s: 'silver', c: 'crystal' }[filename.match(/^Spr_2([gsc])_/i)?.[1]?.toLowerCase() || ''];
     if (gen2Set) return `${gen2Set}/${filename}`;
     const gen3Set = { r: 'ruby-sapphire', f: 'firered-leafgreen', e: 'emerald' }[filename.match(/^Spr_3([rfe])_/i)?.[1]?.toLowerCase() || ''];
@@ -395,14 +409,18 @@ export function getGameSpecificShinySpriteUrl(
     return archiveTherianOverride;
   }
 
-  if (set !== 'gen6-7' && hasRegionalFormMarker(slug)) {
+  if (set !== 'gen6-7' && set !== 'swsh-archive' && hasRegionalFormMarker(slug)) {
     return null;
   }
 
-  const speciesId = set === 'gen6-7'
+  const speciesId = set === 'gen6-7' || set === 'swsh-archive'
     ? resolveGen67SpeciesId(pokemonId, slug)
     : resolveSpeciesId(pokemonId, slug);
   if (!speciesId) return null;
+
+  if (set === 'swsh-archive') {
+    return getSwordShieldArchiveSpriteUrl(speciesId, slug);
+  }
 
   if (set === 'gen6-7') {
     const candidates: Gen67Candidate[] = GEN6_7_SPRITES_BY_SPECIES.get(speciesId) || [];
@@ -533,7 +551,8 @@ export function getGameSpecificSpriteScaleStyle(url?: string | null): any {
  * crisp nearest-neighbour rendering for the older game sets.
  */
 export function getGameSpecificSpriteImageRendering(url?: string | null): 'auto' | 'pixelated' {
-  return getGameSpecificSpriteFilePath(url)?.startsWith('gen6-7/') ? 'auto' : 'pixelated';
+  const filePath = getGameSpecificSpriteFilePath(url);
+  return filePath?.startsWith('gen6-7/') || filePath?.startsWith('swsh-archive/') ? 'auto' : 'pixelated';
 }
 
 export const isGameSpecificShinySpriteUrl = (url?: string | null) =>

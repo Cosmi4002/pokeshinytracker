@@ -171,6 +171,18 @@ describe('game-specific shiny sprites', () => {
     },
   );
 
+  it.each(['sword', 'shield'])('loads base Sword/Shield models from Bulbagarden for %s', (gameId) => {
+    expect(getGameSpecificShinySpriteUrl(1, gameId, { name: 'bulbasaur' }))
+      .toBe('https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_8s_001_s.png');
+    expect(getGameSpecificShinySpriteUrl(810, gameId, { name: 'grookey' }))
+      .toBe('https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_8s_810_s.png');
+  });
+
+  it('does not replace a Sword/Shield form with its base model', () => {
+    expect(getGameSpecificShinySpriteUrl(52, 'sword', { name: 'meowth-galar', form: 'meowth-galar' }))
+      .toBeNull();
+  });
+
   it.each([
     ['https://archives.bulbagarden.net/media/upload/7/7c/Spr_4d_001_s.png', 'scale-[var(--sprite-scale)]'],
     ['/img/pokemon-sprites/remote/archives.bulbagarden.net/media/upload/5/54/Spr_4d_200_s.png', 'scale-[var(--sprite-scale)]'],
@@ -216,12 +228,14 @@ describe('game-specific shiny sprites', () => {
     ['/img/game-sprites/sm/Spr_7s_001_s.webp'],
     ['/img/game-sprites/usum/Spr_7u_001_s.webp'],
     ['/img/game-sprites/gen6-7/bulbasaur.webp'],
+    ['https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_8s_001_s.png'],
   ])('reduces newer game sprites by 15%%: %s', (url) => {
     expect(getGameSpecificSpriteScaleFactor(url)).toBe(0.85);
   });
 
   it('uses smoother rendering for the shared Gen VI/VII sprite set only', () => {
     expect(getGameSpecificSpriteImageRendering('/img/game-sprites/gen6-7/bulbasaur.webp')).toBe('auto');
+    expect(getGameSpecificSpriteImageRendering('https://archives.bulbagarden.net/wiki/Special:Redirect/file/Spr_8s_001_s.png')).toBe('auto');
     expect(getGameSpecificSpriteImageRendering('/img/game-sprites/bw/Spr_5b_001_s.webp')).toBe('pixelated');
   });
 
