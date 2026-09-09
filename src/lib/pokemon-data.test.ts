@@ -116,14 +116,14 @@ describe('pokemon sprite helpers', () => {
       form: 'rapidash-galar',
       game: 'shield',
     })).toBe(
-      '/api/game-sprite?file=Spr_8s_078-G_s.png',
+      '/api/game-sprite?file=Spr_8s_078G_s.png',
     );
 
     expect(getSelectedGameSpriteUrl({
       pokemonId: 3,
       pokemonName: 'venusaur',
       game: 'sword',
-    })).toBe('/api/game-sprite?file=Spr_8s_003_s.png');
+    })).toBe('/api/game-sprite?file=Spr_8s_003_m_s.png');
   });
 
   it('keeps the Crystal Poliwhirl sprite game-specific', () => {

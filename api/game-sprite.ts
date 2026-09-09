@@ -6,9 +6,9 @@ const ARCHIVE_API_URL = 'https://archives.bulbagarden.net/w/api.php';
 // first, then fetch its canonical media URL.
 //
 // This accepts every filename shape that the game-sprite resolver can
-// generate, including Gen VIII's hyphenated regional-form suffixes (for
-// example, `Spr_8s_078-G_s.png`).
-const GAME_SPRITE_FILE = /^Spr_[238][a-z0-9]*_\d{3}(?:-[A-Z]+)?(?:_[mf])?_s\.png$/i;
+// generate, including Gen VIII regional-form suffixes with or without a
+// hyphen (for example, `Spr_8s_078G_s.png`).
+const GAME_SPRITE_FILE = /^Spr_[238][a-z0-9]*_\d{3}(?:-?[A-Z]+)?(?:_[mf])?_s\.png$/i;
 
 const imageUrlPromises = new Map<string, Promise<string | null>>();
 

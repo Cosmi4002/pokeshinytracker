@@ -33,6 +33,55 @@ const FORM_BY_SPECIES_AND_SUFFIX = {
   '618:G': 'stunfisk-galar',
 };
 
+// Bulbagarden's category records some regional models with a hyphen before
+// the form suffix, while their working redirect filenames omit it. Keep the
+// explicit, verified redirect filenames for the affected Sword/Shield forms.
+const VERIFIED_REDIRECT_FILENAME_BY_SPECIES_AND_SUFFIX = new Map([
+  ...[26, 27, 28, 37, 38, 50, 51, 52, 53, 103, 105].map((speciesId) => [`${speciesId}:A`, `Spr_8s_${String(speciesId).padStart(3, '0')}A_s.png`]),
+  ...[52, 77, 78, 79, 80, 83, 110, 122, 144, 145, 146, 199, 222, 263, 264, 554, 555, 562, 618].map((speciesId) => [`${speciesId}:G`, `Spr_8s_${String(speciesId).padStart(3, '0')}G_s.png`]),
+]);
+
+// These gender-different species use an explicit male filename on the
+// Archive. The category's unqualified entry is not a working redirect, so
+// retain the verified male filename and mark it as such in the manifest.
+const VERIFIED_MALE_REDIRECT_SPECIES_IDS = new Set([
+  3, 12, 25, 26, 41, 42, 44, 45, 64, 65, 111, 112, 118, 119, 123, 129, 130, 133,
+  185, 186, 194, 195, 202, 208, 212, 214, 215, 221, 224, 272, 274, 275, 307,
+  308, 315, 316, 317, 322, 323, 332, 350, 369, 403, 404, 405, 407, 415, 417,
+  418, 419, 443, 444, 445, 449, 450, 453, 454, 456, 457, 459, 460, 461, 464,
+  465, 473, 521, 592, 593, 668, 678, 876,
+]);
+
+// Eevee's female model is a verified redirect but is absent from the category
+// feed. The remaining requested female models are already supplied by it.
+const VERIFIED_FEMALE_REDIRECT_SPECIES_IDS = new Set([133]);
+
+// These alternate forms have verified Sword/Shield Archive redirects but are
+// not consistently exposed by the category feed. Add them from the canonical
+// catalogue so every UI using the shared SWSH resolver receives the correct
+// game model.
+const VERIFIED_FORM_SPRITE_FILENAME_BY_CANONICAL_NAME = new Map([
+  ['rotom-heat', 'Spr_8s_479O_s.png'], ['rotom-wash', 'Spr_8s_479W_s.png'],
+  ['rotom-frost', 'Spr_8s_479F_s.png'], ['rotom-fan', 'Spr_8s_479R_s.png'], ['rotom-mow', 'Spr_8s_479L_s.png'],
+  ['giratina-origin', 'Spr_8s_487O_s.png'], ['shellos-east', 'Spr_8s_422E_s.png'], ['gastrodon-east', 'Spr_8s_423E_s.png'],
+  ['basculin-blue-striped', 'Spr_8s_550B_s.png'], ['tornadus-therian', 'Spr_8s_641T_s.png'],
+  ['thundurus-therian', 'Spr_8s_642T_s.png'], ['landorus-therian', 'Spr_8s_645T_s.png'],
+  ['kyurem-black', 'Spr_8s_646B_s.png'], ['kyurem-white', 'Spr_8s_646W_s.png'],
+  ['pumpkaboo-small', 'Spr_8s_710Sm_s.png'], ['pumpkaboo-large', 'Spr_8s_710La_s.png'], ['pumpkaboo-super', 'Spr_8s_710Su_s.png'],
+  ['gourgeist-small', 'Spr_8s_711Sm_s.png'], ['gourgeist-large', 'Spr_8s_711La_s.png'], ['gourgeist-super', 'Spr_8s_711Su_s.png'],
+  ['zygarde-10', 'Spr_8s_718T_s.png'], ['lycanroc-midnight', 'Spr_8s_745Mn_s.png'], ['lycanroc-dusk', 'Spr_8s_745D_s.png'],
+  ...['bug', 'dark', 'dragon', 'electric', 'fairy', 'fighting', 'fire', 'flying', 'ghost', 'grass', 'ground', 'ice', 'poison', 'psychic', 'rock', 'steel', 'water']
+    .map((type) => [`silvally-${type}`, `Spr_8s_773${type[0].toUpperCase()}${type.slice(1)}_s.png`]),
+  ['necrozma-dusk', 'Spr_8s_800DM_s.png'], ['necrozma-dawn', 'Spr_8s_800DW_s.png'],
+  ['toxtricity-low-key', 'Spr_8s_849L_s.png'], ['urshifu-rapid-strike', 'Spr_8s_892R_s.png'],
+  ['zacian-crowned', 'Spr_8s_888C_s.png'], ['zamazenta-crowned', 'Spr_8s_889C_s.png'],
+  ['zarude-dada', 'Spr_8s_893D_s.png'], ['calyrex-ice', 'Spr_8s_898I_s.png'], ['calyrex-shadow', 'Spr_8s_898S_s.png'],
+]);
+const VERIFIED_NON_CATALOG_FORM_SPRITES = [
+  { speciesId: 888, canonicalName: 'zacian-crowned', filename: 'Spr_8s_888C_s.png' },
+  { speciesId: 889, canonicalName: 'zamazenta-crowned', filename: 'Spr_8s_889C_s.png' },
+];
+
 async function fetchCategoryFiles() {
   const files = [];
   let continuation;
@@ -61,6 +110,14 @@ const parse = (filename) => {
 };
 
 const catalog = JSON.parse(await readFile(CATALOG, 'utf8'));
+for (const entry of catalog.filter((entry) => entry.canonicalName.startsWith('alcremie-'))) {
+  const sweet = ['berry', 'love', 'star', 'clover', 'flower', 'ribbon'].find((candidate) => entry.canonicalName.includes(`-${candidate}-sweet`));
+  if (entry.canonicalName.includes('-strawberry-sweet')) VERIFIED_FORM_SPRITE_FILENAME_BY_CANONICAL_NAME.set(entry.canonicalName, 'Spr_8s_869_s.png');
+  if (sweet) VERIFIED_FORM_SPRITE_FILENAME_BY_CANONICAL_NAME.set(
+    entry.canonicalName,
+    `Spr_8s_869${{ berry: 'B', love: 'L', star: 'S', clover: 'C', flower: 'F', ribbon: 'R' }[sweet]}_s.png`,
+  );
+}
 const baseNameBySpecies = new Map(catalog.filter((entry) => entry.formKey === 'base').map((entry) => [entry.speciesId, entry.canonicalName]));
 const regionalNameBySpeciesAndSuffix = new Map(
   catalog
@@ -86,7 +143,38 @@ for (const filename of files) {
       ?? FORM_BY_SPECIES_AND_SUFFIX[`${parsed.speciesId}:${parsed.suffix}`]
     : baseNameBySpecies.get(parsed.speciesId);
   if (!canonicalName) { unmapped.push({ filename, speciesId: parsed.speciesId, suffix: parsed.suffix || null }); continue; }
-  entries.push({ ...parsed, canonicalName: normalize(canonicalName) });
+  const useVerifiedMaleRedirect = parsed.suffix === ''
+    && parsed.gender === null
+    && VERIFIED_MALE_REDIRECT_SPECIES_IDS.has(parsed.speciesId);
+  entries.push({
+    ...parsed,
+    filename: VERIFIED_REDIRECT_FILENAME_BY_SPECIES_AND_SUFFIX.get(`${parsed.speciesId}:${parsed.suffix}`) ?? parsed.filename,
+    ...(useVerifiedMaleRedirect
+      ? { filename: `Spr_8s_${String(parsed.speciesId).padStart(3, '0')}_m_s.png`, gender: 'male' }
+      : {}),
+    canonicalName: normalize(canonicalName),
+  });
+}
+for (const speciesId of VERIFIED_FEMALE_REDIRECT_SPECIES_IDS) {
+  if (entries.some((entry) => entry.speciesId === speciesId && entry.gender === 'female')) continue;
+  const canonicalName = baseNameBySpecies.get(speciesId);
+  const filename = `Spr_8s_${String(speciesId).padStart(3, '0')}_f_s.png`;
+  const parsed = parse(filename);
+  if (!canonicalName || !parsed) throw new Error(`Invalid verified Sword/Shield female filename: ${filename}`);
+  entries.push({ ...parsed, canonicalName });
+}
+for (const entry of catalog) {
+  const filename = VERIFIED_FORM_SPRITE_FILENAME_BY_CANONICAL_NAME.get(entry.canonicalName);
+  if (!filename || entries.some((candidate) => candidate.canonicalName === entry.canonicalName && candidate.gender === null)) continue;
+  const parsed = parse(filename);
+  if (!parsed) throw new Error(`Invalid verified Sword/Shield form filename: ${filename}`);
+  entries.push({ ...parsed, canonicalName: entry.canonicalName });
+}
+for (const entry of VERIFIED_NON_CATALOG_FORM_SPRITES) {
+  if (entries.some((candidate) => candidate.canonicalName === entry.canonicalName && candidate.gender === null)) continue;
+  const parsed = parse(entry.filename);
+  if (!parsed || parsed.speciesId !== entry.speciesId) throw new Error(`Invalid verified Sword/Shield form filename: ${entry.filename}`);
+  entries.push({ ...parsed, canonicalName: entry.canonicalName });
 }
 entries.sort((a, b) => a.speciesId - b.speciesId || a.canonicalName.localeCompare(b.canonicalName) || (a.gender || '').localeCompare(b.gender || ''));
 const report = { category: CATEGORY, files: files.length, mapped: entries.length, unparsed, unmapped };
