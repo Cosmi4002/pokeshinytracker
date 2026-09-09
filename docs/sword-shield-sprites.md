@@ -23,9 +23,10 @@ cambiare quando il file viene aggiornato, mentre il nome del file resta stabile.
 
 Il fallback automatico copre solo i Pokémon in forma base. Forme di Galar,
 Gigamax e altre forme non vengono sostituite con un modello base sbagliato.
-Se servono, aggiungere solo le forme necessarie a un manifest esplicito con il
-loro esatto nome file di Bulbagarden. Questa aggiunta è minuscola perché contiene
-testo, non asset binari.
+Le eccezioni verificate vengono aggiunte al manifest esplicito in
+`src/lib/game-sprites.ts`, con il loro esatto nome file di Bulbagarden. Per
+esempio, Galarian Rapidash usa `Spr_8s_078-G_s.png`. Questa aggiunta è minuscola
+perché contiene testo, non asset binari.
 
 ## Quando scaricarli davvero
 

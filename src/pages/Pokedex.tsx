@@ -13,7 +13,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth-context';
 import { useQuery } from '@tanstack/react-query';
 import { useGlobalCollectionThemes } from '@/hooks/use-global-collection-themes';
-import { resolvePokemonEntity } from '@/lib/pokemon-entity-resolver-v2';
 
 type CaughtEntryStats = { count: number; legacyCount: number; genders: Set<string>; forms: Set<string> };
 type CaughtDataMap = Record<number, CaughtEntryStats>;
@@ -110,19 +109,11 @@ export default function Pokedex() {
                 if (row.form) caught[id].forms.add(row.form);
                 else caught[id].legacyCount++;
 
-                const entity = resolvePokemonEntity({
-                    pokemonId: row.pokemon_id,
-                    pokemonName: row.pokemon_name,
-                    form: row.form,
-                    entityKey: row.entity_key,
-                });
-                if (entity) {
-                    const entityStats = caught[entity.speciesId] || { count: 0, legacyCount: 0, genders: new Set(), forms: new Set() };
-                    entityStats.forms.add(entity.canonicalName);
-                    entity.legacy.formNames.forEach(formName => entityStats.forms.add(formName));
-                    if (row.gender) entityStats.genders.add(row.gender);
-                    caught[entity.speciesId] = entityStats;
-                }
+                // Keep each stored Pokémon/form ID isolated. Regional forms
+                // deliberately share a National Dex species ID with their base
+                // form, but are separate Pokédex cards and completion entries.
+                // Merging canonical entity data into `caught[speciesId]` made a
+                // caught Galarian Rapidash mark the regular Rapidash card.
             });
             return caught;
         },
