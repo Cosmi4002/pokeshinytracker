@@ -398,6 +398,14 @@ describe('game-specific shiny sprites', () => {
   });
 
   it.each([
+    [854, 'sinistea-antique', 'Spr_8s_854_s.png'],
+    [855, 'polteageist-antique', 'Spr_8s_855_s.png'],
+  ])('uses the Phony Sword/Shield model for %s', (pokemonId, canonicalName, filename) => {
+    expect(getGameSpecificShinySpriteUrl(pokemonId, 'sword', { name: canonicalName, form: canonicalName }))
+      .toBe(`/api/game-sprite?file=${filename}`);
+  });
+
+  it.each([
     ['rotom-heat', 'Spr_8s_479O_s.png'], ['giratina-origin', 'Spr_8s_487O_s.png'],
     ['shellos-east', 'Spr_8s_422E_s.png'], ['basculin-blue-striped', 'Spr_8s_550B_s.png'],
     ['tornadus-therian', 'Spr_8s_641T_s.png'], ['kyurem-black', 'Spr_8s_646B_s.png'],

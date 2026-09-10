@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { clampSpriteScale, getSwordShieldSpriteScaleOverrides, isSpriteScaleManager } from './sprite-scale-context';
+import { clampSpriteScale, isSpriteScaleManager, isSwordShieldSpriteUrl } from './sprite-scale-context';
 
 describe('sprite scale editor helpers', () => {
   it('keeps manually entered scales inside the supported range', () => {
@@ -13,11 +13,9 @@ describe('sprite scale editor helpers', () => {
     expect(isSpriteScaleManager('other@example.com')).toBe(false);
   });
 
-  it('creates 190% admin overrides for Sword/Shield models except Pumpkaboo and Gourgeist forms', () => {
-    const overrides = getSwordShieldSpriteScaleOverrides();
-
-    expect(overrides.length).toBeGreaterThan(1_000);
-    expect(overrides.every((override) => override.scale === 1.9)).toBe(true);
-    expect(overrides.some((override) => /Spr_8s_710|Spr_8s_711/.test(override.sprite_url))).toBe(false);
+  it('recognizes only proxied Sword/Shield sprite URLs', () => {
+    expect(isSwordShieldSpriteUrl('/api/game-sprite?file=Spr_8s_025_s.png')).toBe(true);
+    expect(isSwordShieldSpriteUrl('/api/game-sprite?file=Spr_7u_025_s.png')).toBe(false);
+    expect(isSwordShieldSpriteUrl('/img/game-sprites/hgss/Spr_4h_025_s.png')).toBe(false);
   });
 });

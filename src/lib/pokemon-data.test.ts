@@ -68,7 +68,7 @@ describe('pokemon sprite helpers', () => {
     );
   });
 
-  it('uses Gen VI and VII game sprites in Pokémon pickers before HOME fallbacks', () => {
+  it('uses the corresponding game sprites in Pokémon pickers before HOME fallbacks', () => {
     expect(getPokemonCatalogShinySpriteUrl(667, { name: 'litleo', form: 'litleo' })).toBe(
       '/img/game-sprites/gen6-7/litleo.webp',
     );
@@ -81,8 +81,17 @@ describe('pokemon sprite helpers', () => {
     expect(getPokemonCatalogShinySpriteUrl(807, { name: 'zeraora', form: 'zeraora' })).toBe(
       '/img/game-sprites/gen6-7/zeraora-usum.webp',
     );
-    expect(getPokemonCatalogShinySpriteUrl(882, { name: 'dracovish', form: 'dracovish' })).toBe(
-      '/img/pokemon-sprites/remote/raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/882.png',
+    expect(getPokemonCatalogShinySpriteUrl(882, { name: 'dracovish', form: 'dracovish', generation: 8 })).toBe(
+      '/api/game-sprite?file=Spr_8s_882_s.png',
+    );
+  });
+
+  it('uses Sword/Shield sprites only for explicitly identified Generation VIII picker entries', () => {
+    expect(getPokemonCatalogShinySpriteUrl(10163, { name: 'rapidash-galar', form: 'rapidash-galar', generation: 8 })).toBe(
+      '/api/game-sprite?file=Spr_8s_078G_s.png',
+    );
+    expect(getPokemonCatalogShinySpriteUrl(25, { name: 'pikachu', form: 'pikachu' })).toBe(
+      '/img/game-sprites/gen6-7/pikachu.webp',
     );
   });
 
