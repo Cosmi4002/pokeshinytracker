@@ -6,11 +6,14 @@ import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { SWORD_SHIELD_SHINY_MODEL_ENTRIES } from '@/data/sword-shield-shiny-model-manifest';
 
 const SPRITE_MANAGER_EMAIL = 'chritel04@gmail.com';
 const EDITOR_STORAGE_KEY = 'sprite-scale-editor-enabled';
 const MIN_SPRITE_SCALE = 0.25;
 const MAX_SPRITE_SCALE = 2.5;
+const SWORD_SHIELD_SCALE = 1.9;
+const BULK_UPSERT_BATCH_SIZE = 200;
 
 type SelectedSprite = { key: string; url: string; alt: string; isScoped: boolean };
 
@@ -18,6 +21,7 @@ type SpriteScaleContextValue = {
   editorEnabled: boolean;
   setEditorEnabled: (enabled: boolean) => void;
   isManager: boolean;
+  applySwordShieldSpriteScale: () => Promise<boolean>;
 };
 
 const SpriteScaleContext = createContext<SpriteScaleContextValue | undefined>(undefined);
@@ -26,6 +30,14 @@ export const clampSpriteScale = (scale: number) => Math.min(MAX_SPRITE_SCALE, Ma
 
 export const isSpriteScaleManager = (email?: string | null) =>
   email?.toLowerCase() === SPRITE_MANAGER_EMAIL;
+
+export const getSwordShieldSpriteScaleOverrides = () =>
+  SWORD_SHIELD_SHINY_MODEL_ENTRIES
+    .filter((entry) => !/^(pumpkaboo|gourgeist)(?:-|$)/i.test(entry.canonicalName))
+    .map((entry) => ({
+      sprite_url: `/api/game-sprite?file=${encodeURIComponent(entry.filename)}`,
+      scale: SWORD_SHIELD_SCALE,
+    }));
 
 const getSpriteKey = (url: string) => {
   const parsed = new URL(url, window.location.origin);
@@ -154,7 +166,33 @@ export function SpriteScaleProvider({ children }: { children: ReactNode }) {
     setSelectedSprite(null);
   };
 
-  const value = useMemo(() => ({ editorEnabled, setEditorEnabled, isManager }), [editorEnabled, isManager, setEditorEnabled]);
+  const applySwordShieldSpriteScale = useCallback(async () => {
+    if (!isManager) return false;
+
+    setSaving(true);
+    const overridesToSave = getSwordShieldSpriteScaleOverrides();
+    const updatedAt = new Date().toISOString();
+    for (let index = 0; index < overridesToSave.length; index += BULK_UPSERT_BATCH_SIZE) {
+      const { error } = await supabase.from('sprite_scale_overrides').upsert(
+        overridesToSave.slice(index, index + BULK_UPSERT_BATCH_SIZE).map((override) => ({ ...override, updated_at: updatedAt })),
+      );
+      if (error) {
+        setSaving(false);
+        toast({ variant: 'destructive', title: 'Unable to update Sword/Shield sprite sizes', description: error.message });
+        return false;
+      }
+    }
+
+    setOverrides((current) => ({
+      ...current,
+      ...Object.fromEntries(overridesToSave.map((override) => [override.sprite_url, override.scale])),
+    }));
+    setSaving(false);
+    toast({ title: 'Sword/Shield sprites updated', description: `${overridesToSave.length} sprites were saved at 190%. Pumpkaboo and Gourgeist were left unchanged.` });
+    return true;
+  }, [isManager, toast]);
+
+  const value = useMemo(() => ({ editorEnabled, setEditorEnabled, isManager, applySwordShieldSpriteScale }), [applySwordShieldSpriteScale, editorEnabled, isManager, setEditorEnabled]);
 
   return (
     <SpriteScaleContext.Provider value={value}>

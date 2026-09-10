@@ -13,9 +13,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth-context';
 import { useQuery } from '@tanstack/react-query';
 import { useGlobalCollectionThemes } from '@/hooks/use-global-collection-themes';
+import { resolvePokemonEntityKey } from '@/lib/pokemon-entity-resolver-v2';
 
 type CaughtEntryStats = { count: number; legacyCount: number; genders: Set<string>; forms: Set<string> };
-type CaughtDataMap = Record<number, CaughtEntryStats>;
+type CaughtDataMap = Record<string, CaughtEntryStats>;
 const POKEDEX_VIEW_STATE_KEY = 'pokedex-view-state';
 const POKEDEX_LAYOUT_MODE_KEY = 'pokedex-layout-mode';
 
@@ -49,6 +50,9 @@ const hasCaughtForm = (stats: CaughtEntryStats | undefined, formName?: string | 
     if (!stats || !normalizedForm) return false;
     return Array.from(stats.forms).some(form => normalizePokedexForm(form) === normalizedForm);
 };
+
+const getPokemonIdentityKey = (pokemon: Pick<PokemonBasic, 'id' | 'name'>) =>
+    resolvePokemonEntityKey({ pokemonId: pokemon.id, pokemonName: pokemon.name, form: pokemon.name }) || `legacy:${pokemon.id}`;
 
 export default function Pokedex() {
     const { pokemon, loading: pokemonLoading, error: pokemonError } = usePokemonList();
@@ -100,14 +104,19 @@ export default function Pokedex() {
             const caught: CaughtDataMap = {};
             const rows = (data || []) as Array<{ pokemon_id: number; entity_key: string | null; pokemon_name: string | null; gender: string | null; form: string | null }>;
             rows.forEach(row => {
-                const id = row.pokemon_id;
-                if (!caught[id]) {
-                    caught[id] = { count: 0, legacyCount: 0, genders: new Set(), forms: new Set() };
+                const identityKey = resolvePokemonEntityKey({
+                    pokemonId: row.pokemon_id,
+                    pokemonName: row.pokemon_name,
+                    form: row.form,
+                    entityKey: row.entity_key,
+                }) || `legacy:${row.pokemon_id}`;
+                if (!caught[identityKey]) {
+                    caught[identityKey] = { count: 0, legacyCount: 0, genders: new Set(), forms: new Set() };
                 }
-                caught[id].count++;
-                if (row.gender) caught[id].genders.add(row.gender);
-                if (row.form) caught[id].forms.add(row.form);
-                else caught[id].legacyCount++;
+                caught[identityKey].count++;
+                if (row.gender) caught[identityKey].genders.add(row.gender);
+                if (row.form) caught[identityKey].forms.add(row.form);
+                else caught[identityKey].legacyCount++;
 
                 // Keep each stored Pokémon/form ID isolated. Regional forms
                 // deliberately share a National Dex species ID with their base
@@ -421,7 +430,7 @@ export default function Pokedex() {
 
         // Granular caught status
         // 1. Primary sprite (Male or Single Strike)
-        const statsForPrimary = caughtData[p.id];
+        const statsForPrimary = caughtData[getPokemonIdentityKey(p)];
         const isSpecialFormId = p.id > 10000 || p.id !== p.baseId;
         const hasFormMatch = caughtFormNames.has(normalizePokedexForm(p.name));
         const hasPrimaryCaughtRows = (statsForPrimary?.count || 0) > 0;
@@ -439,10 +448,10 @@ export default function Pokedex() {
         // 2. Secondary sprite (Female or Rapid Strike)
         let isSecondaryCaught = false;
         if (hasGenderDiff) {
-            isSecondaryCaught = Boolean((femaleId && caughtData[femaleId]?.count > 0) ||
+            isSecondaryCaught = Boolean((femaleId && caughtData[getPokemonIdentityKey({ id: femaleId, name: femaleVariant?.name || '' })]?.count > 0) ||
                 statsForPrimary?.genders.has('female'));
         } else if (hasFormDiff && secondaryForm) {
-            isSecondaryCaught = caughtData[secondaryForm.id]?.count > 0 ||
+            isSecondaryCaught = caughtData[getPokemonIdentityKey(secondaryForm)]?.count > 0 ||
                 hasCaughtForm(statsForPrimary, secondaryForm.name);
         }
 
@@ -461,7 +470,7 @@ export default function Pokedex() {
         if (formTotal && formTotal > 1) {
             const caughtForms = new Set<string>();
             group.forEach(v => {
-                const stats = caughtData[v.id];
+                const stats = caughtData[getPokemonIdentityKey(v)];
                 const isFormId = v.id > 10000 || v.id !== v.baseId;
                 const formHit = (isFormId ? hasCaughtForm(stats, v.name) : (stats?.count || 0) > 0);
                 const legacyHit = hasCaughtForm(statsForPrimary, v.name);
@@ -472,7 +481,7 @@ export default function Pokedex() {
         // Only use the ID fallback for legacy rows that do not identify a form.
         // A row with an explicit, different form must never mark this card as caught
         // (for example, Vivillon Fancy must not mark Vivillon Monsoon).
-        const hasAnyLegacyRows = permitsLegacyFormFallback && group.some(v => (caughtData[v.id]?.legacyCount || 0) > 0);
+        const hasAnyLegacyRows = permitsLegacyFormFallback && group.some(v => (caughtData[getPokemonIdentityKey(v)]?.legacyCount || 0) > 0);
         if (caughtCount === 0 && hasAnyLegacyRows) caughtCount = 1;
         const isCaught = isPrimaryCaught || isSecondaryCaught || caughtCount > 0 || hasAnyLegacyRows;
         const pct = Math.min(100, (caughtCount / totalVars) * 100);

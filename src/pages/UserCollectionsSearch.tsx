@@ -11,7 +11,7 @@ import { ALPHA_POKEMON_ICON, GIGANTAMAX_ICON, SHINY_CHARM_ICON, findHuntingMetho
 import { GAME_LOGOS } from '@/lib/game-themes';
 import { useRandomColor } from '@/lib/random-color-context';
 import { cn } from '@/lib/utils';
-import { resolvePokemonEntity } from '@/lib/pokemon-entity-resolver-v2';
+import { resolvePokemonEntity, resolvePokemonSpriteIdentity } from '@/lib/pokemon-entity-resolver-v2';
 import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteImageRendering, getGameSpecificSpriteScaleClass, getGameSpecificSpriteScaleStyle, isGameSpecificShinySpriteUrl } from '@/lib/game-sprites';
 
 type ProfileRow = Pick<Tables<'profiles'>, 'user_id' | 'username'>;
@@ -589,16 +589,22 @@ export default function UserCollectionsSearch() {
     options: { showUsername?: boolean; large?: boolean } = {}
   ) => {
     const spriteGame = entry.game || entry.secondary_game;
-    const sprite =
-      getGameSpecificShinySpriteUrl(entry.pokemon_id, spriteGame, {
-        name: entry.form || entry.pokemon_name,
-        form: entry.form,
-        gender: entry.gender,
-      }) ||
-      getCaughtShinySpriteUrl({
+    const spriteIdentity = resolvePokemonSpriteIdentity({
       pokemonId: entry.pokemon_id,
       pokemonName: entry.pokemon_name,
       form: entry.form,
+      entityKey: entry.entity_key,
+    });
+    const sprite =
+      getGameSpecificShinySpriteUrl(spriteIdentity.pokemonId, spriteGame, {
+        name: spriteIdentity.name,
+        form: spriteIdentity.form,
+        gender: entry.gender,
+      }) ||
+      getCaughtShinySpriteUrl({
+      pokemonId: spriteIdentity.pokemonId,
+      pokemonName: spriteIdentity.name,
+      form: spriteIdentity.form,
       gender: entry.gender,
       game: entry.game,
       secondaryGame: entry.secondary_game,
@@ -787,16 +793,22 @@ export default function UserCollectionsSearch() {
     const attempts = Number(entry.attempts || 0);
     const odds = Math.round(getDynamicOdds(entry.method, attempts, entry.has_shiny_charm === true));
     const spriteGame = entry.game || entry.secondary_game;
-    const sprite =
-      getGameSpecificShinySpriteUrl(entry.pokemon_id, spriteGame, {
-        name: entry.form || entry.pokemon_name,
-        form: entry.form,
-        gender: entry.gender,
-      }) ||
-      getCaughtShinySpriteUrl({
+    const spriteIdentity = resolvePokemonSpriteIdentity({
       pokemonId: entry.pokemon_id,
       pokemonName: entry.pokemon_name,
       form: entry.form,
+      entityKey: entry.entity_key,
+    });
+    const sprite =
+      getGameSpecificShinySpriteUrl(spriteIdentity.pokemonId, spriteGame, {
+        name: spriteIdentity.name,
+        form: spriteIdentity.form,
+        gender: entry.gender,
+      }) ||
+      getCaughtShinySpriteUrl({
+      pokemonId: spriteIdentity.pokemonId,
+      pokemonName: spriteIdentity.name,
+      form: spriteIdentity.form,
       gender: entry.gender,
       game: entry.game,
       secondaryGame: entry.secondary_game,

@@ -26,13 +26,31 @@ const normalize = (value?: string | null) =>
 const isKnownEntityKey = (key?: string | null): key is PokemonEntityKey =>
   Boolean(key && POKEMON_CATALOG_V2_BY_KEY.has(key as PokemonEntityKey));
 
+// Older collection rows can contain localized display labels such as
+// "Galarian Rapidash" instead of the canonical `rapidash-galar` slug. Keep
+// regional variants distinct from their base species while resolving those
+// rows, even when they predate entity_key.
+const canonicalizeRegionalFormName = (value?: string | null) => {
+  const normalized = normalize(value);
+  const match = normalized.match(/^(alolan|galarian|hisuian|paldean)-(.+)$/);
+  if (!match) return normalized;
+
+  const region = {
+    alolan: 'alola',
+    galarian: 'galar',
+    hisuian: 'hisui',
+    paldean: 'paldea',
+  }[match[1]];
+  return region ? `${match[2]}-${region}` : normalized;
+};
+
 export function resolvePokemonEntityKey(input: LegacyPokemonEntityInput): PokemonEntityKey | null {
   if (isKnownEntityKey(input.entityKey)) return input.entityKey;
 
   const resolution = resolveLegacyMapValue(legacyMap as unknown as PokemonLegacyMapV2, {
     pokemonId: input.pokemonId,
-    pokemonName: input.pokemonName,
-    form: input.form,
+    pokemonName: canonicalizeRegionalFormName(input.pokemonName),
+    form: canonicalizeRegionalFormName(input.form),
   });
   return resolution.status === 'resolved' ? resolution.entityKey : null;
 }
@@ -40,6 +58,20 @@ export function resolvePokemonEntityKey(input: LegacyPokemonEntityInput): Pokemo
 export function resolvePokemonEntity(input: LegacyPokemonEntityInput) {
   const key = resolvePokemonEntityKey(input);
   return key ? POKEMON_CATALOG_V2_BY_KEY.get(key) || null : null;
+}
+
+/**
+ * Returns the canonical identity to use for sprites and UI state. Database
+ * rows may use a base National Dex ID for a regional form, so the entity's
+ * canonical name is more reliable than the stored display label alone.
+ */
+export function resolvePokemonSpriteIdentity(input: LegacyPokemonEntityInput) {
+  const entity = resolvePokemonEntity(input);
+  return {
+    pokemonId: entity?.speciesId ?? input.pokemonId ?? 0,
+    name: entity?.canonicalName ?? input.form ?? input.pokemonName ?? undefined,
+    form: entity?.canonicalName ?? input.form ?? undefined,
+  };
 }
 
 export function resolvePokemonBasicByEntity(

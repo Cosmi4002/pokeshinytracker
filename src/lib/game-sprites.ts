@@ -17,15 +17,15 @@ import { SWORD_SHIELD_SHINY_MODEL_ENTRIES } from '@/data/sword-shield-shiny-mode
 import { GAME_SPRITE_LONG_SIDE_BY_FILE } from '@/data/game-sprite-long-sides.generated';
 import { LOCAL_SPRITE_URLS } from './local-sprite-map.generated';
 import { getCuratedShinyOriginGameIds } from './pokemon-game-availability';
-import furfrouDandySpriteUrl from '../../missing sprite/Furfrou(dandy trim).png';
-import furfrouDebutanteSpriteUrl from '../../missing sprite/Furfrou(debutante).png';
-import furfrouDiamondSpriteUrl from '../../missing sprite/Furfrou(diamond).png';
-import furfrouHeartSpriteUrl from '../../missing sprite/Furfrou(heart).png';
-import furfrouKabukiSpriteUrl from '../../missing sprite/Furfrou(kabuki trim).png';
-import furfrouLaReineSpriteUrl from '../../missing sprite/Furfrou(La Reine).png';
-import furfrouMatronSpriteUrl from '../../missing sprite/Furfrou(matron).png';
-import furfrouPharaohSpriteUrl from '../../missing sprite/Furfrou(pharaoh).png';
-import furfrouStarSpriteUrl from '../../missing sprite/Furfrou(star).png';
+import furfrouDandySpriteUrl from '../../missing sprite/furfrou-dandy.gif';
+import furfrouDebutanteSpriteUrl from '../../missing sprite/furfrou-debutante.gif';
+import furfrouDiamondSpriteUrl from '../../missing sprite/furfrou-diamond.gif';
+import furfrouHeartSpriteUrl from '../../missing sprite/furfrou-heart.gif';
+import furfrouKabukiSpriteUrl from '../../missing sprite/furfrou-kabuki.gif';
+import furfrouLaReineSpriteUrl from '../../missing sprite/furfrou-lareine.gif';
+import furfrouMatronSpriteUrl from '../../missing sprite/furfrou-matron.gif';
+import furfrouPharaohSpriteUrl from '../../missing sprite/furfrou-pharaoh.gif';
+import furfrouStarSpriteUrl from '../../missing sprite/furfrou-star.gif';
 
 export type GameSpriteOptions = {
   shiny?: boolean;
@@ -100,16 +100,16 @@ type Gen67Candidate = {
 // These source sprites were supplied directly in the repository. Importing
 // them lets Vite publish hashed production assets without duplicating binary
 // files in the PR's public directory.
-const FURFROU_TRIM_SPRITE_URL_BY_FILE: Readonly<Record<string, string>> = {
-  'furfrou-dandy.png': furfrouDandySpriteUrl,
-  'furfrou-debutante.png': furfrouDebutanteSpriteUrl,
-  'furfrou-diamond.png': furfrouDiamondSpriteUrl,
-  'furfrou-heart.png': furfrouHeartSpriteUrl,
-  'furfrou-kabuki.png': furfrouKabukiSpriteUrl,
-  'furfrou-la-reine.png': furfrouLaReineSpriteUrl,
-  'furfrou-matron.png': furfrouMatronSpriteUrl,
-  'furfrou-pharaoh.png': furfrouPharaohSpriteUrl,
-  'furfrou-star.png': furfrouStarSpriteUrl,
+const FURFROU_TRIM_SPRITE_URL_BY_CANONICAL_NAME: Readonly<Record<string, string>> = {
+  'furfrou-dandy': furfrouDandySpriteUrl,
+  'furfrou-debutante': furfrouDebutanteSpriteUrl,
+  'furfrou-diamond': furfrouDiamondSpriteUrl,
+  'furfrou-heart': furfrouHeartSpriteUrl,
+  'furfrou-kabuki': furfrouKabukiSpriteUrl,
+  'furfrou-la-reine': furfrouLaReineSpriteUrl,
+  'furfrou-matron': furfrouMatronSpriteUrl,
+  'furfrou-pharaoh': furfrouPharaohSpriteUrl,
+  'furfrou-star': furfrouStarSpriteUrl,
 };
 
 const toLocalSpriteUrl = (url: string) => {
@@ -535,7 +535,7 @@ export function getGameSpecificShinySpriteUrl(
       : null;
     const maleMatch = preferredCandidates.find((entry) => 'gender' in entry && entry.gender === 'male');
     const entry = genderMatch || maleMatch || preferredCandidates[0];
-    return entry ? FURFROU_TRIM_SPRITE_URL_BY_FILE[entry.file] ?? `/img/game-sprites/gen6-7/${entry.file}` : null;
+    return entry ? FURFROU_TRIM_SPRITE_URL_BY_CANONICAL_NAME[entry.canonicalName] ?? `/img/game-sprites/gen6-7/${entry.file}` : null;
   }
 
   let resolvedSet = set;

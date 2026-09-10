@@ -99,7 +99,7 @@ export default function PokedexManager() {
     const { user, loading: authLoading } = useAuth();
     const { toast } = useToast();
     const { overrides, effects, saveConfig, loading: themesLoading } = useGlobalCollectionThemes();
-    const { editorEnabled: spriteEditorEnabled, setEditorEnabled: setSpriteEditorEnabled } = useSpriteScaleEditor();
+    const { editorEnabled: spriteEditorEnabled, setEditorEnabled: setSpriteEditorEnabled, applySwordShieldSpriteScale } = useSpriteScaleEditor();
     const [isEditorEnabled, setIsEditorEnabled] = useState(() => localStorage.getItem("pokedex-editor-enabled") === "true");
     const [selectedGame, setSelectedGame] = useState("black2");
     const [draftOverrides, setDraftOverrides] = useState(overrides);
@@ -261,6 +261,15 @@ export default function PokedexManager() {
                                     <p className="text-sm text-muted-foreground">When enabled, click any Pokémon sprite on the site to adjust and save its global size. The small “Evoluto da” sprite is saved only on its own card.</p>
                                 </div>
                                 <Switch id="sprite-scale-editor" checked={spriteEditorEnabled} onCheckedChange={setSpriteEditorEnabled} />
+                            </div>
+                            <div className="mt-4 flex items-center justify-between gap-4 rounded-lg border border-border bg-background/60 p-4 dark:border-white/10 dark:bg-white/[0.03]">
+                                <div>
+                                    <Label className="text-base font-bold">Sword / Shield sprite scale</Label>
+                                    <p className="text-sm text-muted-foreground">Save 190% globally for all Sword/Shield models. Pumpkaboo and Gourgeist, including their forms, are excluded.</p>
+                                </div>
+                                <Button type="button" variant="outline" onClick={() => void applySwordShieldSpriteScale()}>
+                                    Apply 190%
+                                </Button>
                             </div>
                         </CardContent>
                     </Card>
