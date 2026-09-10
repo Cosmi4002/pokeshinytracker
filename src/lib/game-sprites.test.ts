@@ -159,9 +159,9 @@ describe('game-specific shiny sprites', () => {
     'resolves Furfrou alternate trims for %s',
     (gameId) => {
       expect(getGameSpecificShinySpriteUrl(10083, gameId, { name: 'furfrou-la-reine', form: 'furfrou-la-reine' }))
-        .toMatch(/Furfrou.*La.*Reine.*\.png$/);
+        .toMatch(/furfrou-lareine.*\.gif$/);
       expect(getGameSpecificShinySpriteUrl(10085, gameId, { name: 'furfrou-pharaoh', form: 'furfrou-pharaoh' }))
-        .toMatch(/Furfrou.*pharaoh.*\.png$/);
+        .toMatch(/furfrou-pharaoh.*\.gif$/);
     },
   );
 
@@ -482,7 +482,7 @@ describe('game-specific shiny sprites', () => {
     ['/img/game-sprites/usum/Spr_7u_001_s.webp'],
     ['/img/game-sprites/gen6-7/bulbasaur.webp'],
     ['/api/game-sprite?file=Spr_8s_001_s.png'],
-  ])('reduces newer game sprites by 15%%: %s', (url) => {
+  ])('reduces Gen VI/VII game sprites by 15%%: %s', (url) => {
     expect(getGameSpecificSpriteScaleFactor(url)).toBe(0.85);
   });
 

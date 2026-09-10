@@ -17,7 +17,7 @@ import { getGameSpecificShinySpriteUrl, getGameSpecificSpriteImageRendering, get
 import { usePokemonList } from '@/hooks/use-pokemon';
 import { findHuntingMethod, GAMES, getCaughtShinySpriteUrl, getDynamicOdds } from '@/lib/pokemon-data';
 import type { Tables } from '@/integrations/supabase/types';
-import { resolvePokemonEntity } from '@/lib/pokemon-entity-resolver-v2';
+import { resolvePokemonEntity, resolvePokemonSpriteIdentity } from '@/lib/pokemon-entity-resolver-v2';
 import { cn } from '@/lib/utils';
 
 type CaughtShinyRow = Tables<'caught_shinies'>;
@@ -156,16 +156,22 @@ function RecordHunt({
   const attempts = Number(entry.attempts || 0);
   const odds = Math.round(getDynamicOdds(entry.method, attempts, entry.has_shiny_charm === true));
   const spriteGame = entry.secondary_game || entry.game;
+  const spriteIdentity = resolvePokemonSpriteIdentity({
+    pokemonId: entry.pokemon_id,
+    pokemonName: entry.pokemon_name,
+    form: entry.form,
+    entityKey: entry.entity_key,
+  });
   const sprite =
-    getGameSpecificShinySpriteUrl(entry.pokemon_id, spriteGame, {
-      name: entry.form || entry.pokemon_name,
-      form: entry.form,
+    getGameSpecificShinySpriteUrl(spriteIdentity.pokemonId, spriteGame, {
+      name: spriteIdentity.name,
+      form: spriteIdentity.form,
       gender: entry.gender,
     }) ||
     getCaughtShinySpriteUrl({
-      pokemonId: entry.pokemon_id,
-      pokemonName: entry.pokemon_name,
-      form: entry.form,
+      pokemonId: spriteIdentity.pokemonId,
+      pokemonName: spriteIdentity.name,
+      form: spriteIdentity.form,
       gender: entry.gender,
       game: entry.game,
       secondaryGame: entry.secondary_game,
