@@ -33,9 +33,10 @@ export function PokemonSelector({ value, valueName, onChange }: PokemonSelectorP
   const [isXboxBrowser, setIsXboxBrowser] = useState(false);
   const { pokemon, loading } = usePokemonList();
 
-  const getSpriteUrl = (pokemonId: number, name: string) => getPokemonCatalogShinySpriteUrl(pokemonId, {
+  const getSpriteUrl = (pokemonId: number, name: string, generation?: number) => getPokemonCatalogShinySpriteUrl(pokemonId, {
     name,
     form: name,
+    generation,
   });
 
   useEffect(() => {
@@ -107,12 +108,12 @@ export function PokemonSelector({ value, valueName, onChange }: PokemonSelectorP
           {selectedPokemon ? (
             <div className="flex items-center gap-2">
               <img
-                key={getSpriteUrl(selectedPokemon.id, selectedPokemon.name)}
-                src={toLocalPokemonSpriteUrl(getSpriteUrl(selectedPokemon.id, selectedPokemon.name))}
+                key={getSpriteUrl(selectedPokemon.id, selectedPokemon.name, selectedPokemon.generation)}
+                src={toLocalPokemonSpriteUrl(getSpriteUrl(selectedPokemon.id, selectedPokemon.name, selectedPokemon.generation))}
                 alt={selectedPokemon.displayName}
                 className="h-8 w-8 pokemon-sprite object-contain"
-                loading={getSpriteUrl(selectedPokemon.id, selectedPokemon.name).startsWith('/img/game-sprites/') ? 'eager' : 'lazy'}
-                fetchPriority={getSpriteUrl(selectedPokemon.id, selectedPokemon.name).startsWith('/img/game-sprites/') ? 'high' : 'auto'}
+                loading={getSpriteUrl(selectedPokemon.id, selectedPokemon.name, selectedPokemon.generation).startsWith('/img/game-sprites/') ? 'eager' : 'lazy'}
+                fetchPriority={getSpriteUrl(selectedPokemon.id, selectedPokemon.name, selectedPokemon.generation).startsWith('/img/game-sprites/') ? 'high' : 'auto'}
                 decoding="async"
                 referrerPolicy="no-referrer"
                 onError={(e) => {
@@ -172,8 +173,8 @@ export function PokemonSelector({ value, valueName, onChange }: PokemonSelectorP
                 >
                   {!isXboxBrowser && (
                     <img
-                      key={getSpriteUrl(p.id, p.name)}
-                      src={toLocalPokemonSpriteUrl(getSpriteUrl(p.id, p.name))}
+                      key={getSpriteUrl(p.id, p.name, p.generation)}
+                      src={toLocalPokemonSpriteUrl(getSpriteUrl(p.id, p.name, p.generation))}
                       alt={p.displayName}
                       className="h-8 w-8 pokemon-sprite object-contain"
                       loading="lazy"

@@ -99,7 +99,7 @@ export default function PokedexManager() {
     const { user, loading: authLoading } = useAuth();
     const { toast } = useToast();
     const { overrides, effects, saveConfig, loading: themesLoading } = useGlobalCollectionThemes();
-    const { editorEnabled: spriteEditorEnabled, setEditorEnabled: setSpriteEditorEnabled, applySwordShieldSpriteScale } = useSpriteScaleEditor();
+    const { editorEnabled: spriteEditorEnabled, setEditorEnabled: setSpriteEditorEnabled, swordShieldScaleEnabled, setSwordShieldScaleEnabled } = useSpriteScaleEditor();
     const [isEditorEnabled, setIsEditorEnabled] = useState(() => localStorage.getItem("pokedex-editor-enabled") === "true");
     const [selectedGame, setSelectedGame] = useState("black2");
     const [draftOverrides, setDraftOverrides] = useState(overrides);
@@ -264,12 +264,10 @@ export default function PokedexManager() {
                             </div>
                             <div className="mt-4 flex items-center justify-between gap-4 rounded-lg border border-border bg-background/60 p-4 dark:border-white/10 dark:bg-white/[0.03]">
                                 <div>
-                                    <Label className="text-base font-bold">Sword / Shield sprite scale</Label>
-                                    <p className="text-sm text-muted-foreground">Save 190% globally for all Sword/Shield models. Pumpkaboo and Gourgeist, including their forms, are excluded.</p>
+                                    <Label htmlFor="sword-shield-sprite-scale" className="text-base font-bold">Scala sprite Sword / Shield</Label>
+                                    <p className="text-sm text-muted-foreground">Applica il 190% con una sola impostazione globale. Le modifiche manuali restano indipendenti e il reset torna a questa scala.</p>
                                 </div>
-                                <Button type="button" variant="outline" onClick={() => void applySwordShieldSpriteScale()}>
-                                    Apply 190%
-                                </Button>
+                                <Switch id="sword-shield-sprite-scale" checked={swordShieldScaleEnabled} onCheckedChange={(enabled) => void setSwordShieldScaleEnabled(enabled)} />
                             </div>
                         </CardContent>
                     </Card>

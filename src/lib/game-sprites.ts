@@ -317,6 +317,14 @@ type SwordShieldCandidate = {
 
 const SWORD_SHIELD_SPRITES_BY_SPECIES = new Map<number, SwordShieldCandidate[]>();
 const SWORD_SHIELD_SPECIES_BY_CANONICAL_NAME = new Map<string, number>();
+// Sword/Shield has one model each for the Phony and Antique tea forms. The
+// archive only labels the shared model with the base form name, so resolve the
+// Antique catalog entries to that verified model rather than falling back to a
+// HOME sprite.
+const SWORD_SHIELD_SHARED_FORM_SPRITE: Readonly<Record<string, string>> = {
+  'sinistea-antique': 'sinistea',
+  'polteageist-antique': 'polteageist',
+};
 for (const entry of SWORD_SHIELD_SHINY_MODEL_ENTRIES as readonly SwordShieldCandidate[]) {
   SWORD_SHIELD_SPRITES_BY_SPECIES.set(entry.speciesId, [
     ...(SWORD_SHIELD_SPRITES_BY_SPECIES.get(entry.speciesId) || []),
@@ -464,6 +472,7 @@ export function getGameSpecificShinySpriteUrl(
   if (!set) return null;
 
   const slug = normalize(options.form || options.name);
+  const swordShieldSlug = SWORD_SHIELD_SHARED_FORM_SPRITE[slug] || slug;
   const archiveTherianOverride = slug ? ARCHIVE_THERIAN_SHINY_OVERRIDE_BY_FORM[slug] : undefined;
   if (archiveTherianOverride && ['black', 'white', 'black2', 'white2'].includes(gameId ?? '')) {
     // These B2W2 Therian sprites are intentionally loaded from their archive
@@ -476,7 +485,7 @@ export function getGameSpecificShinySpriteUrl(
   }
 
   const speciesId = set === 'swsh-archive'
-    ? SWORD_SHIELD_SPECIES_BY_CANONICAL_NAME.get(slug) ?? resolveGen67SpeciesId(pokemonId, slug)
+    ? SWORD_SHIELD_SPECIES_BY_CANONICAL_NAME.get(swordShieldSlug) ?? resolveGen67SpeciesId(pokemonId, swordShieldSlug)
     : set === 'gen6-7'
       ? resolveGen67SpeciesId(pokemonId, slug)
       : resolveSpeciesId(pokemonId, slug);
@@ -492,7 +501,7 @@ export function getGameSpecificShinySpriteUrl(
   }
 
   if (set === 'swsh-archive') {
-    return getSwordShieldArchiveSpriteUrl(speciesId, slug, options.gender);
+    return getSwordShieldArchiveSpriteUrl(speciesId, swordShieldSlug, options.gender);
   }
 
   if (set === 'gen6-7') {

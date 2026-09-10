@@ -527,6 +527,24 @@ export type Database = {
         }
         Relationships: []
       }
+      sprite_scale_settings: {
+        Row: {
+          id: boolean
+          sword_shield_scale: number
+          updated_at: string
+        }
+        Insert: {
+          id?: boolean
+          sword_shield_scale?: number
+          updated_at?: string
+        }
+        Update: {
+          id?: boolean
+          sword_shield_scale?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

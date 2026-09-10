@@ -1315,13 +1315,14 @@ export function getSelectedGameSpriteUrl(options: {
 
 /**
  * Resolves sprites for Pokémon pickers, where no game has been selected yet.
- * Prefer the imported Gen VI/VII game sprite catalogue (including form and
- * gender variants), then retain the archive and HOME fallbacks for anything
- * without a matching game asset.
+ * For explicitly identified Sword/Shield Generation VIII entries, prefer their
+ * Sword/Shield model. Otherwise prefer the imported Gen VI/VII game sprite
+ * catalogue (including form and gender variants), then retain the archive and
+ * HOME fallbacks for anything without a matching game asset.
  */
 export function getPokemonCatalogShinySpriteUrl(
   pokemonId: number,
-  options: { name?: string | null; form?: string | null; gender?: string | null } = {},
+  options: { name?: string | null; form?: string | null; gender?: string | null; generation?: number | null } = {},
 ): string {
   const spriteOptions = {
     shiny: true,
@@ -1329,6 +1330,13 @@ export function getPokemonCatalogShinySpriteUrl(
     form: options.form || undefined,
     gender: options.gender || undefined,
   };
+  const swordShieldSprite = options.generation === 8
+    ? ['sword', 'shield']
+      .map((gameId) => getGameSpecificShinySpriteUrl(pokemonId, gameId, spriteOptions))
+      .find(Boolean)
+    : null;
+  if (swordShieldSprite) return swordShieldSprite;
+
   const gameSprite = ['x', 'y', 'omegaruby', 'alphasapphire', 'sun', 'moon', 'ultrasun', 'ultramoon']
     .map((gameId) => getGameSpecificShinySpriteUrl(pokemonId, gameId, spriteOptions))
     .find(Boolean);
