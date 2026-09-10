@@ -6,7 +6,7 @@ import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
 import { PokemonSelector } from '@/components/counter/PokemonSelector';
-import { usePokemonList, PokemonBasic } from '@/hooks/use-pokemon';
+import { usePokemonList, getPokemonSpriteUrl, PokemonBasic } from '@/hooks/use-pokemon';
 import { getPokemonCatalogShinySpriteUrl } from '@/lib/pokemon-data';
 import { useRandomColor } from '@/lib/random-color-context';
 import { supabase } from '@/integrations/supabase/client';
@@ -86,10 +86,12 @@ type BingoCell = PokemonBasic | GameCell;
  * Keep that area reserved and show a loader until the current source is ready.
  */
 function RandomPokemonSprite({ pokemon, outlineFilterId }: { pokemon: PokemonBasic; outlineFilterId: string }) {
-  const spriteUrl = getPokemonCatalogShinySpriteUrl(pokemon.id, {
+  // The shuffle is intentionally independent of the Bingo board artwork: it
+  // always shows the consistent Pokémon HOME shiny sprite.
+  const spriteUrl = getPokemonSpriteUrl(pokemon.id, {
+    shiny: true,
     name: pokemon.name,
     form: pokemon.name,
-    generation: pokemon.generation,
   });
   const [loadedUrl, setLoadedUrl] = useState<string | null>(null);
   const [failedUrl, setFailedUrl] = useState<string | null>(null);
